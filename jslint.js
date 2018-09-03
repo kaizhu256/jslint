@@ -456,35 +456,35 @@ var jslint = (function JSLint() {
         });
     }
 
-    let anon = "anonymous"; // The guessed name for anonymous functions.
-    let blockage;           // The current block.
-    let block_stack;        // The stack of blocks.
-    let declared_globals;   // The object containing the global declarations.
-    let directives;         // The directive comments.
-    let directive_mode;     // true if directives are still allowed.
-    let early_stop;         // true if JSLint cannot finish.
-    let exports;            // The exported names and values.
-    let froms;              // The array collecting all import-from strings.
-    let fudge;              // true if the natural numbers start with 1.
-    let functionage;        // The current function.
-    let functions;          // The array containing all of the functions.
-    let global;             // The global object; the outermost context.
-    let json_mode;          // true if parsing JSON.
-    let lines;              // The array containing source lines.
-    let module_mode;        // true if import or export was used.
-    let next_token;         // The next token to be examined in the parse.
-    let option;             // The options parameter.
-    let property;           // The object containing the tallied property names.
-    let mega_mode;          // true if currently parsing a megastring literal.
-    let stack;              // The stack of functions.
-    let syntax;             // The object containing the parser.
-    let token;              // The current token being examined in the parse.
-    let token_nr;           // The number of the next token.
-    let tokens;             // The array of tokens.
-    let tenure;             // The predefined property registry.
-    let tree;               // The abstract parse tree.
-    let var_mode;           // "var" if using var; "let" if using let.
-    let warnings;           // The array collecting all generated warnings.
+    var anon = "anonymous"; // The guessed name for anonymous functions.
+    var blockage;           // The current block.
+    var block_stack;        // The stack of blocks.
+    var declared_globals;   // The object containing the global declarations.
+    var directives;         // The directive comments.
+    var directive_mode;     // true if directives are still allowed.
+    var early_stop;         // true if JSLint cannot finish.
+    var exports;            // The exported names and values.
+    var froms;              // The array collecting all import-from strings.
+    var fudge;              // true if the natural numbers start with 1.
+    var functionage;        // The current function.
+    var functions;          // The array containing all of the functions.
+    var global;             // The global object; the outermost context.
+    var json_mode;          // true if parsing JSON.
+    var lines;              // The array containing source lines.
+    var module_mode;        // true if import or export was used.
+    var next_token;         // The next token to be examined in the parse.
+    var option;             // The options parameter.
+    var property;           // The object containing the tallied property names.
+    var mega_mode;          // true if currently parsing a megastring literal.
+    var stack;              // The stack of functions.
+    var syntax;             // The object containing the parser.
+    var token;              // The current token being examined in the parse.
+    var token_nr;           // The number of the next token.
+    var tokens;             // The array of tokens.
+    var tenure;             // The predefined property registry.
+    var tree;               // The abstract parse tree.
+    var var_mode;           // "var" if using var; "let" if using let.
+    var warnings;           // The array collecting all generated warnings.
 
 // Error reportage functions:
 
@@ -614,18 +614,18 @@ var jslint = (function JSLint() {
             : source.split(rx_crlf);
         tokens = [];
 
-        let char;                   // a popular character
-        let column = 0;             // the column number of the next character
-        let first;                  // the first token
-        let from;                   // the starting column number of the token
-        let line = -1;              // the line number of the next character
-        let nr = 0;                 // the next token number
-        let previous = global;      // the previous token including comments
-        let prior = global;         // the previous token excluding comments
-        let mega_from;              // the starting column of megastring
-        let mega_line;              // the starting line of megastring
-        let snippet;                // a piece of string
-        let source_line;            // the current line source string
+        var char;                   // a popular character
+        var column = 0;             // the column number of the next character
+        var first;                  // the first token
+        var from;                   // the starting column number of the token
+        var line = -1;              // the line number of the next character
+        var nr = 0;                 // the next token number
+        var previous = global;      // the previous token including comments
+        var prior = global;         // the previous token excluding comments
+        var mega_from;              // the starting column of megastring
+        var mega_line;              // the starting line of megastring
+        var snippet;                // a piece of string
+        var source_line;            // the current line source string
 
         function next_line() {
 
@@ -633,7 +633,7 @@ var jslint = (function JSLint() {
 // replace them with spaces and give a warning. Also warn if the line contains
 // unsafe characters or is too damn long.
 
-            let at;
+            var at;
             column = 0;
             line += 1;
             source_line = lines[line];
@@ -867,7 +867,7 @@ var jslint = (function JSLint() {
 
             var result = body.match(rx_directive_part);
             if (result) {
-                let allowed;
+                var allowed;
                 var name = result[1];
                 var value = result[2];
                 switch (the_comment.directive) {
@@ -961,9 +961,9 @@ var jslint = (function JSLint() {
 
 // Parse a regular expression literal.
 
-            let multi_mode = false;
-            let result;
-            let value;
+            var multi_mode = false;
+            var result;
+            var value;
 
             function quantifier() {
 
@@ -1220,7 +1220,7 @@ var jslint = (function JSLint() {
 
 // Make a string token.
 
-            let the_token;
+            var the_token;
             snippet = "";
             next_char();
 
@@ -1309,12 +1309,12 @@ var jslint = (function JSLint() {
         }
 
         function lex() {
-            let array;
-            let i = 0;
-            let j = 0;
-            let last;
-            let result;
-            let the_token;
+            var array;
+            var i = 0;
+            var j = 0;
+            var last;
+            var result;
+            var the_token;
             if (!source_line) {
                 source_line = next_line();
                 from = 0;
@@ -1580,7 +1580,7 @@ var jslint = (function JSLint() {
 // Specialized tokens may have additional properties.
 
     function survey(name) {
-        let id = name.id;
+        var id = name.id;
 
 // Tally the property name. If it is a string, only tally strings that conform
 // to the identifier rules.
@@ -1690,7 +1690,7 @@ var jslint = (function JSLint() {
 // Parsing of JSON is simple:
 
     function json_value() {
-        let negative;
+        var negative;
 
         function json_object() {
             var brace = next_token;
@@ -1700,8 +1700,8 @@ var jslint = (function JSLint() {
             advance("{");
             if (next_token.id !== "}") {
                 (function next() {
-                    let name;
-                    let value;
+                    var name;
+                    var value;
                     if (next_token.quote !== "\"") {
                         warn("unexpected_a", next_token, next_token.quote);
                     }
@@ -1798,7 +1798,7 @@ var jslint = (function JSLint() {
 
 // Has the name been enrolled in this context?
 
-            let earlier = functionage.context[id];
+            var earlier = functionage.context[id];
             if (earlier) {
                 warn(
                     "redefinition_a_b",
@@ -1867,8 +1867,8 @@ var jslint = (function JSLint() {
 // process leds (infix operators) until the bind powers cause it to stop. It
 // returns the expression's parse tree.
 
-        let left;
-        let the_symbol;
+        var left;
+        var the_symbol;
 
 // Statements will have already advanced, so advance now only if the token is
 // not the first of a statement,
@@ -1905,7 +1905,7 @@ var jslint = (function JSLint() {
 // Parse the condition part of a do, if, while.
 
         var the_paren = next_token;
-        let the_value;
+        var the_value;
         the_paren.free = true;
         advance("(");
         the_value = expression(0);
@@ -1965,8 +1965,8 @@ var jslint = (function JSLint() {
         if (a.id === "(number)" && b.id === "(number)") {
             return a.value === b.value;
         }
-        let a_string;
-        let b_string;
+        var a_string;
+        var b_string;
         if (a.id === "(string)") {
             a_string = a.value;
         } else if (a.id === "`" && a.constant) {
@@ -2039,10 +2039,10 @@ var jslint = (function JSLint() {
 // have use for one. A statement can be one of the standard statements, or
 // an assignment expression, or an invocation expression.
 
-        let first;
-        let the_label;
-        let the_statement;
-        let the_symbol;
+        var first;
+        var the_label;
+        var the_statement;
+        var the_symbol;
         advance();
         if (token.identifier && next_token.id === ":") {
             the_label = token;
@@ -2100,7 +2100,7 @@ var jslint = (function JSLint() {
 
         var array = [];
         (function next(disrupt) {
-            let a_statement;
+            var a_statement;
             switch (next_token.id) {
             case "}":
             case "case":
@@ -2146,8 +2146,8 @@ var jslint = (function JSLint() {
 //          "naked"     No advance.
 //          undefined   An ordinary block.
 
-        let stmts;
-        let the_block;
+        var stmts;
+        var the_block;
         if (special !== "naked") {
             advance("{");
         }
@@ -2232,7 +2232,7 @@ var jslint = (function JSLint() {
 
 // Make a symbol if it does not already exist in the language's syntax.
 
-        let the_symbol = syntax[id];
+        var the_symbol = syntax[id];
         if (the_symbol === undefined) {
             the_symbol = empty();
             the_symbol.id = id;
@@ -2252,7 +2252,7 @@ var jslint = (function JSLint() {
         var the_symbol = symbol(id, 20);
         the_symbol.led = function (left) {
             var the_token = token;
-            let right;
+            var right;
             the_token.arity = "assignment";
             right = expression(20 - 1);
             if (id === "=" && left.arity === "variable") {
@@ -2517,7 +2517,7 @@ var jslint = (function JSLint() {
     infixr("**", 150);
     infix("(", 160, function (left) {
         var the_paren = token;
-        let the_argument;
+        var the_argument;
         if (left.id !== "function") {
             left_check(left, the_paren);
         }
@@ -2527,7 +2527,7 @@ var jslint = (function JSLint() {
         the_paren.expression = [left];
         if (next_token.id !== ")") {
             (function next() {
-                let ellipsis;
+                var ellipsis;
                 if (next_token.id === "...") {
                     ellipsis = true;
                     advance("...");
@@ -2654,8 +2654,8 @@ var jslint = (function JSLint() {
         the_token.expression = [];
         if (next_token.id !== "]") {
             (function next() {
-                let element;
-                let ellipsis = false;
+                var element;
+                var ellipsis = false;
                 if (next_token.id === "...") {
                     ellipsis = true;
                     advance("...");
@@ -2698,14 +2698,14 @@ var jslint = (function JSLint() {
     });
 
     function parameter_list() {
-        let complex = false;
+        var complex = false;
         var list = [];
-        let optional;
+        var optional;
         var signature = ["("];
         if (next_token.id !== ")" && next_token.id !== "(end)") {
             (function parameter() {
-                let ellipsis = false;
-                let param;
+                var ellipsis = false;
+                var param;
                 if (next_token.id === "{") {
                     complex = true;
                     if (optional !== undefined) {
@@ -2721,7 +2721,7 @@ var jslint = (function JSLint() {
                     advance("{");
                     signature.push("{");
                     (function subparameter() {
-                        let subparam = next_token;
+                        var subparam = next_token;
                         if (!subparam.identifier) {
                             return stop("expected_identifier_a");
                         }
@@ -2840,7 +2840,7 @@ var jslint = (function JSLint() {
     }
 
     function do_function(the_function) {
-        let name;
+        var name;
         if (the_function === undefined) {
             the_function = token;
 
@@ -2987,7 +2987,7 @@ var jslint = (function JSLint() {
 
     prefix("(", function () {
         var the_paren = token;
-        let the_value;
+        var the_value;
         var cadet = lookahead().id;
 
 // We can distinguish between a parameter list for => and a wrapped expression
@@ -3028,11 +3028,11 @@ var jslint = (function JSLint() {
         the_brace.expression = [];
         if (next_token.id !== "}") {
             (function member() {
-                let extra;
-                let full;
-                let id;
-                let name = next_token;
-                let value;
+                var extra;
+                var full;
+                var id;
+                var name = next_token;
+                var value;
                 advance();
                 if (
                     (name.id === "get" || name.id === "set")
@@ -3117,7 +3117,7 @@ var jslint = (function JSLint() {
     });
     stmt("break", function () {
         var the_break = token;
-        let the_label;
+        var the_label;
         if (
             (functionage.loop < 1 && functionage.switch < 1)
             || functionage.finally > 0
@@ -3212,7 +3212,7 @@ var jslint = (function JSLint() {
                 the_bracket.names = [];
                 advance("[");
                 (function element() {
-                    let ellipsis;
+                    var ellipsis;
                     if (next_token.id === "...") {
                         ellipsis = true;
                         advance("...");
@@ -3316,9 +3316,9 @@ var jslint = (function JSLint() {
     });
     stmt("export", function () {
         var the_export = token;
-        let the_id;
-        let the_name;
-        let the_thing;
+        var the_id;
+        var the_name;
+        var the_thing;
 
         function export_id() {
             if (!next_token.identifier) {
@@ -3393,7 +3393,7 @@ var jslint = (function JSLint() {
         return the_export;
     });
     stmt("for", function () {
-        let first;
+        var first;
         var the_for = token;
         if (!option.for) {
             warn("unexpected_a", the_for);
@@ -3439,7 +3439,7 @@ var jslint = (function JSLint() {
     });
     stmt("function", do_function);
     stmt("if", function () {
-        let the_else;
+        var the_else;
         var the_if = token;
         the_if.expression = condition();
         the_if.block = block();
@@ -3461,7 +3461,7 @@ var jslint = (function JSLint() {
     });
     stmt("import", function () {
         var the_import = token;
-        let name;
+        var name;
         if (typeof module_mode === "object") {
             warn("unexpected_directive_a", module_mode, module_mode.directive);
         }
@@ -3523,11 +3523,11 @@ var jslint = (function JSLint() {
         return the_return;
     });
     stmt("switch", function () {
-        let dups = [];
-        let last;
-        let stmts;
+        var dups = [];
+        var last;
+        var stmts;
         var the_cases = [];
-        let the_disrupt = true;
+        var the_disrupt = true;
         var the_switch = token;
         not_top_level(the_switch);
         if (functionage.finally > 0) {
@@ -3618,8 +3618,8 @@ var jslint = (function JSLint() {
         return the_throw;
     });
     stmt("try", function () {
-        let the_catch;
-        let the_disrupt;
+        var the_catch;
+        var the_disrupt;
         var the_try = token;
         if (functionage.try > 0) {
             warn("unexpected_a", the_try);
@@ -3628,7 +3628,7 @@ var jslint = (function JSLint() {
         the_try.block = block();
         the_disrupt = the_try.block.disrupt;
         if (next_token.id === "catch") {
-            let ignored = "ignore";
+            var ignored = "ignore";
             the_catch = next_token;
             the_try.catch = the_catch;
             advance("catch");
@@ -3694,8 +3694,8 @@ var jslint = (function JSLint() {
 // the tree is traversed.
 
         return function (arity, id, task) {
-            let a_set = when[arity];
-            let i_set;
+            var a_set = when[arity];
+            var i_set;
 
 // The id parameter is optional. If excluded, the task will be applied to all
 // ids.
@@ -3737,8 +3737,8 @@ var jslint = (function JSLint() {
 // Given a task set that was built by an action function, run all of the
 // relevant tasks on the token.
 
-            let a_set = when[the_token.arity];
-            let i_set;
+            var a_set = when[the_token.arity];
+            var i_set;
 
 // If there are tasks associated with the token's arity...
 
@@ -3833,7 +3833,7 @@ var jslint = (function JSLint() {
 
 // Look up the variable in the current context.
 
-            let the_variable = functionage.context[thing.id];
+            var the_variable = functionage.context[thing.id];
 
 // If it isn't local, search all the other contexts. If there are name
 // collisions, take the most recent.
@@ -4100,7 +4100,7 @@ var jslint = (function JSLint() {
     }
 
     postaction("assignment", "+=", function (thing) {
-        let right = thing.expression[1];
+        var right = thing.expression[1];
         if (right.constant) {
             if (
                 right.value === ""
@@ -4184,7 +4184,7 @@ var jslint = (function JSLint() {
     }
 
     postaction("binary", function (thing) {
-        let right;
+        var right;
         if (relationop[thing.id]) {
             if (
                 is_weird(thing.expression[0])
@@ -4263,9 +4263,9 @@ var jslint = (function JSLint() {
     });
     postaction("binary", "=>", postaction_function);
     postaction("binary", "(", function (thing) {
-        let left = thing.expression[0];
-        let the_new;
-        let arg;
+        var left = thing.expression[0];
+        var the_new;
+        var arg;
         if (left.id === "new") {
             the_new = left;
             left = left.expression;
@@ -4319,7 +4319,7 @@ var jslint = (function JSLint() {
                 }
             }
         } else if (left.id === ".") {
-            let cack = the_new !== undefined;
+            var cack = the_new !== undefined;
             if (left.expression.id === "Date" && left.name.id === "UTC") {
                 cack = !cack;
             }
@@ -4513,15 +4513,15 @@ var jslint = (function JSLint() {
 // Go through the token list, looking at usage of whitespace.
 
     function whitage() {
-        let closer = "(end)";
-        let free = false;
-        let left = global;
-        let margin = 0;
-        let nr_comments_skipped = 0;
-        let open = true;
-        let qmark = "";
-        let result;
-        let right;
+        var closer = "(end)";
+        var free = false;
+        var left = global;
+        var margin = 0;
+        var nr_comments_skipped = 0;
+        var open = true;
+        var qmark = "";
+        var result;
+        var right;
 
         function expected_at(at) {
             warn(
