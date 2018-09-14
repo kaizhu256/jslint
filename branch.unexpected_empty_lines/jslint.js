@@ -610,7 +610,9 @@ function tokenize(source) {
                 ) {
                     warn_at(
                         "expected_newlines",
-                        Math.max(line - newlines_streak, 0),
+                        line >= newlines_streak
+                        ? line - newlines_streak
+                        : 0,
                         0,
                         newlines_streak
                     );
