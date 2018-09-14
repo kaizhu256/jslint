@@ -13,6 +13,7 @@
 */
 
 import jslint from "./jslint.js";
+window.jslint = jslint;
 import report from "./report.js";
 
 // This is the web script companion file for JSLint. It includes code for
