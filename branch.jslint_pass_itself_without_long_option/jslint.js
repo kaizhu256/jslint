@@ -867,7 +867,8 @@ function tokenize(source) {
 
     function warnings_remove_too_long(line1, line2) {
     /*
-     * this function will remove too_long warnings in the inclusive-range [line1, line2]
+     * this function will remove too_long warnings in the inclusive-range
+     * [line1, line2]
      */
         let ii;
         let warning;
@@ -877,7 +878,8 @@ function tokenize(source) {
         while (true) {
             ii -= 1;
             warning = warnings[ii];
-            // optimization - break early when we move out of range [line1, line2]
+            // optimization - break early when we move out of range
+            // [line1, line2]
             if (!(warning && warning.line >= line1)) {
                 break;
             }
