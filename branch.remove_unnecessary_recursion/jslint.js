@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-08-11
+// 2018-10-26
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -85,54 +85,47 @@
 
 // WARNING: JSLint will hurt your feelings.
 
-/*jslint long */
-
 /*property
-    a, and, arity, assign, b, bad_assignment_a, bad_directive_a,
-    bad_get, bad_module_name_a, bad_option_a, bad_property_a, bad_set,
-    bitwise, block, body, browser, c, calls, catch, charCodeAt, closer,
-    closure, code, column, complex, concat, constant, context, convert,
-    couch, create, d, dead, default, devel, directive, directives,
-    disrupt, dot, duplicate_a, edition, ellipsis, else, empty_block,
-    escape_mega, eval, every, expected_a, expected_a_at_b_c,
-    expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
+    a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
+    bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
+    body, browser, c, calls, catch, charCodeAt, closer, closure, code, column,
+    complex, concat, constant, context, convert, couch, create, d, dead,
+    default, devel, directive, directives, disrupt, dot, duplicate_a, edition,
+    ellipsis, else, empty_block, escape_mega, eval, every, expected_a,
+    expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
     expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
-    expected_identifier_a, expected_line_break_a_b,
-    expected_regexp_factor_a, expected_space_a_b, expected_statements_a,
-    expected_string_a, expected_type_string_a, exports, expression,
-    extra, finally, flag, for, forEach, free, from, froms, fud, fudge,
-    function_in_loop, functions, g, getset, global, i, id, identifier,
-    import, inc, indexOf, infix_in, init, initial, isArray, isNaN, join,
-    json, keys, label, label_a, lbp, led, length, level, line, lines,
-    live, long, loop, m, margin, match, message, misplaced_a,
-    misplaced_directive_a, missing_browser, missing_m, module, multivar,
-    naked_block, name, names, nested_comment, new, node, not_label_a,
-    nr, nud, number_isNaN, ok, open, option, out_of_scope_a, parameters,
-    parent, pop, property, push, quote, redefinition_a_b, replace,
-    required_a_optional_b, reserved_a, right, role, search, signature,
-    single, slice, some, sort, split, statement, stop, strict,
-    subscript_a, switch, test, this, thru, toString, todo_comment,
-    tokens, too_long, too_many_digits, tree, try, type, u,
+    expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
+    expected_space_a_b, expected_statements_a, expected_string_a,
+    expected_type_string_a, exports, expression, extra, finally, flag, for,
+    forEach, free, freeze, freeze_exports, from, froms, fud, fudge,
+    function_in_loop, functions, g, getset, global, i, id, identifier, import,
+    inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys,
+    label, label_a, lbp, led, length, level, line, lines, live, long, loop, m,
+    margin, match, message, misplaced_a, misplaced_directive_a, missing_browser,
+    missing_m, module, multivar, naked_block, name, names, nested_comment, new,
+    node, not_label_a, nr, nud, number_isNaN, ok, open, opening, option,
+    out_of_scope_a, parameters, parent, pop, property, push, quote,
+    redefinition_a_b, replace, required_a_optional_b, reserved_a, right, role,
+    search, shebang, signature, single, slice, some, sort, split, startsWith,
+    statement, stop, strict, subscript_a, switch, test, this, thru, toString,
+    todo_comment, tokens, too_long, too_many_digits, tree, try, type, u,
     unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
     unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a,
-    unexpected_empty_lines,
-    unexpected_expression_a, unexpected_label_a,
+    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
     unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
     unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unsafe, unused_a,
-    use_double, use_open, use_spaces, use_strict, used, value, var_loop,
-    var_switch, variable, warning, warnings, weird_condition_a,
-    weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_assignment, wrap_condition, wrap_immediate, wrap_parameter,
-    wrap_regexp, wrap_unary, wrapped, writable, y
+    unreachable_a, unregistered_property_a, unsafe, unused_a, use_double,
+    use_open, use_spaces, use_strict, used, value, var_loop, var_switch,
+    variable, warning, warnings, weird_condition_a, weird_expression_a,
+    weird_loop, weird_relation_a, white, wrap_condition, wrap_immediate,
+    wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable, y
 */
 
 function empty() {
 
 // The empty function produces a new empty object that inherits nothing. This is
-// much better than {} because confusions around accidental method names like
+// much better than '{}' because confusions around accidental method names like
 // 'constructor' are completely avoided.
 
     return Object.create(null);
@@ -161,7 +154,8 @@ const allowed_option = {
         "Element", "Event", "event", "FileReader", "FormData", "history",
         "localStorage", "location", "MutationObserver", "name", "navigator",
         "screen", "sessionStorage", "setInterval", "setTimeout", "Storage",
-        "URL", "window", "Worker", "XMLHttpRequest"
+        "TextDecoder", "TextEncoder", "URL", "window", "Worker",
+        "XMLHttpRequest"
     ],
     couch: [
         "emit", "getRow", "isArray", "log", "provides", "registerType",
@@ -180,8 +174,8 @@ const allowed_option = {
     node: [
         "Buffer", "clearImmediate", "clearInterval", "clearTimeout",
         "console", "exports", "module", "process", "require",
-        "setImmediate", "setInterval", "setTimeout", "URL",
-        "URLSearchParams", "__dirname", "__filename"
+        "setImmediate", "setInterval", "setTimeout", "TextDecoder",
+        "TextEncoder", "URL", "URLSearchParams", "__dirname", "__filename"
     ],
     single: true,
     this: true,
@@ -280,6 +274,9 @@ const bundle = {
     expected_statements_a: "Expected statements before '{a}'.",
     expected_string_a: "Expected a string and instead saw '{a}'.",
     expected_type_string_a: "Expected a type string and instead saw '{a}'.",
+    freeze_exports: (
+        "Expected 'Object.freeze('. All export values should be frozen."
+    ),
     function_in_loop: "Don't make functions within a loop.",
     infix_in: (
         "Unexpected 'in'. Compare with undefined, "
@@ -317,9 +314,6 @@ const bundle = {
     unexpected_char_a: "Unexpected character '{a}'.",
     unexpected_comment: "Unexpected comment.",
     unexpected_directive_a: "When using modules, don't use directive '/*{a}'.",
-    unexpected_empty_lines: (
-        "Expected 0, 1, or 3 contiguous empty-lines after current line, instead of {a}."
-    ),
     unexpected_expression_a: (
         "Unexpected expression '{a}' in statement position."
     ),
@@ -351,7 +345,6 @@ const bundle = {
     weird_expression_a: "Weird expression '{a}'.",
     weird_loop: "Weird loop.",
     weird_relation_a: "Weird relation '{a}'.",
-    wrap_assignment: "Don't wrap assignment statements in parens.",
     wrap_condition: "Wrap the condition in parens.",
     wrap_immediate: (
         "Wrap an immediate function invocation in parentheses to assist "
@@ -389,7 +382,7 @@ const rx_tab = /\t/g;
 const rx_directive = /^(jslint|property|global)\s+(.*)$/;
 const rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?,?\s*(.*)$/;
 // token (sorry it is so long)
-const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]?,:;'"~`]|=(?:==?|>)?|\.+|[*\/][*\/=]?|\+[=+]?|-[=\-]?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!(?:!|==?)?|(0|[1-9][0-9]*))(.*)$/;
+const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\],:;'"~`]|\?\.?|=(?:==?|>)?|\.+|[*\/][*\/=]?|\+[=+]?|-[=\-]?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!(?:!|==?)?|(0|[1-9][0-9]*))(.*)$/;
 const rx_digits = /^([0-9]+)(.*)$/;
 const rx_hexs = /^([0-9a-fA-F]+)(.*)$/;
 const rx_octals = /^([0-7]+)(.*)$/;
@@ -422,7 +415,6 @@ function supplant(string, object) {
 let anon;               // The guessed name for anonymous functions.
 let blockage;           // The current block.
 let block_stack;        // The stack of blocks.
-let empty_line_count;   // The current count of contiguous empty-lines in function next_line()
 let declared_globals;   // The object containing the global declarations.
 let directives;         // The directive comments.
 let directive_mode;     // true if directives are still allowed.
@@ -435,11 +427,12 @@ let functions;          // The array containing all of the functions.
 let global;             // The global object; the outermost context.
 let json_mode;          // true if parsing JSON.
 let lines;              // The array containing source lines.
+let mega_mode;          // true if currently parsing a megastring literal.
 let module_mode;        // true if import or export was used.
 let next_token;         // The next token to be examined in the parse.
 let option;             // The options parameter.
 let property;           // The object containing the tallied property names.
-let mega_mode;          // true if currently parsing a megastring literal.
+let shebang;            // true if a #! was seen on the first line.
 let stack;              // The stack of functions.
 let syntax;             // The object containing the parser.
 let token;              // The current token being examined in the parse.
@@ -588,8 +581,15 @@ function tokenize(source) {
     let prior = global;         // the previous token excluding comments
     let mega_from;              // the starting column of megastring
     let mega_line;              // the starting line of megastring
+    let regexp_seen;            // regular expression literal seen on this line
     let snippet;                // a piece of string
-    let source_line;            // the current line source string
+    let source_line = "";       // the remaining line source string
+    let whole_line = "";        // the whole line source string
+
+    if (lines[0].startsWith("#!")) {
+        line = 0;
+        shebang = true;
+    }
 
     function next_line() {
 
@@ -598,27 +598,21 @@ function tokenize(source) {
 // unsafe characters or is too damn long.
 
         let at;
+        if (
+            !option.long
+            && whole_line.length > 80
+            && !json_mode
+            && first
+            && !regexp_seen
+        ) {
+            warn_at("too_long", line, 80);
+        }
         column = 0;
         line += 1;
+        regexp_seen = false;
         source_line = lines[line];
+        whole_line = source_line || "";
         if (source_line !== undefined) {
-            empty_line_count += 1;
-            if (source_line.length > 0) {
-                switch (empty_line_count) {
-                case 0:
-                case 1:
-                case 3:
-                    break;
-                default:
-                    warn_at(
-                        "unexpected_empty_lines",
-                        line - empty_line_count - 1,
-                        0,
-                        empty_line_count
-                    );
-                }
-                empty_line_count = -1;
-            }
             at = source_line.search(rx_tab);
             if (at >= 0) {
                 if (!option.white) {
@@ -641,9 +635,6 @@ function tokenize(source) {
                     line,
                     source_line.length - 1
                 );
-            }
-            if (!option.long && source_line.length > 80) {
-                warn_at("too_long", line, 80);
             }
         }
         return source_line;
@@ -915,6 +906,7 @@ function tokenize(source) {
         let multi_mode = false;
         let result;
         let value;
+        regexp_seen = true;
 
         function quantifier() {
 
@@ -1255,18 +1247,19 @@ function tokenize(source) {
         let last;
         let result;
         let the_token;
-        if (!source_line) {
+        // bug-workaround
+        // mitigate v8 RangeError("Maximum call stack size exceeded"),
+        // by avoiding unnecessary recursion
+        while (!source_line) {
             source_line = next_line();
             from = 0;
-            return (
-                source_line === undefined
-                ? (
+            if (source_line === undefined) {
+                return (
                     mega_mode
                     ? stop_at("unclosed_mega", mega_line, mega_from)
                     : make("(end)")
-                )
-                : lex()
-            );
+                );
+            }
         }
         from = column;
         result = source_line.match(rx_token);
@@ -2538,6 +2531,43 @@ infix(".", 170, function (left) {
     the_token.expression = left;
     return the_token;
 });
+infix("?.", 170, function (left) {
+    const the_token = token;
+    const name = next_token;
+    if (
+        (
+            left.id !== "(string)"
+            || (name.id !== "indexOf" && name.id !== "repeat")
+        )
+        && (
+            left.id !== "["
+            || (
+                name.id !== "concat"
+                && name.id !== "forEach"
+                && name.id !== "join"
+                && name.id !== "map"
+            )
+        )
+        && (left.id !== "+" || name.id !== "slice")
+        && (
+            left.id !== "(regexp)"
+            || (name.id !== "exec" && name.id !== "test")
+        )
+    ) {
+        left_check(left, the_token);
+    }
+    if (!name.identifier) {
+        stop("expected_identifier_a");
+    }
+    advance();
+    survey(name);
+
+// The property name is not an expression.
+
+    the_token.name = name;
+    the_token.expression = left;
+    return the_token;
+});
 infix("[", 170, function (left) {
     const the_token = token;
     const the_subscript = expression(0);
@@ -2874,7 +2904,11 @@ function do_function(the_function) {
     ) {
         return stop("unexpected_a", next_token);
     }
-    if (next_token.id === "." || next_token.id === "[") {
+    if (
+        next_token.id === "."
+        || next_token.id === "?."
+        || next_token.id === "["
+    ) {
         warn("unexpected_a");
     }
 
@@ -2887,9 +2921,6 @@ function do_function(the_function) {
 prefix("function", do_function);
 
 function fart(pl) {
-    if (next_token.id === ";") {
-        stop("wrap_assignment", token);
-    }
     advance("=>");
     const the_fart = token;
     the_fart.arity = "binary";
@@ -3290,11 +3321,22 @@ stmt("export", function () {
         }
         advance("default");
         the_thing = expression(0);
-        semicolon();
+        if (
+            the_thing.id !== "("
+            || the_thing.expression[0].id !== "."
+            || the_thing.expression[0].expression.id !== "Object"
+            || the_thing.expression[0].name.id !== "freeze"
+        ) {
+            warn("freeze_exports", the_thing);
+        }
+        if (next_token.id === ";") {
+            semicolon();
+        }
         exports.default = the_thing;
         the_export.expression.push(the_thing);
     } else {
         if (next_token.id === "function") {
+            warn("freeze_exports");
             the_thing = statement();
             the_name = the_thing.name;
             the_id = the_name.id;
@@ -3311,7 +3353,8 @@ stmt("export", function () {
             || next_token.id === "let"
             || next_token.id === "const"
         ) {
-            warn("unexpected_a");
+            warn("unexpected_a", next_token);
+            statement();
         } else if (next_token.id === "{") {
             advance("{");
             (function loop() {
@@ -3324,11 +3367,7 @@ stmt("export", function () {
             advance("}");
             semicolon();
         } else {
-            export_id();
-            if (the_name.writable !== true) {
-                warn("unexpected_a", token);
-            }
-            semicolon();
+            stop("unexpected_a");
         }
     }
     module_mode = true;
@@ -3580,17 +3619,19 @@ stmt("try", function () {
         the_catch = next_token;
         the_try.catch = the_catch;
         advance("catch");
-        advance("(");
-        if (!next_token.identifier) {
-            return stop("expected_identifier_a", next_token);
+        if (next_token.id === "(") {
+            advance("(");
+            if (!next_token.identifier) {
+                return stop("expected_identifier_a", next_token);
+            }
+            if (next_token.id !== "ignore") {
+                ignored = undefined;
+                the_catch.name = next_token;
+                enroll(next_token, "exception", true);
+            }
+            advance();
+            advance(")");
         }
-        if (next_token.id !== "ignore") {
-            ignored = undefined;
-            the_catch.name = next_token;
-            enroll(next_token, "exception", true);
-        }
-        advance();
-        advance(")");
         the_catch.block = block(ignored);
         if (the_catch.block.disrupt !== true) {
             the_disrupt = false;
@@ -4160,7 +4201,7 @@ postaction("binary", function (thing) {
         if (thing.expression[0].id === "self") {
             warn("weird_expression_a", thing, "self[...]");
         }
-    } else if (thing.id === ".") {
+    } else if (thing.id === "." || thing.id === "?.") {
         if (thing.expression.id === "RegExp") {
             warn("weird_expression_a", thing);
         }
@@ -4456,7 +4497,27 @@ function whitage() {
     let margin = 0;
     let nr_comments_skipped = 0;
     let open = true;
+    let opening = true;
     let right;
+
+    function pop() {
+        const previous = stack.pop();
+        closer = previous.closer;
+        free = previous.free;
+        margin = previous.margin;
+        open = previous.open;
+        opening = previous.opening;
+    }
+
+    function push() {
+        stack.push({
+            closer,
+            free,
+            margin,
+            open,
+            opening
+        });
+    }
 
     function expected_at(at) {
         warn(
@@ -4584,15 +4645,10 @@ function whitage() {
             const new_closer = opener[left.id];
             if (typeof new_closer === "string") {
                 if (new_closer !== right.id) {
-                    stack.push({
-                        closer: closer,
-                        free: free,
-                        margin: margin,
-                        open: open,
-                        right: right
-                    });
+                    opening = left.line !== right.line;
+                    push();
                     closer = new_closer;
-                    if (left.line !== right.line) {
+                    if (opening) {
                         free = closer === ")" && left.free;
                         open = true;
                         margin += 4;
@@ -4621,7 +4677,7 @@ function whitage() {
                 } else {
 
 // If left and right are opener and closer, then the placement of right depends
-// on the openness. Illegal pairs (like {]) have already been detected.
+// on the openness. Illegal pairs (like '{]') have already been detected.
 
                     if (left.line === right.line) {
                         no_space();
@@ -4630,27 +4686,30 @@ function whitage() {
                     }
                 }
             } else {
+                if (right.statement === true) {
+                    if (left.id === "else") {
+                        one_space_only();
+                    } else {
+                        at_margin(0);
+                        open = false;
+                    }
 
 // If right is a closer, then pop the previous state.
 
-                if (right.id === closer) {
-                    const previous = stack.pop();
-                    margin = previous.margin;
-                    if (open && right.id !== ";") {
+                } else if (right.id === closer) {
+                    pop();
+                    if (opening && right.id !== ";") {
                         at_margin(0);
                     } else {
                         no_space_only();
                     }
-                    closer = previous.closer;
-                    free = previous.free;
-                    open = previous.open;
                 } else {
 
-// Left is not an opener, and right is not a closer. The nature of left and
-// right will determine the space between them.
+// Left is not an opener, and right is not a closer.
+// The nature of left and right will determine the space between them.
 
-// If left is , or ; or right is a statement then if open, right must go at the
-// margin, or if closed, a space between.
+// If left is ',' or ';' or right is a statement then if open,
+// right must go at the margin, or if closed, a space between.
 
                     if (right.switch) {
                         at_margin(-4);
@@ -4684,6 +4743,7 @@ function whitage() {
                         no_space();
                     } else if (
                         left.id === "."
+                        || left.id === "?."
                         || left.id === "..."
                         || right.id === ","
                         || right.id === ";"
@@ -4698,12 +4758,8 @@ function whitage() {
                         )
                     ) {
                         no_space_only();
-                    } else if (right.id === ".") {
-                        if (left.line === right.line) {
-                            no_space();
-                        } else {
-                            at_margin(0);
-                        }
+                    } else if (right.id === "." || right.id === "?.") {
+                        no_space_only();
                     } else if (left.id === ";") {
                         if (open) {
                             at_margin(0);
@@ -4724,23 +4780,12 @@ function whitage() {
                         || (left.id === ")" && right.id === "{")
                     ) {
                         one_space_only();
-                    } else if (right.statement === true) {
-                        if (open) {
-                            at_margin(0);
-                        } else {
-                            one_space();
-                        }
                     } else if (
                         left.id === "var"
                         || left.id === "const"
                         || left.id === "let"
                     ) {
-                        stack.push({
-                            closer: closer,
-                            free: free,
-                            margin: margin,
-                            open: open
-                        });
+                        push();
                         closer = ";";
                         free = false;
                         open = left.open;
@@ -4800,7 +4845,11 @@ function whitage() {
 
 // The jslint function itself.
 
-export default function jslint(source, option_object, global_array) {
+export default Object.freeze(function jslint(
+    source = "",
+    option_object = empty(),
+    global_array = []
+) {
     try {
         warnings = [];
         option = Object.assign(empty(), option_object);
@@ -4810,7 +4859,6 @@ export default function jslint(source, option_object, global_array) {
         directive_mode = true;
         directives = [];
         early_stop = true;
-        empty_line_count = -1;
         exports = empty();
         froms = [];
         fudge = (
@@ -4838,15 +4886,14 @@ export default function jslint(source, option_object, global_array) {
         module_mode = false;
         next_token = global;
         property = empty();
+        shebang = false;
         stack = [];
         tenure = undefined;
         token = global;
         token_nr = 0;
         var_mode = undefined;
         populate(standard, declared_globals, false);
-        if (global_array !== undefined) {
-            populate(global_array, declared_globals, false);
-        }
+        populate(global_array, declared_globals, false);
         Object.keys(option).forEach(function (name) {
             if (option[name] === true) {
                 const allowed = allowed_option[name];
@@ -4909,24 +4956,29 @@ export default function jslint(source, option_object, global_array) {
         }
     }
     return {
-        directives: directives,
-        edition: "2018-08-11",
-        exports: exports,
-        froms: froms,
-        functions: functions,
-        global: global,
+        directives,
+        edition: "2018-10-26",
+        exports,
+        froms,
+        functions,
+        global,
         id: "(JSLint)",
         json: json_mode,
-        lines: lines,
+        lines,
         module: module_mode === true,
         ok: warnings.length === 0 && !early_stop,
-        option: option,
-        property: property,
+        option,
+        property,
+        shebang: (
+            shebang
+            ? lines[0]
+            : undefined
+        ),
         stop: early_stop,
-        tokens: tokens,
-        tree: tree,
+        tokens,
+        tree,
         warnings: warnings.sort(function (a, b) {
             return a.line - b.line || a.column - b.column;
         })
     };
-};
+});
