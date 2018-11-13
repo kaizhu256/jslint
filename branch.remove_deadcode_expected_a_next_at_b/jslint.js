@@ -105,7 +105,7 @@
     missing_m, module, multivar, naked_block, name, names, nested_comment, new,
     node, not_label_a, nr, nud, number_isNaN, ok, open, opening, option,
     out_of_scope_a, parameters, parent, pop, property, push, quote,
-    redefinition_a_b, replace, required_a_optional_b, reserved_a, right, role,
+    redefinition_a_b, replace, required_a_optional_b, reserved_a, role,
     search, shebang, signature, single, slice, some, sort, split, startsWith,
     statement, stop, strict, subscript_a, switch, test, this, thru, toString,
     todo_comment, tokens, too_long, too_many_digits, tree, try, type, u,

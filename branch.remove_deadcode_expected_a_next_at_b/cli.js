@@ -78,7 +78,9 @@ onNext = function (error, data) {
         // read data from file
         file = process.argv[2];
         console.error("jslint " + file);
-        data = file.match(/^(https?):\/\//);
+        data = file.match(
+            /^(https?):\/\//
+        );
         if (!data) {
             fs.readFile(file, "utf8", onNext);
             return;
@@ -100,7 +102,9 @@ onNext = function (error, data) {
         // jslint data
         data = local.jslint(data
         // ignore first-line shebang in nodejs scripts
-        .replace((/^#!/), "//"));
+        .replace((
+            /^#!/
+        ), "//"));
         fudge = data.option.fudge || 0;
         // init warning_text
         warning_text = "";
