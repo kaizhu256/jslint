@@ -1587,8 +1587,8 @@ function dispense() {
 // Deliver the next token, skipping the comments.
 
     const cadet = tokens[token_nr];
-    token_nr += 1;
     // hack-jslint - advance token async/await to next_token based on context
+    const next_cadet_id = (tokens[token_nr + 1] || { id: "" }).id;
     if (
         (cadet.id === "async" && next_cadet_id === "function")
         || (cadet.id === "await" && next_cadet_id.match(/[a-zA-Z_$]/))
@@ -1596,6 +1596,7 @@ function dispense() {
         cadet.id = next_cadet_id;
         token_nr += 1;
     }
+    token_nr += 1;
     if (cadet.id === "(comment)") {
         if (json_mode) {
             warn("unexpected_a", cadet);

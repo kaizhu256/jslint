@@ -56,7 +56,31 @@
       autofocus
       spellcheck="false"
       placeholder="// Paste JavaScript source or JSON text here."
-  ></textarea></fieldset>
+  >
+/*jslint node*/
+(async function () {
+    async function foo() {
+        const puppeteer = require("puppeteer");
+        const browser = await puppeteer.launch({
+            args: [
+                "--no-sandbox", "--disable-setuid-sandbox"
+            ]
+        });
+        const page = await browser.newPage();
+        await page.goto("https://www.example.com");
+        await page.screenshot({
+            path: "screenshot.png"
+        });
+        await browser.close();
+    }
+    const bar = async function () {
+        const result = await foo();
+        return result;
+    };
+    bar();
+
+}());
+</textarea></fieldset>
   <div class="center">
       <button name=JSLint>JSLint</button>
       <button name=clear>clear</button>
