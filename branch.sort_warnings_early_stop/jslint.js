@@ -5001,7 +5001,7 @@ export default Object.freeze(function jslint(
         early_stop = false;
     } catch (e) {
         e.early_stop = early_stop;
-        e.message = "[JSLint was unable to finish] - " + e.message;
+        e.message += " [JSLint was unable to finish]";
         if (e.name !== "JSLintError") {
             warnings.push(e);
         }
