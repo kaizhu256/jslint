@@ -158,11 +158,11 @@ const allowed_option = {
         "TextDecoder", "TextEncoder", "URL", "window", "Worker",
         "XMLHttpRequest"
     ],
+    convert: true,
     couch: [
         "emit", "getRow", "isArray", "log", "provides", "registerType",
         "require", "send", "start", "sum", "toJSON"
     ],
-    convert: true,
     devel: [
         "alert", "confirm", "console", "prompt"
     ],
@@ -202,10 +202,10 @@ const opener = {
 
 // The open and close pairs.
 
+    "${": "}",      // mega
     "(": ")",       // paren
     "[": "]",       // bracket
-    "{": "}",       // brace
-    "${": "}"       // mega
+    "{": "}"        // brace
 };
 
 // The relational operators.
@@ -544,10 +544,10 @@ function warn_at(code, line, column, a, b, c, d) {
 // resembles an exception.
 
     const warning = {         // ~~
-        name: "JSLintError",
+        code,
         column,
         line,
-        code
+        name: "JSLintError"
     };
     if (a !== undefined) {
         warning.a = a;
@@ -3938,9 +3938,9 @@ function lookup(thing) {
                 }
                 the_variable = {
                     dead: false,
-                    parent: global,
                     id: thing.id,
                     init: true,
+                    parent: global,
                     role: "variable",
                     used: 0,
                     writable: false
@@ -4915,10 +4915,10 @@ export default Object.freeze(function jslint(
         );
         functions = [];
         global = {
-            id: "(global)",
             body: true,
             context: empty(),
             from: 0,
+            id: "(global)",
             level: 0,
             line: 0,
             live: [],
