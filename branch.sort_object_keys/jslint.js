@@ -3074,12 +3074,12 @@ prefix("(", function () {
 });
 prefix("`", do_tick);
 prefix("{", function () {
+    let a;
+    let b = "";
     const the_brace = token;
     const seen = empty();
     the_brace.expression = [];
     if (next_token.id !== "}") {
-        let a;
-        let b = "";
         (function member() {
             let extra;
             let full;
