@@ -1,5 +1,5 @@
 // jslint.js
-// 2020-11-06
+// 2021-05-17
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -114,7 +114,7 @@
     unexpected_char_a, unexpected_comment, unexpected_directive_a,
     unexpected_expression_a, unexpected_label_a, unexpected_parens,
     unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
-    unexpected_typeof_a, uninitialized_a, unreachable_a,
+    unexpected_typeof_a, uninitialized_a, unordered_property_a, unreachable_a,
     unregistered_property_a, unused_a, use_double, use_open, use_spaces,
     used, value, var_loop, var_switch, variable, warning, warnings,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
@@ -327,6 +327,9 @@ const bundle = {
         "Unexpected 'typeof'. Use '===' to compare directly with {a}."
     ),
     uninitialized_a: "Uninitialized '{a}'.",
+    unordered_property_a: (
+        "Property name '{a}' is not listed in alphabetical order."
+    ),
     unreachable_a: "Unreachable '{a}'.",
     unregistered_property_a: "Unregistered property name '{a}'.",
     unused_a: "Unused '{a}'.",
@@ -3065,20 +3068,19 @@ prefix("{", function () {
     const seen = empty();
     the_brace.expression = [];
     if (next_token.id !== "}") {
-        // hack-jslint - validate sorted-object-keys
-        let aa;
-        let bb;
-        bb = "";
+        let a;
+        let b;
+        b = "";
         (function member() {
             let extra;
             let full;
             let id;
             let name = next_token;
             let value;
-            aa = bb;
-            bb = String(name.value || name.id);
-            if (!(aa < bb)) {
-                warn("Unsorted object-keys.", name);
+            a = b;
+            b = String(name.value || name.id);
+            if (b > a) {
+                warn("unordered_property_a", name);
             }
             advance();
             if (
@@ -5000,7 +5002,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2020-11-06",
+        edition: "2021-05-17",
         exports,
         froms,
         functions,
