@@ -766,13 +766,13 @@ ${String(count).padStart(7, " ")}
         if (url.indexOf("file:///") !== 0) {
             return;
         }
-        pathname = url.replace("file:///", "").replace((
+        pathname = url.replace((
+            process.platform === "win32"
+            ? "file:///"
+            : "file://"
+        ), "").replace((
             /\\\\/g
         ), "/");
-        debugInline({
-            cwd,
-            pathname
-        });
         if (
             pathname.indexOf(cwd) !== 0 ||
             pathname.indexOf(cwd + "[") === 0 ||
