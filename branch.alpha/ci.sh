@@ -1,16 +1,38 @@
 #!/bin/sh
 
+shGitCmdWithGithubToken() {(set -e
+# this function will run git $CMD with $GITHUB_TOKEN
+    local CMD
+    local EXIT_CODE
+    local REMOTE
+    local URL
+    printf "shGitCmdWithGithubToken $*\n"
+    CMD="$1"
+    shift
+    REMOTE="$1"
+    shift
+    URL="$(
+        git config "remote.$REMOTE.url" |
+            sed -e "s|https://|https://x-access-token:$GITHUB_TOKEN@|"
+    )"
+    EXIT_CODE=0
+    # hide $GITHUB_TOKEN in case of err
+    git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
+    printf "EXIT_CODE=$EXIT_CODE\n"
+    return "$EXIT_CODE"
+)}
+
 shGithubCi() {(set -e
 # this function will run github-ci
-    local BRANCH
     # jslint all files
     shJslintCli .
     # create coverage-report
     shV8CoverageReport shJslintCli jslint.js
-    if [ ! "$GITHUB_ACTIONS" ]
-    then
-        return
-    fi
+)}
+
+shGithubUploadArtifact() {(set -e
+# this function will upload build-artifacts to branch-gh-pages
+    local BRANCH
     # init $BRANCH
     BRANCH="$(git rev-parse --abbrev-ref HEAD)"
     # init .git/config
@@ -45,28 +67,6 @@ shGithubCi() {(set -e
     fi
     # push branch-gh-pages
     shGitCmdWithGithubToken push origin -f HEAD:gh-pages
-)}
-
-shGitCmdWithGithubToken() {(set -e
-# this function will run git $CMD with $GITHUB_TOKEN
-    local CMD
-    local EXIT_CODE
-    local REMOTE
-    local URL
-    printf "shGitCmdWithGithubToken $*\n"
-    CMD="$1"
-    shift
-    REMOTE="$1"
-    shift
-    URL="$(
-        git config "remote.$REMOTE.url" |
-            sed -e "s|https://|https://x-access-token:$GITHUB_TOKEN@|"
-    )"
-    EXIT_CODE=0
-    # hide $GITHUB_TOKEN in case of err
-    git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
-    printf "EXIT_CODE=$EXIT_CODE\n"
-    return "$EXIT_CODE"
 )}
 
 shJslintCli() {(set -e
