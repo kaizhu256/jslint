@@ -3237,10 +3237,10 @@ function do_var() {
     }
     (function next() {
         if (next_token.id === "{" && the_statement.id !== "var") {
-            const the_brace = next_token;
-            advance("{");
             let a;
             let b = "";
+            const the_brace = next_token;
+            advance("{");
             (function pair() {
                 if (!next_token.identifier) {
                     return stop("expected_identifier_a", next_token);
