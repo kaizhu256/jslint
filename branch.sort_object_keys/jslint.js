@@ -114,12 +114,12 @@
     unexpected_char_a, unexpected_comment, unexpected_directive_a,
     unexpected_expression_a, unexpected_label_a, unexpected_parens,
     unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
-    unexpected_typeof_a, uninitialized_a, unordered_property_a, unreachable_a,
-    unregistered_property_a, unused_a, use_double, use_open, use_spaces,
-    used, value, var_loop, var_switch, variable, warning, warnings,
-    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
-    wrapped, writable, y
+    unexpected_typeof_a, uninitialized_a, unordered_param_a,
+    unordered_property_a, unreachable_a, unregistered_property_a, unused_a,
+    use_double, use_open, use_spaces, used, value, var_loop, var_switch,
+    variable, warning, warnings, weird_condition_a, weird_expression_a,
+    weird_loop, weird_relation_a, white, wrap_condition, wrap_immediate,
+    wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable, y
 */
 
 function empty() {
@@ -327,8 +327,11 @@ const bundle = {
         "Unexpected 'typeof'. Use '===' to compare directly with {a}."
     ),
     uninitialized_a: "Uninitialized '{a}'.",
+    unordered_param_a: (
+        "Parameter '{a}' not listed in alphabetical order."
+    ),
     unordered_property_a: (
-        "Property name '{a}' is not listed in alphabetical order."
+        "Property name '{a}' not listed in alphabetical order."
     ),
     unreachable_a: "Unreachable '{a}'.",
     unregistered_property_a: "Unregistered property name '{a}'.",
@@ -2745,6 +2748,8 @@ function parameter_list() {
             let ellipsis = false;
             let param;
             if (next_token.id === "{") {
+                let a;
+                let b = "";
                 if (optional !== undefined) {
                     warn(
                         "required_a_optional_b",
@@ -2763,6 +2768,11 @@ function parameter_list() {
                         return stop("expected_identifier_a");
                     }
                     survey(subparam);
+                    a = b;
+                    b = String(subparam.value || subparam.id);
+                    if (a > b) {
+                        warn("unordered_param_a", subparam);
+                    }
                     advance();
                     signature.push(subparam.id);
                     if (next_token.id === ":") {
@@ -3069,8 +3079,7 @@ prefix("{", function () {
     the_brace.expression = [];
     if (next_token.id !== "}") {
         let a;
-        let b;
-        b = "";
+        let b = "";
         (function member() {
             let extra;
             let full;
@@ -3079,7 +3088,7 @@ prefix("{", function () {
             let value;
             a = b;
             b = String(name.value || name.id);
-            if (b > a) {
+            if (a > b) {
                 warn("unordered_property_a", name);
             }
             advance();
@@ -3230,12 +3239,19 @@ function do_var() {
         if (next_token.id === "{" && the_statement.id !== "var") {
             const the_brace = next_token;
             advance("{");
+            let a;
+            let b = "";
             (function pair() {
                 if (!next_token.identifier) {
                     return stop("expected_identifier_a", next_token);
                 }
                 const name = next_token;
                 survey(name);
+                a = b;
+                b = String(name.value || name.id);
+                if (a > b) {
+                    warn("unordered_param_a", name);
+                }
                 advance();
                 if (next_token.id === ":") {
                     advance(":");
