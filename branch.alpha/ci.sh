@@ -906,10 +906,5 @@ ${String(count).padStart(7, " ")}
 ' # '
 )}
 
-shWinpty() {(set -e
-# this function will run "$@" in current-env with winpty
-    winpty -Xallow-non-tty -Xplain sh "$HOME/lib.utility2.sh" "$@"
-)}
-
 # run "$@"
 "$@"
