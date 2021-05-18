@@ -48,10 +48,14 @@ shGithubUploadArtifact() {(set -e
     # add dir branch.$BRANCH
     rm -rf "branch.$BRANCH"
     mkdir "branch.$BRANCH"
-    (cd "branch.$BRANCH" && git init && git pull --depth=1 .. "$BRANCH")
-    rm -rf "branch.$BRANCH/.git"
+    (set -e
+        cd "branch.$BRANCH"
+        git init
+        git pull --depth=1 .. "$BRANCH"
+        rm -rf .git
+    )
     git add -f "branch.$BRANCH"
-    git commit -am "update dir branch.$BRANCH" || true
+    git commit -am "add dir branch.$BRANCH" || true
     # if branch-gh-pages has more than 100 commits,
     # then backup and squash all commits
     if [ "$(git rev-list gh-pages --count)" -gt 100 ]
