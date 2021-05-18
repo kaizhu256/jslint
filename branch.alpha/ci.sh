@@ -57,18 +57,18 @@ shGithubUploadArtifact() {(set -e
     git add -f "branch.$BRANCH"
     git commit -am "add dir branch.$BRANCH" || true
     # if branch-gh-pages has more than 100 commits,
-    # then backup and squash all commits
-    if [ "$(git rev-list gh-pages --count)" -gt 100 ]
+    # then backup and squash commits
+    if [ "$(git rev-list gh-pages --count)" -gt 50 ]
     then
         # backup
         shGitCmdWithGithubToken push origin -f gh-pages:gh-pages.backup
-        # squash all commits
+        # squash commits
         git checkout --orphan squash1
         git commit --quiet -am squash || true
         # reset branch-gh-pages to squashed-commit
         git push . -f squash1:gh-pages
         git checkout gh-pages
-        # force push squashed-commit
+        # force-push squashed-commit
         shGitCmdWithGithubToken push origin -f gh-pages
     fi
     # push branch-gh-pages
