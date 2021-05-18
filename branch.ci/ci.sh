@@ -580,7 +580,7 @@ body {
         }, ii) {
             let coverageLevel;
             let coveragePct;
-            coveragePct = Math.floor(10000 * linesCovered / linesTotal);
+            coveragePct = Math.floor(10000 * linesCovered / linesTotal | 0);
             coverageLevel = (
                 coveragePct >= 8000
                 ? "coverageHigh"
@@ -769,6 +769,10 @@ ${String(count).padStart(7, " ")}
         pathname = url.replace("file:///", "").replace((
             /\\\\/g
         ), "/");
+        debugInline({
+            cwd,
+            pathname
+        });
         if (
             pathname.indexOf(cwd) !== 0 ||
             pathname.indexOf(cwd + "[") === 0 ||
