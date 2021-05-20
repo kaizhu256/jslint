@@ -53,6 +53,7 @@ plays the part of a stern but benevolent editor, helping you to get the style
 right so that you can focus your creative energy where it is most needed.
 
 ## Changelog Since v2020.11.6
+- ci - allow pull-requests to run restricted-ci
 - gh-pages - fix missing assets and insecure http-links
 - gh-pages - merge file jslint.css into index.html
 - gh-pages - add files image-jslint-xxx.png
@@ -67,7 +68,6 @@ right so that you can focus your creative energy where it is most needed.
 - none
 
 ## Todo
-- ci - allow pr to run ci
 - doc - add svg package-listing.
 - ci - add regression tests and improve code-coverage.
 - none
