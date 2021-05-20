@@ -4,12 +4,13 @@
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 name: CI
 on:
-  push:
+  - push:
     branches:
-    - alpha
-    - beta
-    - master
-    - sandbox
+      - alpha
+      - beta
+      - master
+      - sandbox
+# shCiBase - start
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -39,6 +40,7 @@ jobs:
       # fetch ci.sh from trusted source
       - run: git fetch origin alpha && git checkout origin/alpha ci.sh
       - run: sh ci.sh shCiBase
+# shCiBase - end
       # fetch ci.sh from trusted source
       - run: git fetch origin alpha && git checkout origin/alpha ci.sh
       - run: sh ci.sh shCiArtifactUpload
