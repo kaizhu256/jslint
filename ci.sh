@@ -41,7 +41,9 @@ if (!globalThis.debugInline) {
     if (String(file + "/").indexOf(process.cwd() + "/") === 0) {
         file = file.replace(process.cwd(), "");
     }
-    file = ".build/screenshot.browser." + encodeURIComponent(file);
+    file = ".build/screenshot.browser." + encodeURIComponent(file).replace((
+        /%/g
+    ), "_").toLowerCase();
     process.on("exit", function (exitCode) {
         if (typeof exitCode === "object" && exitCode) {
             console.error(exitCode);
@@ -67,7 +69,7 @@ if (!globalThis.debugInline) {
             "--incognito",
             "--timeout=30000",
             "--user-data-dir=/dev/null",
-            "--window-size=800x600",
+            "--window-size=" + (process.argv[2] || "800x600"),
             (
                 extname === ".html"
                 ? "--dump-dom"
@@ -112,7 +114,7 @@ if (!globalThis.debugInline) {
         );
     });
 }());
-' "$1" # '
+' "$@" # '
 )}
 
 shGitCmdWithGithubToken() {(set -e
@@ -219,7 +221,7 @@ shGithubCi() {(set -e
     # create coverage-report
     shRunWithCoverage shJslintCli jslint.js
     # screenshot live-web-demo
-    shBrowserScreenshot https://jslint.com/index.html
+    shBrowserScreenshot index.html
 )}
 
 shGithubArtifactUpload() {(set -e
@@ -720,7 +722,7 @@ if (!globalThis.debugInline) {
             ), "&$1");
         }
         html = "";
-        html += `<!doctype html>
+        html += `<!DOCTYPE html>
 <html lang="en">
 <head>
 <title>coverage-report</title>
