@@ -71,4 +71,3 @@ right so that you can focus your creative energy where it is most needed.
 - doc - add svg package-listing.
 - ci - add regression tests and improve code-coverage.
 - none
-
