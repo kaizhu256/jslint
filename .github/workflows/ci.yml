@@ -43,9 +43,9 @@ jobs:
           architecture: ${{ matrix.architecture }}
       # fetch ci.sh from trusted source
       - run: git fetch origin alpha && git checkout origin/alpha ci.sh
-      - run: sh ci.sh shGithubCi
+      - run: sh ci.sh shCiBase
       - run: git fetch origin alpha && git checkout origin/alpha ci.sh
-      - run: sh ci.sh shGithubArtifactUpload
+      - run: sh ci.sh shCiArtifactUpload
         env:
           CI_NODE_VERSION_ARCH_PLATFORM: v14.x64.linux
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
