@@ -899,9 +899,7 @@ function jslint(
 // /*jslint beta, node*/
 // import https from "https";
 // (async function () {
-//     let dict = {
-//         import: true
-//     };
+//     let dict = {};
 //     let result = "";
 //     await new Promise(function (resolve) {
 //         https.get((
@@ -976,12 +974,13 @@ function jslint(
             "encodeURIComponent",
             "eval",
             "globalThis",
-            "import",
             "isFinite",
             "isNaN",
             "parseFloat",
             "parseInt",
-            "undefined"
+            "undefined",
+
+            "import"
         ]);
         object_assign_from_list(global_dict, global_list);
         Object.keys(option_dict).forEach(function (name) {
@@ -990,7 +989,6 @@ function jslint(
                 object_assign_from_list(global_dict, allowed);
             }
         });
-
         Object.assign(state, {
             allowed_option,
             artifact,
