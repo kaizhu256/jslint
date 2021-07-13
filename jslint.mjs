@@ -95,6 +95,7 @@
 
 /*property
     causes,
+    global_list,
     max, min,
     stringify,
     test_cause,
@@ -894,103 +895,6 @@ function jslint(
 // full tokenization to precede parsing.
 
         option_dict = Object.assign(empty(), option_dict);
-
-// Assign standard ECMAScript global variables to global_dict.
-// /*jslint beta, node*/
-// import https from "https";
-// (async function () {
-//     let dict = {};
-//     let result = "";
-//     await new Promise(function (resolve) {
-//         https.get((
-//             "https://raw.githubusercontent.com/mdn/content/main/files/"
-//             + "en-us/web/javascript/reference/global_objects/index.html"
-//         ), function (res) {
-//             res.on("data", function (chunk) {
-//                 result += chunk;
-//             }).on("end", resolve).setEncoding("utf8");
-//         });
-//     });
-//     result.replace((
-//         /<li>\{\{JSxRef\("(?:Global_Objects\/)?([^"\/]+?)"/g
-//     ), function (ignore, key) {
-//         if (globalThis.hasOwnProperty(key)) {
-//             dict[key] = true;
-//         }
-//         return "";
-//     });
-//     console.log(JSON.stringify(Object.keys(dict).sort(), undefined, 4));
-// }());
-
-        object_assign_from_list(global_dict, [
-            "Array",
-            "ArrayBuffer",
-            "Atomics",
-            "BigInt",
-            "BigInt64Array",
-            "BigUint64Array",
-            "Boolean",
-            "DataView",
-            "Date",
-            "Error",
-            "EvalError",
-            "Float32Array",
-            "Float64Array",
-            "Function",
-            "Infinity",
-            "Int16Array",
-            "Int32Array",
-            "Int8Array",
-            "Intl",
-            "JSON",
-            "Map",
-            "Math",
-            "NaN",
-            "Number",
-            "Object",
-            "Promise",
-            "Proxy",
-            "RangeError",
-            "ReferenceError",
-            "Reflect",
-            "RegExp",
-            "Set",
-            "SharedArrayBuffer",
-            "String",
-            "Symbol",
-            "SyntaxError",
-            "TypeError",
-            "URIError",
-            "Uint16Array",
-            "Uint32Array",
-            "Uint8Array",
-            "Uint8ClampedArray",
-            "WeakMap",
-            "WeakSet",
-            "WebAssembly",
-            "decodeURI",
-            "decodeURIComponent",
-            "encodeURI",
-            "encodeURIComponent",
-            "eval",
-            "globalThis",
-            "isFinite",
-            "isNaN",
-            "parseFloat",
-            "parseInt",
-            "undefined",
-
-// Misc.
-
-            "import"
-        ], "ECMAScript");
-        object_assign_from_list(global_dict, global_list);
-        Object.keys(option_dict).forEach(function (name) {
-            const allowed = allowed_option[name];
-            if (option_dict[name] === true && Array.isArray(allowed)) {
-                object_assign_from_list(global_dict, allowed);
-            }
-        });
         Object.assign(state, {
             allowed_option,
             artifact,
@@ -1001,6 +905,7 @@ function jslint(
             function_list,
             function_stack,
             global_dict,
+            global_list,
             import_list,
             is_equal,
             is_weird,
@@ -1447,6 +1352,7 @@ function jslint_phase2_lex(state) {
         artifact,
         directive_list,
         global_dict,
+        global_list,
         line_list,
         option_dict,
         stop,
@@ -2783,6 +2689,103 @@ function jslint_phase2_lex(state) {
         }
         return the_token;
     }
+
+// Assign standard ECMAScript global variables to global_dict.
+// /*jslint beta, node*/
+// import https from "https";
+// (async function () {
+//     let dict = {};
+//     let result = "";
+//     await new Promise(function (resolve) {
+//         https.get((
+//             "https://raw.githubusercontent.com/mdn/content/main/files/"
+//             + "en-us/web/javascript/reference/global_objects/index.html"
+//         ), function (res) {
+//             res.on("data", function (chunk) {
+//                 result += chunk;
+//             }).on("end", resolve).setEncoding("utf8");
+//         });
+//     });
+//     result.replace((
+//         /<li>\{\{JSxRef\("(?:Global_Objects\/)?([^"\/]+?)"/g
+//     ), function (ignore, key) {
+//         if (globalThis.hasOwnProperty(key)) {
+//             dict[key] = true;
+//         }
+//         return "";
+//     });
+//     console.log(JSON.stringify(Object.keys(dict).sort(), undefined, 4));
+// }());
+
+    object_assign_from_list(global_dict, [
+        "Array",
+        "ArrayBuffer",
+        "Atomics",
+        "BigInt",
+        "BigInt64Array",
+        "BigUint64Array",
+        "Boolean",
+        "DataView",
+        "Date",
+        "Error",
+        "EvalError",
+        "Float32Array",
+        "Float64Array",
+        "Function",
+        "Infinity",
+        "Int16Array",
+        "Int32Array",
+        "Int8Array",
+        "Intl",
+        "JSON",
+        "Map",
+        "Math",
+        "NaN",
+        "Number",
+        "Object",
+        "Promise",
+        "Proxy",
+        "RangeError",
+        "ReferenceError",
+        "Reflect",
+        "RegExp",
+        "Set",
+        "SharedArrayBuffer",
+        "String",
+        "Symbol",
+        "SyntaxError",
+        "TypeError",
+        "URIError",
+        "Uint16Array",
+        "Uint32Array",
+        "Uint8Array",
+        "Uint8ClampedArray",
+        "WeakMap",
+        "WeakSet",
+        "WebAssembly",
+        "decodeURI",
+        "decodeURIComponent",
+        "encodeURI",
+        "encodeURIComponent",
+        "eval",
+        "globalThis",
+        "isFinite",
+        "isNaN",
+        "parseFloat",
+        "parseInt",
+        "undefined",
+
+// Misc.
+
+        "import"
+    ], "ECMAScript");
+    Object.keys(option_dict).sort().forEach(function (name) {
+        const allowed = allowed_option[name];
+        if (option_dict[name] === true && Array.isArray(allowed)) {
+            object_assign_from_list(global_dict, allowed);
+        }
+    });
+    object_assign_from_list(global_dict, global_list, "User-defined");
 
 // Scan first line for "#!" and ignore it.
 
