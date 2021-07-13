@@ -35,7 +35,7 @@ curl -L https://www.jslint.com/jslint.mjs > jslint.mjs
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-download.svg)
 
 ## To run `jslint.mjs` from command-line:
-```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-cli-file.svg -->
+```shell
 #!/bin/sh
 
 printf "console.log('hello world');\n" > hello.js
