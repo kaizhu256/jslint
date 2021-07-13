@@ -260,7 +260,7 @@ function jslint(
             "module",
             "process",
             "require",
-            "setImmediate"
+            "setImmediate",
             "setInterval",
             "setTimeout"
         ],
@@ -980,10 +980,10 @@ function jslint(
             "parseInt",
             "undefined",
 
-// Extra.
+// Misc.
 
             "import"
-        ]);
+        ], "ECMAScript");
         object_assign_from_list(global_dict, global_list);
         Object.keys(option_dict).forEach(function (name) {
             const allowed = allowed_option[name];
@@ -8112,12 +8112,12 @@ function noop() {
     return;
 }
 
-function object_assign_from_list(dict, list) {
+function object_assign_from_list(dict, list, val = true) {
 
 // Assign each property-name from <list> to <dict>.
 
     list.forEach(function (key) {
-        dict[key] = true;
+        dict[key] = val;
     });
     return dict;
 }
