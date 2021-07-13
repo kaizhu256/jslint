@@ -145,7 +145,11 @@ import moduleChildProcess from "child_process";
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100  250k  100  250k    0     0   250k      0  0:00:01 --:--:--  0:00:01  250k
-            `).trim()
+            `).trim().replace((
+                /250k/g
+            ), String(
+                moduleFs.statSync("jslint.mjs").size >> 10 //jslint-quiet
+            ) + "k")
         ],
         // parallel-task - screenshot files
         [
