@@ -202,13 +202,8 @@ function jslint(
             "IntersectionObserver",
             "MutationObserver",
             "Storage",
-            "TextDecoder",
-            "TextEncoder",
-            "URL",
             "Worker",
             "XMLHttpRequest",
-            "clearInterval",
-            "clearTimeout",
             "document",
             "fetch",
             "localStorage",
@@ -216,8 +211,6 @@ function jslint(
             "navigator",
             "screen",
             "sessionStorage",
-            "setInterval",
-            "setTimeout",
             "window"
         ],
         convert: true,          // Allow conversion operators.
@@ -246,23 +239,16 @@ function jslint(
         name: true,             // Allow weird property names.
         node: [                 // Assume Node.js environment.
             "Buffer",
-            "TextDecoder",
-            "TextEncoder",
-            "URL",
             "URLSearchParams",
             "__dirname",
             "__filename",
             "clearImmediate",
-            "clearInterval",
-            "clearTimeout",
             "console",
             "exports",
             "module",
             "process",
             "require",
-            "setImmediate",
-            "setInterval",
-            "setTimeout"
+            "setImmediate"
         ],
         single: true,           // Allow single-quote strings.
         test_cause: true,       // Test jslint's causes.
@@ -980,7 +966,16 @@ function jslint(
             "parseInt",
             "undefined",
 
-            "import"
+// Common globals found in both browser and nodejs.
+
+            "TextDecoder",
+            "TextEncoder",
+            "URL",
+            "clearInterval",
+            "clearTimeout",
+            "import",
+            "setInterval",
+            "setTimeout"
         ]);
         object_assign_from_list(global_dict, global_list);
         Object.keys(option_dict).forEach(function (name) {
