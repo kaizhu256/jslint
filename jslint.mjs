@@ -305,37 +305,30 @@ function jslint(
     let standard = [            // These are the globals that are provided by
                                 // ... the language standard.
 // node --input-type=module -e '
-// /*jslint beta node*/
+// /*jslint beta, node*/
 // import https from "https";
 // (async function () {
-//     var dict;
-//     var result = "";
+//     let dict = {
+//         import: true
+//     };
+//     let result = "";
 //     await new Promise(function (resolve) {
 //         https.get((
-//             "https://developer.mozilla.org"
-//             + "/en-US/docs/Web/JavaScript/Reference/Global_Objects"
+//             "https://raw.githubusercontent.com/mdn/content/main/files/"
+//             + "en-us/web/javascript/reference/global_objects/index.html"
 //         ), function (res) {
 //             res.on("data", function (chunk) {
 //                 result += chunk;
 //             }).on("end", resolve).setEncoding("utf8");
 //         });
 //     });
-//     dict = {
-//         import: true
-//     };
-//     result.replace(new RegExp((
-//         "href=\"\\/en-US\\/docs\\/Web\\/JavaScript\\/Reference"
-//         + "\\/Global_Objects\\/.*?<code>(\\w+).*?<\\/code>"
-//     ), "g"), function (ignore, key) {
-//         switch (globalThis.hasOwnProperty(key) && key) {
-//         case "escape":
-//         case "unescape":
-//         case "uneval":
-//         case false:
-//             break;
-//         default:
+//     result.replace((
+//         /<li>\{\{JSxRef\("(?:Global_Objects\/)?([^"\/]+?)"/g
+//     ), function (ignore, key) {
+//         if (globalThis.hasOwnProperty(key)) {
 //             dict[key] = true;
 //         }
+//         return "";
 //     });
 //     console.log(JSON.stringify(Object.keys(dict).sort(), undefined, 4));
 // }());
