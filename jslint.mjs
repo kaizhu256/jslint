@@ -2408,7 +2408,7 @@ function jslint_phase2_lex(state) {
         case "eval":            // Allow eval().
         case "for":             // Allow for-statement.
         case "getset":          // Allow get() and set().
-        case "indent2":         // Allow 2-space indent.
+        case "indent2":         // Use 2-space indent.
         case "long":            // Allow long lines.
         case "name":            // Allow weird property names.
         case "node":            // Assume Node.js environment.
