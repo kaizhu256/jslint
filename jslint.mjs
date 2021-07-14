@@ -2570,7 +2570,7 @@ function jslint_phase2_lex(state) {
                 "parseInt",
                 "undefined",
 
-        // Misc.
+// Misc.
 
                 "import"
             ], "ECMAScript");
