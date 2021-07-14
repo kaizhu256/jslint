@@ -2564,15 +2564,12 @@ function jslint_phase2_lex(state) {
                 "encodeURIComponent",
                 "eval",
                 "globalThis",
+                "import",
                 "isFinite",
                 "isNaN",
                 "parseFloat",
                 "parseInt",
-                "undefined",
-
-// Misc.
-
-                "import"
+                "undefined"
             ], "ECMAScript");
             break;
 
