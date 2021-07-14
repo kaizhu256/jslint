@@ -1450,10 +1450,7 @@ function jslint_phase2_lex(state) {
         let body;
         let ii = 0;
         let jj = 0;
-        let key;
-        let match;
         let the_comment;
-        let val;
 
 // Create a comment object. Comments are not allowed in JSON text. Comments can
 // include directives and notices of incompletion.
