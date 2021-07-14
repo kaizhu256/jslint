@@ -1612,7 +1612,7 @@ function jslint_phase2_lex(state) {
 
                     warn("bad_option_a", the_comment, key + ":" + val);
                 }
-                global_dict[key] = false;
+                global_dict[key] = "user-defined";
                 state.mode_module = the_comment;
             }
         }
@@ -2863,7 +2863,7 @@ function jslint_phase2_lex(state) {
     Object.keys(option_dict).sort().forEach(function (key) {
         option_dict_set(key, option_dict[key] === true);
     });
-    object_assign_from_list(global_dict, global_list, "User-defined");
+    object_assign_from_list(global_dict, global_list, "user-defined");
 
 // Scan first line for "#!" and ignore it.
 
