@@ -616,6 +616,9 @@ function jslint(
         case "redefinition_a_b":
             mm = `Redefinition of '${a}' from line ${b}.`;
             break;
+        case "redefinition_global_a_b":
+            mm = `Redefinition of '${a}' from global ${b} variable.`;
+            break;
         case "required_a_optional_b":
             mm = `Required parameter '${a}' after optional parameter '${b}'.`;
             break;
@@ -2453,11 +2456,11 @@ function jslint_phase2_lex(state) {
                 "URL",
                 "URLSearchParams",
                 "WebAssembly",
-                "atob",
-                "btoa",
+                // "atob",
+                // "btoa",
                 "clearInterval",
                 "clearTimeout",
-                "console",
+                // "console",
                 "performance",
                 "queueMicrotask",
                 "setInterval",
@@ -2641,8 +2644,8 @@ function jslint_phase2_lex(state) {
                 "WebAssembly",
                 "__dirname",
                 "__filename",
-                "atob",
-                "btoa",
+                // "atob",
+                // "btoa",
                 "clearImmediate",
                 "clearInterval",
                 "clearTimeout",
@@ -2894,6 +2897,7 @@ function jslint_phase3_parse(state) {
         export_dict,
         function_list,
         function_stack,
+        global_dict,
         import_list,
         is_equal,
         option_dict,
