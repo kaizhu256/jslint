@@ -1538,7 +1538,6 @@ function jslint_phase2_lex(state) {
     }
 
     function lex_comment() {
-        let allowed;
         let body;
         let ii = 0;
         let jj = 0;
@@ -1686,20 +1685,7 @@ function jslint_phase2_lex(state) {
                 name, val, body
             ] = match.slice(1);
             if (the_comment.directive === "jslint") {
-                allowed = allowed_option[name];
-                if (
-                    typeof allowed === "boolean"
-                    || typeof allowed === "object"
-                ) {
-                    if (val === "false") {
-                        option_dict[name] = false;
-                    } else {
-                        option_dict[name] = true;
-                        if (Array.isArray(allowed)) {
-                            object_assign_from_list(global_dict, allowed);
-                        }
-                    }
-                } else {
+                if (!validate_option(name, val !== "false")) {
 
 // test_cause:
 // ["/*jslint undefined*/", "lex_comment", "bad_option_a", "undefined", 1]
@@ -2676,7 +2662,7 @@ function jslint_phase2_lex(state) {
         return the_token;
     }
 
-    function validate_option(key, val = true) {
+    function validate_option(key, val) {
         switch (key) {
         case "beta":            // Enable experimental warnings.
         case "bitwise":         // Allow bitwise operators.
