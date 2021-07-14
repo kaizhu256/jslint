@@ -3483,6 +3483,10 @@ function jslint_phase3_parse(state) {
 
             warn("redefinition_a_b", name, name.id, earlier.line);
         } else if (global_dict[name.id] && role !== "parameter") {
+
+// test_cause:
+// ["let Array", "enroll", "redefinition_global_a_b", "Array", 5]
+
             warn(
                 "redefinition_global_a_b",
                 name,
