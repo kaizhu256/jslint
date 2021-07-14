@@ -852,7 +852,13 @@ function jslint_ui_onresize() {
 /*global caches, indexedDb*/ //jslint-quiet
 
 import https from "https";
-import jslint from \u0022./jslint.mjs\u0022;
+import jslint from "./jslint.mjs";
+
+/*jslint-disable*/
+SYNTAX ERROR.
+/*jslint-enable*/
+
+eval("console.log(\"hello world\");"); //jslint-quiet
 
 // Optional directives.
 // .... /*jslint beta*/ .......... Enable experimental warnings.
@@ -876,16 +882,6 @@ import jslint from \u0022./jslint.mjs\u0022;
 // .... /*jslint variable*/ ...... Allow unordered const and let declarations
 // ................................... that are not at top of function-scope.
 // .... /*jslint white: true...... Allow messy whitespace.
-
-/*jslint-disable*/
-// TODO: jslint this code-block in future.
-console.log('hello world');
-/*jslint-enable*/
-
-// Suppress warnings on next-line.
-eval( //jslint-quiet
-    "console.log(\\"hello world\\");"
-);
 
 (async function () {
     let result;
