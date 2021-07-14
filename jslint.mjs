@@ -617,7 +617,7 @@ function jslint(
             mm = `Redefinition of '${a}' from line ${b}.`;
             break;
         case "redefinition_global_a_b":
-            mm = `Redefinition of '${a}' from global ${b} variable.`;
+            mm = `Redefinition of global ${a} variable '${b}'.`;
             break;
         case "required_a_optional_b":
             mm = `Required parameter '${a}' after optional parameter '${b}'.`;
@@ -2485,7 +2485,7 @@ function jslint_phase2_lex(state) {
                 "localStorage",
                 "location",
                 "navigator",
-                "screen",
+                // "screen",
                 "sessionStorage",
                 "window"
             ], "browser");
@@ -2897,7 +2897,7 @@ function jslint_phase3_parse(state) {
         export_dict,
         function_list,
         function_stack,
-        //!! global_dict,
+        global_dict,
         import_list,
         is_equal,
         option_dict,
@@ -3457,14 +3457,11 @@ function jslint_phase3_parse(state) {
 
                 warn("redefinition_a_b", name, name.id, earlier.line);
             }
-        } else if (earlier) {
-            if (
-                (
-                    role !== "exception"
-                    || earlier.role !== "exception"
-                )
-                && role !== "parameter" && role !== "function"
-            ) {
+        } else if (
+            earlier
+            && (role !== "exception" || earlier.role !== "exception")
+            && role !== "parameter" && role !== "function"
+        ) {
 
 // test_cause:
 // ["
@@ -3472,8 +3469,14 @@ function jslint_phase3_parse(state) {
 // ", "enroll", "redefinition_a_b", "1", 31]
 // ["function aa(){var aa;}", "enroll", "redefinition_a_b", "1", 19]
 
-                warn("redefinition_a_b", name, name.id, earlier.line);
-            }
+            warn("redefinition_a_b", name, name.id, earlier.line);
+        } else if (global_dict[name.id] && role !== "parameter") {
+            warn(
+                "redefinition_global_a_b",
+                name,
+                global_dict[name.id],
+                name.id
+            );
         }
 
 // Enroll it.
