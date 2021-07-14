@@ -6267,12 +6267,16 @@ function jslint_phase4_walk(state) {
     let preaction;
     let preamble;
     let pres = empty();
-    let relationop = object_assign_from_list(
-        empty(),
-        [                               // The relational operators.
-            "!=", "!==", "==", "===", "<", "<=", ">", ">="
-        ]
-    );
+    let relationop = Object.assign(empty(), {   // The relational operators.
+        "!=": true,
+        "!==": true,
+        "<": true,
+        "<=": true,
+        "==": true,
+        "===": true,
+        ">": true,
+        ">=": true
+    });
 
 // Ambulation of the parse tree.
 
