@@ -1447,8 +1447,8 @@ function jslint_phase2_lex(state) {
         let body;
         let ii = 0;
         let jj = 0;
+        let key;
         let match;
-        let name;
         let the_comment;
         let val;
 
@@ -1588,28 +1588,28 @@ function jslint_phase2_lex(state) {
                 break;
             }
             [
-                name, val, body
+                key, val, body
             ] = match.slice(1);
             if (the_comment.directive === "jslint") {
-                if (!option_dict_set(name, val !== "false")) {
+                if (!option_dict_set(key, val !== "false")) {
 
 // test_cause:
 // ["/*jslint undefined*/", "lex_comment", "bad_option_a", "undefined", 1]
 
-                    warn("bad_option_a", the_comment, name);
+                    warn("bad_option_a", the_comment, key);
                 }
             } else if (the_comment.directive === "property") {
                 state.mode_property = true;
-                tenure[name] = true;
+                tenure[key] = true;
             } else if (the_comment.directive === "global") {
                 if (val) {
 
 // test_cause:
 // ["/*global aa:false*/", "lex_comment", "bad_option_a", "aa:false", 1]
 
-                    warn("bad_option_a", the_comment, name + ":" + val);
+                    warn("bad_option_a", the_comment, key + ":" + val);
                 }
-                global_dict[name] = false;
+                global_dict[key] = false;
                 state.mode_module = the_comment;
             }
         }
@@ -2423,6 +2423,9 @@ function jslint_phase2_lex(state) {
         default:
             return false;
         }
+
+// Initialize global-variables.
+
         switch (val && key) {
         case "browser":
             [
@@ -2781,8 +2784,8 @@ function jslint_phase2_lex(state) {
 
         "import"
     ], "ECMAScript");
-    Object.keys(option_dict).sort().forEach(function (name) {
-        option_dict_set(name, option_dict[name] === true);
+    Object.keys(option_dict).sort().forEach(function (key) {
+        option_dict_set(key, option_dict[key] === true);
     });
     object_assign_from_list(global_dict, global_list, "User-defined");
 
