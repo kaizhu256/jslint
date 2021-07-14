@@ -2428,8 +2428,20 @@ function jslint_phase2_lex(state) {
 // Initialize global-variables.
 
         switch (val && key) {
+
+// Assign global browser variables to global_dict.
+// /*jslint beta, browser, devel*/
+// console.log(JSON.stringify(Array.from([
+//     ...
+// ]).filter(function (key) {
+//     return window.hasOwnProperty(key);
+// }), undefined, 4));
+
         case "browser":
             object_assign_from_list(global_dict, [
+
+// Shared with Node.js.
+
                 "AbortController",
                 "Event",
                 "EventTarget",
@@ -2450,6 +2462,8 @@ function jslint_phase2_lex(state) {
                 "queueMicrotask",
                 "setInterval",
                 "setTimeout",
+
+// Browser only.
 
                 "CharacterData",
                 "DOMException",
