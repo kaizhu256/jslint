@@ -3453,9 +3453,9 @@ function jslint_phase3_parse(state) {
             if (earlier.role === "variable") {
 
 // test_cause:
-// ["let ignore;function aa(ignore){}", "enroll", "unexpected_a", "ignore", 24]
+// ["let ignore;function aa(ignore){}", "enroll", "redefinition_a_b", "1", 24]
 
-                warn("unexpected_a", name);
+                warn("redefinition_a_b", name, name.id, earlier.line);
             }
         } else if (earlier) {
             if (
@@ -3472,12 +3472,7 @@ function jslint_phase3_parse(state) {
 // ", "enroll", "redefinition_a_b", "1", 31]
 // ["function aa(){var aa;}", "enroll", "redefinition_a_b", "1", 19]
 
-                warn(
-                    "redefinition_a_b",
-                    name,
-                    name.id,
-                    earlier.line
-                );
+                warn("redefinition_a_b", name, name.id, earlier.line);
             }
         }
 
