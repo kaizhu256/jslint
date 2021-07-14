@@ -867,7 +867,6 @@ eval("console.log(\\"hello world\\");"); //jslint-quiet
 // .... /*jslint convert*/ ....... Allow conversion operators.
 // .... /*jslint debug*/ ......... Include jslint stack-trace in warnings.
 // .... /*jslint devel*/ ......... Allow console.log() and friends.
-// .... /*jslint eval*/ .......... Allow eval().
 // .... /*jslint for*/ ........... Allow for-statement.
 // .... /*jslint getset*/ ........ Allow get() and set().
 // .... /*jslint indent2*/ ....... Use 2-space indent.
