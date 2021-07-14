@@ -1538,7 +1538,6 @@ function jslint_phase2_lex(state) {
     }
 
     function lex_comment() {
-        let allowed;
         let body;
         let ii = 0;
         let jj = 0;
@@ -1686,31 +1685,7 @@ function jslint_phase2_lex(state) {
                 name, val, body
             ] = match.slice(1);
             if (the_comment.directive === "jslint") {
-                allowed = allowed_option[name];
-                if (
-                    typeof allowed === "boolean"
-                    || typeof allowed === "object"
-                ) {
-                    if (val === "true" || val === undefined) {
-                        option_dict[name] = true;
-                        if (Array.isArray(allowed)) {
-                            object_assign_from_list(global_dict, allowed);
-                        }
-                    } else {
-
-// Probably deadcode.
-// } else if (val === "false") {
-//     option_dict[name] = false;
-// } else {
-//     warn("bad_option_a", the_comment, name + ":" + val);
-
-                        assert_or_throw(
-                            val === "false",
-                            `Expected val === "false".`
-                        );
-                        option_dict[name] = false;
-                    }
-                } else {
+                if (!validate_option(name, val !== false)) {
 
 // test_cause:
 // ["/*jslint undefined*/", "lex_comment", "bad_option_a", "undefined", 1]
@@ -2685,6 +2660,124 @@ function jslint_phase2_lex(state) {
             token_prv_expr = token_prv;
         }
         return the_token;
+    }
+
+    function validate_option(key, val = true) {
+        switch (key) {
+        case "beta":            // Enable experimental warnings.
+        case "bitwise":         // Allow bitwise operators.
+        case "browser":         // Assume browser environment.
+        case "convert":         // Allow conversion operators.
+        case "couch":           // Assume CouchDb environment.
+        case "debug":           // Include jslint stack-trace in warnings.
+        case "devel":           // Allow console.log() and friends.
+        case "eval":            // Allow eval().
+        case "for":             // Allow for-statement.
+        case "getset":          // Allow get() and set().
+        case "indent2":         // Allow 2-space indent.
+        case "long":            // Allow long lines.
+        case "name":            // Allow weird property names.
+        case "node":            // Assume Node.js environment.
+        case "single":          // Allow single-quote strings.
+        case "test_cause":      // Test jslint's causes.
+        case "test_internal_error":     // Test jslint's internal-error
+                                        // ... handling-ability.
+        case "this":            // Allow 'this'.
+        case "unordered":       // Allow unordered cases, params, properties,
+                                // ... and variables.
+        case "variable":        // Allow unordered const and let declarations
+                                // ... that are not at top of function-scope.
+        case "white":           // Allow messy whitespace.
+            option_dict[key] = val;
+            break;
+        default:
+            return false;
+        }
+        switch (val && key) {
+        case "browser":
+            [
+                "CharacterData",
+                "DOMException",
+                "DocumentType",
+                "Element",
+                "Event",
+                "FileReader",
+                "FontFace",
+                "FormData",
+                "IntersectionObserver",
+                "MutationObserver",
+                "Storage",
+                "TextDecoder",
+                "TextEncoder",
+                "URL",
+                "Worker",
+                "XMLHttpRequest",
+                "clearInterval",
+                "clearTimeout",
+                "document",
+                "fetch",
+                "localStorage",
+                "location",
+                "navigator",
+                "screen",
+                "sessionStorage",
+                "setInterval",
+                "setTimeout",
+                "window"
+            ].forEach(function (key) {
+                global_dict[key] = "browser";
+            });
+            break;
+        case "couch":
+            [
+                "emit",
+                "getRow",
+                "isArray",
+                "log",
+                "provides",
+                "registerType",
+                "require",
+                "send",
+                "start",
+                "sum",
+                "toJSON"
+            ].forEach(function (key) {
+                global_dict[key] = "CouchDb";
+            });
+            break;
+        case "devel":
+            [
+                "alert", "confirm", "console", "prompt"
+            ].forEach(function (key) {
+                global_dict[key] = "development";
+            });
+            break;
+        case "node":
+            [
+                "Buffer",
+                "TextDecoder",
+                "TextEncoder",
+                "URL",
+                "URLSearchParams",
+                "__dirname",
+                "__filename",
+                "clearImmediate",
+                "clearInterval",
+                "clearTimeout",
+                "console",
+                "exports",
+                "module",
+                "process",
+                "require",
+                "setImmediate",
+                "setInterval",
+                "setTimeout"
+            ].forEach(function (key) {
+                global_dict[key] = "Node.js";
+            });
+            break;
+        }
+        return true;
     }
 
 // Assign standard ECMAScript global variables to global_dict.
