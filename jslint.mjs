@@ -6267,12 +6267,12 @@ function jslint_phase4_walk(state) {
     let preaction;
     let preamble;
     let pres = empty();
-    let relationop = object_assign_from_list(
-        empty(),
-        [                               // The relational operators.
-            "!=", "!==", "==", "===", "<", "<=", ">", ">="
-        ]
-    );
+
+// The relational operators.
+
+    let relationop = object_assign_from_list(empty(), [
+        "!=", "!==", "<", "<=", "==", "===", ">", ">="
+    ], true);
 
 // Ambulation of the parse tree.
 
@@ -7494,15 +7494,14 @@ function jslint_phase5_whitage(state) {
     let open = true;
     let opening = true;
     let right;
-    let spaceop = object_assign_from_list(
-        empty(),
-        [                       // This is the set of infix operators that
-                                // ... require a space on each side.
-            "!=", "!==", "%", "%=", "&", "&=", "&&", "*", "*=", "+=", "-=", "/",
-            "/=", "<", "<=", "<<", "<<=", "=", "==", "===", "=>", ">", ">=",
-            ">>", ">>=", ">>>", ">>>=", "^", "^=", "|", "|=", "||"
-        ]
-    );
+
+// This is the set of infix operators that require a space on each side.
+
+    let spaceop = object_assign_from_list(empty(), [
+        "!=", "!==", "%", "%=", "&", "&&", "&=", "*", "*=", "+=", "-=", "/",
+        "/=", "<", "<<", "<<=", "<=", "=", "==", "===", "=>", ">", ">=", ">>",
+        ">>=", ">>>", ">>>=", "^", "^=", "|", "|=", "||"
+    ], true);
 
     function at_margin(fit) {
         const at = margin + fit;
@@ -8117,7 +8116,7 @@ function noop() {
     return;
 }
 
-function object_assign_from_list(dict, list, val = true) {
+function object_assign_from_list(dict, list, val) {
 
 // Assign each property-name from <list> to <dict>.
 
