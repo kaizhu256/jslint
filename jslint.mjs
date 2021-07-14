@@ -99,7 +99,7 @@
     max, min,
     stringify,
     test_cause,
-    JSLINT_BETA, a, all, allowed_option, argv, arity, artifact, assign, async,
+    JSLINT_BETA, a, all, argv, arity, artifact, assign, async,
     b, beta, bind, bitwise, block, body, browser, c, calls, catch, catch_list,
     catch_stack, cjs_module, cjs_require, cli, closer, closure, code, column,
     concat, console_error, constant, context, convert, couch, create, cwd, d,
@@ -181,101 +181,6 @@ function jslint(
 ) {
 
 // The jslint function itself.
-
-    let allowed_option = {
-
-// These are the options that are recognized in the option object or that may
-// appear in a /*jslint*/ directive. Most options will have a boolean value,
-// usually true. Some options will also predefine some number of global
-// variables.
-
-        beta: true,             // Enable experimental warnings.
-        bitwise: true,          // Allow bitwise operators.
-        browser: [              // Assume browser environment.
-            "CharacterData",
-            "DOMException",
-            "DocumentType",
-            "Element",
-            "Event",
-            "FileReader",
-            "FontFace",
-            "FormData",
-            "IntersectionObserver",
-            "MutationObserver",
-            "Storage",
-            "TextDecoder",
-            "TextEncoder",
-            "URL",
-            "Worker",
-            "XMLHttpRequest",
-            "clearInterval",
-            "clearTimeout",
-            "document",
-            "fetch",
-            "localStorage",
-            "location",
-            "navigator",
-            "screen",
-            "sessionStorage",
-            "setInterval",
-            "setTimeout",
-            "window"
-        ],
-        convert: true,          // Allow conversion operators.
-        couch: [                // Assume CouchDb environment.
-            "emit",
-            "getRow",
-            "isArray",
-            "log",
-            "provides",
-            "registerType",
-            "require",
-            "send",
-            "start",
-            "sum",
-            "toJSON"
-        ],
-        debug: true,            // Include jslint stack-trace in warnings.
-        devel: [                // Allow console.log() and friends.
-            "alert", "confirm", "console", "prompt"
-        ],
-        eval: true,             // Allow eval().
-        for: true,              // Allow for-statement.
-        getset: true,           // Allow get() and set().
-        indent2: true,          // Allow 2-space indent.
-        long: true,             // Allow long lines.
-        name: true,             // Allow weird property names.
-        node: [                 // Assume Node.js environment.
-            "Buffer",
-            "TextDecoder",
-            "TextEncoder",
-            "URL",
-            "URLSearchParams",
-            "__dirname",
-            "__filename",
-            "clearImmediate",
-            "clearInterval",
-            "clearTimeout",
-            "console",
-            "exports",
-            "module",
-            "process",
-            "require",
-            "setImmediate",
-            "setInterval",
-            "setTimeout"
-        ],
-        single: true,           // Allow single-quote strings.
-        test_cause: true,       // Test jslint's causes.
-        test_internal_error: true,      // Test jslint's internal-error
-                                        // ... handling-ability.
-        this: true,             // Allow 'this'.
-        unordered: true,        // Allow unordered cases, params, properties,
-                                // ... and variables.
-        variable: true,         // Allow unordered const and let declarations
-                                // ... that are not at top of function-scope.
-        white: true             // Allow messy whitespace.
-    };
     let catch_list = [];        // The array containing all catch-blocks.
     let catch_stack = [         // The stack of catch-blocks.
         {
@@ -896,7 +801,6 @@ function jslint(
 
         option_dict = Object.assign(empty(), option_dict);
         Object.assign(state, {
-            allowed_option,
             artifact,
             catch_list,
             catch_stack,
@@ -1348,7 +1252,6 @@ function jslint_phase2_lex(state) {
 // PHASE 2. Lex <line_list> into <token_list>.
 
     let {
-        allowed_option,
         artifact,
         directive_list,
         global_dict,
@@ -1364,6 +1267,100 @@ function jslint_phase2_lex(state) {
         warn,
         warn_at
     } = state;
+    let allowed_option = {
+
+// These are the options that are recognized in the option object or that may
+// appear in a /*jslint*/ directive. Most options will have a boolean value,
+// usually true. Some options will also predefine some number of global
+// variables.
+
+        beta: true,             // Enable experimental warnings.
+        bitwise: true,          // Allow bitwise operators.
+        browser: [              // Assume browser environment.
+            "CharacterData",
+            "DOMException",
+            "DocumentType",
+            "Element",
+            "Event",
+            "FileReader",
+            "FontFace",
+            "FormData",
+            "IntersectionObserver",
+            "MutationObserver",
+            "Storage",
+            "TextDecoder",
+            "TextEncoder",
+            "URL",
+            "Worker",
+            "XMLHttpRequest",
+            "clearInterval",
+            "clearTimeout",
+            "document",
+            "fetch",
+            "localStorage",
+            "location",
+            "navigator",
+            "screen",
+            "sessionStorage",
+            "setInterval",
+            "setTimeout",
+            "window"
+        ],
+        convert: true,          // Allow conversion operators.
+        couch: [                // Assume CouchDb environment.
+            "emit",
+            "getRow",
+            "isArray",
+            "log",
+            "provides",
+            "registerType",
+            "require",
+            "send",
+            "start",
+            "sum",
+            "toJSON"
+        ],
+        debug: true,            // Include jslint stack-trace in warnings.
+        devel: [                // Allow console.log() and friends.
+            "alert", "confirm", "console", "prompt"
+        ],
+        eval: true,             // Allow eval().
+        for: true,              // Allow for-statement.
+        getset: true,           // Allow get() and set().
+        indent2: true,          // Allow 2-space indent.
+        long: true,             // Allow long lines.
+        name: true,             // Allow weird property names.
+        node: [                 // Assume Node.js environment.
+            "Buffer",
+            "TextDecoder",
+            "TextEncoder",
+            "URL",
+            "URLSearchParams",
+            "__dirname",
+            "__filename",
+            "clearImmediate",
+            "clearInterval",
+            "clearTimeout",
+            "console",
+            "exports",
+            "module",
+            "process",
+            "require",
+            "setImmediate",
+            "setInterval",
+            "setTimeout"
+        ],
+        single: true,           // Allow single-quote strings.
+        test_cause: true,       // Test jslint's causes.
+        test_internal_error: true,      // Test jslint's internal-error
+                                        // ... handling-ability.
+        this: true,             // Allow 'this'.
+        unordered: true,        // Allow unordered cases, params, properties,
+                                // ... and variables.
+        variable: true,         // Allow unordered const and let declarations
+                                // ... that are not at top of function-scope.
+        white: true             // Allow messy whitespace.
+    };
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
     let from;                   // The starting column number of the token.
@@ -1548,7 +1545,7 @@ function jslint_phase2_lex(state) {
         let match;
         let name;
         let the_comment;
-        let value;
+        let val;
 
 // Create a comment object. Comments are not allowed in JSON text. Comments can
 // include directives and notices of incompletion.
@@ -1668,7 +1665,7 @@ function jslint_phase2_lex(state) {
 // function processes one item, and calls itself recursively to process the
 // next one.
 
-// Lex/loop throught each directive in /*...*/
+// Lex/loop through each directive in /*...*/
 
         while (true) {
             match = body.match(
@@ -1686,7 +1683,7 @@ function jslint_phase2_lex(state) {
                 break;
             }
             [
-                name, value, body
+                name, val, body
             ] = match.slice(1);
             if (the_comment.directive === "jslint") {
                 allowed = allowed_option[name];
@@ -1694,7 +1691,7 @@ function jslint_phase2_lex(state) {
                     typeof allowed === "boolean"
                     || typeof allowed === "object"
                 ) {
-                    if (value === "true" || value === undefined) {
+                    if (val === "true" || val === undefined) {
                         option_dict[name] = true;
                         if (Array.isArray(allowed)) {
                             object_assign_from_list(global_dict, allowed);
@@ -1702,14 +1699,14 @@ function jslint_phase2_lex(state) {
                     } else {
 
 // Probably deadcode.
-// } else if (value === "false") {
+// } else if (val === "false") {
 //     option_dict[name] = false;
 // } else {
-//     warn("bad_option_a", the_comment, name + ":" + value);
+//     warn("bad_option_a", the_comment, name + ":" + val);
 
                         assert_or_throw(
-                            value === "false",
-                            `Expected value === "false".`
+                            val === "false",
+                            `Expected val === "false".`
                         );
                         option_dict[name] = false;
                     }
@@ -1724,12 +1721,12 @@ function jslint_phase2_lex(state) {
                 state.mode_property = true;
                 tenure[name] = true;
             } else if (the_comment.directive === "global") {
-                if (value) {
+                if (val) {
 
 // test_cause:
 // ["/*global aa:false*/", "lex_comment", "bad_option_a", "aa:false", 1]
 
-                    warn("bad_option_a", the_comment, name + ":" + value);
+                    warn("bad_option_a", the_comment, name + ":" + val);
                 }
                 global_dict[name] = false;
                 state.mode_module = the_comment;
