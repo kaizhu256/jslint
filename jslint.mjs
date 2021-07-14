@@ -6267,18 +6267,11 @@ function jslint_phase4_walk(state) {
     let preaction;
     let preamble;
     let pres = empty();
-    let relationop = Object.assign(     // The relational operators.
+    let relationop = object_assign_from_list(
         empty(),
-        {
-            "!=": true,
-            "!==": true,
-            "<": true,
-            "<=": true,
-            "==": true,
-            "===": true,
-            ">": true,
-            ">=": true
-        }
+        [                               // The relational operators.
+            "!=", "!==", "==", "===", "<", "<=", ">", ">="
+        ]
     );
 
 // Ambulation of the parse tree.
@@ -7501,44 +7494,14 @@ function jslint_phase5_whitage(state) {
     let open = true;
     let opening = true;
     let right;
-    let spaceop = Object.assign(        // This is the set of infix operators
-                                        // ... that require a space on each
-                                        // ... side.
+    let spaceop = object_assign_from_list(
         empty(),
-        {
-            "!=": true,
-            "!==": true,
-            "%": true,
-            "%=": true,
-            "&": true,
-            "&&": true,
-            "&=": true,
-            "*": true,
-            "*=": true,
-            "+=": true,
-            "-=": true,
-            "/": true,
-            "/=": true,
-            "<": true,
-            "<<": true,
-            "<<=": true,
-            "<=": true,
-            "=": true,
-            "==": true,
-            "===": true,
-            "=>": true,
-            ">": true,
-            ">=": true,
-            ">>": true,
-            ">>=": true,
-            ">>>": true,
-            ">>>=": true,
-            "^": true,
-            "^=": true,
-            "|": true,
-            "|=": true,
-            "||": true
-        }
+        [                       // This is the set of infix operators that
+                                // ... require a space on each side.
+            "!=", "!==", "%", "%=", "&", "&=", "&&", "*", "*=", "+=", "-=", "/",
+            "/=", "<", "<=", "<<", "<<=", "=", "==", "===", "=>", ">", ">=",
+            ">>", ">>=", ">>>", ">>>=", "^", "^=", "|", "|=", "||"
+        ]
     );
 
     function at_margin(fit) {
