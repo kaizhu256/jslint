@@ -1251,22 +1251,6 @@ function jslint_phase2_lex(state) {
 
 // PHASE 2. Lex <line_list> into <token_list>.
 
-    let {
-        artifact,
-        directive_list,
-        global_dict,
-        global_list,
-        line_list,
-        option_dict,
-        stop,
-        stop_at,
-        tenure,
-        test_cause,
-        token_global,
-        token_list,
-        warn,
-        warn_at
-    } = state;
     let allowed_option = {
 
 // These are the options that are recognized in the option object or that may
@@ -1361,6 +1345,22 @@ function jslint_phase2_lex(state) {
                                 // ... that are not at top of function-scope.
         white: true             // Allow messy whitespace.
     };
+    let {
+        artifact,
+        directive_list,
+        global_dict,
+        global_list,
+        line_list,
+        option_dict,
+        stop,
+        stop_at,
+        tenure,
+        test_cause,
+        token_global,
+        token_list,
+        warn,
+        warn_at
+    } = state;
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
     let from;                   // The starting column number of the token.
@@ -1641,11 +1641,13 @@ function jslint_phase2_lex(state) {
 
 // Lex directives in comment.
 
-        match = snippet.match(
+        [
+            the_comment.directive, body
+        ] = Array.from(snippet.match(
             // rx_directive
             /^(jslint|property|global)\s+(.*)$/
-        );
-        if (!match) {
+        ) || []).slice(1);
+        if (the_comment.directive === undefined) {
             return the_comment;
         }
         directive_list.push(the_comment);
@@ -1654,11 +1656,9 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["0\n/*global aa*/", "lex_comment", "misplaced_directive_a", "global", 1]
 
-            warn_at("misplaced_directive_a", line, from, match[1]);
+            warn_at("misplaced_directive_a", line, from, the_comment.directive);
             return the_comment;
         }
-        the_comment.directive = match[1];
-        body = match[2];
 
 // lex_directive();
 // JSLint recognizes three directives that can be encoded in comments. This
