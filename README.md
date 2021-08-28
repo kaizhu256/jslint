@@ -25,8 +25,8 @@ Douglas Crockford <douglas@crockford.com>
 
 # Web Demo Archived
 - [Web Demo 2020](https://www.jslint.com/branch-v2020.11.6/index.html)
-- [Web Demo 2014 (can lint ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
-- [Web Demo 2013 (can lint ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
+- [Web Demo 2014 (ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
+- [Web Demo 2013 (ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
 
 
 # Install
