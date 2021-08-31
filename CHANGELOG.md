@@ -18,8 +18,9 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2021.9.1-beta
-- jslint - disable warning "Expected 'catch' before 'finally'".
+- jslint - add warning `Expected 'u' flag in regular expression.`
 - jslint - add bigint support.
+- jslint - disable warning "Expected 'catch' before 'finally'".
 - vim - add vim-plugin and file jslint.vim.
 
 # v2021.8.20

@@ -2157,8 +2157,8 @@ function jslint_phase2_lex(state) {
         char_before();
         if (flag.u === undefined) {
 
-//!! // test_cause:
-//!! // ["aa=/.//", "lex_regexp", "unexpected_a", "/", 3]
+// test_cause:
+// ["aa=/./", "lex_regexp", "missing_u", "", 6]
 
             warn_at("missing_u", line, column);
         }
