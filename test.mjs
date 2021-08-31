@@ -186,10 +186,10 @@ function noop() {
             "let aa = aa[`!`];"
         ],
         regexp: [
-            "function aa() {\n    return /./;\n}",
-            "let aa = /(?!.)(?:.)(?=.)/;",
+            "function aa() {\n    return /./u;\n}",
+            "let aa = /(?!.)(?:.)(?=.)/u;",
             "let aa = /./gimuy;",
-            "let aa = /[\\--\\-]/;"
+            "let aa = /[\\--\\-]/u;"
         ],
         ternary: [
             (
@@ -296,7 +296,7 @@ function noop() {
             String(
                 await moduleFs.promises.readFile("jslint.mjs", "utf8")
             ).replace((
-                /\u0020{4}/g
+                /\u0020{4}/gu
             ), "  "),
             {indent2: true},
             []
@@ -363,7 +363,7 @@ function noop() {
         // test jslint's directive handling-behavior
         source = (
             "/*jslint " + JSON.stringify(option_dict).slice(1, -1).replace((
-                /"/g
+                /"/gu
             ), "") + "*/\n"
             + (
                 global_list.length === 0
@@ -371,7 +371,7 @@ function noop() {
                 : "/*global " + global_list.join(",") + "*/\n"
             )
             + source.replace((
-                /^#!/
+                /^#!/u
             ), "//")
         );
         assertOrThrow(jslint(source).warnings.length === 0, source);
@@ -389,7 +389,7 @@ function noop() {
     String(
         await moduleFs.promises.readFile("jslint.mjs", "utf8")
     ).replace((
-        /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?)\u0020*?\S/g
+        /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?)\u0020*?\S/gu
     ), function (match0, header, causeList, footer) {
         let tmp;
         // console.error(match0);
@@ -399,15 +399,15 @@ function noop() {
         assertOrThrow(footer === "\n\n", match0);
         // Validate causeList.
         causeList = causeList.replace((
-            /^\/\/\u0020/gm
+            /^\/\/\u0020/gmu
         ), "").replace((
-            /^\["\n([\S\s]*?)\n"(,.*?)$/gm
+            /^\["\n([\S\s]*?)\n"(,.*?)$/gmu
         ), function (ignore, source, param) {
             source = "[" + JSON.stringify(source) + param;
             assertOrThrow(source.length > (80 - 3), source);
             return source;
         }).replace((
-            /\u0020\/\/jslint-quiet$/gm
+            /\u0020\/\/jslint-quiet$/gmu
         ), "");
         tmp = causeList.split("\n").map(function (cause) {
             return (
