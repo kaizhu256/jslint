@@ -67,9 +67,9 @@ function dom_style_report_unmatched() {
     let style_list = [];
     Array.from(document.querySelectorAll("style")).forEach(function (elem) {
         elem.innerHTML.replace((
-            /\/\*[\S\s]*?\*\/|;|\}/g
+            /\/\*[\S\s]*?\*\/|;|\}/gu
         ), "\n").replace((
-            /^([^\n\u0020@].*?)[,{:].*?$/gm
+            /^([^\n\u0020@].*?)[,{:].*?$/gmu
         ), function (match0, match1) {
             let ii;
             try {
@@ -78,7 +78,7 @@ function dom_style_report_unmatched() {
                 console.error(match1 + "\n" + err); //jslint-quiet
             }
             if (ii <= 1 && !(
-                /^0\u0020(?:(body\u0020>\u0020)?(?:\.button|\.readonly|\.styleColorError|\.textarea|\.uiAnimateSlide|a|base64|body|code|div|input|pre|textarea)(?:,|\u0020\{))|^[1-9]\d*?\u0020#/m
+                /^0\u0020(?:(body\u0020>\u0020)?(?:\.button|\.readonly|\.styleColorError|\.textarea|\.uiAnimateSlide|a|base64|body|code|div|input|pre|textarea)(?:,|\u0020\{))|^[1-9]\d*?\u0020#/mu
             ).test(ii + " " + match0)) {
                 style_list.push(ii + " " + match0);
             }
@@ -162,11 +162,11 @@ function jslint_report_html({
 // Replace & < > with less destructive html-entities.
 
         return String(str).replace((
-            /&/g
+            /&/gu
         ), "&amp;").replace((
-            /</g
+            /</gu
         ), "&lt;").replace((
-            />/g
+            />/gu
         ), "&gt;");
     }
 
@@ -778,7 +778,7 @@ function jslint_ui_onresize() {
 
 // Init mode_debug.
     mode_debug = (
-        /\bdebug=1\b/
+        /\bdebug=1\b/u
     ).test(location.search);
 
 // Init CodeMirror editor.
@@ -857,7 +857,7 @@ function jslint_ui_onresize() {
         currentTarget
     }) {
         jslint_option_dict.globals = currentTarget.value.trim().split(
-            /[\s,;'"]+/
+            /[\s,;'"]+/u
         );
     };
     document.querySelector(

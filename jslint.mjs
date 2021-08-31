@@ -122,7 +122,7 @@
     stack_trace, startsWith, statement, stop, stop_at, switch, syntax_dict,
     tenure, test, test_internal_error, this, thru, token, token_global,
     token_list, token_nxt, token_tree, tokens, tree, trim, trimRight, try, type,
-    unordered, url, used, value, variable, versions, warn, warn_at, warning,
+    u, unordered, url, used, value, variable, versions, warn, warn_at, warning,
     warning_list, warnings, white, wrapped, readonly
 */
 
@@ -201,7 +201,7 @@ function jslint(
         "\n" + source
     ).split(
         // rx_crlf
-        /\n|\r\n?/
+        /\n|\r\n?/u
     ).map(function (line_source) {
         return {
             line_source
@@ -417,11 +417,11 @@ function jslint(
         if (option_dict.test_cause) {
             cause_dict[JSON.stringify([
                 String(new Error().stack).replace((
-                    /^\u0020{4}at\u0020(?:file|stop|stop_at|test_cause|warn|warn_at)\b.*?\n/gm
+                    /^\u0020{4}at\u0020(?:file|stop|stop_at|test_cause|warn|warn_at)\b.*?\n/gmu
                 ), "").match(
-                    /\n\u0020{4}at\u0020((?:Object\.\w+?_)?\w+?)\u0020/
+                    /\n\u0020{4}at\u0020((?:Object\.\w+?_)?\w+?)\u0020/u
                 )[1].replace((
-                    /^Object\./
+                    /^Object\./u
                 ), ""),
                 code,
                 String(
@@ -602,6 +602,9 @@ function jslint(
 
         case "missing_m":
             mm = `Expected 'm' flag on a multiline regular expression.`;
+            break;
+        case "missing_u":
+            mm = `Expected 'u' flag in regular expression.`;
             break;
         case "naked_block":
             mm = `Naked block.`;
@@ -1018,14 +1021,14 @@ async function jslint_cli({
             file
         });
         switch ((
-            /\.\w+?$|$/m
+            /\.\w+?$|$/mu
         ).exec(file)[0]) {
         case ".html":
 
 // Recursively jslint embedded "<script>\n...\n</script>".
 
             code.replace((
-                /^<script>\n([\S\s]*?\n)<\/script>$/gm
+                /^<script>\n([\S\s]*?\n)<\/script>$/gmu
             ), function (ignore, match1, ii) {
                 jslint_from_file({
                     code: match1,
@@ -1043,7 +1046,7 @@ async function jslint_cli({
 // Recursively jslint embedded "```javascript\n...\n```".
 
             code.replace((
-                /^```(?:javascript|js)\n([\S\s]*?\n)```$/gm
+                /^```(?:javascript|js)\n([\S\s]*?\n)```$/gmu
             ), function (ignore, match1, ii) {
                 jslint_from_file({
                     code: match1,
@@ -1059,7 +1062,7 @@ async function jslint_cli({
 // Recursively jslint embedded "node -e '\n...\n'".
 
             code.replace((
-                /\bnode\u0020.*?-e\u0020'\n([\S\s]*?\n)'/gm
+                /\bnode\u0020.*?-e\u0020'\n([\S\s]*?\n)'/gmu
             ), function (ignore, match1, ii) {
                 jslint_from_file({
                     code: match1,
@@ -1069,7 +1072,7 @@ async function jslint_cli({
                         beta: Boolean(
                             process.env.JSLINT_BETA
                             && !(
-                                /0|false|null|undefined/
+                                /0|false|null|undefined/u
                             ).test(process.env.JSLINT_BETA)
                         ),
                         node: true
@@ -1172,7 +1175,7 @@ async function jslint_cli({
             && process.execArgv.indexOf("-e") === -1
             && (
                 (
-                    /[\/|\\]jslint(?:\.[cm]?js)?$/m
+                    /[\/|\\]jslint(?:\.[cm]?js)?$/mu
                 ).test(process_argv[1])
                 || mode_cli
             )
@@ -1206,9 +1209,9 @@ async function jslint_cli({
         file = file.replace(process.cwd() + "/", "").slice(0, -1) || ".";
     }
     file = file.replace((
-        /\\/g
+        /\\/gu
     ), "/").replace((
-        /\/$/g
+        /\/$/gu
     ), "");
     if (source) {
         jslint_from_file({
@@ -1231,7 +1234,7 @@ async function jslint_cli({
             let time_start = Date.now();
             file2 = file + "/" + file2;
             switch ((
-                /\.\w+?$|$/m
+                /\.\w+?$|$/mu
             ).exec(file2)[0]) {
             case ".cjs":
             case ".html":
@@ -1251,7 +1254,7 @@ async function jslint_cli({
             }
             if (!(
                 !(
-                    /\b(?:lock|min|raw|rollup)\b/
+                    /\b(?:lock|min|raw|rollup)\b/u
                 ).test(file2) && code && code.length < 1048576
             )) {
                 return;
@@ -1549,7 +1552,7 @@ function jslint_phase2_lex(state) {
             }
             jj = line_source.slice(0, ii).search(
                 // rx_slash_star_or_slash
-                /\/\*|\/$/
+                /\/\*|\/$/u
             );
             if (jj >= 0) {
 
@@ -1571,7 +1574,7 @@ function jslint_phase2_lex(state) {
             !option_dict.devel
             && (
                 // rx_todo
-                /\b(?:todo|TO\s?DO|HACK)\b/
+                /\b(?:todo|TO\s?DO|HACK)\b/u
             ).test(snippet)
         ) {
 
@@ -1587,7 +1590,7 @@ function jslint_phase2_lex(state) {
             the_comment.directive, body
         ] = Array.from(snippet.match(
             // rx_directive
-            /^(jslint|property|global)\s+(.*)$/
+            /^(jslint|property|global)\s+(.*)$/u
         ) || []).slice(1);
         if (the_comment.directive === undefined) {
             return the_comment;
@@ -1612,7 +1615,7 @@ function jslint_phase2_lex(state) {
         ii = 0;
         body.replace((
             // rx_directive_part
-            /([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?,?\s*|$/g
+            /([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?,?\s*|$/gu
         ), function (match0, key, val, jj) {
             if (ii !== jj) {
 
@@ -1690,7 +1693,7 @@ function jslint_phase2_lex(state) {
             match = line_source.match(
                 // rx_mega
                 // Vim-hack - vim-editor has trouble parsing '`' in regexp
-                /[\u0060\\]|\$\{/
+                /[\u0060\\]|\$\{/u
             ) || {
                 "0": "",
                 index: 0
@@ -2152,6 +2155,13 @@ function jslint_phase2_lex(state) {
             char_after();
         }
         char_before();
+        if (flag.u === undefined) {
+
+//!! // test_cause:
+//!! // ["aa=/.//", "lex_regexp", "unexpected_a", "/", 3]
+
+            warn_at("missing_u", line, column);
+        }
         if (char === "/" || char === "*") {
 
 // test_cause:
@@ -2721,21 +2731,21 @@ function jslint_phase2_lex(state) {
             mode === "b"
             ? (
                 // rx_bits
-                /^[01]*/
+                /^[01]*/u
             )
             : mode === "o"
             ? (
                 // rx_octals
-                /^[0-7]*/
+                /^[0-7]*/u
             )
             : mode === "x"
             ? (
                 // rx_hexs
-                /^[0-9A-F]*/i
+                /^[0-9A-F]*/iu
             )
             : (
                 // rx_digits
-                /^[0-9]*/
+                /^[0-9]*/u
             )
         )[0];
         let length = digits.length;
@@ -2831,7 +2841,7 @@ function jslint_phase2_lex(state) {
             }
             line_source = line_source.replace((
                 // rx_tab
-                /\t/g
+                /\t/gu
             ), " ");
         }
         if (!option_dict.white && line_source.endsWith(" ")) {
@@ -2988,10 +2998,10 @@ function jslint_phase3_parse(state) {
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
     let rx_identifier = (
-        /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/
+        /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/u
     );
     let rx_json_number = (
-        /^-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][\-+]?\d+)?$/
+        /^-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][\-+]?\d+)?$/u
     );
     let token_ii = 0;           // The number of the next token.
     let token_now = token_global;       // The current token being examined in
@@ -5488,7 +5498,7 @@ function jslint_phase3_parse(state) {
         the_import.import = token_now;
         if (!(
             // rx_module
-            /^[a-zA-Z0-9_$:.@\-\/]+$/
+            /^[a-zA-Z0-9_$:.@\-\/]+$/u
         ).test(token_now.value)) {
 
 // test_cause:
@@ -6128,7 +6138,7 @@ function jslint_phase3_parse(state) {
                 && name.identifier
                 && (
                     // rx_weird_property
-                    /^_|\$|Sync$|_$/m
+                    /^_|\$|Sync$|_$/mu
                 ).test(id)
             ) {
 
@@ -6887,7 +6897,7 @@ function jslint_phase4_walk(state) {
             }
             if ((
                 // rx_cap
-                /^[A-Z]/
+                /^[A-Z]/u
             ).test(left.name.id) !== cack) {
                 if (the_new !== undefined) {
 

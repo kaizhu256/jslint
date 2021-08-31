@@ -51,7 +51,7 @@ import moduleUrl from "url";
     timeStart = Date.now();
     url = process.argv[1];
     if (!(
-        /^\w+?:/
+        /^\w+?:/u
     ).test(url)) {
         url = modulePath.resolve(url);
     }
@@ -61,7 +61,7 @@ import moduleUrl from "url";
         file = file.replace(process.cwd(), "");
     }
     file = ".build/screenshot-browser-" + encodeURIComponent(file).replace((
-        /%/g
+        /%/gu
     ), "_").toLowerCase() + ".png";
     moduleChildProcess.spawn(
         (
@@ -142,7 +142,7 @@ echo "\
 100  250k  100  250k    0     0   250k      0  0:00:01 --:--:--  0:00:01  250k\
 "
     `).trim().replace((
-        /250/g
+        /250/gu
     ), Math.floor(screenshotCurl.size / 1024));
     [
         // parallel-task - screenshot files
@@ -176,18 +176,18 @@ echo "\
     Array.from(String(
         await moduleFs.promises.readFile("README.md", "utf8")
     ).matchAll(
-        /\n```shell\u0020<!--\u0020shRunWithScreenshotTxt\u0020(.*?)\u0020-->\n([\S\s]*?\n)```\n/g
+        /\n```shell\u0020<!--\u0020shRunWithScreenshotTxt\u0020(.*?)\u0020-->\n([\S\s]*?\n)```\n/gu
     )).forEach(async function ([
         ignore, file, script
     ]) {
         await moduleFs.promises.writeFile(file + ".sh", (
             "printf \u0027"
             + script.trim().replace((
-                /[%\\]/gm
+                /[%\\]/gmu
             ), "$&$&").replace((
-                /\u0027/g
+                /\u0027/gu
             ), "\u0027\"\u0027\"\u0027").replace((
-                /^/gm
+                /^/gmu
             ), "> ")
             + "\n\n\n\u0027\n"
             + script.replace(
@@ -242,19 +242,19 @@ import moduleFs from "fs";
         "\n<style class=\"JSLINT_REPORT_STYLE\"></style>\n"
     ), function () {
         return fileDict["browser.mjs"].match(
-            /\n<style\sclass="JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/
+            /\n<style\sclass="JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/u
         )[0];
     });
 
 // Invalidate cached-assets.
 
     fileDict["browser.mjs"] = fileDict["browser.mjs"].replace((
-        /^import\u0020.+?\u0020from\u0020".+?\.(?:js|mjs)\b/gm
+        /^import\u0020.+?\u0020from\u0020".+?\.(?:js|mjs)\b/gmu
     ), function (match0) {
         return `${match0}?cc=${cacheKey}`;
     });
     fileDict["index.html"] = fileDict["index.html"].replace((
-        /\b(?:href|src)=".+?\.(?:css|js|mjs)\b/g
+        /\b(?:href|src)=".+?\.(?:css|js|mjs)\b/gu
     ), function (match0) {
         return `${match0}?cc=${cacheKey}`;
     });
@@ -370,7 +370,7 @@ import moduleFs from "fs";
         dict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
     Array.from(dict["CHANGELOG.md"].matchAll(
-        /\n\n#\u0020(v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
+        /\n\n#\u0020(v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/gu
     )).slice(0, 2).forEach(function ([
         ignore, version, isBeta
     ]) {
@@ -381,13 +381,13 @@ import moduleFs from "fs";
         {
             file: "README.md",
             src: dict["README.md"].replace((
-                /\bv\d\d\d\d\.\d\d?\.\d\d?\b/m
+                /\bv\d\d\d\d\.\d\d?\.\d\d?\b/mu
             ), versionMaster),
             src0: dict["README.md"]
         }, {
             file: "jslint.mjs",
             src: dict["jslint.mjs"].replace((
-                /^let\u0020jslint_edition\u0020=\u0020".*?";$/m
+                /^let\u0020jslint_edition\u0020=\u0020".*?";$/mu
             ), `let jslint_edition = "${versionBeta}";`),
             src0: dict["jslint.mjs"]
         }
@@ -433,23 +433,23 @@ import moduleUrl from "url";
     ).forEach(async function (file) {
         let data;
         if (!(
-            /.\.html$|.\.md$/m
+            /.\.html$|.\.md$/mu
         ).test(file)) {
             return;
         }
         data = await moduleFs.promises.readFile(file, "utf8");
         data.replace((
-            /\bhttps?:\/\/.*?(?:[\s")\]]|\W?$)/gm
+            /\bhttps?:\/\/.*?(?:[\s")\]]|\W?$)/gmu
         ), function (url) {
             let req;
             url = url.slice(0, -1).replace((
-                /[\u0022\u0027]/g
+                /[\u0022\u0027]/gu
             ), "").replace((
-                /\/branch-\w+?\//g
+                /\/branch-\w+?\//gu
             ), "/branch-alpha/").replace((
-                /\bjslint-org\/jslint\b/g
+                /\bjslint-org\/jslint\b/gu
             ), process.env.GITHUB_REPOSITORY || "jslint-org/jslint").replace((
-                /\bjslint-org\.github\.io\/jslint\b/g
+                /\bjslint-org\.github\.io\/jslint\b/gu
             ), String(
                 process.env.GITHUB_REPOSITORY || "jslint-org/jslint"
             ).replace("/", ".github.io/"));
@@ -481,7 +481,7 @@ import moduleUrl from "url";
             return "";
         });
         data.replace((
-            /(\bhref=|\bsrc=|\burl\(|\[[^]*?\]\()("?.*?)(?:[")\]]|$)/gm
+            /(\bhref=|\bsrc=|\burl\(|\[[^]*?\]\()("?.*?)(?:[")\]]|$)/gmu
         ), function (ignore, linkType, url) {
             if (!linkType.startsWith("[")) {
                 url = url.slice(1);
@@ -495,7 +495,7 @@ import moduleUrl from "url";
             }
             dict[url] = true;
             if (!(
-                /^https?|^mailto:|^[#\/]/m
+                /^https?|^mailto:|^[#\/]/mu
             ).test(url)) {
                 moduleFs.stat(url.split("?")[0], function (ignore, exists) {
                     console.error(
@@ -564,7 +564,7 @@ import moduleChildProcess from "child_process";
         }).setEncoding("utf8");
     });
     result = Array.from(result.matchAll(
-        /^(\S+?)\u0020+?\S+?\u0020+?\S+?\u0020+?(\S+?)\t(\S+?)$/gm
+        /^(\S+?)\u0020+?\S+?\u0020+?\S+?\u0020+?(\S+?)\t(\S+?)$/gmu
     )).map(function ([
         ignore, mode, size, file
     ]) {
@@ -726,7 +726,7 @@ import moduleUrl from "url";
         }
         // replace trailing "/" with "/index.html"
         file = pathname.slice(1).replace((
-            /\/$/
+            /\/$/u
         ), "/index.html");
         // resolve file
         file = modulePath.resolve(file);
@@ -744,7 +744,7 @@ import moduleUrl from "url";
                 return;
             }
             contentType = contentTypeDict[(
-                /^\/$|\.[^.]*?$|$/m
+                /^\/$|\.[^.]*?$|$/mu
             ).exec(file)[0]];
             if (contentType) {
                 res.setHeader("content-type", contentType);
@@ -791,7 +791,7 @@ import moduleUrl from "url";
     // hook custom-eval-function
     that.eval = function (script, context, file, onError) {
         script.replace((
-            /^(\S+)\u0020(.*?)\n/
+            /^(\S+)\u0020(.*?)\n/u
         ), function (ignore, match1, match2) {
             switch (match1) {
             // syntax-sugar - run shell-cmd
@@ -811,7 +811,7 @@ import moduleUrl from "url";
                     break;
                 }
                 match2 = match2.replace((
-                    /^git\u0020/
+                    /^git\u0020/u
                 ), "git --no-pager ");
                 // run shell-cmd
                 console.error("$ " + match2);
@@ -987,7 +987,7 @@ import moduleHttps from "https";
     let result;
     file = process.argv[1];
     if ((
-        /^https:\/\//
+        /^https:\/\//u
     ).test(file)) {
         result = await new Promise(function (resolve) {
             moduleHttps.get(file, function (res) {
@@ -1005,10 +1005,10 @@ import moduleHttps from "https";
     }
     result = String(
         "data:image/" + file.match(
-            /\.[^.]*?$|$/m
+            /\.[^.]*?$|$/mu
         )[0].slice(1) + ";base64," + result.toString("base64")
     ).replace((
-        /.{72}/g
+        /.{72}/gu
     ), "$&\\\n");
     console.log(result);
 }());
@@ -1064,7 +1064,7 @@ import moduleFs from "fs";
                             "utf8"
                         )
                     ).replace((
-                        /^\ufeff/
+                        /^\ufeff/u
                     ), "")
                 )
             ),
@@ -1115,7 +1115,7 @@ import modulePath from "path";
     }
     // init matchObj
     matchObj = (
-        /^\/\*jslint-disable\*\/\n\/\*\nshRawLibFetch\n(\{\n[\S\s]*?\n\})([\S\s]*?)\n\*\/\n/m
+        /^\/\*jslint-disable\*\/\n\/\*\nshRawLibFetch\n(\{\n[\S\s]*?\n\})([\S\s]*?)\n\*\/\n/mu
     ).exec(await moduleFs.promises.readFile(process.argv[1], "utf8"));
     // JSON.parse match1 with comment
     fetchList = JSON.parse(matchObj[1]).fetchList;
@@ -1187,18 +1187,18 @@ import modulePath from "path";
                 "https://github.com/",
                 ""
             ).replace((
-                /\/blob\/[^\/]*/
+                /\/blob\/[^\/]*/u
             ), "/").replace((
-                /\W/g
+                /\W/gu
             ), "_").replace((
-                /(_)_+|_+$/g
+                /(_)_+|_+$/gu
             ), "$1");
             list[ii].exports = prefix + "_" + modulePath.basename(
                 elem.url
             ).replace((
-                /\.js$/
+                /\.js$/u
             ), "").replace((
-                /\W/g
+                /\W/gu
             ), "_");
             if (elem.dataUriType) {
                 return;
@@ -1208,7 +1208,7 @@ import modulePath from "path";
                     "\n\n\n/*\n"
                     + "repo " + elem.prefix.replace("/blob/", "/tree/") + "\n"
                     + "committed " + (
-                        /\b\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ\b/
+                        /\b\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ\b/u
                     ).exec(elem.dateCommitted.toString())[0] + "\n"
                     + "*/"
                 );
@@ -1216,9 +1216,9 @@ import modulePath from "path";
             // comment /*...*/
             if (elem.comment) {
                 elem.data = "/*\n" + elem.data.toString().trim().replace((
-                    /\/\*/g
+                    /\/\*/gu
                 ), "/\\*").replace((
-                    /\*\//g
+                    /\*\//gu
                 ), "*\\/") + "\n*/";
             }
             // mangle module.exports
@@ -1233,24 +1233,24 @@ import modulePath from "path";
         );
         // comment #!
         result = result.replace((
-            /^#!/gm
+            /^#!/gmu
         ), "// $&");
         // normalize newline
         result = result.replace((
-            /\r\n|\r/g
+            /\r\n|\r/gu
         ), "\n");
         // remove trailing-whitespace
         result = result.replace((
-            /[\t\u0020]+$/gm
+            /[\t\u0020]+$/gmu
         ), "");
         // remove leading-newline before ket
         result = result.replace((
-            /\n+?(\n\u0020*?\})/g
+            /\n+?(\n\u0020*?\})/gu
         ), "$1");
         // eslint - no-multiple-empty-lines
         // https://github.com/eslint/eslint/blob/v7.2.0/docs/rules/no-multiple-empty-lines.md //jslint-quiet
         result = result.replace((
-            /\n{4,}/g
+            /\n{4,}/gu
         ), "\n\n\n");
         // replace from replaceList
         replaceList.forEach(function ({
@@ -1276,29 +1276,29 @@ import modulePath from "path";
                 return elem.trim();
             }).map(function (elem) {
                 return elem.trim().replace((
-                    /\*\//g
+                    /\*\//gu
                 ), "*\\\\/").replace((
-                    /\/\*/g
+                    /\/\*/gu
                 ), "/\\\\*") + "\n";
             }).sort().join("\n") + "*/\n\n"
         );
         // replace from header-diff
         header.replace((
-            /((?:^-.*?\n)+?)((?:^\+.*?\n)+)/gm
+            /((?:^-.*?\n)+?)((?:^\+.*?\n)+)/gmu
         ), function (ignore, aa, bb) {
             aa = "\n" + aa.replace((
-                /^-/gm
+                /^-/gmu
             ), "").replace((
-                /\*\\\\\//g
+                /\*\\\\\//gu
             ), "*/").replace((
-                /\/\\\\\*/g
+                /\/\\\\\*/gu
             ), "/*");
             bb = "\n" + bb.replace((
-                /^\+/gm
+                /^\+/gmu
             ), "").replace((
-                /\*\\\\\//g
+                /\*\\\\\//gu
             ), "*/").replace((
-                /\/\\\\\*/g
+                /\/\\\\\*/gu
             ), "/*");
             result0 = result;
             // disable $-escape in replacement-string
@@ -1344,7 +1344,7 @@ import modulePath from "path";
         // init footer
         result = header + result;
         matchObj.input.replace((
-            /\n\/\*\nfile\u0020none\n\*\/\n\/\*jslint-enable\*\/\n([\S\s]+)/
+            /\n\/\*\nfile\u0020none\n\*\/\n\/\*jslint-enable\*\/\n([\S\s]+)/u
         ), function (ignore, match1) {
             result += "\n\n" + match1.trim() + "\n";
         });
@@ -1590,7 +1590,7 @@ body {
                 : "coverageLow"
             );
             coveragePct = String(coveragePct).replace((
-                /..$/m
+                /..$/mu
             ), ".$&");
             if (!lineList && ii === 0) {
                 fill = (
@@ -1750,7 +1750,7 @@ ${String(count).padStart(7, " ")}
 <span>${lineHtml}</span>
 </pre>
                 `).replace((
-                    /\n/g
+                    /\n/gu
                 ), "").trim() + "\n";
             });
         }
@@ -1778,7 +1778,7 @@ ${String(count).padStart(7, " ")}
     data = await moduleFs.promises.readdir(DIR_COVERAGE);
     await Promise.all(data.map(async function (file) {
         if ((
-            /^coverage-.*?\.json$/
+            /^coverage-.*?\.json$/u
         ).test(file)) {
             data = await moduleFs.promises.readFile((
                 DIR_COVERAGE + file
@@ -1792,7 +1792,7 @@ ${String(count).padStart(7, " ")}
     }));
     fileDict = {};
     cwd = process.cwd().replace((
-        /\\/g
+        /\\/gu
     ), "/") + "/";
     await Promise.all(JSON.parse(data).result.map(async function ({
         functions,
@@ -1811,7 +1811,7 @@ ${String(count).padStart(7, " ")}
             ? "file:///"
             : "file://"
         ), "").replace((
-            /\\\\/g
+            /\\\\/gu
         ), "/");
         if (
             !pathname.startsWith(cwd)
@@ -1827,7 +1827,7 @@ ${String(count).padStart(7, " ")}
         src = await moduleFs.promises.readFile(pathname, "utf8");
         lineList = [{}];
         src.replace((
-            /^.*$/gm
+            /^.*$/gmu
         ), function (line, startOffset) {
             lineList[lineList.length - 1].endOffset = startOffset - 1;
             lineList.push({
@@ -1954,19 +1954,19 @@ import moduleFs from "fs";
     let yy = 10;
     // remove ansi escape-code
     result = result.replace((
-        /\u001b.*?m/g
+        /\u001b.*?m/gu
     ), "");
     /*
     // format unicode
     result = result.replace((
-        /\\u[0-9a-f]{4}/g
+        /\\u[0-9a-f]{4}/gu
     ), function (match0) {
         return String.fromCharCode("0x" + match0.slice(-4));
     });
     */
     // normalize "\r\n"
     result = result.replace((
-        /\r\n?/
+        /\r\n?/u
     ), "\n").trimEnd();
     // 96-column wordwrap
     result = result.split("\n").map(function (line) {
@@ -1980,11 +1980,11 @@ import moduleFs from "fs";
     }).join("\n");
     // html-escape
     result = result.replace((
-        /&/g
+        /&/gu
     ), "&amp;").replace((
-        /</g
+        /</gu
     ), "&lt;").replace((
-        />/g
+        />/gu
     ), "&gt;");
     // convert text to svg-tspan
     result = result.split("\n").map(function (line) {
