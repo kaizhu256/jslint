@@ -1688,8 +1688,9 @@ function jslint_phase2_lex(state) {
 
         while (true) {
             match = line_source.match(
-                //rx_mega
-                /[`\\]|\$\{/
+                // rx_mega
+                // Vim-hack - vim-editor has trouble parsing '`' in regexp
+                /[\u0060\\]|\$\{/
             ) || {
                 "0": "",
                 index: 0
@@ -7302,7 +7303,7 @@ function jslint_phase4_walk(state) {
                 left_variable = parent.context[left.id];
                 if (
                     left_variable !== undefined
-                    // coverage-hack
+                    // Coverage-hack.
                     // && left_variable.dead
                     && left_variable.parent === parent
                     && left_variable.calls !== undefined
