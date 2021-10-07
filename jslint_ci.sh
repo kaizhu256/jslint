@@ -2136,7 +2136,7 @@ async function module_fs_init() {
     }
 }
 jslint_coverage_report({
-    coverage_dir: process.env.COVERAGE_DIR,
+    coverage_dir: process.env.COVERAGE_DIR
 });
 ' "$@" # '
     find "$COVERAGE_DIR"
