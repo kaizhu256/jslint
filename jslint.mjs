@@ -94,6 +94,26 @@
 /*jslint beta, node*/
 
 /*property
+    NODE_V8_COVERAGE,
+    char, count, coverage_dir,
+    endOffset,
+    fileList,
+    holeList,
+    isHole,
+    jslint_coverage_report,
+    lineList, linesCovered, linesTotal,
+    modeCoverageIgnoreFile,
+    npm_config_mode_coverage,
+    platform,
+    ranges, result,
+    startOffset,
+
+    floor,
+    on,
+    padEnd,
+    rename, reverse, round,
+    sep, shell, spawn, stdio,
+    unshift,
     JSLINT_BETA, a, all, argv, arity, artifact, assert_or_throw, assign, async,
     b, beta, bitwise, block, body, browser, c, calls, catch, catch_list,
     catch_stack, causes, cjs_module, cjs_require, closer, closure, code, column,
@@ -1526,21 +1546,21 @@ async function jslint_cli({
 
 // This function will count number of newlines in <code>.
 
-        let cnt;
+        let count;
         let ii;
 
 // https://jsperf.com/regexp-counting-2/8
 
-        cnt = 0;
+        count = 0;
         ii = 0;
         while (true) {
             ii = code.indexOf("\n", ii) + 1;
             if (ii === 0) {
                 break;
             }
-            cnt += 1;
+            count += 1;
         }
-        return cnt;
+        return count;
     }
 
 // Feature-detect nodejs.
@@ -1599,7 +1619,16 @@ async function jslint_cli({
         }));
         return;
 
-// CL-xxx - add command jslint_plugin_vim
+// PR-xxx - Add command jslint_coverage_report.
+
+    case "jslint_coverage_report":
+        await jslint_coverage_report({
+            coverage_dir: command[1],
+            process_argv: process.argv.slice(3)
+        });
+        return;
+
+// PR-xxx - Add command jslint_plugin_vim.
 
     case "jslint_plugin_vim":
         mode_plugin_vim = true;
@@ -1714,6 +1743,595 @@ async function jslint_cli({
     }
     process_exit(exit_code);
     return exit_code;
+}
+
+async function jslint_coverage_report({
+    coverage_dir,
+    process_argv
+}) {
+
+// This function will
+// 1. Spawn node.js program <process_argv> with coverage
+// 2. After program exit, create html-coverage-report in <coverage_dir>.
+
+    let cwd;
+    let data;
+    let exit_code;
+    let file_dict;
+    async function htmlRender({
+        fileList,
+        lineList,
+        pathname
+    }) {
+        let html;
+        let padLines;
+        let padPathname;
+        let txt;
+        let txtBorder;
+        html = "";
+        html += `<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>coverage-report</title>
+<style>
+/* csslint ignore:start */
+* {
+box-sizing: border-box;
+    font-family: consolas, menlo, monospace;
+}
+/* csslint ignore:end */
+body {
+    margin: 0;
+}
+.coverage pre {
+    margin: 5px 0;
+}
+.coverage table {
+    border-collapse: collapse;
+}
+.coverage td,
+.coverage th {
+    border: 1px solid #777;
+    margin: 0;
+    padding: 5px;
+}
+.coverage td span {
+    display: inline-block;
+    width: 100%;
+}
+.coverage .content {
+    padding: 0 5px;
+}
+.coverage .content a {
+    text-decoration: none;
+}
+.coverage .count {
+    margin: 0 5px;
+    padding: 0 5px;
+}
+.coverage .footer,
+.coverage .header {
+    padding: 20px;
+}
+.coverage .percentbar {
+    height: 12px;
+    margin: 2px 0;
+    min-width: 200px;
+    position: relative;
+    width: 100%;
+}
+.coverage .percentbar div {
+    height: 100%;
+    position: absolute;
+}
+.coverage .title {
+    font-size: large;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.coverage td,
+.coverage th {
+    background: #fff;
+}
+.coverage .count {
+    background: #9d9;
+    color: #777;
+}
+.coverage .coverageHigh{
+    background: #9d9;
+}
+.coverage .coverageIgnore{
+    background: #ccc;
+}
+.coverage .coverageLow{
+    background: #ebb;
+}
+.coverage .coverageMedium{
+    background: #fd7;
+}
+.coverage .header {
+    background: #ddd;
+}
+.coverage .lineno {
+    background: #ddd;
+}
+.coverage .percentbar {
+    background: #999;
+}
+.coverage .percentbar div {
+    background: #666;
+}
+.coverage .uncovered {
+    background: #dbb;
+}
+
+.coverage pre:hover span,
+.coverage tr:hover td {
+    background: #7d7;
+}
+.coverage pre:hover span.uncovered,
+.coverage tr:hover td.coverageLow {
+    background: #d99;
+}
+</style>
+</head>
+<body class="coverage">
+<div class="header">
+<div class="title">coverage-report</div>
+<table>
+<thead>
+<tr>
+<th>files covered</th>
+<th>lines</th>
+</tr>
+</thead>
+<tbody>`;
+        if (!lineList) {
+            padLines = String("(ignore) 100.00 %").length;
+            padPathname = 32;
+            fileList.unshift({
+                linesCovered: 0,
+                linesTotal: 0,
+                modeCoverageIgnoreFile: "",
+                pathname: "./"
+            });
+            fileList.slice(1).forEach(function ({
+                linesCovered,
+                linesTotal,
+                modeCoverageIgnoreFile,
+                pathname
+            }) {
+                if (!modeCoverageIgnoreFile) {
+                    fileList[0].linesCovered += linesCovered;
+                    fileList[0].linesTotal += linesTotal;
+                }
+                padPathname = Math.max(padPathname, pathname.length + 2);
+                padLines = Math.max(
+                    padLines,
+                    String(linesCovered + " / " + linesTotal).length
+                );
+            });
+        }
+        txtBorder = (
+            "+" + "-".repeat(padPathname + 2) + "+"
+            + "-".repeat(padLines + 2) + "+\n"
+        );
+        txt = "";
+        txt += "coverage-report\n";
+        txt += txtBorder;
+        txt += (
+            "| " + String("files covered").padEnd(padPathname, " ") + " | "
+            + String("lines").padStart(padLines, " ") + " |\n"
+        );
+        txt += txtBorder;
+        await Promise.all(fileList.map(async function ({
+            linesCovered,
+            linesTotal,
+            modeCoverageIgnoreFile,
+            pathname
+        }, ii) {
+            let coverageLevel;
+            let coveragePct;
+            let fill;
+            let str1;
+            let str2;
+            let xx1;
+            let xx2;
+            coveragePct = Math.floor(10000 * linesCovered / linesTotal || 0);
+            coverageLevel = (
+                modeCoverageIgnoreFile
+                ? "coverageIgnore"
+                : coveragePct >= 8000
+                ? "coverageHigh"
+                : coveragePct >= 5000
+                ? "coverageMedium"
+                : "coverageLow"
+            );
+            coveragePct = String(coveragePct).replace((
+                /..$/m
+            ), ".$&");
+            if (!lineList && ii === 0) {
+                fill = (
+                    // red
+                    "#" + Math.round(
+                        (100 - Number(coveragePct)) * 2.21
+                    ).toString(16).padStart(2, "0")
+                    // green
+                    + Math.round(
+                        Number(coveragePct) * 2.21
+                    ).toString(16).padStart(2, "0")
+                    + // blue
+                    "00"
+                );
+                str1 = "coverage";
+                str2 = coveragePct + " %";
+                xx1 = 6 * str1.length + 20;
+                xx2 = 6 * str2.length + 20;
+                // fs - write coverage_badge.svg
+                await fs_write_file_with_parents((
+                    coverage_dir + "coverage_badge.svg"
+                ), String(`
+<svg height="20" width="${xx1 + xx2}" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#555" height="20" width="${xx1 + xx2}"/>
+<rect fill="${fill}" height="20" width="${xx2}" x="${xx1}"/>
+<g
+    fill="#fff"
+    font-family="dejavu sans, verdana, geneva, sans-serif"
+    font-size="11"
+    font-weight="bold"
+    text-anchor="middle"
+>
+<text x="${0.5 * xx1}" y="14">${str1}</text>
+<text x="${xx1 + 0.5 * xx2}" y="14">${str2}</text>
+</g>
+</svg>
+                `).trim() + "\n");
+                pathname = "";
+            }
+            txt += (
+                "| "
+                + String("./" + pathname).padEnd(padPathname, " ") + " | "
+                + String(
+                    modeCoverageIgnoreFile + " " + coveragePct + " %"
+                ).padStart(padLines, " ") + " |\n"
+            );
+            txt += (
+                "| " + "*".repeat(
+                    Math.round(0.01 * coveragePct * padPathname)
+                ).padEnd(padPathname, "_") + " | "
+                + String(
+                    linesCovered + " / " + linesTotal
+                ).padStart(padLines, " ") + " |\n"
+            );
+            txt += txtBorder;
+            pathname = html_escape(pathname);
+            html += `<tr>
+<td class="${coverageLevel}">
+            ${(
+                lineList
+                ? (
+                    "<a href=\"index.html\">./ </a>"
+                    + pathname + "<br>"
+                )
+                : (
+                    "<a href=\"" + (pathname || "index") + ".html\">./ "
+                    + pathname + "</a><br>"
+                )
+            )}
+<div class="percentbar">
+    <div style="width: ${coveragePct}%;"></div>
+</div>
+</td>
+<td style="text-align: right;">
+    ${modeCoverageIgnoreFile} ${coveragePct} %<br>
+    ${linesCovered} / ${linesTotal}
+</td>
+</tr>`;
+        }));
+        if (lineList) {
+            html += `</tbody>
+</table>
+</div>
+<div class="content">
+`;
+            lineList.forEach(function ({
+                count,
+                holeList,
+                line,
+                startOffset
+            }, ii) {
+                let chunk;
+                let inHole;
+                let lineHtml;
+                let lineId;
+                lineHtml = "";
+                lineId = "line_" + (ii + 1);
+                switch (count) {
+                case -1:
+                case 0:
+                    if (holeList.length === 0) {
+                        lineHtml += "</span>";
+                        lineHtml += "<span class=\"uncovered\">";
+                        lineHtml += html_escape(line);
+                        break;
+                    }
+                    line = line.split("").map(function (char) {
+                        return {
+                            char,
+                            isHole: undefined
+                        };
+                    });
+                    holeList.forEach(function ([
+                        aa, bb
+                    ]) {
+                        aa = Math.max(aa - startOffset, 0);
+                        bb = Math.min(bb - startOffset, line.length);
+                        while (aa < bb) {
+                            line[aa].isHole = true;
+                            aa += 1;
+                        }
+                    });
+                    chunk = "";
+                    line.forEach(function ({
+                        char,
+                        isHole
+                    }) {
+                        if (inHole !== isHole) {
+                            lineHtml += html_escape(chunk);
+                            lineHtml += (
+                                isHole
+                                ? "</span><span class=\"uncovered\">"
+                                : "</span><span>"
+                            );
+                            chunk = "";
+                            inHole = isHole;
+                        }
+                        chunk += char;
+                    });
+                    lineHtml += html_escape(chunk);
+                    break;
+                default:
+                    lineHtml += html_escape(line);
+                }
+                html += String(`
+<pre>
+<span class="lineno">
+<a href="#${lineId}" id="${lineId}">${String(ii + 1).padStart(5, " ")}.</a>
+</span>
+<span class="count
+                ${(
+                    count <= 0
+                    ? "uncovered"
+                    : ""
+                )}"
+>
+${String(count).padStart(7, " ")}
+</span>
+<span>${lineHtml}</span>
+</pre>
+                `).replace((
+                    /\n/g
+                ), "").trim() + "\n";
+            });
+        }
+        html += `
+</div>
+<div class="coverageFooter">
+</div>
+</body>
+</html>`;
+        html += "\n";
+        // fs - write *.html
+        await fs_write_file_with_parents(pathname + ".html", html);
+        if (lineList) {
+            return;
+        }
+        // fs - write coverage.txt
+        console.error("\n" + txt);
+        await fs_write_file_with_parents((
+            coverage_dir + "coverage_report.txt"
+        ), txt);
+    }
+    await module_fs_init();
+
+// Init coverage_dir.
+
+    coverage_dir = module_path.resolve(coverage_dir) + module_path.sep;
+    assert_or_throw(
+        coverage_dir.startsWith(process.cwd() + module_path.sep),
+        coverage_dir
+    );
+    coverage_dir = coverage_dir.replace(process.cwd() + module_path.sep, "");
+    coverage_dir = coverage_dir.replace((
+        /\\/g
+    ), "/");
+    assert_or_throw(
+        coverage_dir && !coverage_dir.startsWith("/"),
+        coverage_dir
+    );
+    exit_code = await new Promise(function (resolve) {
+        module_child_process.spawn((
+            "rm -rf " + coverage_dir + "; mkdir -p " + coverage_dir
+        ), {
+            shell: "sh",
+            stdio: [
+                "ignore", 1, 2
+            ]
+        }).on("exit", resolve);
+    });
+    assert_or_throw(
+        exit_code === 0,
+        "jslint_coverage_report - failed rm -rf " + coverage_dir
+    );
+
+// 1. Spawn node.js program <process_argv> with coverage
+
+    exit_code = await new Promise(function (resolve) {
+        module_child_process.spawn(process_argv[0], process_argv.slice(1), {
+            env: Object.assign({}, process.env, {
+                NODE_V8_COVERAGE: coverage_dir
+            }),
+            stdio: [
+                "ignore", 1, 2
+            ]
+        }).on("exit", resolve);
+    });
+
+// 2. After program exit, create html-coverage-report in <coverage_dir>.
+
+    data = await module_fs.promises.readdir(coverage_dir);
+    await Promise.all(data.map(async function (file) {
+        if ((
+            /^coverage-.*?\.json$/
+        ).test(file)) {
+            data = await module_fs.promises.readFile((
+                coverage_dir + file
+            ), "utf8");
+            // fs - rename to coverage_v8.json
+            module_fs.promises.rename(
+                coverage_dir + file,
+                coverage_dir + "coverage_v8.json"
+            );
+        }
+    }));
+    file_dict = {};
+    cwd = process.cwd().replace((
+        /\\/g
+    ), "/") + "/";
+    await Promise.all(JSON.parse(data).result.map(async function ({
+        functions,
+        url
+    }) {
+        let lineList;
+        let linesCovered;
+        let linesTotal;
+        let pathname;
+        let source;
+        if (!url.startsWith("file:///")) {
+            return;
+        }
+        pathname = url.replace((
+            process.platform === "win32"
+            ? "file:///"
+            : "file://"
+        ), "").replace((
+            /\\\\/g
+        ), "/");
+        if (
+            !pathname.startsWith(cwd)
+            || pathname.startsWith(cwd + "[")
+            || (
+                process.env.npm_config_mode_coverage !== "all"
+                && pathname.indexOf("/node_modules/") >= 0
+            )
+        ) {
+            return;
+        }
+        pathname = pathname.replace(cwd, "");
+        source = await module_fs.promises.readFile(pathname, "utf8");
+        lineList = [{}];
+        source.replace((
+            /^.*$/gm
+        ), function (line, startOffset) {
+            lineList[lineList.length - 1].endOffset = startOffset - 1;
+            lineList.push({
+                count: -1,
+                endOffset: 0,
+                holeList: [],
+                line,
+                startOffset
+            });
+            return "";
+        });
+        lineList.shift();
+        lineList[lineList.length - 1].endOffset = source.length;
+        functions.reverse().forEach(function ({
+            ranges
+        }) {
+            ranges.reverse().forEach(function ({
+                count,
+                endOffset,
+                startOffset
+            }, ii, list) {
+                lineList.forEach(function (elem) {
+                    if (!(
+                        (
+                            elem.startOffset <= startOffset
+                            && startOffset <= elem.endOffset
+                        ) || (
+                            elem.startOffset <= endOffset
+                            && endOffset <= elem.endOffset
+                        ) || (
+                            startOffset <= elem.startOffset
+                            && elem.endOffset <= endOffset
+                        )
+                    )) {
+                        return;
+                    }
+                    // handle root-range
+                    if (ii + 1 === list.length) {
+                        if (elem.count === -1) {
+                            elem.count = count;
+                        }
+                        return;
+                    }
+                    // handle non-root-range
+                    if (elem.count !== 0) {
+                        elem.count = Math.max(count, elem.count);
+                    }
+                    if (count === 0) {
+                        elem.count = 0;
+                        elem.holeList.push([
+                            startOffset, endOffset
+                        ]);
+                    }
+                });
+            });
+        });
+        linesTotal = lineList.length;
+        linesCovered = lineList.filter(function ({
+            count
+        }) {
+            return count > 0;
+        }).length;
+        await module_fs.promises.mkdir((
+            module_path.dirname(coverage_dir + pathname)
+        ), {
+            recursive: true
+        });
+        file_dict[pathname] = {
+            lineList,
+            linesCovered,
+            linesTotal,
+            modeCoverageIgnoreFile: (
+                (
+                    /^\/\*mode-coverage-ignore-file\*\/$/m
+                ).test(source.slice(0, 65536))
+                ? "(ignore)"
+                : ""
+            ),
+            pathname,
+            source
+        };
+        await htmlRender({
+            fileList: [
+                file_dict[pathname]
+            ],
+            lineList,
+            pathname: coverage_dir + pathname
+        });
+    }));
+    await htmlRender({
+        fileList: Object.keys(file_dict).sort().map(function (pathname) {
+            return file_dict[pathname];
+        }),
+        pathname: coverage_dir + "index"
+    });
+    assert_or_throw(
+        exit_code === 0,
+        "jslint_coverage_report - nonzero exit_code " + exit_code
+    );
 }
 
 function jslint_phase1_split() {
@@ -9332,6 +9950,7 @@ jslint_export = Object.freeze(Object.assign(jslint, {
     jslint_assert,
     jslint_charset_ascii,
     jslint_cli,
+    jslint_coverage_report,
     jslint_edition,
     jslint_phase1_split,
     jslint_phase2_lex,
