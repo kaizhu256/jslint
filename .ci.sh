@@ -161,7 +161,7 @@ import moduleFs from "fs";
                     jslint.fs_write_file_with_parents,
                     jslint.html_escape,
                     jslint.jslint_run_with_coverage,
-                    jslint.module_init
+                    jslint.module_fs_init
                 ].join("\n") + "\njslint_run_with_coverage(";
             })
         }
