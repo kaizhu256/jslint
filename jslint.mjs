@@ -1746,17 +1746,14 @@ async function jslint_cli({
 }
 
 async function jslint_coverage_report({
-    coverage_dir,
-    process_argv
+    coverage_dir
 }) {
 
 // This function will
-// 1. Spawn node.js program <process_argv> with coverage
 // 2. After program exit, create html-coverage-report in <coverage_dir>.
 
     let cwd;
     let data;
-    let exit_code;
     let file_dict;
     async function htmlRender({
         fileList,
@@ -2150,33 +2147,6 @@ ${String(count).padStart(7, " ")}
         coverage_dir && !coverage_dir.startsWith("/"),
         coverage_dir
     );
-    exit_code = await new Promise(function (resolve) {
-        module_child_process.spawn((
-            "rm -rf " + coverage_dir + "; mkdir -p " + coverage_dir
-        ), {
-            shell: "sh",
-            stdio: [
-                "ignore", 1, 2
-            ]
-        }).on("exit", resolve);
-    });
-    assert_or_throw(
-        exit_code === 0,
-        "jslint_coverage_report - failed rm -rf " + coverage_dir
-    );
-
-// 1. Spawn node.js program <process_argv> with coverage
-
-    exit_code = await new Promise(function (resolve) {
-        module_child_process.spawn(process_argv[0], process_argv.slice(1), {
-            env: Object.assign({}, process.env, {
-                NODE_V8_COVERAGE: coverage_dir
-            }),
-            stdio: [
-                "ignore", 1, 2
-            ]
-        }).on("exit", resolve);
-    });
 
 // 2. After program exit, create html-coverage-report in <coverage_dir>.
 
@@ -2328,10 +2298,6 @@ ${String(count).padStart(7, " ")}
         }),
         pathname: coverage_dir + "index"
     });
-    assert_or_throw(
-        exit_code === 0,
-        "jslint_coverage_report - nonzero exit_code " + exit_code
-    );
 }
 
 function jslint_phase1_split() {

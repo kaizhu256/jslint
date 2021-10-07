@@ -1488,9 +1488,7 @@ shRunWithCoverage() {(set -e
         export NODE_V8_COVERAGE="$COVERAGE_DIR"
         "$@"
     ) || EXIT_CODE="$?"
-    if [ "$EXIT_CODE" = 0 ]
-    then
-        node --input-type=module -e '
+    node --input-type=module -e '
 import moduleFs from "fs";
 import modulePath from "path";
 // init debugInline
@@ -2058,8 +2056,7 @@ ${String(count).padStart(7, " ")}
     });
 }());
 ' "$@" # '
-        find "$COVERAGE_DIR"
-    fi
+    find "$COVERAGE_DIR"
     printf "shRunWithCoverage - EXIT_CODE=$EXIT_CODE\n" 1>&2
     return "$EXIT_CODE"
 )}
