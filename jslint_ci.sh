@@ -1489,6 +1489,12 @@ shRunWithCoverage() {(set -e
         "$@"
     ) || EXIT_CODE="$?"
     node --input-type=module -e '
+/*jslint beta, node*/
+let module_child_process;
+let module_fs;
+let module_path;
+let module_url;
+
 import moduleFs from "fs";
 import modulePath from "path";
 // init debugInline
@@ -2055,6 +2061,9 @@ ${String(count).padStart(7, " ")}
         pathname: COVERAGE_DIR + "index"
     });
 }());
+jslint_run_with_coverage({
+    coverage_dir: process.env.COVERAGE_DIR,
+});
 ' "$@" # '
     find "$COVERAGE_DIR"
     printf "shRunWithCoverage - EXIT_CODE=$EXIT_CODE\n" 1>&2
