@@ -2135,7 +2135,7 @@ async function module_fs_init() {
         module_fs_init_resolve_list.shift()();
     }
 }
-jslint_run_with_coverage({
+jslint_coverage_report({
     coverage_dir: process.env.COVERAGE_DIR,
 });
 ' "$@" # '
