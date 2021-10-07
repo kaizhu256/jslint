@@ -116,7 +116,8 @@ import moduleFs from "fs";
         "CHANGELOG.md",
         "README.md",
         "index.html",
-        "jslint.mjs"
+        "jslint.mjs",
+        "jslint_ci.sh"
     ].map(async function (file) {
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));

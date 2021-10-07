@@ -1481,11 +1481,11 @@ shRunWithCoverage() {(set -e
 # and create coverage-report .artifact/coverage/index.html
     local EXIT_CODE
     EXIT_CODE=0
-    export DIR_COVERAGE=.artifact/coverage/
-    rm -rf "$DIR_COVERAGE"
-    mkdir -p "$DIR_COVERAGE"
+    export COVERAGE_DIR=.artifact/coverage/
+    rm -rf "$COVERAGE_DIR"
+    mkdir -p "$COVERAGE_DIR"
     (set -e
-        export NODE_V8_COVERAGE="$DIR_COVERAGE"
+        export NODE_V8_COVERAGE="$COVERAGE_DIR"
         "$@"
     ) || EXIT_CODE="$?"
     if [ "$EXIT_CODE" = 0 ]
@@ -1507,7 +1507,7 @@ import modulePath from "path";
     };
 }());
 (async function () {
-    let DIR_COVERAGE = process.env.DIR_COVERAGE;
+    let COVERAGE_DIR = process.env.COVERAGE_DIR;
     let cwd;
     let data;
     let fileDict;
@@ -1742,7 +1742,7 @@ body {
                 xx2 = 6 * str2.length + 20;
                 // fs - write coverage_badge.svg
                 moduleFs.promises.writeFile((
-                    DIR_COVERAGE + "/coverage_badge.svg"
+                    COVERAGE_DIR + "/coverage_badge.svg"
                 ), String(`
 <svg height="20" width="${xx1 + xx2}" xmlns="http://www.w3.org/2000/svg">
 <rect fill="#555" height="20" width="${xx1 + xx2}"/>
@@ -1905,21 +1905,21 @@ ${String(count).padStart(7, " ")}
         // fs - write coverage.txt
         console.error("\n" + txt);
         moduleFs.promises.writeFile((
-            DIR_COVERAGE + "/coverage_report.txt"
+            COVERAGE_DIR + "/coverage_report.txt"
         ), txt);
     }
-    data = await moduleFs.promises.readdir(DIR_COVERAGE);
+    data = await moduleFs.promises.readdir(COVERAGE_DIR);
     await Promise.all(data.map(async function (file) {
         if ((
             /^coverage-.*?\.json$/
         ).test(file)) {
             data = await moduleFs.promises.readFile((
-                DIR_COVERAGE + file
+                COVERAGE_DIR + file
             ), "utf8");
             // fs - rename to coverage_v8.json
             moduleFs.promises.rename(
-                DIR_COVERAGE + file,
-                DIR_COVERAGE + "coverage_v8.json"
+                COVERAGE_DIR + file,
+                COVERAGE_DIR + "coverage_v8.json"
             );
         }
     }));
@@ -2024,7 +2024,7 @@ ${String(count).padStart(7, " ")}
             return count > 0;
         }).length;
         await moduleFs.promises.mkdir((
-            modulePath.dirname(DIR_COVERAGE + pathname)
+            modulePath.dirname(COVERAGE_DIR + pathname)
         ), {
             recursive: true
         });
@@ -2047,18 +2047,18 @@ ${String(count).padStart(7, " ")}
                 fileDict[pathname]
             ],
             lineList,
-            pathname: DIR_COVERAGE + pathname
+            pathname: COVERAGE_DIR + pathname
         });
     }));
     await htmlRender({
         fileList: Object.keys(fileDict).sort().map(function (pathname) {
             return fileDict[pathname];
         }),
-        pathname: DIR_COVERAGE + "index"
+        pathname: COVERAGE_DIR + "index"
     });
 }());
 ' "$@" # '
-        find "$DIR_COVERAGE"
+        find "$COVERAGE_DIR"
     fi
     printf "shRunWithCoverage - EXIT_CODE=$EXIT_CODE\n" 1>&2
     return "$EXIT_CODE"
