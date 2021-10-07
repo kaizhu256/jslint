@@ -162,7 +162,7 @@ import moduleFs from "fs";
                     jslint.html_escape,
                     jslint.jslint_coverage_report,
                     jslint.module_fs_init
-                ].join("\n") + "\njslint_run_with_coverage(";
+                ].join("\n") + "\njslint_coverage_report(";
             })
         }
     ].forEach(function ({
