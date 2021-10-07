@@ -154,13 +154,13 @@ import moduleFs from "fs";
             file: "jslint_ci.sh",
             // inline css-assets
             src: fileDict["jslint_ci.sh"].replace((
-                /(\nshRunWithCoverage[\S\s]*?\nlet module_url;\n)[\S\s]*?\njslint_run_with_coverage\(/m
+                /(\nshRunWithCoverage[\S\s]*?\nlet module_url;\n)[\S\s]*?\njslint_coverage_report\(/m
             ), function (ignore, match1) {
                 return match1 + [
                     jslint.assert_or_throw,
                     jslint.fs_write_file_with_parents,
                     jslint.html_escape,
-                    jslint.jslint_run_with_coverage,
+                    jslint.jslint_coverage_report,
                     jslint.module_fs_init
                 ].join("\n") + "\njslint_run_with_coverage(";
             })

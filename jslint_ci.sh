@@ -1492,29 +1492,68 @@ shRunWithCoverage() {(set -e
 /*jslint beta, node*/
 let module_child_process;
 let module_fs;
+let module_fs_init_resolve_list;
 let module_path;
 let module_url;
+function assert_or_throw(condition, message) {
 
-import moduleFs from "fs";
-import modulePath from "path";
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+// This function will throw <message> if <condition> is falsy.
 
-// this function will both print <argList> to stderr and return <argList>[0]
+    if (!condition) {
+        throw (
+            typeof message === "string"
+            ? new Error(message.slice(0, 2048))
+            : message
+        );
+    }
+}
+async function fs_write_file_with_parents(pathname, data) {
 
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}());
-(async function () {
-    let COVERAGE_DIR = process.env.COVERAGE_DIR;
+// This function will write <data> to <pathname> and lazy-mkdirp if necessary.
+
+    await module_fs_init();
+
+// Try writing to pathname.
+
+    try {
+        await module_fs.promises.writeFile(pathname, data);
+    } catch (ignore) {
+
+// Lazy mkdirp.
+
+        await module_fs.promises.mkdir(module_path.dirname(pathname), {
+            recursive: true
+        });
+
+// Retry writing to pathname.
+
+        await module_fs.promises.writeFile(pathname, data);
+
+    }
+    console.error("wrote file " + pathname);
+}
+function html_escape(str) {
+
+// This function will make <str> html-safe by escaping & < >.
+
+    return String(str).replace((
+        /&/g
+    ), "&amp;").replace((
+        /</g
+    ), "&lt;").replace((
+        />/g
+    ), "&gt;");
+}
+async function jslint_coverage_report({
+    coverage_dir
+}) {
+
+// This function will
+// 2. After program exit, create html-coverage-report in <coverage_dir>.
+
     let cwd;
     let data;
-    let fileDict;
+    let file_dict;
     async function htmlRender({
         fileList,
         lineList,
@@ -1525,25 +1564,6 @@ import modulePath from "path";
         let padPathname;
         let txt;
         let txtBorder;
-        function stringHtmlSafe(str) {
-        /*
-         * this function will make <str> html-safe
-         * https://stackoverflow.com/questions/7381974/which-characters-need-to-be-escaped-on-html //jslint-quiet
-         */
-            return str.replace((
-                /&/gu
-            ), "&amp;").replace((
-                /"/gu
-            ), "&quot;").replace((
-                /\u0027/gu
-            ), "&apos;").replace((
-                /</gu
-            ), "&lt;").replace((
-                />/gu
-            ), "&gt;").replace((
-                /&amp;(amp;|apos;|gt;|lt;|quot;)/igu
-            ), "&$1");
-        }
         html = "";
         html += `<!DOCTYPE html>
 <html lang="en">
@@ -1701,7 +1721,7 @@ body {
             + String("lines").padStart(padLines, " ") + " |\n"
         );
         txt += txtBorder;
-        fileList.forEach(function ({
+        await Promise.all(fileList.map(async function ({
             linesCovered,
             linesTotal,
             modeCoverageIgnoreFile,
@@ -1745,8 +1765,8 @@ body {
                 xx1 = 6 * str1.length + 20;
                 xx2 = 6 * str2.length + 20;
                 // fs - write coverage_badge.svg
-                moduleFs.promises.writeFile((
-                    COVERAGE_DIR + "/coverage_badge.svg"
+                await fs_write_file_with_parents((
+                    coverage_dir + "coverage_badge.svg"
                 ), String(`
 <svg height="20" width="${xx1 + xx2}" xmlns="http://www.w3.org/2000/svg">
 <rect fill="#555" height="20" width="${xx1 + xx2}"/>
@@ -1781,7 +1801,7 @@ body {
                 ).padStart(padLines, " ") + " |\n"
             );
             txt += txtBorder;
-            pathname = stringHtmlSafe(pathname);
+            pathname = html_escape(pathname);
             html += `<tr>
 <td class="${coverageLevel}">
             ${(
@@ -1804,7 +1824,7 @@ body {
     ${linesCovered} / ${linesTotal}
 </td>
 </tr>`;
-        });
+        }));
         if (lineList) {
             html += `</tbody>
 </table>
@@ -1829,12 +1849,12 @@ body {
                     if (holeList.length === 0) {
                         lineHtml += "</span>";
                         lineHtml += "<span class=\"uncovered\">";
-                        lineHtml += stringHtmlSafe(line);
+                        lineHtml += html_escape(line);
                         break;
                     }
-                    line = line.split("").map(function (chr) {
+                    line = line.split("").map(function (char) {
                         return {
-                            chr,
+                            char,
                             isHole: undefined
                         };
                     });
@@ -1850,11 +1870,11 @@ body {
                     });
                     chunk = "";
                     line.forEach(function ({
-                        chr,
+                        char,
                         isHole
                     }) {
                         if (inHole !== isHole) {
-                            lineHtml += stringHtmlSafe(chunk);
+                            lineHtml += html_escape(chunk);
                             lineHtml += (
                                 isHole
                                 ? "</span><span class=\"uncovered\">"
@@ -1863,12 +1883,12 @@ body {
                             chunk = "";
                             inHole = isHole;
                         }
-                        chunk += chr;
+                        chunk += char;
                     });
-                    lineHtml += stringHtmlSafe(chunk);
+                    lineHtml += html_escape(chunk);
                     break;
                 default:
-                    lineHtml += stringHtmlSafe(line);
+                    lineHtml += html_escape(line);
                 }
                 html += String(`
 <pre>
@@ -1898,36 +1918,53 @@ ${String(count).padStart(7, " ")}
 </body>
 </html>`;
         html += "\n";
-        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {
-            recursive: true
-        });
         // fs - write *.html
-        moduleFs.promises.writeFile(pathname + ".html", html);
+        await fs_write_file_with_parents(pathname + ".html", html);
         if (lineList) {
             return;
         }
         // fs - write coverage.txt
         console.error("\n" + txt);
-        moduleFs.promises.writeFile((
-            COVERAGE_DIR + "/coverage_report.txt"
+        await fs_write_file_with_parents((
+            coverage_dir + "coverage_report.txt"
         ), txt);
     }
-    data = await moduleFs.promises.readdir(COVERAGE_DIR);
+    await module_fs_init();
+
+// Init coverage_dir.
+
+    coverage_dir = module_path.resolve(coverage_dir) + module_path.sep;
+    assert_or_throw(
+        coverage_dir.startsWith(process.cwd() + module_path.sep),
+        coverage_dir
+    );
+    coverage_dir = coverage_dir.replace(process.cwd() + module_path.sep, "");
+    coverage_dir = coverage_dir.replace((
+        /\\/g
+    ), "/");
+    assert_or_throw(
+        coverage_dir && !coverage_dir.startsWith("/"),
+        coverage_dir
+    );
+
+// 2. After program exit, create html-coverage-report in <coverage_dir>.
+
+    data = await module_fs.promises.readdir(coverage_dir);
     await Promise.all(data.map(async function (file) {
         if ((
             /^coverage-.*?\.json$/
         ).test(file)) {
-            data = await moduleFs.promises.readFile((
-                COVERAGE_DIR + file
+            data = await module_fs.promises.readFile((
+                coverage_dir + file
             ), "utf8");
             // fs - rename to coverage_v8.json
-            moduleFs.promises.rename(
-                COVERAGE_DIR + file,
-                COVERAGE_DIR + "coverage_v8.json"
+            module_fs.promises.rename(
+                coverage_dir + file,
+                coverage_dir + "coverage_v8.json"
             );
         }
     }));
-    fileDict = {};
+    file_dict = {};
     cwd = process.cwd().replace((
         /\\/g
     ), "/") + "/";
@@ -1939,7 +1976,7 @@ ${String(count).padStart(7, " ")}
         let linesCovered;
         let linesTotal;
         let pathname;
-        let src;
+        let source;
         if (!url.startsWith("file:///")) {
             return;
         }
@@ -1961,9 +1998,9 @@ ${String(count).padStart(7, " ")}
             return;
         }
         pathname = pathname.replace(cwd, "");
-        src = await moduleFs.promises.readFile(pathname, "utf8");
+        source = await module_fs.promises.readFile(pathname, "utf8");
         lineList = [{}];
-        src.replace((
+        source.replace((
             /^.*$/gm
         ), function (line, startOffset) {
             lineList[lineList.length - 1].endOffset = startOffset - 1;
@@ -1977,7 +2014,7 @@ ${String(count).padStart(7, " ")}
             return "";
         });
         lineList.shift();
-        lineList[lineList.length - 1].endOffset = src.length;
+        lineList[lineList.length - 1].endOffset = source.length;
         functions.reverse().forEach(function ({
             ranges
         }) {
@@ -2027,40 +2064,77 @@ ${String(count).padStart(7, " ")}
         }) {
             return count > 0;
         }).length;
-        await moduleFs.promises.mkdir((
-            modulePath.dirname(COVERAGE_DIR + pathname)
+        await module_fs.promises.mkdir((
+            module_path.dirname(coverage_dir + pathname)
         ), {
             recursive: true
         });
-        fileDict[pathname] = {
+        file_dict[pathname] = {
             lineList,
             linesCovered,
             linesTotal,
             modeCoverageIgnoreFile: (
                 (
                     /^\/\*mode-coverage-ignore-file\*\/$/m
-                ).test(src.slice(0, 65536))
+                ).test(source.slice(0, 65536))
                 ? "(ignore)"
                 : ""
             ),
             pathname,
-            src
+            source
         };
         await htmlRender({
             fileList: [
-                fileDict[pathname]
+                file_dict[pathname]
             ],
             lineList,
-            pathname: COVERAGE_DIR + pathname
+            pathname: coverage_dir + pathname
         });
     }));
     await htmlRender({
-        fileList: Object.keys(fileDict).sort().map(function (pathname) {
-            return fileDict[pathname];
+        fileList: Object.keys(file_dict).sort().map(function (pathname) {
+            return file_dict[pathname];
         }),
-        pathname: COVERAGE_DIR + "index"
+        pathname: coverage_dir + "index"
     });
-}());
+}
+async function module_fs_init() {
+
+// This function will import nodejs builtin-modules if they have not yet been
+// imported.
+
+// State 3 - Modules already imported.
+
+    if (module_fs !== undefined) {
+        return;
+    }
+
+// State 2 - Wait while modules are importing.
+
+    if (module_fs_init_resolve_list !== undefined) {
+        return new Promise(function (resolve) {
+            module_fs_init_resolve_list.push(resolve);
+        });
+    }
+
+// State 1 - Start importing modules.
+
+    module_fs_init_resolve_list = [];
+    [
+        module_child_process,
+        module_fs,
+        module_path,
+        module_url
+    ] = await Promise.all([
+        import("child_process"),
+        import("fs"),
+        import("path"),
+        import("url")
+    ]);
+    while (module_fs_init_resolve_list.length > 0) {
+        module_fs_init_resolve_list.shift()();
+    }
+}
 jslint_run_with_coverage({
     coverage_dir: process.env.COVERAGE_DIR,
 });
