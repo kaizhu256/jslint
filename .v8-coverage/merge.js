@@ -163,7 +163,7 @@ function RangeTree(start, end, delta, children) {
 }
 
 Object.assign(RangeTree.prototype, {
-    normalize() {
+    normalize: function () {
         const children = [];
         let curEnd;
         let head;
@@ -213,7 +213,7 @@ Object.assign(RangeTree.prototype, {
      * @precondition `tree.start < value && value < tree.end`
      * @return RangeTree Right part
      */
-    split(value) {
+    split: function (value) {
         let ii = 0;
         let leftChildLen = this.children.length;
         let mid;
@@ -250,7 +250,7 @@ Object.assign(RangeTree.prototype, {
      *
      * The ranges are pre-order sorted.
      */
-    toRanges() {
+    toRanges: function () {
         const ranges = [];
         // Stack of parent trees and counts.
         const stack = [[this, 0]];
@@ -447,75 +447,84 @@ function constructor(offset, trees) {
     this.offset = offset;
     this.trees = trees;
 }
-class StartEventQueue {
-    constructor(queue) {
-        this.queue = queue;
-        this.nextIndex = 0;
-        this.pendingOffset = 0;
-        this.pendingTrees = undefined;
-    }
-    static fromParentTrees(parentTrees) {
-        const startToTrees = new Map();
-        parentTrees.entries().forEach(function([parentIndex, parentTree]) {
-            parentTree.children.forEach(function(child) {
-                let trees = startToTrees.get(child.start);
-                if (trees === undefined) {
-                    trees = [];
-                    startToTrees.set(child.start, trees);
-                }
-                trees.push(new RangeTreeWithParent(parentIndex, child));
-            });
+function StartEventQueue(queue) {
+    this.queue = queue;
+    this.nextIndex = 0;
+    this.pendingOffset = 0;
+    delete this.pendingTrees;
+}
+function fromParentTrees(parentTrees) {
+    const startToTrees = new Map();
+    parentTrees.entries().forEach(function([parentIndex, parentTree]) {
+        parentTree.children.forEach(function(child) {
+            let trees = startToTrees.get(child.start);
+            if (trees === undefined) {
+                trees = [];
+                startToTrees.set(child.start, trees);
+            }
+            trees.push(new RangeTreeWithParent(parentIndex, child));
         });
-        const queue = [];
-        startToTrees.forEach(function([startOffset, trees]) {
-            queue.push(new StartEvent(startOffset, trees));
+    });
+    const queue = [];
+    startToTrees.forEach(function([startOffset, trees]) {
+        queue.push({
+            offset: startOffset,
+            trees
         });
-        queue.sort(function (aa, bb) {
-            return aa.offset - bb.offset;
-        });
-        return new StartEventQueue(queue);
-    }
-    setPendingOffset(offset) {
-        this.pendingOffset = offset;
-    }
-    pushPendingTree(tree) {
-        if (this.pendingTrees === undefined) {
-            this.pendingTrees = [];
-        }
-        this.pendingTrees.push(tree);
-    }
-    next() {
+    });
+    queue.sort(function (aa, bb) {
+        return aa.offset - bb.offset;
+    });
+    return new StartEventQueue(queue);
+}
+Object.assign(StartEventQueue.prototype, {
+    next: function () {
         const pendingTrees = this.pendingTrees;
         const nextEvent = this.queue[this.nextIndex];
         if (pendingTrees === undefined) {
-            this.nextIndex++;
+            this.nextIndex += 1;
             return nextEvent;
         }
         else if (nextEvent === undefined) {
-            this.pendingTrees = undefined;
-            return new StartEvent(this.pendingOffset, pendingTrees);
+            delete this.pendingTrees;
+            return {
+                offset: this.pendingOffset,
+                trees: pendingTrees
+            };
         }
         else {
             if (this.pendingOffset < nextEvent.offset) {
-                this.pendingTrees = undefined;
-                return new StartEvent(this.pendingOffset, pendingTrees);
+                delete this.pendingTrees;
+                return {
+                    offset: this.pendingOffset,
+                    trees: pendingTrees
+                };
             }
             else {
                 if (this.pendingOffset === nextEvent.offset) {
-                    this.pendingTrees = undefined;
+                    delete this.pendingTrees;
                     pendingTrees.forEach(function(tree) {
                         nextEvent.trees.push(tree);
                     });
                 }
-                this.nextIndex++;
+                this.nextIndex += 1;
                 return nextEvent;
             }
         }
+    },
+    pushPendingTree: function (tree) {
+        if (this.pendingTrees === undefined) {
+            this.pendingTrees = [];
+        }
+        this.pendingTrees.push(tree);
+    },
+    setPendingOffset: function (offset) {
+        this.pendingOffset = offset;
     }
-}
+});
 function mergeRangeTreeChildren(parentTrees) {
     const result = [];
-    const startEventQueue = StartEventQueue.fromParentTrees(parentTrees);
+    const startEventQueue = fromParentTrees(parentTrees);
     const parentToNested = new Map();
     let openRange;
     while (true) {
@@ -534,13 +543,18 @@ function mergeRangeTreeChildren(parentTrees) {
                 insertChild(parentToNested, parentIndex, tree);
             });
             startEventQueue.setPendingOffset(openRangeEnd);
-            openRange = { start: event.offset, end: openRangeEnd };
+            openRange = {
+                end: openRangeEnd,
+                start: event.offset
+            };
         }
         else {
             event.trees.forEach(function({ parentIndex, tree }) {
                 if (tree.end > openRange.end) {
                     const right = tree.split(openRange.end);
-                    startEventQueue.pushPendingTree(new RangeTreeWithParent(parentIndex, right));
+                    startEventQueue.pushPendingTree(
+                        new RangeTreeWithParent(parentIndex, right)
+                    );
                 }
                 insertChild(parentToNested, parentIndex, tree);
             });
@@ -562,11 +576,17 @@ function insertChild(parentToNested, parentIndex, tree) {
 function nextChild(openRange, parentToNested) {
     const matchingTrees = [];
     parentToNested.values().forEach(function(nested) {
-        if (nested.length === 1 && nested[0].start === openRange.start && nested[0].end === openRange.end) {
+        if (
+            nested.length === 1
+            && nested[0].start === openRange.start
+            && nested[0].end === openRange.end
+        ) {
             matchingTrees.push(nested[0]);
         }
         else {
-            matchingTrees.push(new RangeTree(openRange.start, openRange.end, 0, nested));
+            matchingTrees.push(
+                new RangeTree(openRange.start, openRange.end, 0, nested)
+            );
         }
     });
     parentToNested.clear();
