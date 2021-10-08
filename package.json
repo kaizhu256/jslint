@@ -1,4 +1,5 @@
 {
+    "fileCount": 25,
     "scripts": {
         "test": "sh jslint_ci.sh shCiBase"
     }
