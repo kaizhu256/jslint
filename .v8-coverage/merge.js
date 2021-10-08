@@ -11,12 +11,10 @@ function compareScriptCovs(a, b) {
     if (a.url === b.url) {
         return 0;
     }
-    else if (a.url < b.url) {
+    if (a.url < b.url) {
         return -1;
     }
-    else {
-        return 1;
-    }
+    return 1;
 }
 /**
  * Compares two function coverages.
@@ -37,9 +35,7 @@ function compareRangeCovs(a, b) {
     if (a.startOffset !== b.startOffset) {
         return a.startOffset - b.startOffset;
     }
-    else {
-        return b.endOffset - a.endOffset;
-    }
+    return b.endOffset - a.endOffset;
 }
 /**
  * Normalizes a process coverage.
@@ -68,7 +64,7 @@ function normalizeProcessCov(processCov) {
  * @param processCov Process coverage to normalize.
  */
 function deepNormalizeProcessCov(processCov) {
-    processCov.result.forEach(function(scriptCov) {
+    processCov.result.forEach(function (scriptCov) {
         deepNormalizeScriptCov(scriptCov);
     });
     normalizeProcessCov(processCov);
@@ -93,7 +89,7 @@ function normalizeScriptCov(scriptCov) {
  * @param scriptCov Script coverage to normalize.
  */
 function deepNormalizeScriptCov(scriptCov) {
-    scriptCov.functions.forEach(function(funcCov) {
+    scriptCov.functions.forEach(function (funcCov) {
         normalizeFunctionCov(funcCov);
     });
     normalizeScriptCov(scriptCov);
@@ -126,7 +122,7 @@ function fromSortedRanges(ranges) {
     let root;
     // Stack of parent trees and parent counts.
     const stack = [];
-    ranges.forEach(function(range) {
+    ranges.forEach(function (range) {
         const node = new RangeTree(
             range.startOffset,
             range.endOffset,
@@ -168,7 +164,7 @@ Object.assign(RangeTree.prototype, {
         let curEnd;
         let head;
         const tail = [];
-        this.children.forEach(function(child) {
+        this.children.forEach(function (child) {
             if (head === undefined) {
                 head = child;
             }
@@ -197,8 +193,8 @@ Object.assign(RangeTree.prototype, {
         function endChain() {
             if (tail.length !== 0) {
                 head.end = tail[tail.length - 1].end;
-                tail.forEach(function(tailTree) {
-                    tailTree.children.forEach(function(subChild) {
+                tail.forEach(function (tailTree) {
+                    tailTree.children.forEach(function (subChild) {
                         subChild.delta += tailTree.delta - head.delta;
                         head.children.push(subChild);
                     });
@@ -294,8 +290,8 @@ function mergeProcessCovs(processCovs) {
         return merged;
     }
     const urlToScripts = new Map();
-    processCovs.forEach(function(processCov) {
-        processCov.result.forEach(function(scriptCov) {
+    processCovs.forEach(function (processCov) {
+        processCov.result.forEach(function (scriptCov) {
             let scriptCovs = urlToScripts.get(scriptCov.url);
             if (scriptCovs === undefined) {
                 scriptCovs = [];
@@ -305,7 +301,7 @@ function mergeProcessCovs(processCovs) {
         });
     });
     const result = [];
-    urlToScripts.values().forEach(function(scripts) {
+    urlToScripts.values().forEach(function (scripts) {
         // assert: `scripts.length > 0`
         result.push(mergeScriptCovs(scripts));
     });
@@ -339,8 +335,8 @@ function mergeScriptCovs(scriptCovs) {
     const scriptId = first.scriptId;
     const url = first.url;
     const rangeToFuncs = new Map();
-    scriptCovs.forEach(function(scriptCov) {
-        scriptCov.functions.forEach(function(funcCov) {
+    scriptCovs.forEach(function (scriptCov) {
+        scriptCov.functions.forEach(function (funcCov) {
             const rootRange = stringifyFunctionRootRange(funcCov);
             let funcCovs = rangeToFuncs.get(rootRange);
             if (funcCovs === undefined ||
@@ -359,7 +355,7 @@ function mergeScriptCovs(scriptCovs) {
         });
     });
     const functions = [];
-    rangeToFuncs.values().forEach(function(funcCovs) {
+    rangeToFuncs.values().forEach(function (funcCovs) {
         // assert: `funcCovs.length > 0`
         functions.push(mergeFunctionCovs(funcCovs));
     });
@@ -410,7 +406,7 @@ function mergeFunctionCovs(funcCovs) {
     }
     const functionName = funcCovs[0].functionName;
     const trees = [];
-    funcCovs.forEach(function(funcCov) {
+    funcCovs.forEach(function (funcCov) {
         // assert: `fn.ranges.length > 0`
         // assert: `fn.ranges` is sorted
         trees.push(fromSortedRanges(funcCov.ranges));
@@ -433,7 +429,7 @@ function mergeRangeTrees(trees) {
     }
     const first = trees[0];
     let delta = 0;
-    trees.forEach(function(tree) {
+    trees.forEach(function (tree) {
         delta += tree.delta;
     });
     const children = mergeRangeTreeChildren(trees);
@@ -455,8 +451,8 @@ function StartEventQueue(queue) {
 }
 function fromParentTrees(parentTrees) {
     const startToTrees = new Map();
-    parentTrees.entries().forEach(function([parentIndex, parentTree]) {
-        parentTree.children.forEach(function(child) {
+    parentTrees.entries().forEach(function ([parentIndex, parentTree]) {
+        parentTree.children.forEach(function (child) {
             let trees = startToTrees.get(child.start);
             if (trees === undefined) {
                 trees = [];
@@ -466,7 +462,7 @@ function fromParentTrees(parentTrees) {
         });
     });
     const queue = [];
-    startToTrees.forEach(function([startOffset, trees]) {
+    startToTrees.forEach(function ([startOffset, trees]) {
         queue.push({
             offset: startOffset,
             trees
@@ -503,7 +499,7 @@ Object.assign(StartEventQueue.prototype, {
             else {
                 if (this.pendingOffset === nextEvent.offset) {
                     delete this.pendingTrees;
-                    pendingTrees.forEach(function(tree) {
+                    pendingTrees.forEach(function (tree) {
                         nextEvent.trees.push(tree);
                     });
                 }
@@ -527,6 +523,19 @@ function mergeRangeTreeChildren(parentTrees) {
     const startEventQueue = fromParentTrees(parentTrees);
     const parentToNested = new Map();
     let openRange;
+    function insertChildParentToNested({ parentIndex, tree }) {
+        openRangeEnd = Math.max(openRangeEnd, tree.end);
+        insertChild(parentToNested, parentIndex, tree);
+    }
+    function insertChildParentToNested2({ parentIndex, tree }) {
+        if (tree.end > openRange.end) {
+            const right = tree.split(openRange.end);
+            startEventQueue.pushPendingTree(
+                new RangeTreeWithParent(parentIndex, right)
+            );
+        }
+        insertChild(parentToNested, parentIndex, tree);
+    }
     while (true) {
         const event = startEventQueue.next();
         if (event === undefined) {
@@ -538,10 +547,7 @@ function mergeRangeTreeChildren(parentTrees) {
         }
         if (openRange === undefined) {
             let openRangeEnd = event.offset + 1;
-            event.trees.forEach(function({ parentIndex, tree }) {
-                openRangeEnd = Math.max(openRangeEnd, tree.end);
-                insertChild(parentToNested, parentIndex, tree);
-            });
+            event.trees.forEach(insertChildParentToNested);
             startEventQueue.setPendingOffset(openRangeEnd);
             openRange = {
                 end: openRangeEnd,
@@ -549,15 +555,7 @@ function mergeRangeTreeChildren(parentTrees) {
             };
         }
         else {
-            event.trees.forEach(function({ parentIndex, tree }) {
-                if (tree.end > openRange.end) {
-                    const right = tree.split(openRange.end);
-                    startEventQueue.pushPendingTree(
-                        new RangeTreeWithParent(parentIndex, right)
-                    );
-                }
-                insertChild(parentToNested, parentIndex, tree);
-            });
+            event.trees.forEach(insertChildParentToNested2);
         }
     }
     if (openRange !== undefined) {
@@ -575,7 +573,7 @@ function insertChild(parentToNested, parentIndex, tree) {
 }
 function nextChild(openRange, parentToNested) {
     const matchingTrees = [];
-    parentToNested.values().forEach(function(nested) {
+    parentToNested.values().forEach(function (nested) {
         if (
             nested.length === 1
             && nested[0].start === openRange.start
