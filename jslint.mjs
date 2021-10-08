@@ -8039,7 +8039,6 @@ function jslint_phase4_walk(state) {
 // ", "walk_statement", "unexpected_expression_a", "0", 27]
 // ["typeof 0", "walk_statement", "unexpected_expression_a", "typeof", 1]
 
-                    debug_inline(thing);
                     warn("unexpected_expression_a", thing);
                 }
 
