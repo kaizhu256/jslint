@@ -6525,6 +6525,7 @@ function jslint_phase3_parse(state) {
 
         if (
             option_dict.beta
+            && !mode_for
             && !option_dict.unordered
             && !option_dict.variable
             && variable_prv
