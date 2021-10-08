@@ -2294,6 +2294,7 @@ function jslint_phase2_lex(state) {
                         warn_at("unexpected_a", line, column - 1, "-");
                     }
                     return char_after("]");
+
 // PR-362 - Relax regexp-warning against using <space>.
 //                 case " ":
 //
@@ -2302,6 +2303,7 @@ function jslint_phase2_lex(state) {
 //
 //                     warn_at("expected_a_b", line, column, "\\u0020", " ");
 //                     break;
+
                 case "-":
                 case "/":
                 case "[":
@@ -5760,13 +5762,16 @@ function jslint_phase3_parse(state) {
     function stmt_for() {
         let first;
         let the_for = token_now;
-        if (!option_dict.for) {
 
-// test_cause:
-// ["for", "stmt_for", "unexpected_a", "for", 1]
+// PR-xxx - Relax warning against using for-statement.
+//         if (!option_dict.for) {
+//
+// // test_cause:
+// // ["for", "stmt_for", "unexpected_a", "for", 1]
+//
+//             warn("unexpected_a", the_for);
+//         }
 
-            warn("unexpected_a", the_for);
-        }
         check_not_top_level(the_for);
         functionage.loop += 1;
         advance("(");

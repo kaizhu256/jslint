@@ -1,0 +1,5 @@
+{
+    "scripts": {
+        "test": "sh jslint_ci.sh shCiBase"
+    }
+}

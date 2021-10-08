@@ -13,6 +13,7 @@
 
 # v2021.10.1-beta
 - jslint - add `for...of` syntax support.
+- npm - add file package.json and command `npm test`
 - bugfix - fix false warning `uninitialized 'bb'` in code `/*jslint node*/\nlet {aa:bb} = {}; bb();`
 - bugfix - fix issue #358 - switch-statement crashes jslint
 - ci - rename dir .build/ to .artifact/
