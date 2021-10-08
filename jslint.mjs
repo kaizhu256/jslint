@@ -5810,7 +5810,7 @@ function jslint_phase3_parse(state) {
 
             //!! stop("unexpected_a");
             advance();
-            stmt_var();
+            stmt_var(true);
             first = parse_expression(0, true);
             break;
         default:
@@ -6287,7 +6287,7 @@ function jslint_phase3_parse(state) {
         return the_try;
     }
 
-    function stmt_var() {
+    function stmt_var(mode_for) {
         let ellipsis;
         let mode_const;
         let name;
@@ -6548,7 +6548,9 @@ function jslint_phase3_parse(state) {
                 variable_prv.names[0].id
             );
         }
-        semicolon();
+        if (!mode_for) {
+            semicolon();
+        }
         return the_variable;
     }
 
