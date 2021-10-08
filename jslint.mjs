@@ -4604,12 +4604,11 @@ function jslint_phase3_parse(state) {
                 warn("unexpected_a", the_label);
             }
             advance(":");
-            if (
-                token_nxt.id === "do"
-                || token_nxt.id === "for"
-                || token_nxt.id === "switch"
-                || token_nxt.id === "while"
-            ) {
+            switch (token_nxt.id) {
+            case "do":
+            case "for":
+            case "switch":
+            case "while":
                 enroll(the_label, "label", true);
                 the_label.dead = false;
                 the_label.init = true;
@@ -7469,6 +7468,9 @@ function jslint_phase4_walk(state) {
     }
 
     function post_s_for(thing) {
+
+// Recurse walk_statement.
+
         walk_statement(thing.inc);
     }
 
@@ -7524,6 +7526,9 @@ function jslint_phase4_walk(state) {
                     init: true
                 });
             }
+
+// Recurse walk_statement.
+
             walk_statement(thing.catch.block);
 
 // Restore previous catch-scope after catch-block.
@@ -7852,6 +7857,9 @@ function jslint_phase4_walk(state) {
                 }
             }
         }
+
+// Recurse walk_statement.
+
         walk_statement(thing.initial);
     }
 
@@ -7962,6 +7970,9 @@ function jslint_phase4_walk(state) {
 // ["aa=function(){}", "walk_expression", "function", "", 0]
 
                     test_cause("function");
+
+// Recurse walk_statement.
+
                     walk_statement(thing.block);
                 }
                 if (
@@ -8001,6 +8012,9 @@ function jslint_phase4_walk(state) {
 // ["+[]", "walk_statement", "isArray", "", 0]
 
                 test_cause("isArray");
+
+// Recurse walk_statement.
+
                 thing.forEach(walk_statement);
             } else {
                 preamble(thing);
@@ -8031,6 +8045,9 @@ function jslint_phase4_walk(state) {
 
                     warn("unexpected_expression_a", thing);
                 }
+
+// Recurse walk_statement.
+
                 walk_statement(thing.block);
                 walk_statement(thing.else);
                 postamble(thing);
