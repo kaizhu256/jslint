@@ -107,7 +107,7 @@ function deepNormalizeScriptCov(scriptCov) {
  */ //jslint-quiet
 function normalizeFunctionCov(funcCov) {
     funcCov.ranges.sort(compareRangeCovs);
-    const tree = RangeTree.fromSortedRanges(funcCov.ranges);
+    const tree = fromSortedRanges(funcCov.ranges);
     normalizeRangeTree(tree);
     funcCov.ranges = tree.toRanges();
 }
@@ -118,45 +118,46 @@ function normalizeRangeTree(tree) {
     tree.normalize();
 }
 
-class RangeTree {
-    constructor(start, end, delta, children) {
-        this.start = start;
-        this.end = end;
-        this.delta = delta;
-        this.children = children;
-    }
-    /**
-     * @precodition `ranges` are well-formed and pre-order sorted
-     */
-    static fromSortedRanges(ranges) {
-        let root;
-        // Stack of parent trees and parent counts.
-        const stack = [];
-        ranges.forEach(function(range) {
-            const node = new RangeTree(range.startOffset, range.endOffset, range.count, []);
-            if (root === undefined) {
-                root = node;
-                stack.push([node, range.count]);
-                return;
-            }
-            let parent;
-            let parentCount;
-            while (true) {
-                [parent, parentCount] = stack[stack.length - 1];
-                // assert: `top !== undefined` (the ranges are sorted)
-                if (range.startOffset < parent.end) {
-                    break;
-                }
-                else {
-                    stack.pop();
-                }
-            }
-            node.delta -= parentCount;
-            parent.children.push(node);
+/**
+ * @precodition `ranges` are well-formed and pre-order sorted
+ */
+fromSortedRanges(ranges) {
+    let root;
+    // Stack of parent trees and parent counts.
+    const stack = [];
+    ranges.forEach(function(range) {
+        const node = new RangeTree(range.startOffset, range.endOffset, range.count, []);
+        if (root === undefined) {
+            root = node;
             stack.push([node, range.count]);
-        });
-        return root;
-    }
+            return;
+        }
+        let parent;
+        let parentCount;
+        while (true) {
+            [parent, parentCount] = stack[stack.length - 1];
+            // assert: `top !== undefined` (the ranges are sorted)
+            if (range.startOffset < parent.end) {
+                break;
+            }
+            else {
+                stack.pop();
+            }
+        }
+        node.delta -= parentCount;
+        parent.children.push(node);
+        stack.push([node, range.count]);
+    });
+    return root;
+}
+
+function RangeTree(start, end, delta, children) {
+    this.start = start;
+    this.end = end;
+    this.delta = delta;
+    this.children = children;
+}
+class RangeTree {
     normalize() {
         const children = [];
         let curEnd;
@@ -391,7 +392,7 @@ function mergeFunctionCovs(funcCovs) {
     funcCovs.forEach(function(funcCov) {
         // assert: `fn.ranges.length > 0`
         // assert: `fn.ranges` is sorted
-        trees.push(RangeTree.fromSortedRanges(funcCov.ranges));
+        trees.push(fromSortedRanges(funcCov.ranges));
     });
     // assert: `trees.length > 0`
     const mergedTree = mergeRangeTrees(trees);
