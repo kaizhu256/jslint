@@ -5762,6 +5762,7 @@ function jslint_phase3_parse(state) {
     function stmt_for() {
         let first;
         let the_for = token_now;
+        let the_variable;
 
 // PR-xxx - Relax warning against using for-statement.
 //         if (!option_dict.for) {
@@ -5800,7 +5801,7 @@ function jslint_phase3_parse(state) {
 
             test_cause("for_var", token_nxt.id);
             advance();
-            stmt_var(true);
+            the_variable = stmt_var(true);
             first = parse_expression(0, true);
             break;
         default:
@@ -5827,7 +5828,7 @@ function jslint_phase3_parse(state) {
             }
             break;
         default:
-            the_for.initial = first;
+            the_for.initial = the_variable || first;
             advance(";");
             the_for.expression = parse_expression(0);
             advance(";");
