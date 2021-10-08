@@ -7837,58 +7837,6 @@ function jslint_phase4_walk(state) {
         });
     }
 
-    function pre_s_f(thing) {
-
-// test_cause:
-// ["()=>0", "pre_s_f", "", "", 0]
-// ["(function (){}())", "pre_s_f", "", "", 0]
-// ["function aa(){}", "pre_s_f", "", "", 0]
-
-        test_cause("");
-        if (thing.arity === "statement" && blockage.body !== true) {
-
-// test_cause:
-// ["if(0){function aa(){}\n}", "pre_s_f", "unexpected_a", "function", 7]
-
-            warn("unexpected_a", thing);
-        }
-        function_stack.push(functionage);
-        block_stack.push(blockage);
-        functionage = thing;
-        blockage = thing;
-        thing.live = [];
-        if (typeof thing.name === "object") {
-            thing.name.dead = false;
-            thing.name.init = true;
-        }
-        if (thing.extra === "get") {
-            if (thing.parameters.length !== 0) {
-
-// test_cause:
-// ["/*jslint getset*/\naa={get aa(aa){}}", "pre_s_f", "bad_get", "function", 9]
-
-                warn("bad_get", thing);
-            }
-        } else if (thing.extra === "set") {
-            if (thing.parameters.length !== 1) {
-
-// test_cause:
-// ["/*jslint getset*/\naa={set aa(){}}", "pre_s_f", "bad_set", "function", 9]
-
-                warn("bad_set", thing);
-            }
-        }
-        thing.parameters.forEach(function (name) {
-            walk_expression(name.expression);
-            if (name.id === "{" || name.id === "[") {
-                name.names.forEach(subactivate);
-            } else {
-                name.dead = false;
-                name.init = true;
-            }
-        });
-    }
-
     function pre_s_for(thing) {
         let the_variable;
         if (thing.name !== undefined) {
@@ -7905,6 +7853,62 @@ function jslint_phase4_walk(state) {
             }
         }
         walk_statement(thing.initial);
+    }
+
+    function pre_s_func(thing) {
+
+// test_cause:
+// ["()=>0", "pre_s_func", "", "", 0]
+// ["(function (){}())", "pre_s_func", "", "", 0]
+// ["function aa(){}", "pre_s_func", "", "", 0]
+
+        test_cause("");
+        if (thing.arity === "statement" && blockage.body !== true) {
+
+// test_cause:
+// ["if(0){function aa(){}\n}", "pre_s_func", "unexpected_a", "function", 7]
+
+            warn("unexpected_a", thing);
+        }
+        function_stack.push(functionage);
+        block_stack.push(blockage);
+        functionage = thing;
+        blockage = thing;
+        thing.live = [];
+        if (typeof thing.name === "object") {
+            thing.name.dead = false;
+            thing.name.init = true;
+        }
+        if (thing.extra === "get") {
+            if (thing.parameters.length !== 0) {
+
+// test_cause:
+// ["
+// /*jslint getset*/\naa={get aa(aa){}}
+// ", "pre_s_func", "bad_get", "function", 9]
+
+                warn("bad_get", thing);
+            }
+        } else if (thing.extra === "set") {
+            if (thing.parameters.length !== 1) {
+
+// test_cause:
+// ["
+// /*jslint getset*/\naa={set aa(){}}
+// ", "pre_s_func", "bad_set", "function", 9]
+
+                warn("bad_set", thing);
+            }
+        }
+        thing.parameters.forEach(function (name) {
+            walk_expression(name.expression);
+            if (name.id === "{" || name.id === "[") {
+                name.names.forEach(subactivate);
+            } else {
+                name.dead = false;
+                name.init = true;
+            }
+        });
     }
 
     function pre_s_lbrace(thing) {
@@ -8061,17 +8065,17 @@ function jslint_phase4_walk(state) {
     preaction("binary", "!=", pre_b_noteq);
     preaction("binary", "(", pre_b_lparen);
     preaction("binary", "==", pre_b_eqeq);
-    preaction("binary", "=>", pre_s_f);
+    preaction("binary", "=>", pre_s_func);
     preaction("binary", "in", pre_b_in);
     preaction("binary", "instanceof", pre_b_instanceof);
     preaction("binary", "||", pre_b_or);
     preaction("binary", pre_b);
     preaction("binary", pre_a_bitwise);
     preaction("statement", "for", pre_s_for);
-    preaction("statement", "function", pre_s_f);
+    preaction("statement", "function", pre_s_func);
     preaction("statement", "try", pre_try);
     preaction("statement", "{", pre_s_lbrace);
-    preaction("unary", "function", pre_s_f);
+    preaction("unary", "function", pre_s_func);
     preaction("unary", "~", pre_a_bitwise);
     preaction("variable", pre_v);
 
