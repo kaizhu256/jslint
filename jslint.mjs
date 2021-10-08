@@ -7884,7 +7884,8 @@ function jslint_phase4_walk(state) {
 
 // test_cause:
 // ["
-// /*jslint getset*/\naa={get aa(aa){}}
+// /*jslint getset*/
+// aa={get aa(aa){}}
 // ", "pre_s_func", "bad_get", "function", 9]
 
                 warn("bad_get", thing);
@@ -7894,7 +7895,8 @@ function jslint_phase4_walk(state) {
 
 // test_cause:
 // ["
-// /*jslint getset*/\naa={set aa(){}}
+// /*jslint getset*/
+// aa={set aa(){}}
 // ", "pre_s_func", "bad_set", "function", 9]
 
                 warn("bad_set", thing);
