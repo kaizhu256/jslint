@@ -1,13 +1,22 @@
 /*jslint this*/
+/*property
+    assign, children, clear, count, delta, end, endOffset, entries, forEach,
+    functionName, functions, get, isBlockCoverage, length, max, next, nextIndex,
+    normalize, offset, parentIndex, pendingOffset, pendingTrees, pop, prototype,
+    push, pushPendingTree, queue, ranges, result, scriptId, set,
+    setPendingOffset, sort, splice, split, start, startOffset, toRanges,
+    toString, tree, trees, unshift, url, values
+*/
+
 "use strict";
 
+function compareScriptCovs(a, b) {
 /**
  * Compares two script coverages.
  *
  * The result corresponds to the comparison of their `url` value
  * (alphabetical sort).
  */
-function compareScriptCovs(a, b) {
     if (a.url === b.url) {
         return 0;
     }
@@ -16,14 +25,17 @@ function compareScriptCovs(a, b) {
     }
     return 1;
 }
+
+function compareFunctionCovs(a, b) {
 /**
  * Compares two function coverages.
  *
  * The result corresponds to the comparison of the root ranges.
  */
-function compareFunctionCovs(a, b) {
     return compareRangeCovs(a.ranges[0], b.ranges[0]);
 }
+
+function compareRangeCovs(a, b) {
 /**
  * Compares two range coverages.
  *
@@ -31,12 +43,13 @@ function compareFunctionCovs(a, b) {
  * descending `endOffset`.
  * This corresponds to a pre-order tree traversal.
  */
-function compareRangeCovs(a, b) {
     if (a.startOffset !== b.startOffset) {
         return a.startOffset - b.startOffset;
     }
     return b.endOffset - a.endOffset;
 }
+
+function normalizeProcessCov(processCov) {
 /**
  * Normalizes a process coverage.
  *
@@ -47,7 +60,6 @@ function compareRangeCovs(a, b) {
  *
  * @param processCov Process coverage to normalize.
  */
-function normalizeProcessCov(processCov) {
     processCov.result.sort(compareScriptCovs);
     processCov.forEach(function ([
         scriptId, scriptCov
@@ -55,6 +67,8 @@ function normalizeProcessCov(processCov) {
         scriptCov.scriptId = scriptId.toString(10);
     });
 }
+
+function deepNormalizeProcessCov(processCov) {
 /**
  * Normalizes a process coverage deeply.
  *
@@ -63,12 +77,13 @@ function normalizeProcessCov(processCov) {
  *
  * @param processCov Process coverage to normalize.
  */
-function deepNormalizeProcessCov(processCov) {
     processCov.result.forEach(function (scriptCov) {
         deepNormalizeScriptCov(scriptCov);
     });
     normalizeProcessCov(processCov);
 }
+
+function normalizeScriptCov(scriptCov) {
 /**
  * Normalizes a script coverage.
  *
@@ -77,9 +92,10 @@ function deepNormalizeProcessCov(processCov) {
  *
  * @param scriptCov Script coverage to normalize.
  */
-function normalizeScriptCov(scriptCov) {
     scriptCov.functions.sort(compareFunctionCovs);
 }
+
+function deepNormalizeScriptCov(scriptCov) {
 /**
  * Normalizes a script coverage deeply.
  *
@@ -88,12 +104,13 @@ function normalizeScriptCov(scriptCov) {
  *
  * @param scriptCov Script coverage to normalize.
  */
-function deepNormalizeScriptCov(scriptCov) {
     scriptCov.functions.forEach(function (funcCov) {
         normalizeFunctionCov(funcCov);
     });
     normalizeScriptCov(scriptCov);
 }
+
+function normalizeFunctionCov(funcCov) {
 /**
  * Normalizes a function coverage.
  *
@@ -102,16 +119,16 @@ function deepNormalizeScriptCov(scriptCov) {
  *
  * @param funcCov Function coverage to normalize.
  */ //jslint-quiet
-function normalizeFunctionCov(funcCov) {
     funcCov.ranges.sort(compareRangeCovs);
     const tree = fromSortedRanges(funcCov.ranges);
     normalizeRangeTree(tree);
     funcCov.ranges = tree.toRanges();
 }
+
+function normalizeRangeTree(tree) {
 /**
  * @internal
  */
-function normalizeRangeTree(tree) {
     tree.normalize();
 }
 
@@ -167,11 +184,9 @@ Object.assign(RangeTree.prototype, {
         this.children.forEach(function (child) {
             if (head === undefined) {
                 head = child;
-            }
-            else if (child.delta === head.delta && child.start === curEnd) {
+            } else if (child.delta === head.delta && child.start === curEnd) {
                 tail.push(child);
-            }
-            else {
+            } else {
                 endChain();
                 head = child;
             }
@@ -282,7 +297,9 @@ Object.assign(RangeTree.prototype, {
 function mergeProcessCovs(processCovs) {
     let merged;
     if (processCovs.length === 0) {
-        return { result: [] };
+        return {
+            result: []
+        };
     }
     if (processCovs.length === 1) {
         merged = processCovs[0];
@@ -305,7 +322,9 @@ function mergeProcessCovs(processCovs) {
         // assert: `scripts.length > 0`
         result.push(mergeScriptCovs(scripts));
     });
-    merged = { result };
+    merged = {
+        result
+    };
     normalizeProcessCov(merged);
     return merged;
 }
@@ -345,8 +364,9 @@ function mergeScriptCovs(scriptCovs) {
                 (!funcCovs[0].isBlockCoverage && funcCov.isBlockCoverage)) {
                 funcCovs = [];
                 rangeToFuncs.set(rootRange, funcCovs);
-            }
-            else if (funcCovs[0].isBlockCoverage && !funcCov.isBlockCoverage) {
+            } else if (
+                funcCovs[0].isBlockCoverage && !funcCov.isBlockCoverage
+            ) {
                 // if the entry in rangeToFuncs is block-level granularity,
                 // we should not append function level granularity.
                 return;
@@ -416,7 +436,11 @@ function mergeFunctionCovs(funcCovs) {
     normalizeRangeTree(mergedTree);
     const ranges = mergedTree.toRanges();
     const isBlockCoverage = !(ranges.length === 1 && ranges[0].count === 0);
-    merged = { functionName, isBlockCoverage, ranges };
+    merged = {
+        functionName,
+        isBlockCoverage,
+        ranges
+    };
     // assert: `merged` is normalized
     return merged;
 }
@@ -480,23 +504,20 @@ Object.assign(StartEventQueue.prototype, {
         if (pendingTrees === undefined) {
             this.nextIndex += 1;
             return nextEvent;
-        }
-        else if (nextEvent === undefined) {
+        } else if (nextEvent === undefined) {
             delete this.pendingTrees;
             return {
                 offset: this.pendingOffset,
                 trees: pendingTrees
             };
-        }
-        else {
+        } else {
             if (this.pendingOffset < nextEvent.offset) {
                 delete this.pendingTrees;
                 return {
                     offset: this.pendingOffset,
                     trees: pendingTrees
                 };
-            }
-            else {
+            } else {
                 if (this.pendingOffset === nextEvent.offset) {
                     delete this.pendingTrees;
                     pendingTrees.forEach(function (tree) {
@@ -523,11 +544,17 @@ function mergeRangeTreeChildren(parentTrees) {
     const startEventQueue = fromParentTrees(parentTrees);
     const parentToNested = new Map();
     let openRange;
-    function insertChildParentToNested({ parentIndex, tree }) {
+    function insertChildParentToNested({
+        parentIndex,
+        tree
+    }) {
         openRangeEnd = Math.max(openRangeEnd, tree.end);
         insertChild(parentToNested, parentIndex, tree);
     }
-    function insertChildParentToNested2({ parentIndex, tree }) {
+    function insertChildParentToNested2({
+        parentIndex,
+        tree
+    }) {
         if (tree.end > openRange.end) {
             const right = tree.split(openRange.end);
             startEventQueue.pushPendingTree(
@@ -553,8 +580,7 @@ function mergeRangeTreeChildren(parentTrees) {
                 end: openRangeEnd,
                 start: event.offset
             };
-        }
-        else {
+        } else {
             event.trees.forEach(insertChildParentToNested2);
         }
     }
@@ -580,8 +606,7 @@ function nextChild(openRange, parentToNested) {
             && nested[0].end === openRange.end
         ) {
             matchingTrees.push(nested[0]);
-        }
-        else {
+        } else {
             matchingTrees.push(
                 new RangeTree(openRange.start, openRange.end, 0, nested)
             );
