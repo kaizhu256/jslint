@@ -10,32 +10,32 @@
 
 "use strict";
 
-function compareScriptCovs(a, b) {
+function compareScriptCovs(aa, bb) {
 /**
  * Compares two script coverages.
  *
  * The result corresponds to the comparison of their `url` value
  * (alphabetical sort).
  */
-    if (a.url === b.url) {
+    if (aa.url === bb.url) {
         return 0;
     }
-    if (a.url < b.url) {
+    if (aa.url < bb.url) {
         return -1;
     }
     return 1;
 }
 
-function compareFunctionCovs(a, b) {
+function compareFunctionCovs(aa, bb) {
 /**
  * Compares two function coverages.
  *
  * The result corresponds to the comparison of the root ranges.
  */
-    return compareRangeCovs(a.ranges[0], b.ranges[0]);
+    return compareRangeCovs(aa.ranges[0], bb.ranges[0]);
 }
 
-function compareRangeCovs(a, b) {
+function compareRangeCovs(aa, bb) {
 /**
  * Compares two range coverages.
  *
@@ -43,10 +43,10 @@ function compareRangeCovs(a, b) {
  * descending `endOffset`.
  * This corresponds to a pre-order tree traversal.
  */
-    if (a.startOffset !== b.startOffset) {
-        return a.startOffset - b.startOffset;
+    if (aa.startOffset !== bb.startOffset) {
+        return aa.startOffset - bb.startOffset;
     }
-    return b.endOffset - a.endOffset;
+    return bb.endOffset - aa.endOffset;
 }
 
 function normalizeProcessCov(processCov) {
