@@ -6346,8 +6346,8 @@ function jslint_phase3_parse(state) {
     }
 
     function stmt_for() {
-        const the_for = token_now;
         let first;
+        let the_for = token_now;
         if (!option_dict.for) {
 
 // test_cause:
@@ -6366,41 +6366,36 @@ function jslint_phase3_parse(state) {
 
             return stop("expected_a_b", the_for, "while (", "for (;");
         }
-        if (
-            token_nxt.id === "var"
-            || token_nxt.id === "let"
-            || token_nxt.id === "const"
-        ) {
+        switch (token_nxt.id) {
+        case "const":
+        case "let":
+        case "var":
 
 // test_cause:
 // ["for(const aa in aa){}", "stmt_for", "unexpected_a", "const", 5]
 
-            return stop("unexpected_a");
+            stop("unexpected_a");
+            break;
         }
         first = parse_expression(0);
-        if (first.id === "in") {
+        switch (first.id) {
+        case "in":
+        case "of":
             if (first.expression[0].arity !== "variable") {
 
 // test_cause:
 // ["for(0 in aa){}", "stmt_for", "bad_assignment_a", "0", 5]
+// ["for(0 of aa){}", "stmt_for", "bad_assignment_a", "0", 5]
 
                 warn("bad_assignment_a", first.expression[0]);
             }
             the_for.name = first.expression[0];
             the_for.expression = first.expression[1];
-            warn("expected_a_b", the_for, "Object.keys", "for in");
-        } else if (first.id === "of") {
-            if (first.expression[0].arity !== "variable") {
-
-// test_cause:
-// ["for(0 in aa){}", "stmt_for", "bad_assignment_a", "0", 5]
-
-                warn("bad_assignment_a", first.expression[0]);
+            if (first.id === "in") {
+                warn("expected_a_b", the_for, "Object.keys", "for in");
             }
-            the_for.name = first.expression[0];
-            the_for.expression = first.expression[1];
-            warn("expected_a_b", the_for, "Object.keys", "for in");
-        } else {
+            break;
+        default:
             the_for.initial = first;
             advance(";");
             the_for.expression = parse_expression(0);
