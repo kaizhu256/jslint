@@ -363,7 +363,11 @@ function mergeScriptCovs(scriptCovs) {
         // assert: `funcCovs.length > 0`
         functions.push(mergeFunctionCovs(funcCovs));
     });
-    merged = { scriptId, url, functions };
+    merged = {
+        functions,
+        scriptId,
+        url
+    };
     normalizeScriptCov(merged);
     return merged;
 }
@@ -380,7 +384,7 @@ function mergeScriptCovs(scriptCovs) {
  */
 function stringifyFunctionRootRange(funcCov) {
     const rootRange = funcCov.ranges[0];
-    return `${rootRange.startOffset.toString(10)};${rootRange.endOffset.toString(10)}`;
+    return `${rootRange.startOffset.toString(10)};${rootRange.endOffset.toString(10)}`; //jslint-quiet
 }
 /**
  * Merges a list of matching function coverages.
@@ -399,7 +403,7 @@ function mergeFunctionCovs(funcCovs) {
     if (funcCovs.length === 0) {
         return undefined;
     }
-    else if (funcCovs.length === 1) {
+    if (funcCovs.length === 1) {
         merged = funcCovs[0];
         normalizeFunctionCov(merged);
         return merged;
@@ -412,11 +416,11 @@ function mergeFunctionCovs(funcCovs) {
         trees.push(fromSortedRanges(funcCov.ranges));
     });
     // assert: `trees.length > 0`
-    mergedTree = mergeRangeTrees(trees);
+    const mergedTree = mergeRangeTrees(trees);
     normalizeRangeTree(mergedTree);
     const ranges = mergedTree.toRanges();
     const isBlockCoverage = !(ranges.length === 1 && ranges[0].count === 0);
-    merged = { functionName, ranges, isBlockCoverage };
+    merged = { functionName, isBlockCoverage, ranges };
     // assert: `merged` is normalized
     return merged;
 }
@@ -435,20 +439,13 @@ function mergeRangeTrees(trees) {
     const children = mergeRangeTreeChildren(trees);
     return new RangeTree(first.start, first.end, delta, children);
 }
-class RangeTreeWithParent {
-    constructor(parentIndex, tree) {
-        this.parentIndex = parentIndex;
-        this.tree = tree;
-    }
+function RangeTreeWithParent(parentIndex, tree) {
+    this.parentIndex = parentIndex;
+    this.tree = tree;
 }
-class StartEvent {
-    constructor(offset, trees) {
-        this.offset = offset;
-        this.trees = trees;
-    }
-    static compare(a, b) {
-        return a.offset - b.offset;
-    }
+function constructor(offset, trees) {
+    this.offset = offset;
+    this.trees = trees;
 }
 class StartEventQueue {
     constructor(queue) {
@@ -473,7 +470,9 @@ class StartEventQueue {
         startToTrees.forEach(function([startOffset, trees]) {
             queue.push(new StartEvent(startOffset, trees));
         });
-        queue.sort(StartEvent.compare);
+        queue.sort(function (aa, bb) {
+            return aa.offset - bb.offset;
+        });
         return new StartEventQueue(queue);
     }
     setPendingOffset(offset) {
