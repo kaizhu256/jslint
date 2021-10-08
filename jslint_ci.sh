@@ -1549,7 +1549,8 @@ async function jslint_coverage_report({
 }) {
 
 // This function will
-// 2. After program exit, create html-coverage-report in <coverage_dir>.
+// 1. Read and merge v8-coverage-files from <coverage_dir>
+// 2. Create html-coverage-report in <coverage_dir>.
 
     let cwd;
     let data;
@@ -1947,7 +1948,7 @@ ${String(count).padStart(7, " ")}
         coverage_dir
     );
 
-// 2. After program exit, create html-coverage-report in <coverage_dir>.
+// 1. Read and merge v8-coverage-files from <coverage_dir>
 
     data = await module_fs.promises.readdir(coverage_dir);
     await Promise.all(data.map(async function (file) {
@@ -1964,6 +1965,9 @@ ${String(count).padStart(7, " ")}
             );
         }
     }));
+
+// 2. Create html-coverage-report in <coverage_dir>.
+
     file_dict = {};
     cwd = process.cwd().replace((
         /\\/g
@@ -2023,35 +2027,42 @@ ${String(count).padStart(7, " ")}
                 endOffset,
                 startOffset
             }, ii, list) {
-                lineList.forEach(function (elem) {
+                lineList.forEach(function (line) {
                     if (!(
                         (
-                            elem.startOffset <= startOffset
-                            && startOffset <= elem.endOffset
+                            line.startOffset <= startOffset
+                            && startOffset <= line.endOffset
                         ) || (
-                            elem.startOffset <= endOffset
-                            && endOffset <= elem.endOffset
+                            line.startOffset <= endOffset
+                            && endOffset <= line.endOffset
                         ) || (
-                            startOffset <= elem.startOffset
-                            && elem.endOffset <= endOffset
+                            startOffset <= line.startOffset
+                            && line.endOffset <= endOffset
                         )
                     )) {
                         return;
                     }
-                    // handle root-range
+
+// Handle root-range.
+
                     if (ii + 1 === list.length) {
-                        if (elem.count === -1) {
-                            elem.count = count;
+                        if (line.count === -1) {
+                            line.count = count;
                         }
                         return;
                     }
-                    // handle non-root-range
-                    if (elem.count !== 0) {
-                        elem.count = Math.max(count, elem.count);
+
+// Handle non-root-range.
+
+                    if (line.count !== 0) {
+                        line.count = Math.max(count, line.count);
                     }
+
+// Handle holes.
+
                     if (count === 0) {
-                        elem.count = 0;
-                        elem.holeList.push([
+                        line.count = 0;
+                        line.holeList.push([
                             startOffset, endOffset
                         ]);
                     }
