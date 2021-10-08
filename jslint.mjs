@@ -94,26 +94,6 @@
 /*jslint beta, node*/
 
 /*property
-    NODE_V8_COVERAGE,
-    char, count, coverage_dir,
-    endOffset,
-    fileList,
-    holeList,
-    isHole,
-    jslint_coverage_report,
-    lineList, linesCovered, linesTotal,
-    modeCoverageIgnoreFile,
-    npm_config_mode_coverage,
-    platform,
-    ranges, result,
-    startOffset,
-
-    floor,
-    on,
-    padEnd,
-    rename, reverse, round,
-    sep, shell, spawn, stdio,
-    unshift,
     JSLINT_BETA, a, all, argv, arity, artifact, assert_or_throw, assign, async,
     b, beta, bitwise, block, body, browser, c, calls, catch, catch_list,
     catch_stack, causes, cjs_module, cjs_require, closer, closure, code, column,
@@ -4609,6 +4589,14 @@ function jslint_phase3_parse(state) {
             case "for":
             case "switch":
             case "while":
+
+// test_cause:
+// ["aa:do{}", "parse_statement", "the_statement_label", "do", 0]
+// ["aa:for{}", "parse_statement", "the_statement_label", "for", 0]
+// ["aa:switch{}", "parse_statement", "the_statement_label", "switch", 0]
+// ["aa:while{}", "parse_statement", "the_statement_label", "while", 0]
+
+                test_cause("the_statement_label", token_nxt.id);
                 enroll(the_label, "label", true);
                 the_label.dead = false;
                 the_label.init = true;
@@ -5804,10 +5792,17 @@ function jslint_phase3_parse(state) {
         case "let":
         case "var":
 
-//!! // test_cause:
-//!! // ["for(const aa in aa){}", "stmt_for", "unexpected_a", "const", 5]
+// PR-xxx - Add for...of syntax-support.
 
-            //!! stop("unexpected_a");
+// test_cause:
+// ["for(const aa in aa){}", "stmt_for", "for_var", "const", 0]
+// ["for(const aa of aa){}", "stmt_for", "for_var", "const", 0]
+// ["for(let aa in aa){}", "stmt_for", "for_var", "let", 0]
+// ["for(let aa of aa){}", "stmt_for", "for_var", "let", 0]
+// ["for(var aa in aa){}", "stmt_for", "for_var", "var", 0]
+// ["for(var aa of aa){}", "stmt_for", "for_var", "var", 0]
+
+            test_cause("for_var", token_nxt.id);
             advance();
             stmt_var(true);
             first = parse_expression(0, true);
@@ -5817,6 +5812,9 @@ function jslint_phase3_parse(state) {
         }
         switch (first.id) {
         case "in":
+
+// PR-xxx - Add for...of syntax-support.
+
         case "of":
             if (first.expression[0].arity !== "variable") {
 
@@ -7845,6 +7843,7 @@ function jslint_phase4_walk(state) {
     function pre_s_for(thing) {
         let the_variable;
         if (thing.name !== undefined) {
+            thing.name.dead = false;
             the_variable = lookup(thing.name);
             if (the_variable !== undefined) {
                 the_variable.init = true;
