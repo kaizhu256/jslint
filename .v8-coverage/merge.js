@@ -1,3 +1,4 @@
+/*jslint this*/
 "use strict";
 
 /**
@@ -121,12 +122,17 @@ function normalizeRangeTree(tree) {
 /**
  * @precodition `ranges` are well-formed and pre-order sorted
  */
-fromSortedRanges(ranges) {
+function fromSortedRanges(ranges) {
     let root;
     // Stack of parent trees and parent counts.
     const stack = [];
     ranges.forEach(function(range) {
-        const node = new RangeTree(range.startOffset, range.endOffset, range.count, []);
+        const node = new RangeTree(
+            range.startOffset,
+            range.endOffset,
+            range.count,
+            []
+        );
         if (root === undefined) {
             root = node;
             stack.push([node, range.count]);
@@ -140,9 +146,7 @@ fromSortedRanges(ranges) {
             if (range.startOffset < parent.end) {
                 break;
             }
-            else {
-                stack.pop();
-            }
+            stack.pop();
         }
         node.delta -= parentCount;
         parent.children.push(node);
@@ -157,7 +161,8 @@ function RangeTree(start, end, delta, children) {
     this.delta = delta;
     this.children = children;
 }
-class RangeTree {
+
+Object.assign(RangeTree.prototype, {
     normalize() {
         const children = [];
         let curEnd;
@@ -203,7 +208,7 @@ class RangeTree {
             head.normalize();
             children.push(head);
         }
-    }
+    },
     /**
      * @precondition `tree.start < value && value < tree.end`
      * @return RangeTree Right part
@@ -212,7 +217,7 @@ class RangeTree {
         let ii = 0;
         let leftChildLen = this.children.length;
         let mid;
-        // TODO(perf): Binary search (check overhead)
+        // TODO(perf): Binary search (check overhead) //jslint-quiet
         while (ii < this.children.length) {
             const child = this.children[ii];
             if (child.start < value && value < child.end) {
@@ -220,7 +225,7 @@ class RangeTree {
                 leftChildLen = ii + 1;
                 break;
             }
-            else if (child.start >= value) {
+            if (child.start >= value) {
                 leftChildLen = ii;
                 break;
             }
@@ -231,10 +236,15 @@ class RangeTree {
         if (mid !== undefined) {
             rightChildren.unshift(mid);
         }
-        const result = new RangeTree(value, this.end, this.delta, rightChildren);
+        const result = new RangeTree(
+            value,
+            this.end,
+            this.delta,
+            rightChildren
+        );
         this.end = value;
         return result;
-    }
+    },
     /**
      * Get the range coverages corresponding to the tree.
      *
@@ -247,7 +257,11 @@ class RangeTree {
         while (stack.length > 0) {
             const [cur, parentCount] = stack.pop();
             const count = parentCount + cur.delta;
-            ranges.push({ startOffset: cur.start, endOffset: cur.end, count });
+            ranges.push({
+                count,
+                endOffset: cur.end,
+                startOffset: cur.start
+            });
             let ii = cur.children.length - 1;
             while (ii >= 0) {
                 stack.push([cur.children[ii], count]);
@@ -256,7 +270,7 @@ class RangeTree {
         }
         return ranges;
     }
-}
+});
 
 /**
  * Merges a list of process coverages.
@@ -270,11 +284,12 @@ class RangeTree {
  * @return Merged process coverage.
  */
 function mergeProcessCovs(processCovs) {
+    let merged;
     if (processCovs.length === 0) {
         return { result: [] };
     }
-    else if (processCovs.length === 1) {
-        const merged = processCovs[0];
+    if (processCovs.length === 1) {
+        merged = processCovs[0];
         deepNormalizeProcessCov(merged);
         return merged;
     }
@@ -294,7 +309,7 @@ function mergeProcessCovs(processCovs) {
         // assert: `scripts.length > 0`
         result.push(mergeScriptCovs(scripts));
     });
-    const merged = { result };
+    merged = { result };
     normalizeProcessCov(merged);
     return merged;
 }
@@ -311,11 +326,12 @@ function mergeProcessCovs(processCovs) {
  * @return Merged script coverage, or `undefined` if the input list was empty.
  */
 function mergeScriptCovs(scriptCovs) {
+    let merged;
     if (scriptCovs.length === 0) {
         return undefined;
     }
-    else if (scriptCovs.length === 1) {
-        const merged = scriptCovs[0];
+    if (scriptCovs.length === 1) {
+        merged = scriptCovs[0];
         deepNormalizeScriptCov(merged);
         return merged;
     }
@@ -328,15 +344,15 @@ function mergeScriptCovs(scriptCovs) {
             const rootRange = stringifyFunctionRootRange(funcCov);
             let funcCovs = rangeToFuncs.get(rootRange);
             if (funcCovs === undefined ||
-                // if the entry in rangeToFuncs is function-level granularity and
-                // the new coverage is block-level, prefer block-level.
+                // if the entry in rangeToFuncs is function-level granularity
+                // and the new coverage is block-level, prefer block-level.
                 (!funcCovs[0].isBlockCoverage && funcCov.isBlockCoverage)) {
                 funcCovs = [];
                 rangeToFuncs.set(rootRange, funcCovs);
             }
             else if (funcCovs[0].isBlockCoverage && !funcCov.isBlockCoverage) {
-                // if the entry in rangeToFuncs is block-level granularity, we should
-                // not append function level granularity.
+                // if the entry in rangeToFuncs is block-level granularity,
+                // we should not append function level granularity.
                 return;
             }
             funcCovs.push(funcCov);
@@ -347,7 +363,7 @@ function mergeScriptCovs(scriptCovs) {
         // assert: `funcCovs.length > 0`
         functions.push(mergeFunctionCovs(funcCovs));
     });
-    const merged = { scriptId, url, functions };
+    merged = { scriptId, url, functions };
     normalizeScriptCov(merged);
     return merged;
 }
@@ -379,11 +395,12 @@ function stringifyFunctionRootRange(funcCov) {
  * @return Merged function coverage, or `undefined` if the input list was empty.
  */
 function mergeFunctionCovs(funcCovs) {
+    let merged;
     if (funcCovs.length === 0) {
         return undefined;
     }
     else if (funcCovs.length === 1) {
-        const merged = funcCovs[0];
+        merged = funcCovs[0];
         normalizeFunctionCov(merged);
         return merged;
     }
@@ -395,11 +412,11 @@ function mergeFunctionCovs(funcCovs) {
         trees.push(fromSortedRanges(funcCov.ranges));
     });
     // assert: `trees.length > 0`
-    const mergedTree = mergeRangeTrees(trees);
+    mergedTree = mergeRangeTrees(trees);
     normalizeRangeTree(mergedTree);
     const ranges = mergedTree.toRanges();
     const isBlockCoverage = !(ranges.length === 1 && ranges[0].count === 0);
-    const merged = { functionName, ranges, isBlockCoverage };
+    merged = { functionName, ranges, isBlockCoverage };
     // assert: `merged` is normalized
     return merged;
 }
