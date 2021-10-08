@@ -246,9 +246,9 @@ function noop(val) {
             "function aa() {\n    return () => 0;\n}"
         ],
         for: [
-            "function aa() {\n"
-            + "    for (const aa of bb) {\n"
-            + "        aa();\n"
+            "function aa(bb) {\n"
+            + "    for (const cc of bb) {\n"
+            + "        cc();\n"
             + "    }\n"
             + "}\n"
         ],
