@@ -1599,7 +1599,7 @@ async function jslint_cli({
         }));
         return;
 
-// PR-xxx - Add command jslint_plugin_vim.
+// COMMIT-b26d6df2 - Add command jslint_plugin_vim.
 
     case "jslint_plugin_vim":
         mode_plugin_vim = true;
@@ -7458,7 +7458,7 @@ function jslint_phase4_walk(state) {
 
     function post_s_for(thing) {
 
-// Recurse walk_statement.
+// Recurse walk_statement().
 
         walk_statement(thing.inc);
     }
@@ -7516,7 +7516,7 @@ function jslint_phase4_walk(state) {
                 });
             }
 
-// Recurse walk_statement.
+// Recurse walk_statement().
 
             walk_statement(thing.catch.block);
 
@@ -7848,7 +7848,7 @@ function jslint_phase4_walk(state) {
             }
         }
 
-// Recurse walk_statement.
+// Recurse walk_statement().
 
         walk_statement(thing.initial);
     }
@@ -7961,7 +7961,7 @@ function jslint_phase4_walk(state) {
 
                     test_cause("function");
 
-// Recurse walk_statement.
+// Recurse walk_statement().
 
                     walk_statement(thing.block);
                 }
@@ -8003,7 +8003,7 @@ function jslint_phase4_walk(state) {
 
                 test_cause("isArray");
 
-// Recurse walk_statement.
+// Recurse walk_statement().
 
                 thing.forEach(walk_statement);
             } else {
@@ -8036,7 +8036,7 @@ function jslint_phase4_walk(state) {
                     warn("unexpected_expression_a", thing);
                 }
 
-// Recurse walk_statement.
+// Recurse walk_statement().
 
                 walk_statement(thing.block);
                 walk_statement(thing.else);
@@ -9273,7 +9273,7 @@ body {
             case "[":
             case "{":
 
-// Recurse extract.
+// Recurse extract().
 
                 names.forEach(extract);
                 break;

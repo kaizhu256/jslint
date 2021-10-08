@@ -13,10 +13,10 @@
 
 # v2021.10.1-beta
 - jslint - add `for...of` syntax support.
-- cli - add cli-command jslint_plugin_vim
 - bugfix - fix false warning `uninitialized 'bb'` in code `/*jslint node*/\nlet {aa:bb} = {}; bb();`
 - bugfix - fix issue #358 - switch-statement crashes jslint
 - ci - rename dir .build/ to .artifact/
+- cli - add cli-command jslint_plugin_vim
 - cli - change cli-option `--mode-report` to cli-command `jslint_report=<filename>`
 - deprecated - cli - add cli-option `--mode-report`
 - doc - add api-documentation
