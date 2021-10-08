@@ -3,7 +3,8 @@
 /**
  * Compares two script coverages.
  *
- * The result corresponds to the comparison of their `url` value (alphabetical sort).
+ * The result corresponds to the comparison of their `url` value
+ * (alphabetical sort).
  */
 function compareScriptCovs(a, b) {
     if (a.url === b.url) {
@@ -50,7 +51,7 @@ function compareRangeCovs(a, b) {
  * @param processCov Process coverage to normalize.
  */
 function normalizeProcessCov(processCov) {
-    processCov.result.sort(compare_1.compareScriptCovs);
+    processCov.result.sort(compareScriptCovs);
     processCov.forEach(function ([
         scriptId, scriptCov
     ]) {
@@ -80,7 +81,7 @@ function deepNormalizeProcessCov(processCov) {
  * @param scriptCov Script coverage to normalize.
  */
 function normalizeScriptCov(scriptCov) {
-    scriptCov.functions.sort(compare_1.compareFunctionCovs);
+    scriptCov.functions.sort(compareFunctionCovs);
 }
 /**
  * Normalizes a script coverage deeply.
@@ -105,7 +106,7 @@ function deepNormalizeScriptCov(scriptCov) {
  * @param funcCov Function coverage to normalize.
  */
 function normalizeFunctionCov(funcCov) {
-    funcCov.ranges.sort(compare_1.compareRangeCovs);
+    funcCov.ranges.sort(compareRangeCovs);
     const tree = range_tree_1.RangeTree.fromSortedRanges(funcCov.ranges);
     normalizeRangeTree(tree);
     funcCov.ranges = tree.toRanges();
@@ -207,10 +208,11 @@ class RangeTree {
      * @return RangeTree Right part
      */
     split(value) {
+        let ii = 0;
         let leftChildLen = this.children.length;
         let mid;
         // TODO(perf): Binary search (check overhead)
-        for (let ii = 0; ii < this.children.length; ii++) {
+        while (ii < this.children.length) {
             const child = this.children[ii];
             if (child.start < value && value < child.end) {
                 mid = child.split(value);
@@ -221,6 +223,7 @@ class RangeTree {
                 leftChildLen = ii;
                 break;
             }
+            ii += 1;
         }
         const rightLen = this.children.length - leftChildLen;
         const rightChildren = this.children.splice(leftChildLen, rightLen);
@@ -244,8 +247,10 @@ class RangeTree {
             const [cur, parentCount] = stack.pop();
             const count = parentCount + cur.delta;
             ranges.push({ startOffset: cur.start, endOffset: cur.end, count });
-            for (let ii = cur.children.length - 1; ii >= 0; ii--) {
+            let ii = cur.children.length - 1;
+            while (ii >= 0) {
                 stack.push([cur.children[ii], count]);
+                ii -= 1;
             }
         }
         return ranges;
@@ -436,7 +441,7 @@ class StartEventQueue {
     }
     static fromParentTrees(parentTrees) {
         const startToTrees = new Map();
-        for (const [parentIndex, parentTree] of parentTrees.entries()) {
+        parentTrees.entries().forEach(function([parentIndex, parentTree]) {
             parentTree.children.forEach(function(child) {
                 let trees = startToTrees.get(child.start);
                 if (trees === undefined) {
@@ -445,11 +450,11 @@ class StartEventQueue {
                 }
                 trees.push(new RangeTreeWithParent(parentIndex, child));
             });
-        }
+        });
         const queue = [];
-        for (const [startOffset, trees] of startToTrees) {
+        startToTrees.forEach(function([startOffset, trees]) {
             queue.push(new StartEvent(startOffset, trees));
-        }
+        });
         queue.sort(StartEvent.compare);
         return new StartEventQueue(queue);
     }
@@ -507,21 +512,21 @@ function mergeRangeTreeChildren(parentTrees) {
         }
         if (openRange === undefined) {
             let openRangeEnd = event.offset + 1;
-            for (const { parentIndex, tree } of event.trees) {
+            event.trees.forEach(function({ parentIndex, tree }) {
                 openRangeEnd = Math.max(openRangeEnd, tree.end);
                 insertChild(parentToNested, parentIndex, tree);
-            }
+            });
             startEventQueue.setPendingOffset(openRangeEnd);
             openRange = { start: event.offset, end: openRangeEnd };
         }
         else {
-            for (const { parentIndex, tree } of event.trees) {
+            event.trees.forEach(function({ parentIndex, tree }) {
                 if (tree.end > openRange.end) {
                     const right = tree.split(openRange.end);
                     startEventQueue.pushPendingTree(new RangeTreeWithParent(parentIndex, right));
                 }
                 insertChild(parentToNested, parentIndex, tree);
-            }
+            });
         }
     }
     if (openRange !== undefined) {
