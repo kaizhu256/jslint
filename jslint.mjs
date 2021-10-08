@@ -7842,14 +7842,14 @@ function jslint_phase4_walk(state) {
             thing.name.dead = false;
             the_variable = lookup(thing.name);
             if (the_variable !== undefined) {
-                the_variable.init = true;
-                if (the_variable.readonly) {
+                if (!the_variable.init && !the_variable.readonly) {
 
 // test_cause:
 // ["const aa=0;for(aa in aa){}", "pre_s_for", "bad_assignment_a", "aa", 16]
 
                     warn("bad_assignment_a", thing.name);
                 }
+                the_variable.init = true;
             }
         }
 
