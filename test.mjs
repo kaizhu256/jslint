@@ -588,9 +588,8 @@ function noop(val) {
 /*
  * this function will test misc handling-behavior
  */
-
     // test debugInline's handling-behavior
-    debugInline();
+    noop(debugInline);
     // test assertOrThrow's handling-behavior
     try {
         assertOrThrow(undefined, "undefined");
