@@ -4958,94 +4958,148 @@ function jslint_phase3_parse(state) {
         const signature = ["("];
         let optional;
         let subparam;
-        if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
-            (function parameter() {
-                let ellipsis = false;
-                let param;
-                if (token_nxt.id === "{") {
-                    if (optional !== undefined) {
+        function parameter() {
+            let ellipsis = false;
+            let param;
+            if (token_nxt.id === "{") {
+                if (optional !== undefined) {
 
 // test_cause:
 // ["function aa(aa=0,{}){}", "parameter", "required_a_optional_b", "aa", 18]
 
-                        warn(
-                            "required_a_optional_b",
-                            token_nxt,
-                            token_nxt.id,
-                            optional.id
-                        );
-                    }
-                    param = token_nxt;
-                    param.names = [];
-                    advance("{");
-                    signature.push("{");
-                    while (true) {
-                        subparam = token_nxt;
-                        if (!subparam.identifier) {
+                    warn(
+                        "required_a_optional_b",
+                        token_nxt,
+                        token_nxt.id,
+                        optional.id
+                    );
+                }
+                param = token_nxt;
+                param.names = [];
+                advance("{");
+                signature.push("{");
+                while (true) {
+                    subparam = token_nxt;
+                    if (!subparam.identifier) {
 
 // test_cause:
 // ["function aa(aa=0,{}){}", "parameter", "expected_identifier_a", "}", 19]
 // ["function aa({0}){}", "parameter", "expected_identifier_a", "0", 14]
 
-                            return stop("expected_identifier_a");
-                        }
-                        survey(subparam);
+                        return stop("expected_identifier_a");
+                    }
+                    survey(subparam);
+                    advance();
+                    signature.push(subparam.id);
+                    if (token_nxt.id === ":") {
+                        advance(":");
                         advance();
-                        signature.push(subparam.id);
-                        if (token_nxt.id === ":") {
-                            advance(":");
-                            advance();
-                            token_now.label = subparam;
-                            subparam = token_now;
-                            if (!subparam.identifier) {
+                        token_now.label = subparam;
+                        subparam = token_now;
+                        if (!subparam.identifier) {
 
 // test_cause:
 // ["function aa({aa:0}){}", "parameter", "expected_identifier_a", "}", 18]
 
-                                return stop(
-                                    "expected_identifier_a",
-                                    token_nxt
-                                );
-                            }
+                            return stop(
+                                "expected_identifier_a",
+                                token_nxt
+                            );
                         }
+                    }
 
 // test_cause:
 // ["function aa({aa=aa},aa){}", "parameter", "equal", "", 0]
 
-                        test_cause("equal");
-                        if (token_nxt.id === "=") {
-                            advance("=");
-                            subparam.expression = parse_expression();
-                            param.open = true;
-                        }
-                        param.names.push(subparam);
-                        if (token_nxt.id === ",") {
-                            advance(",");
-                            signature.push(", ");
-                        } else {
-                            break;
-                        }
+                    test_cause("equal");
+                    if (token_nxt.id === "=") {
+                        advance("=");
+                        subparam.expression = parse_expression();
+                        param.open = true;
                     }
-                    list.push(param);
+                    param.names.push(subparam);
+                    if (token_nxt.id === ",") {
+                        advance(",");
+                        signature.push(", ");
+                    } else {
+                        break;
+                    }
+                }
+                list.push(param);
 
 // test_cause:
 // ["
 // function aa({bb,aa}){}
 // ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
 
-                    check_ordered("parameter", param.names);
-                    advance("}");
-                    signature.push("}");
-                    if (token_nxt.id === ",") {
-                        advance(",");
-                        signature.push(", ");
-                        return parameter();
-                    }
-                } else if (token_nxt.id === "[") {
-                    if (optional !== undefined) {
+                check_ordered("parameter", param.names);
+                advance("}");
+                signature.push("}");
+                if (token_nxt.id === ",") {
+                    advance(",");
+                    signature.push(", ");
+                    return parameter();
+                }
+            } else if (token_nxt.id === "[") {
+                if (optional !== undefined) {
 
 // test_cause:
 // ["function aa(aa=0,[]){}", "parameter", "required_a_optional_b", "aa", 18]
+
+                    warn(
+                        "required_a_optional_b",
+                        token_nxt,
+                        token_nxt.id,
+                        optional.id
+                    );
+                }
+                param = token_nxt;
+                param.names = [];
+                advance("[");
+                signature.push("[]");
+                while (true) {
+                    subparam = token_nxt;
+                    if (!subparam.identifier) {
+
+// test_cause:
+// ["function aa(aa=0,[]){}", "parameter", "expected_identifier_a", "]", 19]
+
+                        return stop("expected_identifier_a");
+                    }
+                    advance();
+                    param.names.push(subparam);
+
+// test_cause:
+// ["function aa([aa=aa],aa){}", "parameter", "id", "", 0]
+
+                    test_cause("id");
+                    if (token_nxt.id === "=") {
+                        advance("=");
+                        subparam.expression = parse_expression();
+                        param.open = true;
+                    }
+                    if (token_nxt.id === ",") {
+                        advance(",");
+                    } else {
+                        break;
+                    }
+                }
+                list.push(param);
+                advance("]");
+                if (token_nxt.id === ",") {
+                    advance(",");
+                    signature.push(", ");
+                    return parameter();
+                }
+            } else {
+                if (token_nxt.id === "...") {
+                    ellipsis = true;
+                    signature.push("...");
+                    advance("...");
+                    if (optional !== undefined) {
+
+// test_cause:
+// ["function aa(aa=0,...){}", "parameter", "required_a_optional_b", "aa", 21]
 
                         warn(
                             "required_a_optional_b",
@@ -5054,102 +5108,49 @@ function jslint_phase3_parse(state) {
                             optional.id
                         );
                     }
-                    param = token_nxt;
-                    param.names = [];
-                    advance("[");
-                    signature.push("[]");
-                    while (true) {
-                        subparam = token_nxt;
-                        if (!subparam.identifier) {
+                }
+                if (!token_nxt.identifier) {
 
 // test_cause:
-// ["function aa(aa=0,[]){}", "parameter", "expected_identifier_a", "]", 19]
+// ["function aa(0){}", "parameter", "expected_identifier_a", "0", 13]
 
-                            return stop("expected_identifier_a");
-                        }
-                        advance();
-                        param.names.push(subparam);
+                    return stop("expected_identifier_a");
+                }
+                param = token_nxt;
+                list.push(param);
+                advance();
+                signature.push(param.id);
+                if (ellipsis) {
+                    param.ellipsis = true;
+                } else {
+                    if (token_nxt.id === "=") {
+                        optional = param;
+                        advance("=");
+                        param.expression = parse_expression(0);
+                    } else {
+                        if (optional !== undefined) {
 
 // test_cause:
-// ["function aa([aa=aa],aa){}", "parameter", "id", "", 0]
+// ["function aa(aa=0,bb){}", "parameter", "required_a_optional_b", "aa", 18]
 
-                        test_cause("id");
-                        if (token_nxt.id === "=") {
-                            advance("=");
-                            subparam.expression = parse_expression();
-                            param.open = true;
-                        }
-                        if (token_nxt.id === ",") {
-                            advance(",");
-                        } else {
-                            break;
+                            warn(
+                                "required_a_optional_b",
+                                param,
+                                param.id,
+                                optional.id
+                            );
                         }
                     }
-                    list.push(param);
-                    advance("]");
                     if (token_nxt.id === ",") {
                         advance(",");
                         signature.push(", ");
                         return parameter();
                     }
-                } else {
-                    if (token_nxt.id === "...") {
-                        ellipsis = true;
-                        signature.push("...");
-                        advance("...");
-                        if (optional !== undefined) {
-
-// test_cause:
-// ["function aa(aa=0,...){}", "parameter", "required_a_optional_b", "aa", 21]
-
-                            warn(
-                                "required_a_optional_b",
-                                token_nxt,
-                                token_nxt.id,
-                                optional.id
-                            );
-                        }
-                    }
-                    if (!token_nxt.identifier) {
-
-// test_cause:
-// ["function aa(0){}", "parameter", "expected_identifier_a", "0", 13]
-
-                        return stop("expected_identifier_a");
-                    }
-                    param = token_nxt;
-                    list.push(param);
-                    advance();
-                    signature.push(param.id);
-                    if (ellipsis) {
-                        param.ellipsis = true;
-                    } else {
-                        if (token_nxt.id === "=") {
-                            optional = param;
-                            advance("=");
-                            param.expression = parse_expression(0);
-                        } else {
-                            if (optional !== undefined) {
-
-// test_cause:
-// ["function aa(aa=0,bb){}", "parameter", "required_a_optional_b", "aa", 18]
-
-                                warn(
-                                    "required_a_optional_b",
-                                    param,
-                                    param.id,
-                                    optional.id
-                                );
-                            }
-                        }
-                        if (token_nxt.id === ",") {
-                            advance(",");
-                            signature.push(", ");
-                            return parameter();
-                        }
-                    }
                 }
-            }());
+            }
+        }
+        if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
+            parameter();
         }
         advance(")");
         signature.push(")");
