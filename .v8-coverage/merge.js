@@ -2,7 +2,7 @@
 /*property
     assign, children, clear, count, delta, end, endOffset, entries, forEach,
     functionName, functions, get, isBlockCoverage, length, max, next, nextIndex,
-    normalize, offset, parentIndex, pendingOffset, pendingTrees, pop, prototype,
+    offset, parentIndex, pendingOffset, pendingTrees, pop, prototype,
     push, pushPendingTree, queue, ranges, result, scriptId, set,
     setPendingOffset, sort, splice, split, start, startOffset, toRanges,
     toString, tree, trees, unshift, url, values
@@ -129,7 +129,48 @@ function normalizeRangeTree(tree) {
 /**
  * @internal
  */
-    tree.normalize();
+    const children = [];
+    let curEnd;
+    let head;
+    const tail = [];
+    tree.children.forEach(function (child) {
+        if (head === undefined) {
+            head = child;
+        } else if (child.delta === head.delta && child.start === curEnd) {
+            tail.push(child);
+        } else {
+            endChain();
+            head = child;
+        }
+        curEnd = child.end;
+    });
+    if (head !== undefined) {
+        endChain();
+    }
+    if (children.length === 1) {
+        const child = children[0];
+        if (child.start === tree.start && child.end === tree.end) {
+            tree.delta += child.delta;
+            tree.children = child.children;
+            // `.lazyCount` is zero for both (both are after normalization)
+            return;
+        }
+    }
+    tree.children = children;
+    function endChain() {
+        if (tail.length !== 0) {
+            head.end = tail[tail.length - 1].end;
+            tail.forEach(function (tailTree) {
+                tailTree.children.forEach(function (subChild) {
+                    subChild.delta += tailTree.delta - head.delta;
+                    head.children.push(subChild);
+                });
+            });
+            tail.length = 0;
+        }
+        normalizeRangeTree(head);
+        children.push(head);
+    }
 }
 
 /**
@@ -176,50 +217,6 @@ function RangeTree(start, end, delta, children) {
 }
 
 Object.assign(RangeTree.prototype, {
-    normalize: function () {
-        const children = [];
-        let curEnd;
-        let head;
-        const tail = [];
-        this.children.forEach(function (child) {
-            if (head === undefined) {
-                head = child;
-            } else if (child.delta === head.delta && child.start === curEnd) {
-                tail.push(child);
-            } else {
-                endChain();
-                head = child;
-            }
-            curEnd = child.end;
-        });
-        if (head !== undefined) {
-            endChain();
-        }
-        if (children.length === 1) {
-            const child = children[0];
-            if (child.start === this.start && child.end === this.end) {
-                this.delta += child.delta;
-                this.children = child.children;
-                // `.lazyCount` is zero for both (both are after normalization)
-                return;
-            }
-        }
-        this.children = children;
-        function endChain() {
-            if (tail.length !== 0) {
-                head.end = tail[tail.length - 1].end;
-                tail.forEach(function (tailTree) {
-                    tailTree.children.forEach(function (subChild) {
-                        subChild.delta += tailTree.delta - head.delta;
-                        head.children.push(subChild);
-                    });
-                });
-                tail.length = 0;
-            }
-            head.normalize();
-            children.push(head);
-        }
-    },
     /**
      * @precondition `tree.start < value && value < tree.end`
      * @return RangeTree Right part
