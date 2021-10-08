@@ -6389,6 +6389,17 @@ function jslint_phase3_parse(state) {
             the_for.name = first.expression[0];
             the_for.expression = first.expression[1];
             warn("expected_a_b", the_for, "Object.keys", "for in");
+        } else if (first.id === "of") {
+            if (first.expression[0].arity !== "variable") {
+
+// test_cause:
+// ["for(0 in aa){}", "stmt_for", "bad_assignment_a", "0", 5]
+
+                warn("bad_assignment_a", first.expression[0]);
+            }
+            the_for.name = first.expression[0];
+            the_for.expression = first.expression[1];
+            warn("expected_a_b", the_for, "Object.keys", "for in");
         } else {
             the_for.initial = first;
             advance(";");
@@ -7282,6 +7293,7 @@ function jslint_phase3_parse(state) {
     infix(110, ">=");
     infix(110, "in");
     infix(110, "instanceof");
+    infix(110, "of");
     infix(120, "<<");
     infix(120, ">>");
     infix(120, ">>>");

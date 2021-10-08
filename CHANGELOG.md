@@ -1,9 +1,9 @@
 # Changelog
 
 # Todo
+- cli - add cli-command jslint_coverage_report
 - cli - remove cli-option `--mode-vim-plugin`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
-- jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around comma-separated concatenations.
 - jslint - require regexp to use open-form.
@@ -12,7 +12,7 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2021.10.1-beta
-- cli - add cli-command jslint_coverage_report
+- jslint - add `for...of` syntax support.
 - cli - add cli-command jslint_plugin_vim
 - bugfix - fix false warning `uninitialized 'bb'` in code `/*jslint node*/\nlet {aa:bb} = {}; bb();`
 - bugfix - fix issue #358 - switch-statement crashes jslint
