@@ -6371,13 +6371,17 @@ function jslint_phase3_parse(state) {
         case "let":
         case "var":
 
-// test_cause:
-// ["for(const aa in aa){}", "stmt_for", "unexpected_a", "const", 5]
+//!! // test_cause:
+//!! // ["for(const aa in aa){}", "stmt_for", "unexpected_a", "const", 5]
 
-            stop("unexpected_a");
+            //!! stop("unexpected_a");
+            advance();
+            stmt_var();
+            first = parse_expression(0, true);
             break;
+        default:
+            first = parse_expression(0);
         }
-        first = parse_expression(0);
         switch (first.id) {
         case "in":
         case "of":
