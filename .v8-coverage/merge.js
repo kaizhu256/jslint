@@ -101,13 +101,13 @@ function deepNormalizeScriptCov(scriptCov) {
  * Normalizes a function coverage.
  *
  * Sorts the ranges (pre-order sort).
- * TODO: Tree-based normalization of the ranges.
+ * TODO: Tree-based normalization of the ranges. //jslint-quiet
  *
  * @param funcCov Function coverage to normalize.
- */
+ */ //jslint-quiet
 function normalizeFunctionCov(funcCov) {
     funcCov.ranges.sort(compareRangeCovs);
-    const tree = range_tree_1.RangeTree.fromSortedRanges(funcCov.ranges);
+    const tree = RangeTree.fromSortedRanges(funcCov.ranges);
     normalizeRangeTree(tree);
     funcCov.ranges = tree.toRanges();
 }
