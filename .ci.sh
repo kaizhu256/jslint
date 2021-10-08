@@ -105,7 +105,7 @@ shCiBaseCustom() {(set -e
 # this function will run base-ci
     # update edition in README.md, jslint.mjs from CHANGELOG.md
     node --input-type=module -e '
-import jslint from "./jslint.mjs";
+//!! import jslint from "./jslint.mjs";
 import moduleFs from "fs";
 (async function () {
     let fileDict;
@@ -150,11 +150,12 @@ import moduleFs from "fs";
             src: fileDict["jslint.mjs"].replace((
                 /^let jslint_edition = ".*?";$/m
             ), `let jslint_edition = "${versionBeta}";`)
+/*
         }, {
             file: "jslint_ci.sh",
             // inline css-assets
             src: fileDict["jslint_ci.sh"].replace((
-                /(\nshRunWithCoverage[\S\s]*?\nlet module_url;\n)[\S\s]*?\njslint_coverage_report\(/m
+                /(\nshRunWithCoverage[\S\s]*?\nlet module_url;\n)[\S\s]*?\njslint_coverage_report\(/m //jslint-quiet
             ), function (ignore, match1) {
                 return match1 + [
                     jslint.assert_or_throw,
@@ -164,6 +165,7 @@ import moduleFs from "fs";
                     jslint.module_fs_init
                 ].join("\n") + "\njslint_coverage_report(";
             })
+*/
         }
     ].forEach(function ({
         file,
