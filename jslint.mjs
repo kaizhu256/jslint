@@ -6488,7 +6488,7 @@ function jslint_phase3_parse(state) {
                     warn("unexpected_a", name);
                 }
                 enroll(name, "variable", mode_const);
-                if (token_nxt.id === "=" || mode_const) {
+                if (token_nxt.id === "=" || (mode_const && !mode_for)) {
                     advance("=");
                     name.dead = false;
                     name.init = true;

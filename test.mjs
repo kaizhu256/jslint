@@ -245,6 +245,13 @@ function noop(val) {
         fart: [
             "function aa() {\n    return () => 0;\n}"
         ],
+        for: [
+            "function aa() {\n"
+            + "    for (const aa of bb) {\n"
+            + "        aa();\n"
+            + "    }\n"
+            + "}\n"
+        ],
         jslint_disable: [
             "/*jslint-disable*/\n0\n/*jslint-enable*/"
         ],

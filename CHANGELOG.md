@@ -10,10 +10,10 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - merge function.html and help.html into README.md
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
+- npm - add file package.json and command `npm test`
 
 # v2021.10.1-beta
 - jslint - add `for...of` syntax support.
-- npm - add file package.json and command `npm test`
 - bugfix - fix false warning `uninitialized 'bb'` in code `/*jslint node*/\nlet {aa:bb} = {}; bb();`
 - bugfix - fix issue #358 - switch-statement crashes jslint
 - ci - rename dir .build/ to .artifact/
