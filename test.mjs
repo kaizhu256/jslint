@@ -250,8 +250,20 @@ function noop(val) {
         ],
         for: [
             (
+                //!! "function aa(bb) {\n"
+                //!! + "    for (let cc = 0; cc < 0; cc += 1) {\n"
+                //!! + "        cc();\n"
+                //!! + "    }\n"
+                //!! + "}\n"
+            //!! ), (
                 "function aa(bb) {\n"
                 + "    for (const cc of bb) {\n"
+                + "        cc();\n"
+                + "    }\n"
+                + "}\n"
+            ), (
+                "function aa(bb) {\n"
+                + "    for (let cc of bb) {\n"
                 + "        cc();\n"
                 + "    }\n"
                 + "}\n"
