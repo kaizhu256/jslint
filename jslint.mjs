@@ -1599,15 +1599,6 @@ async function jslint_cli({
         }));
         return;
 
-//!! // PR-xxx - Add command jslint_coverage_report.
-
-    //!! case "jslint_coverage_report":
-        //!! await jslint_coverage_report({
-            //!! coverage_dir: command[1],
-            //!! process_argv: process.argv.slice(3)
-        //!! });
-        //!! return;
-
 // PR-xxx - Add command jslint_plugin_vim.
 
     case "jslint_plugin_vim":
@@ -9397,7 +9388,6 @@ jslint_export = Object.freeze(Object.assign(jslint, {
     jslint_assert,
     jslint_charset_ascii,
     jslint_cli,
-    //!! jslint_coverage_report,
     jslint_edition,
     jslint_phase1_split,
     jslint_phase2_lex,

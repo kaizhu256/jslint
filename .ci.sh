@@ -105,7 +105,6 @@ shCiBaseCustom() {(set -e
 # this function will run base-ci
     # update edition in README.md, jslint.mjs from CHANGELOG.md
     node --input-type=module -e '
-//!! import jslint from "./jslint.mjs";
 import moduleFs from "fs";
 (async function () {
     let fileDict;
@@ -117,7 +116,6 @@ import moduleFs from "fs";
         "README.md",
         "index.html",
         "jslint.mjs"
-        //!! "jslint_ci.sh"
     ].map(async function (file) {
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
@@ -150,22 +148,6 @@ import moduleFs from "fs";
             src: fileDict["jslint.mjs"].replace((
                 /^let jslint_edition = ".*?";$/m
             ), `let jslint_edition = "${versionBeta}";`)
-/*
-        }, {
-            file: "jslint_ci.sh",
-            // inline css-assets
-            src: fileDict["jslint_ci.sh"].replace((
-                /(\nshRunWithCoverage[\S\s]*?\nlet module_url;\n)[\S\s]*?\njslint_coverage_report\(/m //jslint-quiet
-            ), function (ignore, match1) {
-                return match1 + [
-                    jslint.assert_or_throw,
-                    jslint.fs_write_file_with_parents,
-                    jslint.html_escape,
-                    jslint.jslint_coverage_report,
-                    jslint.module_fs_init
-                ].join("\n") + "\njslint_coverage_report(";
-            })
-*/
         }
     ].forEach(function ({
         file,
