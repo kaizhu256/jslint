@@ -7860,18 +7860,18 @@ function jslint_phase4_walk(state) {
         walk_statement(thing.initial);
     }
 
-    function pre_s_func(thing) {
+    function pre_s_function(thing) {
 
 // test_cause:
-// ["()=>0", "pre_s_func", "", "", 0]
-// ["(function (){}())", "pre_s_func", "", "", 0]
-// ["function aa(){}", "pre_s_func", "", "", 0]
+// ["()=>0", "pre_s_function", "", "", 0]
+// ["(function (){}())", "pre_s_function", "", "", 0]
+// ["function aa(){}", "pre_s_function", "", "", 0]
 
         test_cause("");
         if (thing.arity === "statement" && blockage.body !== true) {
 
 // test_cause:
-// ["if(0){function aa(){}\n}", "pre_s_func", "unexpected_a", "function", 7]
+// ["if(0){function aa(){}\n}", "pre_s_function", "unexpected_a", "function", 7]
 
             warn("unexpected_a", thing);
         }
@@ -7891,7 +7891,7 @@ function jslint_phase4_walk(state) {
 // ["
 // /*jslint getset*/
 // aa={get aa(aa){}}
-// ", "pre_s_func", "bad_get", "function", 9]
+// ", "pre_s_function", "bad_get", "function", 9]
 
                 warn("bad_get", thing);
             }
@@ -7902,7 +7902,7 @@ function jslint_phase4_walk(state) {
 // ["
 // /*jslint getset*/
 // aa={set aa(){}}
-// ", "pre_s_func", "bad_set", "function", 9]
+// ", "pre_s_function", "bad_set", "function", 9]
 
                 warn("bad_set", thing);
             }
@@ -8081,17 +8081,17 @@ function jslint_phase4_walk(state) {
     preaction("binary", "!=", pre_b_noteq);
     preaction("binary", "(", pre_b_lparen);
     preaction("binary", "==", pre_b_eqeq);
-    preaction("binary", "=>", pre_s_func);
+    preaction("binary", "=>", pre_s_function);
     preaction("binary", "in", pre_b_in);
     preaction("binary", "instanceof", pre_b_instanceof);
     preaction("binary", "||", pre_b_or);
     preaction("binary", pre_b);
     preaction("binary", pre_a_bitwise);
     preaction("statement", "for", pre_s_for);
-    preaction("statement", "function", pre_s_func);
+    preaction("statement", "function", pre_s_function);
     preaction("statement", "try", pre_try);
     preaction("statement", "{", pre_s_lbrace);
-    preaction("unary", "function", pre_s_func);
+    preaction("unary", "function", pre_s_function);
     preaction("unary", "~", pre_a_bitwise);
     preaction("variable", pre_v);
 
