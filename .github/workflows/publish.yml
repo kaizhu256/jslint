@@ -35,19 +35,6 @@ jobs:
       contents: read
       packages: write
     steps:
-      # Setup .npmrc file to publish to npm
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node_version }}
-          architecture: ${{ matrix.architecture }}
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm install
-      # Publish to npm
-      - run: npm publish --access public || true
-      - run: ls -la || true; cat .npmrc || true; cat ~/.npmrc || true; cat package.json
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       # Setup .npmrc file to publish to GitHub Packages
       - uses: actions/checkout@v2
@@ -64,4 +51,18 @@ jobs:
       - run: ls -la || true; cat .npmrc || true; cat ~/.npmrc || true; cat package.json
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Setup .npmrc file to publish to npm
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node_version }}
+          architecture: ${{ matrix.architecture }}
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm install
+      # Publish to npm
+      - run: npm publish --access public || true
+      - run: ls -la || true; cat .npmrc || true; cat ~/.npmrc || true; cat package.json
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 # npm publish - end
