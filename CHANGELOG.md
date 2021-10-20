@@ -12,7 +12,7 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
-# v1000.0.1-test-1
+# v1000.0.1-test-3
 
 # v2021.10.1-beta
 - ci - add release-trigger to publish to `@jslint-org/jslint`
