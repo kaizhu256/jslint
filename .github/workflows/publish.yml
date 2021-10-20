@@ -37,6 +37,7 @@ jobs:
     steps:
 
       # Setup .npmrc file to publish to GitHub Packages
+      - run: rm -f /home/runner/work/_temp/.npmrc
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
@@ -46,11 +47,12 @@ jobs:
           # Defaults to the user or organization that owns the workflow file
           # scope: '@octocat'
       # Publish to GitHub Packages
-      - run: npm install && npm publish
+      - run: npm install && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Setup .npmrc file to publish to npm
+      - run: rm -f /home/runner/work/_temp/.npmrc
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
