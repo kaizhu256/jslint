@@ -3,10 +3,10 @@
     "description": "JSLint, The JavaScript Code Quality and Coverage Tool",
     "fileCount": 26,
     "license": "UNLICENSE",
-    "name": "@kaizhu256/my-test",
+    "name": "@kaizhu256/test-package",
     "repository": {
         "type": "git",
-        "url": "https://github.com/jslint-org/jslint.git"
+        "url": "https://github.com/kaizhu256/jslint.git"
     },
     "scripts": {
         "test": "node jslint.mjs v8_coverage_report=.artifact/coverage node test.mjs",
