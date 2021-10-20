@@ -48,7 +48,7 @@ jobs:
       - run: npm install
       # Publish to GitHub Packages
       - run: npm publish || true
-      - run: rm -f .npmrc
+      - run: rm -f .npmrc ~/.npmrc && cat package.json
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -61,7 +61,7 @@ jobs:
       - run: npm install
       # Publish to npm
       - run: npm publish --access public || true
-      - run: rm -f .npmrc
+      - run: rm -f .npmrc ~/.npmrc && cat package.json
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 # npm publish - end
