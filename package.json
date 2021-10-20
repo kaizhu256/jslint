@@ -3,7 +3,7 @@
     "description": "JSLint, The JavaScript Code Quality and Coverage Tool",
     "fileCount": 26,
     "license": "UNLICENSE",
-    "name": "@jslint-org/jslint",
+    "name": "@kaizhu256/jslint",
     "repository": {
         "type": "git",
         "url": "https://github.com/jslint-org/jslint.git"
