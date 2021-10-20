@@ -45,7 +45,7 @@ jobs:
       - run: npm install
       # Publish to npm
       - run: npm publish --access public || true
-      - run: ls -la; cat .npmrc; cat ~/.npmrc; cat package.json
+      - run: ls -la || true; cat .npmrc || true; cat ~/.npmrc || true; cat package.json
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
@@ -61,7 +61,7 @@ jobs:
       - run: npm install
       # Publish to GitHub Packages
       - run: npm publish || true
-      - run: ls -la; cat .npmrc; cat ~/.npmrc; cat package.json
+      - run: ls -la || true; cat .npmrc || true; cat ~/.npmrc || true; cat package.json
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 # npm publish - end
