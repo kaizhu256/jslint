@@ -1208,7 +1208,8 @@ shNpmPublishV0() {(set -e
     DIR=/tmp/shNpmPublishV0
     rm -rf "$DIR" && mkdir -p "$DIR" && cd "$DIR"
     printf "{\"name\":\"$1\",\"version\":\"0.0.1\"}\n" > package.json
-    npm publish
+    shift
+    npm publish "$@"
 )}
 
 shRawLibFetch() {(set -e

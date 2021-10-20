@@ -45,10 +45,8 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           # Defaults to the user or organization that owns the workflow file
           # scope: '@octocat'
-      - run: npm install
       # Publish to GitHub Packages
-      - run: npm publish || true
-      - run: ls -la || true; cat .npmrc || true; cat ~/.npmrc || true; cat package.json
+      - run: npm install && npm publish || true
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -61,8 +59,10 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm install
       # Publish to npm
-      - run: npm publish --access public || true
-      - run: ls -la || true; cat .npmrc || true; cat ~/.npmrc || true; cat package.json
+      - run: npm install && npm publish --access public || true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: ls -la || true; cat /home/runner/work/_temp/.npmrc || true; cat package.json
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 # npm publish - end
