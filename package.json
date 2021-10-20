@@ -1,7 +1,7 @@
 {
     "counter": 7,
     "description": "JSLint, The JavaScript Code Quality and Coverage Tool",
-    "fileCount": 26,
+    "fileCount": 27,
     "license": "UNLICENSE",
     "name": "@kaizhu256/test-package",
     "repository": {
