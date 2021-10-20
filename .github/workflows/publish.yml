@@ -47,7 +47,8 @@ jobs:
           # Defaults to the user or organization that owns the workflow file
           # scope: '@octocat'
       # Publish to GitHub Packages
-      - run: npm install && npm publish --access public --dry-run
+      - run: npm install
+      - run: npm publish --access public --dry-run
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -60,7 +61,8 @@ jobs:
           architecture: ${{ matrix.architecture }}
           registry-url: 'https://registry.npmjs.org'
       # Publish to npm
-      - run: npm install && npm publish --access public --dry-run
+      - run: npm install
+      - run: npm publish --access public --dry-run
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 # npm publish - end
