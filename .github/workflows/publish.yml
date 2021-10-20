@@ -48,7 +48,7 @@ jobs:
           # scope: '@octocat'
       # Publish to GitHub Packages
       - run: npm install
-      - run: npm publish --access public --dry-run
+      - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -62,7 +62,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       # Publish to npm
       - run: npm install
-      - run: npm publish --access public --dry-run
+      - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 # npm publish - end
