@@ -11,6 +11,9 @@ on:
       - master
       - sandbox
 jobs:
+
+
+# publish - start
   build:
     strategy:
       matrix:
@@ -59,3 +62,4 @@ jobs:
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+# publish - end
