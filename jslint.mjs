@@ -100,7 +100,7 @@
     catch_stack, causes, char, children, clear, closer, closure, code, column,
     concat, consoleError, console_error, console_log, constant, context,
     convert, count, coverageDir, create, cwd, d, dead, debugInline, default,
-    delta, devel, directive, directive_ignore_line, directive_list, directives,
+    delta, directive, directive_ignore_line, directive_list, directives,
     dirname, disrupt, dot, edition, elem_list, ellipsis, else, end, endOffset,
     endsWith, entries, env, error, eval, every, example_list, excludeList, exec,
     execArgv, exit, exitCode, export_dict, exports, expression, extra, file,
@@ -2410,7 +2410,7 @@ function jslint_phase2_lex(state) {
 
 // Uncompleted work comment.
 
-        if (!option_dict.devel && jslint_rgx_todo.test(snippet)) {
+        if (jslint_rgx_todo.test(snippet)) {
 
 // test_cause:
 // ["//todo", "lex_comment", "todo_comment", "(comment)", 1] //jslint-ignore-line
@@ -3325,7 +3325,7 @@ function jslint_phase2_lex(state) {
 
 // Assign global browser variables to global_dict.
 /*
-// /\*jslint beta, browser, devel*\/
+// /\*jslint beta, browser*\/
 console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
 */
 
@@ -3580,7 +3580,7 @@ import moduleHttps from "https";
                 "clearImmediate",
                 "clearInterval",
                 "clearTimeout",
-                "console",
+                // "console",
                 "exports",
                 "global",
                 "module",
@@ -3830,6 +3830,7 @@ import moduleHttps from "https";
 // Init global_dict and option_dict.
 
     option_set_item("ecma", true);
+    option_set_item("devel", true);
     Object.keys(option_dict).sort().forEach(function (key) {
         option_set_item(key, option_dict[key] === true);
     });
@@ -4031,7 +4032,7 @@ function jslint_phase3_parse(state) {
         stmts = parse_statements();
         the_block.block = stmts;
         if (stmts.length === 0) {
-            if (!option_dict.devel && special !== "ignore") {
+            if (special !== "ignore") {
 
 // test_cause:
 // ["function aa(){}", "block", "empty_block", "{", 14]
@@ -6065,13 +6066,17 @@ function jslint_phase3_parse(state) {
 
     function stmt_debugger() {
         const the_debug = token_now;
-        if (!option_dict.devel) {
 
-// test_cause:
-// ["debugger", "stmt_debugger", "unexpected_a", "debugger", 1]
+// PR-xxx - relax devel-related warnings
+//
+//         if (!option_dict.devel) {
+//
+// // test_cause:
+// // ["debugger", "stmt_debugger", "unexpected_a", "debugger", 1]
+//
+//             warn("unexpected_a", the_debug);
+//         }
 
-            warn("unexpected_a", the_debug);
-        }
         semicolon();
         return the_debug;
     }
