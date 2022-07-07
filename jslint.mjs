@@ -3487,6 +3487,7 @@ import https from "https";
 
         case "ecma":
             object_assign_from_list(global_dict, [
+                "AggregateError",
                 "Array",
                 "ArrayBuffer",
                 "Atomics",
@@ -3557,7 +3558,7 @@ import moduleHttps from "https";
     let result = "";
     await new Promise(function (resolve) {
         moduleHttps.get((
-            "https://raw.githubusercontent.com/nodejs/node/master/doc/api"
+            "https://raw.githubusercontent.com/nodejs/node/v16.x/doc/api"
             + "/globals.md"
         ), function (res) {
             res.on("data", function (chunk) {
@@ -3580,12 +3581,16 @@ import moduleHttps from "https";
             object_assign_from_list(global_dict, [
                 "AbortController",
                 "Buffer",
-                "DOMException",
+                // "Crypto",
+                // "CryptoKey",
                 "Event",
                 "EventTarget",
                 "MessageChannel",
                 "MessageEvent",
                 "MessagePort",
+                // "Request",
+                // "Response",
+                // "SubtleCrypto",
                 "TextDecoder",
                 "TextEncoder",
                 "URL",
@@ -3598,8 +3603,10 @@ import moduleHttps from "https";
                 "clearImmediate",
                 "clearInterval",
                 "clearTimeout",
-                // "console",
+                "console",
+                // "crypto",
                 "exports",
+                // "fetch",
                 "global",
                 "module",
                 "performance",
@@ -3608,8 +3615,7 @@ import moduleHttps from "https";
                 "require",
                 "setImmediate",
                 "setInterval",
-                "setTimeout",
-                "structuredClone"
+                "setTimeout"
             ], "Node.js");
             break;
         }
