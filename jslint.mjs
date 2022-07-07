@@ -92,7 +92,7 @@
 
 // WARNING: JSLint will hurt your feelings.
 
-/*jslint beta, node, trace*/
+/*jslint beta, node*/
 /*property
     JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
     assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
@@ -222,9 +222,12 @@ let jslint_rgx_slash_star_or_slash = (
 let jslint_rgx_tab = (
     /\t/g
 );
+
+// PR-xxx - Relax devel-related warnings.
 // let jslint_rgx_todo = (
 //     /\b(?:todo|TO\s?DO|HACK)\b/
 // );
+
 let jslint_rgx_token = new RegExp(
     "^("
     + "(\\s+)"
@@ -984,7 +987,6 @@ function jslint(
             break;
 
 // PR-378 - Relax warning "function_in_loop".
-//
 //         case "function_in_loop":
 //             mm = `Don't create functions within a loop.`;
 //             break;
@@ -6076,10 +6078,16 @@ function jslint_phase3_parse(state) {
     function stmt_debugger() {
         const the_debug = token_now;
 
-// test_cause:
-// ["debugger", "stmt_debugger", "unexpected_a", "debugger", 1]
+// PR-xxx - Relax devel-related warnings.
+//
+//         if (!option_dict.devel) {
+//
+// // test_cause:
+// // ["debugger", "stmt_debugger", "unexpected_a", "debugger", 1]
+//
+//             warn("unexpected_a", the_debug);
+//         }
 
-        warn("unexpected_a", the_debug);
         semicolon();
         return the_debug;
     }
@@ -10225,7 +10233,7 @@ function v8CoverageListMerge(processCovs) {
             let resultTree;
             let rightChildren;
 
-// TODO(perf): Binary search (check overhead) //jslint-ignore-line
+// TODO(perf): Binary search (check overhead)
 
             while (ii < tree.children.length) {
                 child = tree.children[ii];
@@ -10303,7 +10311,7 @@ function v8CoverageListMerge(processCovs) {
 
 // This function will normalize-and-sort <funcCov>.ranges.
 // Sorts the ranges (pre-order sort).
-// TODO: Tree-based normalization of the ranges. //jslint-ignore-line
+// TODO: Tree-based normalization of the ranges.
 // @param funcCov Function coverage to normalize.
 
         funcCov.ranges = treeToRanges(treeFromSortedRanges(
