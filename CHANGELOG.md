@@ -13,7 +13,7 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2022.7.1-beta
-- jslint - relax warning against console.log and friends and deprecate directive "devel"
+- jslint - relax devel-related warnings and make directive "devel" a no-op.
 - doc - document jslint directives
 - vscode - add extra contextmenu commands "JSLint - Do Not Lint Selected Region", "JSLint - Ignore Current Line"
 

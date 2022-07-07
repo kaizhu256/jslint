@@ -223,7 +223,8 @@ let jslint_rgx_tab = (
     /\t/g
 );
 
-// PR-xxx - Relax devel-related warnings.
+// PR-xxx - Relax devel-related warnings and make directive "devel" a no-op.
+//
 // let jslint_rgx_todo = (
 //     /\b(?:todo|TO\s?DO|HACK)\b/
 // );
@@ -987,6 +988,7 @@ function jslint(
             break;
 
 // PR-378 - Relax warning "function_in_loop".
+//
 //         case "function_in_loop":
 //             mm = `Don't create functions within a loop.`;
 //             break;
@@ -1016,6 +1018,7 @@ function jslint(
             break;
 
 // PR-347 - Disable warning "missing_browser".
+//
 //         case "missing_browser":
 //             mm = `/*global*/ requires the Assume a browser option.`;
 //             break;
@@ -1100,6 +1103,7 @@ function jslint(
             break;
 
 // PR-347 - Disable warning "unexpected_directive_a".
+//
 //         case "unexpected_directive_a":
 //             mm = `When using modules, don't use directive '/\u002a${a}'.`;
 //             break;
@@ -1330,6 +1334,7 @@ function jslint(
         );
 
 // PR-347 - Disable warning "missing_browser".
+//
 //         if (!option_dict.browser) {
 //             directive_list.forEach(function (comment) {
 //                 if (comment.directive === "global") {
@@ -2410,7 +2415,7 @@ function jslint_phase2_lex(state) {
             the_comment = token_create("(comment)", snippet);
         }
 
-// PR-xxx - Relax devel-related warnings.
+// PR-xxx - Relax devel-related warnings and make directive "devel" a no-op.
 //
 // // Uncompleted work comment.
 //
@@ -2704,6 +2709,7 @@ function jslint_phase2_lex(state) {
                     return char_after("]");
 
 // PR-362 - Relax regexp-warning against using <space>.
+//
 //                 case " ":
 //
 // // test_cause:
@@ -2784,6 +2790,7 @@ function jslint_phase2_lex(state) {
                     return;
 
 // PR-362 - Relax regexp-warning against using <space>.
+//
 //                 case " ":
 //
 // // test_cause:
@@ -3309,7 +3316,7 @@ function jslint_phase2_lex(state) {
             option_dict[key] = val;
             break;
 
-// PR-xxx - Deprecate directive "devel" and make it noop for backwards-compat.
+// PR-xxx - Relax devel-related warnings and make directive "devel" a no-op.
 
         case "devel":
             break;
@@ -6078,7 +6085,7 @@ function jslint_phase3_parse(state) {
     function stmt_debugger() {
         const the_debug = token_now;
 
-// PR-xxx - Relax devel-related warnings.
+// PR-xxx - Relax devel-related warnings and make directive "devel" a no-op.
 //
 //         if (!option_dict.devel) {
 //
