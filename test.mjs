@@ -924,8 +924,6 @@ jstestDescribe((
         ], [
             "registerType();", {couch: true}, []
         ], [
-            "debugger;", {devel: true}, []
-        ], [
 
 // PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
 

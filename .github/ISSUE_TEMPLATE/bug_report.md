@@ -14,7 +14,6 @@ labels: "bug"
 3. Code snippet (if applicable):
 
 ```javascript
-/*jslint devel*/
 console.log("hello world");
 ```
 
