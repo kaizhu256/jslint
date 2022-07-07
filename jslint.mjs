@@ -92,7 +92,7 @@
 
 // WARNING: JSLint will hurt your feelings.
 
-/*jslint beta, node*/
+/*jslint beta, node, trace*/
 /*property
     JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
     assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
@@ -3308,7 +3308,7 @@ function jslint_phase2_lex(state) {
 // PR-xxx - Deprecate directive "devel" as a noop.
 
         case "devel":
-            return option_set_item("eval", val);
+            break;
 
 // PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
 
