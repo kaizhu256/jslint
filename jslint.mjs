@@ -3351,12 +3351,16 @@ console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
 
                 "AbortController",
                 // "Buffer",
-                "DOMException",
+                // "Crypto",
+                // "CryptoKey",
                 "Event",
                 "EventTarget",
                 "MessageChannel",
                 "MessageEvent",
                 "MessagePort",
+                // "Request",
+                // "Response",
+                // "SubtleCrypto",
                 "TextDecoder",
                 "TextEncoder",
                 "URL",
@@ -3370,7 +3374,9 @@ console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
                 "clearInterval",
                 "clearTimeout",
                 // "console",
+                // "crypto",
                 // "exports",
+                // "fetch",
                 // "global",
                 // "module",
                 "performance",
@@ -3379,8 +3385,7 @@ console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
                 // "require",
                 // "setImmediate",
                 "setInterval",
-                "setTimeout",
-                "structuredClone",
+                "setTimeout"
 
 // Web worker only.
 // https://github.com/mdn/content/blob/main/files/en-us/web/api
