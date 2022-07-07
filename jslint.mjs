@@ -3282,7 +3282,6 @@ function jslint_phase2_lex(state) {
         case "browser":         // Assume browser environment.
         case "convert":         // Allow conversion operators.
         case "couch":           // Assume CouchDb environment.
-        case "devel":           // Allow console.log() and friends.
         case "ecma":            // Assume ECMAScript environment.
         case "eval":            // Allow eval().
         case "for":             // Allow for-statement.
@@ -3305,6 +3304,11 @@ function jslint_phase2_lex(state) {
         case "white":           // Allow messy whitespace.
             option_dict[key] = val;
             break;
+
+// PR-xxx - Deprecate directive "devel" as a noop.
+
+        case "devel":
+            return option_set_item("eval", val);
 
 // PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
 
