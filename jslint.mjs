@@ -222,9 +222,9 @@ let jslint_rgx_slash_star_or_slash = (
 let jslint_rgx_tab = (
     /\t/g
 );
-let jslint_rgx_todo = (
-    /\b(?:todo|TO\s?DO|HACK)\b/
-);
+// let jslint_rgx_todo = (
+//     /\b(?:todo|TO\s?DO|HACK)\b/
+// );
 let jslint_rgx_token = new RegExp(
     "^("
     + "(\\s+)"
@@ -2408,15 +2408,17 @@ function jslint_phase2_lex(state) {
             the_comment = token_create("(comment)", snippet);
         }
 
-// Uncompleted work comment.
-
-        if (jslint_rgx_todo.test(snippet)) {
-
-// test_cause:
-// ["//todo", "lex_comment", "todo_comment", "(comment)", 1] //jslint-ignore-line
-
-            warn("todo_comment", the_comment);
-        }
+// PR-xxx - Relax devel-related warnings.
+//
+// // Uncompleted work comment.
+//
+//         if (!option_dict.devel && jslint_rgx_todo.test(snippet)) {
+//
+// // test_cause:
+// // ["//todo", "lex_comment", "todo_comment", "(comment)", 1] //jslint-ignore-line
+//
+//             warn("todo_comment", the_comment);
+//         }
 
 // Lex directives in comment.
 
@@ -3305,7 +3307,7 @@ function jslint_phase2_lex(state) {
             option_dict[key] = val;
             break;
 
-// PR-xxx - Deprecate directive "devel" as a noop.
+// PR-xxx - Deprecate directive "devel" and make it noop for backwards-compat.
 
         case "devel":
             break;
@@ -3435,7 +3437,10 @@ console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
             break;
         case "devel":
             object_assign_from_list(global_dict, [
-                "alert", "confirm", "console", "prompt"
+                "alert",
+                "confirm",
+                "console",
+                "prompt"
             ], "development");
             break;
 
@@ -6071,16 +6076,10 @@ function jslint_phase3_parse(state) {
     function stmt_debugger() {
         const the_debug = token_now;
 
-// PR-xxx - relax devel-related warnings
-//
-//         if (!option_dict.devel) {
-//
-// // test_cause:
-// // ["debugger", "stmt_debugger", "unexpected_a", "debugger", 1]
-//
-//             warn("unexpected_a", the_debug);
-//         }
+// test_cause:
+// ["debugger", "stmt_debugger", "unexpected_a", "debugger", 1]
 
+        warn("unexpected_a", the_debug);
         semicolon();
         return the_debug;
     }
