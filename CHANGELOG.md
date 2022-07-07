@@ -6,7 +6,6 @@
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around plus-separated concatenations.
-- jslint - relax warning against console.log and friends and deprecate directive `devel`
 - jslint - require regexp to use open-form.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - jslint - unify analysis of variable-assignment/function-parameters into one function
@@ -14,6 +13,7 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2022.7.1-beta
+- jslint - relax warning against console.log and friends and deprecate directive "devel"
 - doc - document jslint directives
 - vscode - add extra contextmenu commands "JSLint - Do Not Lint Selected Region", "JSLint - Ignore Current Line"
 

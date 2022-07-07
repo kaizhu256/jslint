@@ -47,7 +47,6 @@ Douglas Crockford <douglas@crockford.com>
         - [`/*jslint browser*/`](#jslint-browser)
         - [`/*jslint convert*/`](#jslint-convert)
         - [`/*jslint couch*/`](#jslint-couch)
-        - [`/*jslint devel*/`](#jslint-devel)
         - [`/*jslint eval*/`](#jslint-eval)
         - [`/*jslint for*/`](#jslint-for)
         - [`/*jslint getset*/`](#jslint-getset)
@@ -124,8 +123,6 @@ node jslint.mjs hello.js
 
 node --input-type=module --eval '
 
-/*jslint devel*/
-
 // Import JSLint in ES Module environment.
 
 import jslint from "./jslint.mjs";
@@ -158,7 +155,6 @@ result.warnings.forEach(function ({
 
 node --eval '
 
-/*jslint devel*/
 (async function () {
     let globals = ["caches", "indexedDb"];
     let jslint;
@@ -235,7 +231,6 @@ node jslint.mjs \
 
 node --input-type=module --eval '
 
-/*jslint devel*/
 import jslint from "./jslint.mjs";
 import fs from "fs";
 (async function () {
@@ -617,17 +612,6 @@ registerType("text-json", "text/json");
 
 <br>
 
-##### `/*jslint devel*/`
-
-```js
-/*jslint devel*/
-// Allow console.log() and friends.
-
-console.log("hello");
-```
-
-<br>
-
 ##### `/*jslint eval*/`
 
 ```js
@@ -658,7 +642,7 @@ function foo() {
 ##### `/*jslint getset*/`
 
 ```js
-/*jslint getset, this, devel*/
+/*jslint getset, this*/
 // Allow get() and set().
 
 let foo = {
