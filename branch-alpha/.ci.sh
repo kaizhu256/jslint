@@ -281,7 +281,9 @@ import moduleFs from "fs";
         }
     }));
     if (fileModified) {
-        throw new Error("modified file " + fileModified);
+        setTimeout(function () {
+            throw new Error("modified file " + fileModified);
+        }, 1000);
     }
 }());
 ' "$@" # '
