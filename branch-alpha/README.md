@@ -817,17 +817,6 @@ function bar({
 }) {
     return aa + bb;
 }
-
-function baz(aa) {
-    switch (aa) {
-    case 2:
-        return 2;
-    case 1:
-        return 1;
-    default:
-        return 0;
-    }
-}
 ```
 
 <br>
