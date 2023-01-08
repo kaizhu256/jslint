@@ -905,7 +905,7 @@ import modulePath from "path";
     let content = process.argv[2];
     let path = process.argv[1];
     let repo;
-    let responseText;
+    let responseBuf;
     let url;
     function httpRequest({
         method,
@@ -924,16 +924,16 @@ import modulePath from "path";
                 },
                 method
             }, function (res) {
-                responseText = [];
+                responseBuf = [];
                 res.on("data", function (chunk) {
-                    responseText.push(chunk);
+                    responseBuf.push(chunk);
                 });
                 res.on("end", function () {
-                    responseText = Buffer.concat(responseText);
+                    responseBuf = Buffer.concat(responseBuf);
                     moduleAssert(res.statusCode === 200, (
                         "shGithubFileUpload"
                         + `- failed to download/upload file ${url} - `
-                        + responseText.slice(0, 1024).toString()
+                        + responseBuf.slice(0, 1024).toString()
                     ));
                     resolve();
                 });
@@ -949,7 +949,7 @@ import modulePath from "path";
     if (!content) {
         await moduleFs.promises.writeFile(
             modulePath.basename(url),
-            responseText
+            responseBuf
         );
         return;
     }
@@ -960,7 +960,7 @@ import modulePath from "path";
             branch,
             content: content.toString("base64"),
             "message": `upload file ${path}`,
-            sha: JSON.parse(responseText).sha
+            sha: JSON.parse(responseBuf).sha
         })
     });
 }());
