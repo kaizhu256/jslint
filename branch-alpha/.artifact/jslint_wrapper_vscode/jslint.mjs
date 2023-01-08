@@ -4185,6 +4185,9 @@ function jslint_phase3_parse(state) {
             }
         }).reduce(function (aa, bb) {
             if (
+
+// PR-xxx - Hide warning about unordered case-statements behind beta-flag.
+
                 option_dict.beta
                 && !option_dict.unordered
                 && aa && bb
