@@ -968,13 +968,13 @@ shGithubPushBackupAndSquash() {
     if [ "$(git rev-list --count "$GIT_BRANCH")" -gt "$COMMITS" ]
     then
         # backup
-        shGitCmdWithGithubToken push "$GIT_REPO" -f \
-            "$GIT_BRANCH:$GIT_BRANCH-backup"
+        shGitCmdWithGithubToken push "$GIT_REPO" \
+            "$GIT_BRANCH:$GIT_BRANCH-backup" -f
         # squash commits
         git checkout --orphan squash1
         git commit --quiet -am "$COMMIT_MESSAGE" || true
-        # reset branch-gh-pages to squashed-commit
-        shGitCmdWithGithubToken push . -f "squash1:$GIT_BRANCH"
+        # reset branc to squashed-commit
+        git push . "squash1:$GIT_BRANCH" -f
         git checkout "$GIT_BRANCH"
         # force-push squashed-commit
         shGitCmdWithGithubToken push "$GIT_REPO" "$GIT_BRANCH" -f
