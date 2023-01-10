@@ -9982,6 +9982,7 @@ function jstestOnExit(exitCode, mode) {
         )
         + "  tests total  - " + jstestCountTotal + "\n"
         + "  tests failed - " + jstestCountFailed + "\n"
+        + "\n"
         + "  time finished - "
         + Number(Date.now() - jstestTimeStart).toLocaleString()
         + " ms\n"
