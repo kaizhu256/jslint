@@ -9981,6 +9981,7 @@ function jstestOnExit(exitCode, mode) {
         )
         + "  tests total  - " + jstestCountTotal + "\n"
         + "  tests failed - " + jstestCountFailed + "\n"
+        + "  time finished - " + (Date.now() - jstestTimeStart) + " ms\n"
         + "\u001b[39m"
     );
     if (mode !== "testsFailed") {
