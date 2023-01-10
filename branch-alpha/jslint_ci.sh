@@ -964,7 +964,7 @@ shGithubPushBackupAndSquash() {
     shift
     local COMMITS="$1"
     shift
-    local COMMIT_MESSAGE="$1"
+    local COMMIT_MESSAGE="squash - $(git log beta -1 --pretty=%B)"
     if [ "$(git rev-list --count "$GIT_BRANCH")" -gt "$COMMITS" ]
     then
         # backup
@@ -972,7 +972,7 @@ shGithubPushBackupAndSquash() {
             "$GIT_BRANCH:$GIT_BRANCH-backup"
         # squash commits
         git checkout --orphan squash1
-        git commit --quiet -am squash || true
+        git commit --quiet -am "$COMMIT_MESSAGE" || true
         # reset branch-gh-pages to squashed-commit
         shGitCmdWithGithubToken push . -f "squash1:$GIT_BRANCH"
         git checkout "$GIT_BRANCH"
