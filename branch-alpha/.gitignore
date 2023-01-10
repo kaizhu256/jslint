@@ -15,6 +15,7 @@ temp*
 tmp
 undefined
 
+!.gitattributes
 !.gitconfig
 !.github
 !.gitignore
