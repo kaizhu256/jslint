@@ -374,7 +374,7 @@ import moduleChildProcess from "child_process";
         "branch-$GITHUB_BRANCH0/README.md"
     git status
     git commit -am "update dir branch-$GITHUB_BRANCH0" || true
-    # backup, squash, push branch-gh-pages
+    # git push
     shGithubPushBackupAndSquash origin gh-pages 50
     # list files
     shGitLsTree
@@ -964,7 +964,7 @@ shGithubPushBackupAndSquash() {
     shift
     local COMMITS="$1"
     shift
-    local COMMIT_MESSAGE="squash - $(git log beta -1 --pretty=%B)"
+    local COMMIT_MESSAGE="squash - $(git log "$GIT_BRANCH" -1 --pretty=%B)"
     if [ "$(git rev-list --count "$GIT_BRANCH")" -gt "$COMMITS" ]
     then
         # backup
