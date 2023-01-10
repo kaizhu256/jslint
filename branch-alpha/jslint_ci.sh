@@ -375,24 +375,11 @@ import moduleChildProcess from "child_process";
     git status
     git commit -am "update dir branch-$GITHUB_BRANCH0" || true
     # if branch-gh-pages has more than 50 commits,
-    # then backup and squash commits
-    if [ "$(git rev-list --count gh-pages)" -gt 50 ]
-    then
-        # backup
-        git push origin -f gh-pages:gh-pages-backup
-        # squash commits
-        git checkout --orphan squash1
-        git commit --quiet -am squash || true
-        # reset branch-gh-pages to squashed-commit
-        git push . -f squash1:gh-pages
-        git checkout gh-pages
-        # force-push squashed-commit
-        git push origin -f gh-pages
-    fi
+    # then backup and squash commits,
+    # else push branch-gh-pages
+    shGithubPushBackupAndSquash origin gh-pages 50
     # list files
     shGitLsTree
-    # push branch-gh-pages
-    git push origin gh-pages
     # validate http-links
     (set -e
         cd "branch-$GITHUB_BRANCH0"
@@ -969,21 +956,23 @@ import modulePath from "path";
 ' "$@" # '
 )}
 
-shGithubSquashBackup() {
+shGithubPushBackupAndSquash() {
     # if branch-gh-pages has more than 50 commits,
     # then backup and squash commits
     if [ "$(git rev-list --count gh-pages)" -gt 50 ]
     then
         # backup
-        git push origin -f gh-pages:gh-pages-backup
+        shGitCmdWithGithubToken push origin -f gh-pages:gh-pages-backup
         # squash commits
         git checkout --orphan squash1
         git commit --quiet -am squash || true
         # reset branch-gh-pages to squashed-commit
-        git push . -f squash1:gh-pages
+        shGitCmdWithGithubToken push . -f squash1:gh-pages
         git checkout gh-pages
         # force-push squashed-commit
-        git push origin -f gh-pages
+        shGitCmdWithGithubToken push origin -f gh-pages
+    else
+        shGitCmdWithGithubToken push origin gh-pages
     fi
 }
 
