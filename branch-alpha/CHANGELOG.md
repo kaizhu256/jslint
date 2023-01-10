@@ -12,6 +12,7 @@
 - jslint - add new warning "Expected Object.create(null) instead of {}"
 
 # v2023.1.1-beta
+- ci - add shell-function shGithubPushBackupAndSquash()
 - test - print time-finished after test-run
 - jslint - hide warning about unordered case-statements behind beta-flag
 - ci - bugfix - update shell-function shCiBase() to handle undefined fileMain
