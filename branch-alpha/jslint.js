@@ -94,6 +94,7 @@
 
 /*jslint beta, node*/
 /*property
+    toLocaleString,
     JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
     assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
     beta, bitwise, block, body, browser, c, calls, catch, catch_list,
@@ -9981,7 +9982,9 @@ function jstestOnExit(exitCode, mode) {
         )
         + "  tests total  - " + jstestCountTotal + "\n"
         + "  tests failed - " + jstestCountFailed + "\n"
-        + "  time finished - " + (Date.now() - jstestTimeStart) + " ms\n"
+        + "  time finished - "
+        + Number(Date.now() - jstestTimeStart).toLocaleString()
+        + " ms\n"
         + "\u001b[39m"
     );
     if (mode !== "testsFailed") {
