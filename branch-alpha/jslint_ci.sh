@@ -733,6 +733,11 @@ shGitCmdWithGithubToken() {(set -e
     local CMD
     local EXIT_CODE
     local URL
+    if [ ! "$MY_GITHUB_TOKEN" ]
+    then
+        git "$@"
+        return
+    fi
     printf "shGitCmdWithGithubToken $*\n"
     CMD="$1"
     shift
@@ -742,13 +747,10 @@ shGitCmdWithGithubToken() {(set -e
     then
         URL="$(git config "remote.$URL.url")"
     fi
-    if [ "$MY_GITHUB_TOKEN" ]
-    then
-        URL="$(
-            printf "$URL" \
-            | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
-        )"
-    fi
+    URL="$(
+        printf "$URL" \
+        | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
+    )"
     EXIT_CODE=0
     # hide $MY_GITHUB_TOKEN in case of err
     git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
@@ -967,10 +969,37 @@ import modulePath from "path";
 ' "$@" # '
 )}
 
+shGithubSquashBackup() {
+    # if branch-gh-pages has more than 50 commits,
+    # then backup and squash commits
+    if [ "$(git rev-list --count gh-pages)" -gt 50 ]
+    then
+        # backup
+        git push origin -f gh-pages:gh-pages-backup
+        # squash commits
+        git checkout --orphan squash1
+        git commit --quiet -am squash || true
+        # reset branch-gh-pages to squashed-commit
+        git push . -f squash1:gh-pages
+        git checkout gh-pages
+        # force-push squashed-commit
+        git push origin -f gh-pages
+    fi
+}
+
+shGithubTokenExport() {
+# this function will export $MY_GITHUB_TOKEN from file
+    if [ ! "$MY_GITHUB_TOKEN" ]
+    then
+        export MY_GITHUB_TOKEN="$(cat .ghbtka.txt)"
+    fi
+}
+
 shGithubWorkflowDispatch() {(set -e
 # this function will trigger-workflow to ci-repo $1 for owner.repo.branch $2
 # example use:
 # shGithubWorkflowDispatch octocat/my_ci octocat/my_project/master
+    shGithubTokenExport
     curl "https://api.github.com/repos/$1"\
 "/actions/workflows/ci.yml/dispatches" \
         -H "accept: application/vnd.github.v3+json" \
