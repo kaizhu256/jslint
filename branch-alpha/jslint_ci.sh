@@ -3683,6 +3683,16 @@ shSshReverseTunnelServer() {(set -e
     do
         shSecretFileGet ".ssh/$FILE" "$HOME/.ssh/$FILE"
     done
+    scp \
+        -P "$SSH_REVERSE_PORT" \
+        -oStrictHostKeyChecking=no \
+        -oUserKnownHostsFile=/dev/null \
+        "$HOME/.ssh/id_ed25519" "$SSH_REVERSE_HOST:~/.ssh/"
+    ssh \
+        -oStrictHostKeyChecking=no \
+        -oUserKnownHostsFile=/dev/null \
+        -p "$SSH_REVERSE_PORT" \
+        "$SSH_REVERSE_HOST" "chmod 600 ~/.ssh/id_ed25519"
     ssh \
         -N \
         -R22222:localhost:22 \
@@ -3690,6 +3700,7 @@ shSshReverseTunnelServer() {(set -e
         -f \
         -oStrictHostKeyChecking=no \
         -oUserKnownHostsFile=/dev/null \
+        -p "$SSH_REVERSE_PORT" \
         "$SSH_REVERSE_HOST"
     while [ 1 ]
     do
