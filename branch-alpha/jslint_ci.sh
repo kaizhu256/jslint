@@ -835,7 +835,7 @@ async function cryptoJweEncrypt({
     return jweCompact;
 }
 
-await (async function () {
+(async function () {
     if (process.argv[1] === "decrypt") {
         await cryptoJweDecrypt({
             fileDecrypted: process.argv[3],
@@ -1778,7 +1778,7 @@ function objectDeepCopyWithKeysSorted(obj) {
     });
     return sorted;
 }
-await (async function () {
+(async function () {
     console.error("shJsonNormalize - " + process.argv[1]);
     await moduleFs.promises.writeFile(
         process.argv[1],
@@ -3578,7 +3578,7 @@ async function fsWriteFileWithParents(pathname, data) {
     }
     // console.error("wrote file " + pathname);
 }
-await (async function () {
+(async function () {
     let data;
     let fileJson;
     let fileKey;
@@ -3600,7 +3600,7 @@ shSecretFileSet() {(set -e
 # this function will open json-file, and set file-key $1 to it
     node --input-type=module --eval '
 import moduleFs from "fs";
-await (async function () {
+(async function () {
     let data;
     let fileJson;
     let fileKey;
@@ -3624,7 +3624,7 @@ shSecretVarExport() {
 # this function will open json-file, and export env key/val items
     eval "$(node --input-type=module --eval '
 import moduleFs from "fs";
-await (async function () {
+(async function () {
     let data;
     data = JSON.parse(
         await moduleFs.promises.readFile(".my_secret.json")
@@ -3668,11 +3668,13 @@ shSshKeygen() {(set -e
 
 shSshReverseTunnelClient() {(set -e
 # this function will client-login to ssh-reverse-tunnel
+    local USERNAME="$1"
+    shift
     ssh \
         -oStrictHostKeyChecking=no \
         -oUserKnownHostsFile=/dev/null \
         -p22222 \
-        "$1@localhost"
+        "$USERNAME@localhost" "$@"
 )}
 
 shSshReverseTunnelServer() {(set -e
