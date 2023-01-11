@@ -578,6 +578,278 @@ shCiPre() {(set -e
     return
 )}
 
+shCryptoJweDecryptEncrypt() {(set -e
+# this function will decrypt/encrypt file using jwe and $MY_GITHUB_TOKEN
+# example use:
+# shCryptoJweDecryptEncrypt decrypt .my_secret.json.encrypted .my_secret.json
+# shCryptoJweDecryptEncrypt encrypt .my_secret.json
+# shGitLsTree | sort -rk4 # sort by size
+    shGithubTokenExport
+    node --input-type=module --eval '
+import assert from "assert";
+import moduleFs from "fs";
+import {
+    webcrypto
+} from "crypto";
+
+let {
+    MY_GITHUB_TOKEN
+} = process.env;
+
+async function cryptoJweDecrypt({
+    fileDecrypted,
+    fileEncrypted,
+    mockResult
+}) {
+
+// This function will:
+// 1. Parse 256-bit jwk-formatted key-encryption-key <jwkKek>
+// 2. Key-unwrap 256-bit content-encryption-key (cek) in <jweCompact>
+//    using <jwkKek>.
+// 3. Decrypt ciphertext with cek, iv, tag in <jweCompact>
+
+    let cek;
+    let header;
+    let iv;
+    let jweCompact;
+    let jwkKek;
+    let kek;
+    let plaintext;
+    let tag;
+    function base64urlFromBuffer(buf) {
+        return Buffer.from(buf).toString("base64").replace((
+            /\+/g
+        ), "-").replace((
+            /\//g
+        ), "_").replace((
+            /\=/g
+        ), "");
+    }
+    if (mockResult) {
+        return mockResult;
+    }
+
+// 1. Parse 256-bit jwk-formatted key-encryption-key <jwkKek>
+
+    jwkKek = await webcrypto.subtle.digest("SHA-256", MY_GITHUB_TOKEN);
+    jwkKek = JSON.stringify({
+        k: base64urlFromBuffer(jwkKek),
+        kty: "oct"
+    });
+    jwkKek = JSON.parse(jwkKek);
+
+// 2. Key-unwrap 256-bit content-encryption-key (cek) in <jweCompact>
+//    using <jwkKek>.
+
+    jweCompact = await moduleFs.promises.readFile(fileEncrypted, "utf8");
+    jweCompact = jweCompact.replace((
+        /\s/g
+    ), "");
+    [
+        header,
+        cek,
+        iv,
+        plaintext,
+        tag
+    ] = jweCompact.replace((
+        /-/g
+    ), "+").replace((
+        /_/g
+    ), "/").split(".").map(function (elem) {
+        return Buffer.from(elem, "base64");
+    });
+    header = jweCompact.split(".")[0];
+    assert(
+        "eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2R0NNIn0" === header,
+        `cryptoJweDecrypt - invalid header - ${header}`
+    );
+    kek = await webcrypto.subtle.importKey(
+        "jwk",
+        jwkKek,
+        {
+            length: 256,
+            name: "AES-KW"
+        },
+        true,
+        [
+            "unwrapKey", "wrapKey"
+        ]
+    );
+    cek = await webcrypto.subtle.unwrapKey(
+        "raw",
+        cek,
+        kek,
+        "AES-KW",
+        "AES-GCM",
+        true,
+        [
+            "decrypt", "encrypt"
+        ]
+    );
+
+// 3. Decrypt ciphertext with cek, iv, tag in <jweCompact>
+
+    plaintext = await webcrypto.subtle.decrypt(
+        {
+            additionalData: header,
+            iv,
+            name: "AES-GCM",
+            tagLength: 128
+        },
+        cek,
+        Buffer.concat([
+            plaintext, tag
+        ])
+    );
+    plaintext = new TextDecoder().decode(plaintext);
+    if (fileDecrypted) {
+        await moduleFs.promises.writeFile(fileDecrypted, plaintext);
+    }
+    return plaintext;
+}
+
+async function cryptoJweEncrypt({
+    fileDecrypted
+}) {
+
+// This function will:
+// 1. Parse 256-bit jwk-formatted key-encryption-key <jwkKek>
+// 2. Create random 256-bit content-encryption-key (cek).
+// 3. Key-wrap cek with given <jwkKek>.
+// 4. Read plaintext from <fileDecrypted>.
+// 5. Encrypt plaintext with cek.
+// 6. Save all of above as jwe-compact-format to <fileDecrypted>.encrypted
+//
+// BASE64URL(UTF8(JWE Protected Header)) || . ||
+// BASE64URL(JWE Encrypted Key) || . ||
+// BASE64URL(JWE Initialization Vector) || . ||
+// BASE64URL(JWE Ciphertext) || . ||
+// BASE64URL(JWE Authentication Tag)
+
+    let cek;
+    let ciphertext;
+    let header;
+    let iv;
+    let jweCompact = [];
+    let jwkKek;
+    let kek;
+    let tag;
+    function base64urlFromBuffer(buf) {
+        return Buffer.from(buf).toString("base64").replace((
+            /\+/g
+        ), "-").replace((
+            /\//g
+        ), "_").replace((
+            /\=/g
+        ), "");
+    }
+
+// BASE64URL(UTF8(JWE Protected Header)) || . ||
+
+    header = base64urlFromBuffer(JSON.stringify({
+        alg: "A256KW",
+        enc: "A256GCM"
+    }));
+    jweCompact.push(header);
+
+// Use given jwkKek or read from file.
+
+    jwkKek = await webcrypto.subtle.digest("SHA-256", MY_GITHUB_TOKEN);
+    jwkKek = JSON.stringify({
+        k: base64urlFromBuffer(jwkKek),
+        kty: "oct"
+    });
+
+// 1. Parse 256-bit jwk-formatted key-encryption-key <jwkKek>
+
+    jwkKek = JSON.parse(jwkKek);
+    kek = await webcrypto.subtle.importKey(
+        "jwk",
+        jwkKek,
+        {
+            length: 256,
+            name: "AES-KW"
+        },
+        true,
+        [
+            "unwrapKey", "wrapKey"
+        ]
+    );
+    jwkKek = JSON.stringify({
+        k: jwkKek.k,
+        kty: jwkKek.kty
+    });
+
+// 2. Create random 256-bit content-encryption-key (cek).
+
+    cek = await webcrypto.subtle.generateKey(
+        {
+            length: 128,
+            name: "AES-GCM"
+        },
+        true,
+        [
+            "decrypt", "encrypt"
+        ]
+    );
+
+// 3. Key-wrap cek with given <jwkKek>.
+
+    jweCompact.push(base64urlFromBuffer(
+        await webcrypto.subtle.wrapKey("raw", cek, kek, "AES-KW")
+    ));
+
+// 4. Read plaintext from <fileDecrypted>.
+
+    ciphertext = await moduleFs.promises.readFile(fileDecrypted);
+
+// 5. Encrypt plaintext with cek.
+
+    iv = webcrypto.getRandomValues(new Uint8Array(12));
+    jweCompact.push(base64urlFromBuffer(iv));
+    ciphertext = await webcrypto.subtle.encrypt(
+        {
+            additionalData: header,
+            iv,
+            name: "AES-GCM",
+            tagLength: 128
+        },
+        cek,
+        ciphertext
+    );
+
+// 6. Save all of above as jwe-compact-format to <fileDecrypted>.encrypted
+
+    ciphertext = Buffer.from(ciphertext);
+    tag = ciphertext.slice(-16);
+    ciphertext = ciphertext.slice(0, -16);
+    jweCompact.push(base64urlFromBuffer(ciphertext).replace((
+        /.{72}/g
+    ), "$&\n"));
+    jweCompact.push(base64urlFromBuffer(tag));
+    jweCompact = jweCompact.join("\n.\n");
+    await moduleFs.promises.writeFile(
+        fileDecrypted + ".encrypted",
+        jweCompact + "\n"
+    );
+    return jweCompact;
+}
+
+await (async function () {
+    if (process.argv[1] === "decrypt") {
+        await cryptoJweDecrypt({
+            fileDecrypted: process.argv[3],
+            fileEncrypted: process.argv[2]
+        });
+    } else {
+        await cryptoJweEncrypt({
+            fileDecrypted: process.argv[2]
+        });
+    }
+}());
+' "$@" # '
+)}
+
 shDiffFileFromDir() {(set -e
 # this function print diff of file $1 against same file in dir $2
     diff -u "$1" "$2/$1"
@@ -987,7 +1259,7 @@ shGithubTokenExport() {
 # this function will export $MY_GITHUB_TOKEN from file
     if [ ! "$MY_GITHUB_TOKEN" ]
     then
-        export MY_GITHUB_TOKEN="$(cat .ghbtka.txt)"
+        export MY_GITHUB_TOKEN="$(cat .my_github_token)"
     fi
 }
 
@@ -1506,7 +1778,7 @@ function objectDeepCopyWithKeysSorted(obj) {
     });
     return sorted;
 }
-(async function () {
+await (async function () {
     console.error("shJsonNormalize - " + process.argv[1]);
     await moduleFs.promises.writeFile(
         process.argv[1],
@@ -3264,6 +3536,167 @@ ${result}
     # cleanup
     rm "$SCREENSHOT_SVG.exit_code" "$SCREENSHOT_SVG.txt"
     return "$EXIT_CODE"
+)}
+
+shSecretCryptoDecrypt() {(set -e
+# this function will decrypt file using jwe and $MY_GITHUB_TOKEN
+    shCryptoJweDecryptEncrypt decrypt .my_secret.json.encrypted .my_secret.json
+    chmod 600 .my_secret.json
+)}
+
+shSecretCryptoEncrypt() {(set -e
+# this function will encrypt file using jwe and $MY_GITHUB_TOKEN
+    shCryptoJweDecryptEncrypt encrypt .my_secret.json
+)}
+
+shSecretFileGet() {(set -e
+# this function will open json-file, and write file-key $1 to file $2
+    node --input-type=module --eval '
+import moduleFs from "fs";
+import modulePath from "path";
+async function fsWriteFileWithParents(pathname, data) {
+
+// This function will write <data> to <pathname> and lazy-mkdirp if necessary.
+
+    // await moduleFsInit();
+
+// Try writing to pathname.
+
+    try {
+        await moduleFs.promises.writeFile(pathname, data);
+    } catch (ignore) {
+
+// Lazy mkdirp.
+
+        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {
+            recursive: true
+        });
+
+// Retry writing to pathname.
+
+        await moduleFs.promises.writeFile(pathname, data);
+    }
+    // console.error("wrote file " + pathname);
+}
+await (async function () {
+    let data;
+    let fileJson;
+    let fileKey;
+    let fileWrite;
+    fileJson = ".my_secret.json";
+    fileKey = process.argv[1];
+    fileWrite = process.argv[2];
+    data = JSON.parse(
+        await moduleFs.promises.readFile(fileJson)
+    );
+    data = Buffer.from(data[fileKey], "base64");
+    await fsWriteFileWithParents(fileWrite, data);
+    await moduleFs.promises.chmod(fileWrite, "600");
+}());
+' "$@" # '
+)}
+
+shSecretFileSet() {(set -e
+# this function will open json-file, and set file-key $1 to it
+    node --input-type=module --eval '
+import moduleFs from "fs";
+await (async function () {
+    let data;
+    let fileJson;
+    let fileKey;
+    fileJson = ".my_secret.json";
+    fileKey = process.argv[1];
+    data = JSON.parse(
+        await moduleFs.promises.readFile(fileJson)
+    );
+    data[fileKey] = Buffer.from(
+        await moduleFs.promises.readFile(fileKey)
+    ).toString("base64");
+    await moduleFs.promises.writeFile(
+        fileJson,
+        JSON.stringify(data, undefined, 4) + "\n"
+    );
+}());
+' "$@" # '
+)}
+
+shSecretVarExport() {
+# this function will open json-file, and export env key/val items
+    eval "$(node --input-type=module --eval '
+import moduleFs from "fs";
+await (async function () {
+    let data;
+    data = JSON.parse(
+        await moduleFs.promises.readFile(".my_secret.json")
+    );
+    data = Object.entries(data);
+    data = data.filter(function ([
+        key
+    ]) {
+        return key.startsWith("EXPORT_");
+    });
+    data = data.map(function ([
+        key, val
+    ]) {
+        return (
+            "export "
+            + key.replace("EXPORT_", "")
+            + "="
+            + "\u0027"
+            + val.replace((
+                /\u0027/g
+            ), `\u0027"\u0027"\u0027`)
+            + "\u0027\n"
+        );
+    }).join("");
+    console.log(data);
+}());
+' "$@")" # '
+}
+
+shSshKeygen() {(set -e
+# this function will generate generic ssh key
+    rm -f ~/.ssh/id_ed25519
+    rm -f ~/.ssh/id_ed25519.pub
+    ssh-keygen \
+        -C "your_email@example.com" \
+        -N "" \
+        -f ~/.ssh/id_ed25519 \
+        -t ed25519 \
+        >/dev/null 2>&1
+)}
+
+shSshReverseTunnelClient() {(set -e
+# this function will client-login to ssh-reverse-tunnel
+    ssh \
+        -oStrictHostKeyChecking=no \
+        -oUserKnownHostsFile=/dev/null \
+        -p22222 \
+        "$1@localhost"
+)}
+
+shSshReverseTunnelServer() {(set -e
+# this function will create ssh-reverse-tunnel on server
+    shSecretCryptoDecrypt
+    shSecretVarExport
+    for FILE in authorized_keys id_ed25519
+    do
+        shSecretFileGet ".ssh/$FILE" "$HOME/.ssh/$FILE"
+    done
+    ssh \
+        -N \
+        -R22222:localhost:22 \
+        -T \
+        -f \
+        -oStrictHostKeyChecking=no \
+        -oUserKnownHostsFile=/dev/null \
+        "$SSH_REVERSE_HOST"
+    while [ 1 ]
+    do
+        printf "username=$(whoami)\n"
+        date
+        sleep 30
+    done
 )}
 
 shCiMain() {(set -e
