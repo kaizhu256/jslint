@@ -3668,20 +3668,24 @@ shSshKeygen() {(set -e
 
 shSshReverseTunnelClient() {(set -e
 # this function will client-login to ssh-reverse-tunnel
-    local HOST="$1"
+# example use:
+# shSshReverseTunnelClient user@localhost:53735 -t bash
+    local REMOTE_HOST="$1"
     shift
-    local PORT_OFFSET="${1:-0}"
-    shift
+    local REMOTE_PORT="$(printf $REMOTE_HOST | sed "s/.*://")"
+    local REMOTE_HOST="$(printf $REMOTE_HOST | sed "s/:.*//")"
     ssh \
         -oStrictHostKeyChecking=no \
         -oUserKnownHostsFile=/dev/null \
-        -p "$((53735+"$PORT_OFFSET"))" \
-        "$HOST" "$@"
+        -p "$REMOTE_PORT" \
+        "$REMOTE_HOST" "$@"
 )}
 
 shSshReverseTunnelClient2() {(set -e
 # this function will client-login to ssh-reverse-tunnel
-    local PROXY="$1"
+# example use:
+# shSshReverseTunnelClient2 user@proxy:22 user@localhost:53735 -t bash
+    local PROXY_HOST="$1"
     shift
     local HOST="$1"
     shift
@@ -3710,38 +3714,44 @@ shSshReverseTunnelServer() {(set -e
 # this function will create ssh-reverse-tunnel on server
     shSecretCryptoDecrypt
     shSecretVarExport
-    SSH_REVERSE_HOST_PORT="${SSH_REVERSE_HOST_PORT:-22}"
-    SSH_REVERSE_PROXY_PORT="${SSH_REVERSE_PROXY_PORT:-22}"
-    SSH_REVERSE_PORT_OFFSET="${SSH_REVERSE_PORT_OFFSET:-0}"
+    local FILE
+    local PROXY_HOST="$(printf $SSH_REVERSE_PROXY | sed "s/:.*//")"
+    local PROXY_PORT="$(printf $SSH_REVERSE_PROXY | sed "s/.*://")"
+    local REMOTE_PORT="$(printf $SSH_REVERSE_REMOTE | sed "s/:.*//")"
+    if [ "$REMOTE_PORT" = random ]
+    then
+        REMOTE_PORT="$(shuf -i 32768-65535 -n 1)"
+        SSH_REVERSE_REMOTE=\
+"$REMOTE_PORT:$(printf "$SSH_REVERSE_REMOTE" | sed "s/random://")"
+    fi
+    # init dir .ssh/
     for FILE in authorized_keys id_ed25519
     do
         shSecretFileGet ".ssh/$FILE" "$HOME/.ssh/$FILE"
     done
+    # copy private-key to local
     scp \
-        -P "$SSH_REVERSE_PROXY_PORT" \
+        -P "$PROXY_PORT" \
         -oStrictHostKeyChecking=no \
-        -oUserKnownHostsFile=/dev/null \
-        "$HOME/.ssh/id_ed25519" "$SSH_REVERSE_HOST:~/.ssh/"
+        "$HOME/.ssh/id_ed25519" "$PROXY_HOST:~/.ssh/" >/dev/null 2>&1
     ssh \
-        -oStrictHostKeyChecking=no \
-        -oUserKnownHostsFile=/dev/null \
-        -p "$SSH_REVERSE_PROXY_PORT" \
-        "$SSH_REVERSE_HOST" "chmod 600 ~/.ssh/id_ed25519"
+        -p "$PROXY_PORT" \
+        "$PROXY_HOST" "chmod 600 ~/.ssh/id_ed25519" >/dev/null 2>&1
+    # create ssh-reverse-tunnel from remote to local
     ssh \
         -N \
-        -R\
-"$((53735+$SSH_REVERSE_PORT_OFFSET)):localhost:$SSH_REVERSE_HOST_PORT" \
+        -R"$SSH_REVERSE_REMOTE" \
         -T \
         -f \
-        -oStrictHostKeyChecking=no \
-        -oUserKnownHostsFile=/dev/null \
-        -p "$SSH_REVERSE_PROXY_PORT" \
-        "$SSH_REVERSE_HOST"
+        -p "$PROXY_PORT" \
+        "$PROXY_HOST" >/dev/null 2>&1
+    # loop-print to keep ci awake
+    printf "$(whoami)@localhost:$REMOTE_PORT\n"
     while [ 1 ]
     do
-        printf "username=$(whoami)\n"
+        printf "$(whoami)@localhost:$REMOTE_PORT\n"
         date
-        sleep 30
+        sleep 60
     done
 )}
 
