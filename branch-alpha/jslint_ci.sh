@@ -3447,7 +3447,7 @@ shRunWithScreenshotTxt() {(set -e
 # https://www.cnx-software.com/2011/09/22/how-to-convert-a-command-line-result-into-an-image-in-linux/
     local EXIT_CODE
     EXIT_CODE=0
-    export SCREENSHOT_SVG="$1"
+    local SCREENSHOT_SVG="$1"
     shift
     printf "0\n" > "$SCREENSHOT_SVG.exit_code"
     printf "shRunWithScreenshotTxt - ($* 2>&1)\n" 1>&2
@@ -3668,41 +3668,74 @@ shSshKeygen() {(set -e
 
 shSshReverseTunnelClient() {(set -e
 # this function will client-login to ssh-reverse-tunnel
-    local USERNAME="$1"
+    local HOST="$1"
+    shift
+    local PORT_OFFSET="${1:-0}"
     shift
     ssh \
         -oStrictHostKeyChecking=no \
         -oUserKnownHostsFile=/dev/null \
-        -p22222 \
-        "$USERNAME@localhost" "$@"
+        -p "$((53735+"$PORT_OFFSET"))" \
+        "$HOST" "$@"
+)}
+
+shSshReverseTunnelClient2() {(set -e
+# this function will client-login to ssh-reverse-tunnel
+    local PROXY="$1"
+    shift
+    local HOST="$1"
+    shift
+    local PORT_OFFSET="${1:-0}"
+    shift
+    if ! (printf "$PROXY" | grep -q ":")
+    then
+        PROXY="$PROXY:22"
+    fi
+    local PROXY_PORT="$(printf $PROXY | sed "s/.*://")"
+    PROXY="$(printf $PROXY | sed "s/:.*//")"
+    ssh \
+        -oStrictHostKeyChecking=no \
+        -oUserKnownHostsFile=/dev/null \
+        -p "$PROXY_PORT" \
+        -t \
+        "$PROXY" \
+        ssh \
+            -oStrictHostKeyChecking=no \
+            -oUserKnownHostsFile=/dev/null \
+            -p "$((53735+"$PORT_OFFSET"))" \
+            "$HOST" "$@"
 )}
 
 shSshReverseTunnelServer() {(set -e
 # this function will create ssh-reverse-tunnel on server
     shSecretCryptoDecrypt
     shSecretVarExport
+    SSH_REVERSE_HOST_PORT="${SSH_REVERSE_HOST_PORT:-22}"
+    SSH_REVERSE_PROXY_PORT="${SSH_REVERSE_PROXY_PORT:-22}"
+    SSH_REVERSE_PORT_OFFSET="${SSH_REVERSE_PORT_OFFSET:-0}"
     for FILE in authorized_keys id_ed25519
     do
         shSecretFileGet ".ssh/$FILE" "$HOME/.ssh/$FILE"
     done
     scp \
-        -P "$SSH_REVERSE_PORT" \
+        -P "$SSH_REVERSE_PROXY_PORT" \
         -oStrictHostKeyChecking=no \
         -oUserKnownHostsFile=/dev/null \
         "$HOME/.ssh/id_ed25519" "$SSH_REVERSE_HOST:~/.ssh/"
     ssh \
         -oStrictHostKeyChecking=no \
         -oUserKnownHostsFile=/dev/null \
-        -p "$SSH_REVERSE_PORT" \
+        -p "$SSH_REVERSE_PROXY_PORT" \
         "$SSH_REVERSE_HOST" "chmod 600 ~/.ssh/id_ed25519"
     ssh \
         -N \
-        -R22222:localhost:22 \
+        -R\
+"$((53735+$SSH_REVERSE_PORT_OFFSET)):localhost:$SSH_REVERSE_HOST_PORT" \
         -T \
         -f \
         -oStrictHostKeyChecking=no \
         -oUserKnownHostsFile=/dev/null \
-        -p "$SSH_REVERSE_PORT" \
+        -p "$SSH_REVERSE_PROXY_PORT" \
         "$SSH_REVERSE_HOST"
     while [ 1 ]
     do
@@ -3719,7 +3752,7 @@ shCiMain() {(set -e
         return
     fi
     # run "$@" with winpty
-    export CI_UNAME="${CI_UNAME:-$(uname)}"
+    local CI_UNAME="${CI_UNAME:-$(uname)}"
     case "$CI_UNAME" in
     MSYS*)
         if [ ! "$CI_WINPTY" ] && [ "$1" != shHttpFileServer ]
