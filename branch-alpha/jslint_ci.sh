@@ -276,6 +276,7 @@ shCiArtifactUpload() {(set -e
     then
         return
     fi
+    mkdir -p .artifact
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
