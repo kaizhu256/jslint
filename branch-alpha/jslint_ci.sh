@@ -521,7 +521,7 @@ import moduleFs from "fs";
     await moduleFs.promises.writeFile("README.md", data);
 }());
 ' "$@" # '
-    if [ -f myci2.sh ]
+    if [ -f ./myci2.sh ]
     then
         . ./myci2.sh :
         shMyciInit
@@ -3291,7 +3291,11 @@ shCiMain() {(set -e
         ;;
     esac
     # run "$@"
-    if [ -f .ci.sh ]
+    if [ -f ./myci2.sh ]
+    then
+        . ./myci2.sh :
+    fi
+    if [ -f ./.ci.sh ]
     then
         . ./.ci.sh :
     fi
