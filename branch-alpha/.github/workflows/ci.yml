@@ -8,7 +8,6 @@ on:
       - alpha
       - beta
       - master
-      - sandbox
   workflow_dispatch:
 env:
   CI_MAIN_JOB: node.v18.x64.linux
