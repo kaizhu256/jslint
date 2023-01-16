@@ -71,7 +71,7 @@ jobs:
 # shCiBase - end
 
 
-# shCiArtifactUpload - start
+# shCiArtifactUpload - beg
       # fetch jslint_ci.sh from trusted source
       - run: |
           git fetch origin alpha --depth=1
