@@ -3286,9 +3286,13 @@ shCiMain() {(set -e
         ;;
     esac
     # run "$@"
+    if [ -f ./myci2.sh ]
+    then
+        . ./myci2.sh :
+    fi
     if [ -f ./.ci.sh ]
     then
-        . ./.ci.sh
+        . ./.ci.sh :
     fi
     "$@"
 )}
