@@ -53,19 +53,19 @@
     textLength="768"
     x="10"
     y="186"
->jslint - 98ms - ./.ci.sh                                                                         </tspan>
+>jslint - 100ms - ./.ci.sh                                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="208"
->jslint - 124ms - ./CHANGELOG.md                                                                  </tspan>
+>jslint - 121ms - ./CHANGELOG.md                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="230"
->jslint - 136ms - ./README.md                                                                     </tspan>
+>jslint - 157ms - ./README.md                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -101,73 +101,73 @@
     textLength="768"
     x="10"
     y="362"
->jslint - 137ms - ./hello.js                                                                      </tspan>
+>jslint - 174ms - ./hello.js                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="384"
->jslint - 169ms - ./index.html                                                                    </tspan>
+>jslint - 216ms - ./index.html                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="406"
->jslint - 472ms - ./jslint.js                                                                     </tspan>
+>jslint - 628ms - ./jslint.js                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="428"
->jslint - 738ms - ./jslint.mjs                                                                    </tspan>
+>jslint - 942ms - ./jslint.mjs                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="450"
->jslint - 839ms - ./jslint_ci.sh                                                                  </tspan>
+>jslint - 1068ms - ./jslint_ci.sh                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="472"
->jslint - 841ms - ./jslint_wrapper_cjs.cjs                                                        </tspan>
+>jslint - 1081ms - ./jslint_wrapper_cjs.cjs                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="494"
->jslint - 840ms - ./jslint_wrapper_codemirror.html                                                </tspan>
+>jslint - 1084ms - ./jslint_wrapper_codemirror.html                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="516"
->jslint - 842ms - ./jslint_wrapper_codemirror.js                                                  </tspan>
+>jslint - 1085ms - ./jslint_wrapper_codemirror.js                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="538"
->jslint - 847ms - ./jslint_wrapper_vscode.js                                                      </tspan>
+>jslint - 1087ms - ./jslint_wrapper_vscode.js                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="560"
->jslint - 853ms - ./package.json                                                                  </tspan>
+>jslint - 1088ms - ./package.json                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="582"
->jslint - 874ms - ./test.mjs                                                                      </tspan>
+>jslint - 1150ms - ./test.mjs                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="604"
->jslint - 963ms - ./test_coverage_merge_data.json                                                 </tspan>
+>jslint - 1284ms - ./test_coverage_merge_data.json                                                </tspan>
 
 </text>
 </svg>

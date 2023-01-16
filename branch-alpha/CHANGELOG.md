@@ -5,11 +5,9 @@
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around plus-separated concatenations.
-- jslint - relax warning against console.log and friends and deprecate directive `devel`
 - jslint - require regexp to use open-form.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - jslint - unify analysis of variable-assignment/function-parameters into one function
-- jslint - add new warning "Expected Object.create(null) instead of {}"
 
 # v2023.1.1-beta
 - ci - add shell-function shGithubPushBackupAndSquash()
