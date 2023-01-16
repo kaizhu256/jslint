@@ -276,7 +276,9 @@ shCiArtifactUpload() {(set -e
 #     return
 # )}
     local FILE
-    if (! shCiIsMainJob)
+    if !(shCiIsMainJob \
+        && [ -f package.json ] \
+        && grep -q '^    "ciArtifactUpload": 1,$' package.json)
     then
         return
     fi

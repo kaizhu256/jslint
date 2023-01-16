@@ -5,6 +5,7 @@
     "bugs": {
         "url": "https://github.com/jslint-org/jslint/issues"
     },
+    "ciArtifactUpload": 1,
     "counter": 7,
     "description": "JSLint, The JavaScript Code Quality and Coverage Tool",
     "exports": {
