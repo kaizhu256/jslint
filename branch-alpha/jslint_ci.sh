@@ -276,9 +276,9 @@ shCiArtifactUpload() {(set -e
 #     return
 # )}
     local FILE
-    if !(shCiIsMainJob \
+    if ! (shCiIsMainJob \
         && [ -f package.json ] \
-        && grep -q '^    "ciArtifactUpload": 1,$' package.json)
+        && grep -q '^    "shCiArtifactUpload": 1,$' package.json)
     then
         return
     fi
@@ -567,6 +567,11 @@ shCiNpmPublish() {(set -e
 # # this function will run custom-code to npm-publish package
 #     # npm publish --access public
 # )}
+    if ! ([ -f package.json ] \
+        && grep -q '^    "shCiNpmPublish": 1,$' package.json)
+    then
+        return
+    fi
     # init package.json for npm-publish
     npm install
     # update package-name

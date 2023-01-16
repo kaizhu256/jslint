@@ -5,7 +5,6 @@
     "bugs": {
         "url": "https://github.com/jslint-org/jslint/issues"
     },
-    "ciArtifactUpload": 1,
     "counter": 7,
     "description": "JSLint, The JavaScript Code Quality and Coverage Tool",
     "exports": {
@@ -33,6 +32,8 @@
         "test": "node jslint.mjs v8_coverage_report=.artifact/coverage node test.mjs",
         "test2": "sh jslint_ci.sh shCiBase"
     },
+    "shCiArtifactUpload": 1,
+    "shCiNpmPublish": 1,
     "type": "module",
     "version": "2023.1.1-beta"
 }
