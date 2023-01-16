@@ -271,6 +271,10 @@ import moduleUrl from "url";
 
 shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
+# shCiArtifactUploadCustom() {(set -e
+# # this function will run custom-code to upload build-artifacts
+#     return
+# )}
     local FILE
     if (! shCiIsMainJob)
     then
@@ -330,7 +334,10 @@ import moduleChildProcess from "child_process";
     });
 }());
 ' "$@" # '
-    shCiArtifactUploadCustom
+    if [ "$(command -v shCiArtifactUploadCustom)" = shCiArtifactUploadCustom]
+    then
+        shCiArtifactUploadCustom
+    fi
     # 1px-border around browser-screenshot
     if (ls .artifact/screenshot_browser_*.png 2>/dev/null \
             && mogrify -version 2>&1 | grep -i imagemagick)
@@ -387,13 +394,12 @@ import moduleChildProcess from "child_process";
     )
 )}
 
-shCiArtifactUploadCustom() {(set -e
-# this function will run custom-code to upload build-artifacts
-    return
-)}
-
 shCiBase() {(set -e
 # this function will run base-ci
+# shCiBaseCustom() {(set -e
+# # this function will run custom-code for base-ci
+#     return
+# )}
     export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
     # validate package.json.fileCount
     node --input-type=module --eval '
@@ -521,18 +527,11 @@ import moduleFs from "fs";
     await moduleFs.promises.writeFile("README.md", data);
 }());
 ' "$@" # '
-    if [ -f ./myci2.sh ]
+    if [ "$(command -v shCiBaseCustom)" = shCiBaseCustom]
     then
-        . ./myci2.sh :
-        shMyciInit
+        shCiBaseCustom
     fi
-    shCiBaseCustom
     git diff
-)}
-
-shCiBaseCustom() {(set -e
-# this function will run custom-ci
-    return
 )}
 
 shCiBranchPromote() {(set -e
@@ -562,6 +561,10 @@ process.exit(Number(
 
 shCiNpmPublish() {(set -e
 # this function will npm-publish package
+# shCiNpmPublishCustom() {(set -e
+# # this function will run custom-code to npm-publish package
+#     # npm publish --access public
+# )}
     # init package.json for npm-publish
     npm install
     # update package-name
@@ -571,17 +574,27 @@ shCiNpmPublish() {(set -e
             "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
             package.json
     fi
-    shCiNpmPublishCustom
-)}
-
-shCiNpmPublishCustom() {(set -e
-# this function will run custom-code to npm-publish package
-    # npm publish --access public
+    if [ "$(command -v shCiNpmPublishCustom)" = shCiNpmPublishCustom]
+    then
+        shCiNpmPublishCustom
+    fi
 )}
 
 shCiPre() {(set -e
 # this function will run pre-ci
-    return
+# shCiPreCustom() {(set -e
+# # this function will run custom-code for pre-ci
+#     return
+# )}
+    if [ -f ./myci2.sh ]
+    then
+        . ./myci2.sh :
+        shMyciInit
+    fi
+    if [ "$(command -v shCiPreCustom)" = shCiPreCustom]
+    then
+        shCiPreCustom
+    fi
 )}
 
 shDiffFileFromDir() {(set -e
