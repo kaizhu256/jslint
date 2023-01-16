@@ -888,6 +888,49 @@ shGitSquashPop() {(set -e
     git commit -am "$MESSAGE" || true
 )}
 
+shGithubCheckoutRemote() {(set -e
+# this function will run like actions/checkout, except checkout remote-branch
+    # GITHUB_REF_NAME="owner/repo/branch"
+    GITHUB_REF_NAME="$1"
+    if (printf "$GITHUB_REF_NAME" | grep -q ".*/.*/.*")
+    then
+        # branch - */*/*
+        git fetch origin alpha
+        # assert latest ci
+        if [ "$(git rev-parse "$GITHUB_REF_NAME")" \
+            != "$(git rev-parse origin/alpha)" ]
+        then
+            git push -f origin "origin/alpha:$GITHUB_REF_NAME"
+            shGithubWorkflowDispatch "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME"
+            return 1
+        fi
+    else
+        # branch - alpha, beta, master
+        GITHUB_REF_NAME="$GITHUB_REPOSITORY/$GITHUB_REF_NAME"
+    fi
+    GITHUB_REPOSITORY="$(printf "$GITHUB_REF_NAME" | cut -d'/' -f1,2)"
+    GITHUB_REF_NAME="$(printf "$GITHUB_REF_NAME" | cut -d'/' -f3)"
+    # replace current git-checkout with $GITHUB_REF_NAME
+    rm -rf * ..?* .[!.]*
+    shGitCmdWithGithubToken clone "https://github.com/$GITHUB_REPOSITORY" tmp \
+        --branch="$GITHUB_REF_NAME" \
+        --depth=1 \
+        --single-branch
+    mv tmp/.git .
+    cp tmp/.gitconfig .git/config
+    rm -rf tmp
+    git reset "origin/$GITHUB_REF_NAME" --hard
+    # fetch jslint_ci.sh from trusted source
+    shGitCmdWithGithubToken fetch origin alpha --depth=1
+    for FILE in .ci.sh jslint_ci.sh myci2.sh
+    do
+        if [ -f "$FILE" ]
+        then
+            git checkout origin/alpha "$FILE"
+        fi
+    done
+)}
+
 shGithubFileDownload() {(set -e
 # this function will download file $1 from github repo/branch
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
@@ -3311,6 +3354,10 @@ shCiMain() {(set -e
     if [ -f ./.ci.sh ]
     then
         . ./.ci.sh :
+    fi
+    if [ -f ./.ci2.sh ]
+    then
+        . ./.ci2.sh :
     fi
     "$@"
 )}
