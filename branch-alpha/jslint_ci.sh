@@ -922,7 +922,7 @@ shGithubCheckoutRemote() {(set -e
     git reset "origin/$GITHUB_REF_NAME" --hard
     # fetch jslint_ci.sh from trusted source
     shGitCmdWithGithubToken fetch origin alpha --depth=1
-    for FILE in .ci.sh jslint_ci.sh myci2.sh
+    for FILE in .ci.sh .ci2.sh jslint_ci.sh myci2.sh
     do
         if [ -f "$FILE" ]
         then
@@ -3235,8 +3235,7 @@ v8CoverageReportCreate({
 shRunWithScreenshotTxt() {(set -e
 # this function will run cmd $@ and screenshot text-output
 # https://www.cnx-software.com/2011/09/22/how-to-convert-a-command-line-result-into-an-image-in-linux/
-    local EXIT_CODE
-    EXIT_CODE=0
+    local EXIT_CODE=0
     local SCREENSHOT_SVG="$1"
     shift
     printf "0\n" > "$SCREENSHOT_SVG.exit_code"
