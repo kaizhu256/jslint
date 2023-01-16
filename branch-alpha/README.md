@@ -892,7 +892,7 @@ eval("1"); //jslint-ignore-line
 <br><br>
 # License
 - JSLint is under [Unlicense License](LICENSE).
-- CodeMirror editor is under [MIT License](https://github.com/codemirror/codemirror5/blob/d0e3b2e727c41aa4fd89fbad0adfb3815339174c/LICENSE).
+- CodeMirror editor is under [MIT License](https://github.com2/codemirror/codemirror5/blob/d0e3b2e727c41aa4fd89fbad0adfb3815339174c/LICENSE).
 - Function `v8CoverageListMerge` is derived from [MIT Licensed v8-coverage](https://github.com/demurgos/v8-coverage/blob/73446087dc38f61b09832c9867122a23f8577099/ts/LICENSE.md).
 
 <!--

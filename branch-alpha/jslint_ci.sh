@@ -380,10 +380,10 @@ import moduleChildProcess from "child_process";
     # list files
     shGitLsTree
     # validate http-links
-    (set -e
-        cd "branch-$GITHUB_BRANCH0"
-        sleep 15
-        shDirHttplinkValidate
+    (
+    cd "branch-$GITHUB_BRANCH0"
+    sleep 15
+    shDirHttplinkValidate
     )
 )}
 
@@ -521,6 +521,11 @@ import moduleFs from "fs";
     await moduleFs.promises.writeFile("README.md", data);
 }());
 ' "$@" # '
+    if [ -f myci2.sh ]
+    then
+        . ./myci2.sh :
+        shMyciInit
+    fi
     shCiBaseCustom
     git diff
 )}
@@ -988,7 +993,7 @@ shGithubTokenExport() {
 # this function will export $MY_GITHUB_TOKEN from file
     if [ ! "$MY_GITHUB_TOKEN" ]
     then
-        export MY_GITHUB_TOKEN="$(cat .my_github_token)"
+        export MY_GITHUB_TOKEN="$(cat "$HOME/.mysecret2/.my_github_token")"
     fi
 }
 
@@ -3181,7 +3186,7 @@ shRunWithScreenshotTxt() {(set -e
     printf "0\n" > "$SCREENSHOT_SVG.exit_code"
     printf "shRunWithScreenshotTxt - ($* 2>&1)\n" 1>&2
     # run "$@" with screenshot
-    (set -e
+    (
         "$@" 2>&1 || printf "$?\n" > "$SCREENSHOT_SVG.exit_code"
     ) | tee "$SCREENSHOT_SVG.txt"
     EXIT_CODE="$(cat "$SCREENSHOT_SVG.exit_code")"
@@ -3286,11 +3291,7 @@ shCiMain() {(set -e
         ;;
     esac
     # run "$@"
-    if [ -f ./myci2.sh ]
-    then
-        . ./myci2.sh :
-    fi
-    if [ -f ./.ci.sh ]
+    if [ -f .ci.sh ]
     then
         . ./.ci.sh :
     fi
