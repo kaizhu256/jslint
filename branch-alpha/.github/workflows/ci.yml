@@ -49,6 +49,11 @@ jobs:
       - run: |
           git fetch origin alpha
           git checkout origin/alpha .ci.sh jslint_ci.sh
+      # https://github.com/actions/setup-node
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+          architecture: ${{ matrix.architecture }}
       # pre-run .ci.sh
       - run: sh jslint_ci.sh shCiPre
       # https://github.com/actions/cache
@@ -60,11 +65,6 @@ jobs:
             ${{ matrix.node_version }}
             ${{ matrix.os }}
           path: .github_cache
-      # https://github.com/actions/setup-node
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node_version }}
-          architecture: ${{ matrix.architecture }}
       # run nodejs coverages and tests
       - run: sh jslint_ci.sh shCiBase
 # shCiBase - end
