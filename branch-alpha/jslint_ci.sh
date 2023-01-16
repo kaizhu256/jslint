@@ -334,7 +334,7 @@ import moduleChildProcess from "child_process";
     });
 }());
 ' "$@" # '
-    if [ "$(command -v shCiArtifactUploadCustom)" = shCiArtifactUploadCustom]
+    if [ "$(command -v shCiArtifactUploadCustom)" = shCiArtifactUploadCustom ]
     then
         shCiArtifactUploadCustom
     fi
@@ -527,7 +527,7 @@ import moduleFs from "fs";
     await moduleFs.promises.writeFile("README.md", data);
 }());
 ' "$@" # '
-    if [ "$(command -v shCiBaseCustom)" = shCiBaseCustom]
+    if [ "$(command -v shCiBaseCustom)" = shCiBaseCustom ]
     then
         shCiBaseCustom
     fi
@@ -574,7 +574,7 @@ shCiNpmPublish() {(set -e
             "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
             package.json
     fi
-    if [ "$(command -v shCiNpmPublishCustom)" = shCiNpmPublishCustom]
+    if [ "$(command -v shCiNpmPublishCustom)" = shCiNpmPublishCustom ]
     then
         shCiNpmPublishCustom
     fi
@@ -591,7 +591,7 @@ shCiPre() {(set -e
         . ./myci2.sh :
         shMyciInit
     fi
-    if [ "$(command -v shCiPreCustom)" = shCiPreCustom]
+    if [ "$(command -v shCiPreCustom)" = shCiPreCustom ]
     then
         shCiPreCustom
     fi
