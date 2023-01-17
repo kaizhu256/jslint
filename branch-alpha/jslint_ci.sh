@@ -955,6 +955,7 @@ shGithubFileUpload() {(set -e
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
 # example use:
 # shGithubFileUpload octocat/hello-worId/master/hello.txt hello.txt
+    shGithubTokenExport
     node --input-type=module --eval '
 import moduleAssert from "assert";
 import moduleFs from "fs";
