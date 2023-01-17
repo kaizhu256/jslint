@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 env:
   MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-  __ZZ: 0
+  zzzz1234: 1
 jobs:
 
 
