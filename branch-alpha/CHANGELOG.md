@@ -10,7 +10,7 @@
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 
 # v2023.1.1-beta
-- ci - add shell-function shGithubPushBackupAndSquash()
+- jslint-ci - revamp auto-updating and add shell-function shGithubCheckoutRemote
 - test - print time-finished after test-run
 - jslint - hide warning about unordered case-statements behind beta-flag
 - ci - bugfix - update shell-function shCiBase() to handle undefined fileMain

@@ -83,7 +83,7 @@
     textLength="768"
     x="10"
     y="296"
->- ci - add shell-function shGithubPushBackupAndSquash()                                          </tspan>
+>- jslint-ci - revamp auto-updating and add shell-function shGithubCheckoutRemote                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
