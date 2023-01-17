@@ -905,7 +905,8 @@ shGithubCheckoutRemote() {(set -e
         # branch - */*/*
         git fetch origin alpha
         # assert latest ci
-        if [ "$(git rev-parse "$GITHUB_REF_NAME")" \
+        if (git rev-parse "$GITHUB_REF_NAME" >/dev/null 2>&1) \
+            && [ "$(git rev-parse "$GITHUB_REF_NAME")" \
             != "$(git rev-parse origin/alpha)" ]
         then
             git push -f origin "origin/alpha:$GITHUB_REF_NAME"
