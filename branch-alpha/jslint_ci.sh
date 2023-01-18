@@ -907,7 +907,7 @@ shGithubCheckoutRemote() {(set -e
         # branch - */*/*
         git fetch origin alpha
         # assert latest ci
-        if (git rev-parse "$GITHUB_REF_NAME" >/dev/null 2>&1) \
+        if (git rev-parse "$GITHUB_REF_NAME" &>/dev/null) \
             && [ "$(git rev-parse "$GITHUB_REF_NAME")" \
             != "$(git rev-parse origin/alpha)" ]
         then
@@ -932,12 +932,13 @@ shGithubCheckoutRemote() {(set -e
     rm -rf tmp
     git reset "origin/$GITHUB_REF_NAME" --hard
     # fetch jslint_ci.sh from trusted source
-    shGitCmdWithGithubToken fetch origin alpha:alpha2 --depth=1
+    git branch -D __tmp1 &>/dev/null || true
+    shGitCmdWithGithubToken fetch origin alpha:__tmp1 --depth=1
     for FILE in .ci.sh .ci2.sh jslint_ci.sh myci2.sh
     do
         if [ -f "$FILE" ]
         then
-            git checkout alpha2 "$FILE"
+            git checkout __tmp1 "$FILE"
         fi
     done
 )}
