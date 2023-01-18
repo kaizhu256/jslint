@@ -1043,7 +1043,7 @@ shGithubPushBackupAndSquash() {
     then
         # backup
         shGitCmdWithGithubToken push "$GIT_REPO" \
-            "$GIT_BRANCH:$GIT_BRANCH-backup" -f
+            "$GIT_BRANCH:$GIT_BRANCH.backup_wday$(date -u +%w)" -f
         # squash commits
         git checkout --orphan squash1
         git commit --quiet -am "$COMMIT_MESSAGE" || true
