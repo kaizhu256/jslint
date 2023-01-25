@@ -424,7 +424,7 @@ globalThis.assert(
         node --input-type=module --eval '
 import moduleFs from "fs";
 (async function () {
-    let fileDict = {};
+    let fileDict = Object.create(null);
     let fileMain;
     let fileModified;
     let packageJson;
@@ -1124,7 +1124,7 @@ import modulePath from "path";
 (async function () {
     "use strict";
     let data;
-    let dict = {};
+    let dict = Object.create(null);
     data = await moduleFs.promises.readFile((
         moduleOs.tmpdir() + "/shGrep.txt"
     ), "utf8");
@@ -1644,7 +1644,7 @@ function objectDeepCopyWithKeysSorted(obj) {
         );
     });
     // init repoDict, fetchList
-    repoDict = {};
+    repoDict = Object.create(null);
     fetchList.forEach(function (elem) {
         if (!elem.url) {
             return;
