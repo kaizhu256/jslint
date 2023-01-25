@@ -647,7 +647,7 @@ import moduleUrl from "url";
         UPSTREAM_GITHUB_IO,
         UPSTREAM_REPOSITORY
     } = process.env;
-    let dict = {};
+    let dict = Object.create(null);
     Array.from(
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
@@ -713,7 +713,7 @@ import moduleUrl from "url";
             if ((
                 /^$|^\\|^data:/m
             ).test(url)) {
-                return;
+                return "";
             }
             // ignore duplicate-link
             if (dict.hasOwnProperty(url)) {
