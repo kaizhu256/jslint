@@ -675,9 +675,13 @@ import moduleUrl from "url";
             if ((
                 /^http:\/\/(?:127\.0\.0\.1|localhost)[\/:]/
             ).test(url)) {
-                return;
+                return "";
             }
             if (url.startsWith("http://")) {
+                switch (url) {
+                case "http://www.w3.org/2000/svg":
+                    return "";
+                }
                 throw new Error(
                     `shDirHttplinkValidate - ${file} - insecure link - ${url}`
                 );
@@ -1434,10 +1438,6 @@ shImageLogoCreate() {(set -e
     if [ ! -f asset_image_logo_512.html ]
     then
         return
-    fi
-    if [ -f asset_font_daley_bold.woff2 ]
-    then
-        cp asset_font_daley_bold.woff2 .artifact
     fi
     # screenshot asset_image_logo_512.png
     shBrowserScreenshot asset_image_logo_512.html \
