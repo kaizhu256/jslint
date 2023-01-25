@@ -424,7 +424,7 @@ globalThis.assert(
         node --input-type=module --eval '
 import moduleFs from "fs";
 (async function () {
-    let fileDict = Object.create(null);
+    let fileDict = {};
     let fileMain;
     let fileModified;
     let packageJson;
@@ -647,7 +647,7 @@ import moduleUrl from "url";
         UPSTREAM_GITHUB_IO,
         UPSTREAM_REPOSITORY
     } = process.env;
-    let dict = Object.create(null);
+    let dict = {};
     Array.from(
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
@@ -1124,7 +1124,7 @@ import modulePath from "path";
 (async function () {
     "use strict";
     let data;
-    let dict = Object.create(null);
+    let dict = {};
     data = await moduleFs.promises.readFile((
         moduleOs.tmpdir() + "/shGrep.txt"
     ), "utf8");
@@ -1644,7 +1644,7 @@ function objectDeepCopyWithKeysSorted(obj) {
         );
     });
     // init repoDict, fetchList
-    repoDict = Object.create(null);
+    repoDict = {};
     fetchList.forEach(function (elem) {
         if (!elem.url) {
             return;
