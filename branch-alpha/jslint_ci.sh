@@ -997,11 +997,17 @@ import modulePath from "path";
                 });
                 res.on("end", function () {
                     responseBuf = Buffer.concat(responseBuf);
-                    moduleAssert.ok(res.statusCode === 200, (
-                        "shGithubFileUpload"
-                        + `- failed to download/upload file ${url} - `
-                        + responseBuf.slice(0, 1024).toString()
-                    ));
+                    moduleAssert.ok(
+                        (
+                            res.statusCode < 400
+                            || (res.statusCode === 404 && content)
+                        ),
+                        (
+                            `shGithubFileUpload - ${res.statusCode}`
+                            + ` - failed to download/upload file ${url} - `
+                            + responseBuf.slice(0, 1024).toString()
+                        )
+                    );
                     resolve();
                 });
             }).end(payload);
