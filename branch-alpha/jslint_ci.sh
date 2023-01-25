@@ -1426,76 +1426,16 @@ import moduleUrl from "url";
 
 shImageLogoCreate() {(set -e
 # this function will create .png logo
-    local SIZE
-    echo '
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>logo</title>
-<style>
-/* sh jslint_ci.sh shBrowserScreenshot asset_image_logo.html --window-size=512x512 */
-/* csslint box-model:false */
-/* csslint ignore:start */
-*,
-*:after,
-*:before {
-    box-sizing: border-box;
-}
-@font-face {
-    font-family: Daley;
-    font-weight: bold;
-    src: url("asset_font_daley_bold.woff2") format("woff2");
-}
-/* csslint ignore:end */
-body,
-div {
-    margin: 0;
-}
-.container1 {
-    background: antiquewhite;
-    border: 24px solid darkslategray;
-    border-radius: 96px;
-    color: darkslategray;
-    font-family: Daley;
-    height: 512px;
-    margin: 0;
-    position: relative;
-    width: 512px;
-    zoom: 100%;
-/*
-    background: transparent;
-    border: 24px solid black;
-    color: black;
-*/
-}
-.text1 {
-    font-size: 256px;
-    left: 44px;
-    position: absolute;
-    top: 32px;
-}
-.text2 {
-    bottom: 8px;
-    font-size: 192px;
-    left: 44px;
-    position: absolute;
-}
-</style>
-</head>
-<body>
-<div class="container1">
-<div class="text1">JS</div>
-<div class="text2">Lint</div>
-</div>
-</body>
-</html>
-' > .artifact/asset_image_logo_512.html
-    cp asset_font_daley_bold.woff2 .artifact || true
     # screenshot asset_image_logo_512.png
-    shBrowserScreenshot .artifact/asset_image_logo_512.html \
+    if [ -f asset_font_daley_bold.woff2 ]
+    then
+        cp asset_font_daley_bold.woff2 .artifact
+    fi
+    shBrowserScreenshot asset_image_logo_512.html \
         --window-size=512x512 \
         -screenshot=.artifact/asset_image_logo_512.png
     # create various smaller thumbnails
+    local SIZE
     for SIZE in 32 64 128 256
     do
         convert -resize "${SIZE}x${SIZE}" .artifact/asset_image_logo_512.png \
