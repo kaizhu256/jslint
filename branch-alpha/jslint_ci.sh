@@ -976,6 +976,7 @@ import modulePath from "path";
     let url;
     function httpRequest({
         method,
+        modeSha,
         payload
     }) {
         return new Promise(function (resolve) {
@@ -1000,7 +1001,7 @@ import modulePath from "path";
                     moduleAssert.ok(
                         (
                             res.statusCode < 400
-                            || (res.statusCode === 404 && content)
+                            || (res.statusCode === 404 && modeSha)
                         ),
                         (
                             `shGithubFileUpload - ${res.statusCode}`
@@ -1018,7 +1019,9 @@ import modulePath from "path";
     branch = path[2];
     path = path.slice(3).join("/");
     url = `https://api.github.com/repos/${repo}/contents/${path}`;
-    await httpRequest({});
+    await httpRequest({
+        modeSha: content
+    });
     if (!content) {
         await moduleFs.promises.writeFile(
             modulePath.basename(url),
