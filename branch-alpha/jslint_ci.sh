@@ -635,6 +635,7 @@ shDirHttplinkValidate() {(set -e
         printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
     node --input-type=module --eval '
+import moduleAssert from "assert";
 import moduleFs from "fs";
 import moduleHttps from "https";
 import moduleUrl from "url";
@@ -673,19 +674,14 @@ import moduleUrl from "url";
                 "g"
             ), GITHUB_GITHUB_IO);
             if ((
-                /^http:\/\/(?:127\.0\.0\.1|localhost)[\/:]/
+                /^http:\/\/(?:127\.0\.0\.1|localhost|www\.w3\.org\/2000\/svg)(?:[\/:]|$)/m
             ).test(url)) {
                 return "";
             }
-            if (url.startsWith("http://")) {
-                switch (url) {
-                case "http://www.w3.org/2000/svg":
-                    return "";
-                }
-                throw new Error(
-                    `shDirHttplinkValidate - ${file} - insecure link - ${url}`
-                );
-            }
+            moduleAssert.ok(
+                !url.startsWith("http://"),
+                `shDirHttplinkValidate - ${file} - insecure link - ${url}`
+            );
             // ignore duplicate-link
             if (dict.hasOwnProperty(url)) {
                 return "";
@@ -697,12 +693,13 @@ import moduleUrl from "url";
                 console.error(
                     "shDirHttplinkValidate " + res.statusCode + " " + url
                 );
-                if (!(res.statusCode < 400)) {
-                    throw new Error(
+                moduleAssert.ok(
+                    res.statusCode < 400,
+                    (
                         "shDirHttplinkValidate - " + file
-                        + " - unreachable link " + url
-                    );
-                }
+                        + " - unreachable link " + JSON.stringify(url)
+                    )
+                );
                 req.abort();
                 res.destroy();
             });
