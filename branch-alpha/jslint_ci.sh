@@ -695,10 +695,7 @@ import moduleUrl from "url";
                 );
                 moduleAssert.ok(
                     res.statusCode < 400,
-                    (
-                        "shDirHttplinkValidate - " + file
-                        + " - unreachable link " + JSON.stringify(url)
-                    )
+                    `shDirHttplinkValidate - ${file} - unreachable link ${url}`
                 );
                 req.abort();
                 res.destroy();
@@ -708,7 +705,7 @@ import moduleUrl from "url";
             return "";
         });
         data.replace((
-            /(\bhref=|\bsrc=|\burl\(|\[[^]*?\]\()("?.*?)(?:[")\]]|$)/gm
+            /(\bhref=|\bsrc=|\burl\(|\[[^]*?\]\()("?[^\\].*?)(?:[")\]]|$)/gm
         ), function (ignore, linkType, url) {
             if (!linkType.startsWith("[")) {
                 url = url.slice(1);
@@ -728,12 +725,13 @@ import moduleUrl from "url";
                     console.error(
                         "shDirHttplinkValidate " + Boolean(exists) + " " + url
                     );
-                    if (!exists) {
-                        throw new Error(
-                            "shDirHttplinkValidate - " + file
-                            + " - unreachable link " + url
-                        );
-                    }
+                    moduleAssert.ok(
+                        exists,
+                        (
+                            `shDirHttplinkValidate - ${file}`
+                            + `- unreachable link ${url}`
+                        )
+                    );
                 });
             }
             return "";
