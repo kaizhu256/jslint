@@ -705,12 +705,14 @@ import moduleUrl from "url";
             return "";
         });
         data.replace((
-            /(\bhref=|\bsrc=|\burl\(|\[[^]*?\]\()("?[^\\].*?)(?:[")\]]|$)/gm
+            /(\bhref=|\bsrc=|\burl\(|\[[^]*?\]\()("?.*?)(?:[")\]]|$)/gm
         ), function (ignore, linkType, url) {
             if (!linkType.startsWith("[")) {
                 url = url.slice(1);
             }
-            if (url.length === 0 || url.startsWith("data:")) {
+            if ((
+                /^$|^\\|^data:/m
+            ).test(url)) {
                 return;
             }
             // ignore duplicate-link
