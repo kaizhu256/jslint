@@ -39,6 +39,11 @@ jobs:
       CI_MATRIX_NAME_MAIN: "node v18 x64 ubuntu-latest"
       CI_MATRIX_NODE_VERSION: v${{ matrix.node_version }}
       CI_MATRIX_NODE_VERSION_MAIN: v18
+      CI_WORKFLOW_NAME: >
+        ${{ github.workflow }}
+        - ${{ github.event_name }}
+        - ${{ github.event.inputs.workflow_dispatch_name }}
+        - ${{ github.ref_name }}
     name: >
       node
       v${{ matrix.node_version }}
@@ -46,6 +51,8 @@ jobs:
       ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
+      - run: |
+          echo "${{ env.CI_WORKFLOW_NAME }}"
       # disable autocrlf in windows
       - run: git config --global core.autocrlf false
       # https://github.com/actions/checkout

@@ -991,7 +991,7 @@ import modulePath from "path";
                 });
                 res.on("end", function () {
                     responseBuf = Buffer.concat(responseBuf);
-                    moduleAssert(res.statusCode === 200, (
+                    moduleAssert.ok(res.statusCode === 200, (
                         "shGithubFileUpload"
                         + `- failed to download/upload file ${url} - `
                         + responseBuf.slice(0, 1024).toString()
