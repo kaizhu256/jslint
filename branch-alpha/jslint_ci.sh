@@ -322,6 +322,11 @@ import moduleChildProcess from "child_process";
             "shRunWithScreenshotTxt",
             ".artifact/screenshot_package_listing.svg",
             "shGitLsTree"
+        ],
+        // parallel-task - screenshot logo
+        [
+            "jslint_ci.sh",
+            "shImageLogoCreate"
         ]
     ].forEach(function (argList) {
         moduleChildProcess.spawn("sh", argList, {
@@ -1426,11 +1431,15 @@ import moduleUrl from "url";
 
 shImageLogoCreate() {(set -e
 # this function will create .png logo
-    # screenshot asset_image_logo_512.png
+    if [ ! -f asset_image_logo_512.html ]
+    then
+        return
+    fi
     if [ -f asset_font_daley_bold.woff2 ]
     then
         cp asset_font_daley_bold.woff2 .artifact
     fi
+    # screenshot asset_image_logo_512.png
     shBrowserScreenshot asset_image_logo_512.html \
         --window-size=512x512 \
         -screenshot=.artifact/asset_image_logo_512.png
