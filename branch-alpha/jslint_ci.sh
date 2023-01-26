@@ -1014,6 +1014,11 @@ import modulePath from "path";
             }).end(payload);
         });
     }
+    console.error(
+        content
+        ? `shGithubFileUpload - ${process.argv[1]}`
+        : `shGithubFileDownload - ${process.argv[1]}`
+    );
     path = path.split("/");
     repo = path.slice(0, 2).join("/");
     branch = path[2];
