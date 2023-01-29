@@ -10,6 +10,9 @@
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 
 # v2023.1.1-beta
+- ci - bugfix - fix ci-shell-function shGithubFileUpload unable to upload new asset
+- ci - auto-create asset_image_logo_512.png from asset_image_logo_512.html
+- bugfix - fix shell-function shGithubCheckoutRemote not able to checkout trusted-files in non-alpha branches
 - jslint-ci - revamp auto-updating and add shell-function shGithubCheckoutRemote
 - test - print time-finished after test-run
 - jslint - hide warning about unordered case-statements behind beta-flag
