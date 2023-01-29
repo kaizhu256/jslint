@@ -1068,7 +1068,7 @@ shGithubPushBackupAndSquash() {
         git branch -D __tmp1 &>/dev/null || true
         git checkout --orphan __tmp1
         git commit --quiet -am "$COMMIT_MESSAGE" || true
-        # reset branc to squashed-commit
+        # reset branch to squashed-commit
         git push . "__tmp1:$GIT_BRANCH" -f
         git checkout "$GIT_BRANCH"
         # force-push squashed-commit
