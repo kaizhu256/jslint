@@ -534,7 +534,7 @@ import moduleFs from "fs";
     await moduleFs.promises.writeFile("README.md", data);
 }());
 ' "$@" # '
-    node jslint.mjs .
+    JSLINT_BETA=1 node jslint.mjs .
     if [ "$(command -v shCiBaseCustom)" = shCiBaseCustom ]
     then
         shCiBaseCustom
