@@ -1358,9 +1358,8 @@ import moduleUrl from "url";
                 // run shell-cmd
                 console.error("$ " + match2);
                 moduleChildProcess.spawn(
-                    "sh",
-                    ["-c", match2],
-                    {stdio: ["ignore", 1, 2]}
+                    match2,
+                    {shell: true, stdio: ["ignore", 1, 2]}
                 ).on("exit", function (exitCode) {
                     // print exitCode
                     console.error("$ EXIT_CODE=" + exitCode);
