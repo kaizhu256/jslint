@@ -99,19 +99,17 @@ echo "\
         await moduleFs.promises.writeFile(file + ".sh", script);
         await new Promise(function (resolve) {
             moduleChildProcess.spawn(
-                "sh",
+                "/bin/sh",
                 [
                     "jslint_ci.sh", "shRunWithScreenshotTxt", file,
-                    "sh", file + ".sh"
+                    "/bin/sh", file + ".sh"
                 ],
                 {
                     env: Object.assign({
                         // limit stdout to xxx lines
                         SH_RUN_WITH_SCREENSHOT_TXT_MAX_LINES: 64
                     }, process.env),
-                    stdio: [
-                        "ignore", 1, 2
-                    ]
+                    stdio: ["ignore", 1, 2]
                 }
             ).on("exit", resolve);
         });
@@ -146,15 +144,9 @@ import moduleChildProcess from "child_process";
     ].map(async function (url) {
         await new Promise(function (resolve) {
             moduleChildProcess.spawn(
-                "sh",
-                [
-                    "jslint_ci.sh", "shBrowserScreenshot", url
-                ],
-                {
-                    stdio: [
-                        "ignore", 1, 2
-                    ]
-                }
+                "/bin/sh",
+                ["jslint_ci.sh", "shBrowserScreenshot", url],
+                {stdio: ["ignore", 1, 2]}
             ).on("exit", resolve);
         });
     }));

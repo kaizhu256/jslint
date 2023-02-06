@@ -249,11 +249,7 @@ import moduleUrl from "url";
         })).filter(function (elem) {
             return elem;
         }),
-        {
-            stdio: [
-                "ignore", 1, 2
-            ]
-        }
+        {stdio: ["ignore", 1, 2]}
     );
     exitCode = await new Promise(function (resolve) {
         child.on("exit", resolve);
@@ -329,11 +325,11 @@ import moduleChildProcess from "child_process";
             "shImageLogoCreate"
         ]
     ].forEach(function (argList) {
-        moduleChildProcess.spawn("sh", argList, {
-            stdio: [
-                "ignore", 1, 2
-            ]
-        }).on("exit", function (exitCode) {
+        moduleChildProcess.spawn(
+            "/bin/sh",
+            argList,
+            {stdio: ["ignore", 1, 2]}
+        ).on("exit", function (exitCode) {
             if (exitCode) {
                 process.exit(exitCode);
             }
@@ -825,14 +821,11 @@ import moduleChildProcess from "child_process";
     // get file, mode, size
     result = await new Promise(function (resolve) {
         result = "";
-        moduleChildProcess.spawn("git", [
-            "ls-tree", "-lr", "HEAD"
-        ], {
-            encoding: "utf8",
-            stdio: [
-                "ignore", "pipe", 2
-            ]
-        }).on("exit", function () {
+        moduleChildProcess.spawn(
+            "git",
+            ["ls-tree", "-lr", "HEAD"],
+            {encoding: "utf8", stdio: ["ignore", "overlapped", 2]}
+        ).on("exit", function () {
             resolve(result);
         }).stdout.on("data", function (chunk) {
             result += chunk;
@@ -861,13 +854,11 @@ import moduleChildProcess from "child_process";
     // get date
     result.forEach(function (elem) {
         result[0].size += elem.size;
-        moduleChildProcess.spawn("git", [
-            "log", "--max-count=1", "--format=%at", elem.file
-        ], {
-            stdio: [
-                "ignore", "pipe", 2
-            ]
-        }).stdout.on("data", function (chunk) {
+        moduleChildProcess.spawn(
+            "git",
+            ["log", "--max-count=1", "--format=%at", elem.file],
+            {stdio: ["ignore", "overlapped", 2]}
+        ).stdout.on("data", function (chunk) {
             elem.date = new Date(
                 Number(chunk) * 1000
             ).toISOString().slice(0, 19) + "Z";
@@ -1314,13 +1305,11 @@ import moduleUrl from "url";
         process.env.HOME + "/jslint.mjs"
     ), function (ignore, exists) {
         if (exists) {
-            moduleChildProcess.spawn("node", [
-                process.env.HOME + "/jslint.mjs", "."
-            ], {
-                stdio: [
-                    "ignore", 1, 2
-                ]
-            });
+            moduleChildProcess.spawn(
+                "node",
+                [process.env.HOME + "/jslint.mjs", "."],
+                {stdio: ["ignore", 1, 2]}
+            );
         }
     });
 }());
@@ -1368,13 +1357,12 @@ import moduleUrl from "url";
                 ), "git --no-pager ");
                 // run shell-cmd
                 console.error("$ " + match2);
-                moduleChildProcess.spawn(match2, {
-                    shell: true,
-                    stdio: [
-                        "ignore", 1, 2
-                    ]
-                // print exitCode
-                }).on("exit", function (exitCode) {
+                moduleChildProcess.spawn(
+                    "/bin/sh",
+                    ["-c", match2],
+                    {stdio: ["ignore", 1, 2]}
+                ).on("exit", function (exitCode) {
+                    // print exitCode
                     console.error("$ EXIT_CODE=" + exitCode);
                     that.evalDefault("\n", context, file, onError);
                 });
@@ -1681,22 +1669,19 @@ function objectDeepCopyWithKeysSorted(obj) {
         }
         // fetch file
         if (elem.node) {
-            pipeToBuffer(moduleChildProcess.spawn("node", [
-                "-e", elem.node
-            ], {
-                stdio: [
-                    "ignore", "pipe", 2
-                ]
-            }).stdout, elem, "data");
+            pipeToBuffer(moduleChildProcess.spawn(
+                "node",
+                ["-e", elem.node],
+                {stdio: ["ignore", "overlapped", 2]}
+            ).stdout, elem, "data");
             return;
         }
         if (elem.sh) {
-            pipeToBuffer(moduleChildProcess.spawn(elem.sh, {
-                shell: true,
-                stdio: [
-                    "ignore", "pipe", 2
-                ]
-            }).stdout, elem, "data");
+            pipeToBuffer(moduleChildProcess.spawn(
+                "/bin/sh",
+                ["-c", elem.sh],
+                {stdio: ["ignore", "overlapped", 2]}
+            ).stdout, elem, "data");
             return;
         }
         moduleHttps.get(elem.url2 || elem.url.replace(
@@ -3029,21 +3014,23 @@ function sentinel() {}
       }
     }));
     exitCode = await new Promise(function (resolve) {
-      moduleChildProcess.spawn((
-        processArgv[0] === "npm"
-        ? process.platform.replace("win32", "npm.cmd").replace(
-          process.platform,
-          "npm"
-        )
-        : processArgv[0]
-      ), processArgv.slice(1), {
-        env: Object.assign({}, process.env, {
-          NODE_V8_COVERAGE: coverageDir
-        }),
-        stdio: [
-          "ignore", 1, 2
-        ]
-      }).on("exit", resolve);
+      moduleChildProcess.spawn(
+        (
+          processArgv[0] === "npm"
+          ? process.platform.replace("win32", "npm.cmd").replace(
+            process.platform,
+            "npm"
+          )
+          : processArgv[0]
+        ),
+        processArgv.slice(1),
+        {
+          env: Object.assign({}, process.env, {
+            NODE_V8_COVERAGE: coverageDir
+          }),
+          stdio: ["ignore", 1, 2]
+        }
+      ).on("exit", resolve);
     });
   }
   v8CoverageObj = await moduleFs.promises.readdir(coverageDir);
