@@ -99,10 +99,10 @@ echo "\
         await moduleFs.promises.writeFile(file + ".sh", script);
         await new Promise(function (resolve) {
             moduleChildProcess.spawn(
-                "/bin/sh",
+                "sh",
                 [
                     "jslint_ci.sh", "shRunWithScreenshotTxt", file,
-                    "/bin/sh", file + ".sh"
+                    "sh", file + ".sh"
                 ],
                 {
                     env: Object.assign({
@@ -144,7 +144,7 @@ import moduleChildProcess from "child_process";
     ].map(async function (url) {
         await new Promise(function (resolve) {
             moduleChildProcess.spawn(
-                "/bin/sh",
+                "sh",
                 ["jslint_ci.sh", "shBrowserScreenshot", url],
                 {stdio: ["ignore", 1, 2]}
             ).on("exit", resolve);
