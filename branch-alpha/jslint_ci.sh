@@ -766,15 +766,15 @@ shGitCmdWithGithubToken() {(set -e
     then
         URL="$(git config "remote.$URL.url")"
     fi
-    URL="$(
-        printf "$URL" \
-        | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
-    )"
     if [ ! "$MY_GITHUB_TOKEN" ]
     then
         git "$CMD" "$URL" "$@"
         return
     fi
+    URL="$(
+        printf "$URL" \
+        | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
+    )"
     EXIT_CODE=0
     # hide $MY_GITHUB_TOKEN in case of err
     git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
