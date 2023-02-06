@@ -326,7 +326,7 @@ import moduleChildProcess from "child_process";
         ]
     ].forEach(function (argList) {
         moduleChildProcess.spawn(
-            "/bin/sh",
+            "sh",
             argList,
             {stdio: ["ignore", 1, 2]}
         ).on("exit", function (exitCode) {
@@ -1358,7 +1358,7 @@ import moduleUrl from "url";
                 // run shell-cmd
                 console.error("$ " + match2);
                 moduleChildProcess.spawn(
-                    "/bin/sh",
+                    "sh",
                     ["-c", match2],
                     {stdio: ["ignore", 1, 2]}
                 ).on("exit", function (exitCode) {
@@ -1678,7 +1678,7 @@ function objectDeepCopyWithKeysSorted(obj) {
         }
         if (elem.sh) {
             pipeToBuffer(moduleChildProcess.spawn(
-                "/bin/sh",
+                "sh",
                 ["-c", elem.sh],
                 {stdio: ["ignore", "overlapped", 2]}
             ).stdout, elem, "data");
