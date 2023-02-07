@@ -384,9 +384,8 @@ import moduleChildProcess from "child_process";
         -e "s|_2fbranch-[a-z]*_2f|_2fbranch-${GITHUB_BRANCH0}_2f|g" \
         "branch-$GITHUB_BRANCH0/README.md"
     git status
-    git commit -am "update dir branch-$GITHUB_BRANCH0" || true
     # git push
-    shGithubPushBackupAndSquash origin gh-pages 50
+    shGitCommitPushOrSquash "" 50
     # list files
     shGitLsTree
     # validate http-links
@@ -750,33 +749,73 @@ shDuList() {(set -e
 
 shGitCmdWithGithubToken() {(set -e
 # this function will run git $CMD with $MY_GITHUB_TOKEN
-    local CMD
-    local EXIT_CODE
-    local URL
     printf "shGitCmdWithGithubToken $*\n"
-    CMD="$1"
+    # scrub token from gitconfig
+    if [ -f .git/config ]
+    then
+        sed -i.bak "s|://.*@|://|g" .git/config
+        rm -f .git/config.bak
+    fi
+    if [ ! "$MY_GITHUB_TOKEN" ]
+    then
+        git "$@"
+        return
+    fi
+    local CMD="$1"
     shift
-    URL="$1"
+    local URL="$1"
     shift
     if (printf "$URL" | grep -qv "^https://")
     then
         URL="$(git config "remote.$URL.url")"
     fi
-    if [ ! "$MY_GITHUB_TOKEN" ]
-    then
-        git "$CMD" "$URL" "$@"
-        return
-    fi
     URL="$(
         printf "$URL" \
         | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
     )"
-    EXIT_CODE=0
+    local EXIT_CODE=0
     # hide $MY_GITHUB_TOKEN in case of err
     git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
     printf "shGitCmdWithGithubToken - EXIT_CODE=$EXIT_CODE\n" 1>&2
     return "$EXIT_CODE"
 )}
+
+shGitCommitPushOrSquash() {
+# this function will, if $COMMIT_COUNT > $COMMIT_LIMIT,
+# then backup, squash, force-push,
+#!! ff
+# else normal-push
+    GIT_BRANCH="$(git branch --show-current)"
+    COMMIT_MESSAGE="${1:-$(git diff HEAD --stat)}"
+    COMMIT_LIMIT="$2"
+    NOBACKUP="$3"
+    if (! git commit -am "$COMMIT_MESSAGE")
+    then
+        return
+    fi
+    COMMIT_COUNT="$(git rev-list --count HEAD)"
+    if (! [ "$COMMIT_COUNT" -gt "$COMMIT_LIMIT" ] &>/dev/null)
+    then
+        shGitCmdWithGithubToken push origin "$GIT_BRANCH"
+        return
+    fi
+    # backup
+    if [ "$NOBACKUP" != nobackup ]
+    then
+        shGitCmdWithGithubToken push origin \
+            "$GIT_BRANCH:$GIT_BRANCH.backup_wday$(date -u +%w)" -f
+    fi
+    # squash commits
+    COMMIT_MESSAGE="[squashed $COMMIT_COUNT commits] $COMMIT_MESSAGE"
+    git branch -D __tmp1 &>/dev/null || true
+    git checkout --orphan __tmp1
+    git commit --quiet -am "$COMMIT_MESSAGE" || true
+    # reset branch to squashed-commit
+    git push . "__tmp1:$GIT_BRANCH" -f
+    git checkout "$GIT_BRANCH"
+    # force-push squashed-commit
+    shGitCmdWithGithubToken push origin "$GIT_BRANCH" -f
+}
 
 shGitGc() {(set -e
 # this function will gc unreachable .git objects
@@ -804,7 +843,7 @@ shGitInitBase() {(set -e
         git checkout -b "$BRANCH" base/base
     done
     sed -i.bak "s|owner/repo|${1:-owner/repo}|" .gitconfig
-    rm .gitconfig.bak
+    rm -f .gitconfig.bak
     cp .gitconfig .git/config
     git commit -am "update owner/repo to $1" || true
 )}
@@ -1042,36 +1081,6 @@ import modulePath from "path";
 }());
 ' "$@" # '
 )}
-
-shGithubPushBackupAndSquash() {
-# this function will, if $GIT_BRANCH has more than $COMMITS commits,
-# then backup, squash, force-push,
-# else normal-push
-    local GIT_REPO="$1"
-    shift
-    local GIT_BRANCH="$1"
-    shift
-    local COMMITS="$1"
-    shift
-    local COMMIT_MESSAGE="squash - $(git log "$GIT_BRANCH" -1 --pretty=%B)"
-    if [ "$(git rev-list --count "$GIT_BRANCH")" -gt "$COMMITS" ]
-    then
-        # backup
-        shGitCmdWithGithubToken push "$GIT_REPO" \
-            "$GIT_BRANCH:$GIT_BRANCH.backup_wday$(date -u +%w)" -f
-        # squash commits
-        git branch -D __tmp1 &>/dev/null || true
-        git checkout --orphan __tmp1
-        git commit --quiet -am "$COMMIT_MESSAGE" || true
-        # reset branch to squashed-commit
-        git push . "__tmp1:$GIT_BRANCH" -f
-        git checkout "$GIT_BRANCH"
-        # force-push squashed-commit
-        shGitCmdWithGithubToken push "$GIT_REPO" "$GIT_BRANCH" -f
-    else
-        shGitCmdWithGithubToken push "$GIT_REPO" "$GIT_BRANCH"
-    fi
-}
 
 shGithubTokenExport() {
 # this function will export $MY_GITHUB_TOKEN from file
@@ -1567,6 +1576,21 @@ shNpmPublishV0() {(set -e
     shift
     npm publish "$@"
 )}
+
+shPidListWait() {
+# this will wait for all process-pid in $PID_LIST to exit
+    local EXIT_CODE=0
+    local PID_LIST="$2"
+    local TASK="$1"
+    for PID in $PID_LIST
+    do
+        printf "$TASK - pid=$PID ...\n"
+        wait "$PID" || EXIT_CODE="$?"
+        printf "$TASK - pid=$PID EXIT_CODE=$EXIT_CODE\n"
+    done
+    printf "$TASK - pid=done EXIT_CODE=$EXIT_CODE\n"
+    return "$EXIT_CODE"
+}
 
 shRawLibFetch() {(set -e
 # this function will fetch raw-lib from $1
