@@ -750,18 +750,26 @@ shDuList() {(set -e
 shGitCmdWithGithubToken() {(set -e
 # this function will run git $CMD with $MY_GITHUB_TOKEN
     printf "shGitCmdWithGithubToken $*\n"
-    # scrub token from gitconfig
     if [ -f .git/config ]
     then
+        # security - scrub token from url
         sed -i.bak "s|://.*@|://|g" .git/config
         rm -f .git/config.bak
     fi
-    if [ ! "$MY_GITHUB_TOKEN" ]
-    then
-        git "$@"
-        return
-    fi
     local CMD="$1"
+    case "$CMD" in
+    clone)
+        ;;
+    ls-remote)
+        ;;
+    *)
+        if [ ! "$MY_GITHUB_TOKEN" ]
+        then
+            git "$@"
+            return
+        fi
+        ;;
+    esac
     shift
     local URL="$1"
     shift
@@ -769,10 +777,13 @@ shGitCmdWithGithubToken() {(set -e
     then
         URL="$(git config "remote.$URL.url")"
     fi
-    URL="$(
-        printf "$URL" \
-        | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
-    )"
+    if [ "$MY_GITHUB_TOKEN" ]
+    then
+        URL="$(
+            printf "$URL" \
+            | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
+        )"
+    fi
     local EXIT_CODE=0
     # hide $MY_GITHUB_TOKEN in case of err
     git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
@@ -780,19 +791,15 @@ shGitCmdWithGithubToken() {(set -e
     return "$EXIT_CODE"
 )}
 
-shGitCommitPushOrSquash() {
+shGitCommitPushOrSquash() {(set -e
 # this function will, if $COMMIT_COUNT > $COMMIT_LIMIT,
 # then backup, squash, force-push,
-#!! ff
 # else normal-push
     GIT_BRANCH="$(git branch --show-current)"
     COMMIT_MESSAGE="${1:-$(git diff HEAD --stat)}"
     COMMIT_LIMIT="$2"
     NOBACKUP="$3"
-    if (! git commit -am "$COMMIT_MESSAGE")
-    then
-        return
-    fi
+    git commit -am "$COMMIT_MESSAGE" || true
     COMMIT_COUNT="$(git rev-list --count HEAD)"
     if (! [ "$COMMIT_COUNT" -gt "$COMMIT_LIMIT" ] &>/dev/null)
     then
@@ -815,7 +822,7 @@ shGitCommitPushOrSquash() {
     git checkout "$GIT_BRANCH"
     # force-push squashed-commit
     shGitCmdWithGithubToken push origin "$GIT_BRANCH" -f
-}
+)}
 
 shGitGc() {(set -e
 # this function will gc unreachable .git objects
@@ -1588,7 +1595,7 @@ shPidListWait() {
         wait "$PID" || EXIT_CODE="$?"
         printf "$TASK - pid=$PID EXIT_CODE=$EXIT_CODE\n"
     done
-    printf "$TASK - pid=done EXIT_CODE=$EXIT_CODE\n"
+    printf "$TASK - pid=done EXIT_CODE=$EXIT_CODE\n\n\n\n"
     return "$EXIT_CODE"
 }
 
@@ -3348,5 +3355,11 @@ shCiMain() {(set -e
 
 # init ubuntu .bashrc
 shBashrcDebianInit || exit "$?"
+
+# source myci2.sh
+if [ -f ~/myci2.sh ]
+then
+    . ~/myci2.sh :
+fi
 
 shCiMain "$@"
