@@ -1129,7 +1129,7 @@ shGithubTokenExport() {
 # this function will export $MY_GITHUB_TOKEN from file
     if [ ! "$MY_GITHUB_TOKEN" ]
     then
-        export MY_GITHUB_TOKEN="$(cat "$HOME/.mysecret2/.my_github_token")"
+        export MY_GITHUB_TOKEN="$(cat ~/.mysecret2/.my_github_token)"
     fi
 }
 
