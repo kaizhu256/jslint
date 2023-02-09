@@ -995,7 +995,7 @@ shGithubCheckoutRemote() {(set -e
             != "$(git rev-parse origin/alpha)" ]
         then
             git push -f origin "origin/alpha:$GITHUB_REF_NAME"
-            shGithubWorkflowDispatch "$GITHUB_REPOSITORY:$GITHUB_REF_NAME"
+            shGithubWorkflowDispatch "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME"
             return 1
         fi
     else
