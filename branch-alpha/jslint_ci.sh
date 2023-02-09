@@ -633,7 +633,7 @@ shCiPre() {(set -e
 )}
 
 shCurlExe() {(set -e
-# this function will print curl.exe if it exists or curl
+# this function will print to stdout "curl.exe", if it exists, else "curl"
     if [ -f c:/windows/system32/curl.exe ]
     then
         printf c:/windows/system32/curl.exe
@@ -1143,13 +1143,13 @@ shGithubWorkflowDispatch() {(set -e
     BRANCH="$1"
     shift
     "$(shCurlExe)" \
+"https://api.github.com/repos/$REPO/actions/workflows/ci.yml/dispatches" \
         -H "accept: application/vnd.github.v3+json" \
         -H "authorization: Bearer $MY_GITHUB_TOKEN" \
         -X POST \
         -d '{"ref":"'"$BRANCH"'"}' \
         -s \
-        "$@" \
-"https://api.github.com/repos/$REPO/actions/workflows/ci.yml/dispatches" \
+        "$@"
 )}
 
 shGrep() {(set -e
