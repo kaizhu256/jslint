@@ -801,7 +801,7 @@ shGitCmdWithGithubToken() {(set -e
         ;;
     esac
     shift
-    local URL="$1"
+    URL="$1"
     shift
     if (printf "$URL" | grep -qv "^https://")
     then
@@ -814,7 +814,7 @@ shGitCmdWithGithubToken() {(set -e
             | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
         )"
     fi
-    local EXIT_CODE=0
+    EXIT_CODE=0
     # hide $MY_GITHUB_TOKEN in case of err
     git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
     printf "shGitCmdWithGithubToken - EXIT_CODE=$EXIT_CODE\n" 1>&2
@@ -1134,9 +1134,9 @@ shGithubTokenExport() {
 }
 
 shGithubWorkflowDispatch() {(set -e
-# this function will trigger-workflow to $REPO for owner.repo.branch $BRANCH
+# this function will trigger github-workflow to given $REPO and $BRANCH
 # example use:
-# shGithubWorkflowDispatch octocat/hello-world alpha
+# shGithubWorkflowDispatch octocat/hello-world master
     shGithubTokenExport
     REPO="$1"
     shift
@@ -3375,12 +3375,12 @@ then
     . ~/myci2.sh :
 fi
 
+# run "$@"
 (set -e
     if [ ! "$1" ]
     then
         return
     fi
-    # run "$@"
     if [ -f ./myci2.sh ]
     then
         . ./myci2.sh :
