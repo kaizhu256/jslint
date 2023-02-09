@@ -1134,7 +1134,7 @@ shGithubTokenExport() {
 }
 
 shGithubWorkflowDispatch() {(set -e
-# this function will trigger github-workflow to given $REPO and $BRANCH
+# this function will trigger github-workflow on given $REPO and $BRANCH
 # example use:
 # shGithubWorkflowDispatch octocat/hello-world master
     shGithubTokenExport
