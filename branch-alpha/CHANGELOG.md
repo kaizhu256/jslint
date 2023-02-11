@@ -9,6 +9,9 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 
+# v2022.2.1-beta
+- remove little-used shell-function shCiBranchPromote
+
 # v2023.1.29
 - ci - in windows-ci-env, alias node=node.exe instead of using winpty for pipes
 - ci - bugfix - fix ci-shell-function shGithubFileUpload unable to upload new asset
