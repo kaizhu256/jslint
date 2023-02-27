@@ -10,7 +10,8 @@
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 
 # v2022.2.1-beta
-- remove little-used shell-function shCiBranchPromote
+- ci - update shell-function shGitCommitPushOrSquash() to be able to save to specified filename
+- ci - remove little-used shell-function shCiBranchPromote()
 
 # v2023.1.29
 - ci - in windows-ci-env, alias node=node.exe instead of using winpty for pipes
