@@ -10,7 +10,7 @@
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 
 # v2022.3.1-beta
-- ci - update various shell-functions in ci-file jslint_ci.sh
+- ci - housekeeping of ci-file jslint_ci.sh
 - ci - update shell-function shGitCommitPushOrSquash() to be able to save to specified filename
 - ci - remove little-used shell-function shCiBranchPromote()
 
