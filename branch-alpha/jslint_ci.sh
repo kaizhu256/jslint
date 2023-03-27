@@ -190,12 +190,12 @@ shBashrcWindowsInit() {
         ;;
     esac
     # alias curl.exe
-    # if (! alias curl &> /dev/null) && [ -f c:/windows/system32/curl.exe ]
+    # if (! alias curl &>/dev/null) && [ -f c:/windows/system32/curl.exe ]
     # then
     #     alias curl=c:/windows/system32/curl.exe
     # fi
     # alias node.exe
-    if (! alias node &> /dev/null)
+    if (! alias node &>/dev/null)
     then
         alias node=node.exe
     fi
@@ -816,7 +816,7 @@ shGitCommitPushOrSquash() {(set -e
     MODE_FORCE="$4"
     git commit -am "$COMMIT_MESSAGE" || true
     COMMIT_COUNT="$(git rev-list --count HEAD)"
-    if (! [ "$COMMIT_COUNT" -gt "$COMMIT_LIMIT" ] &> /dev/null)
+    if (! [ "$COMMIT_COUNT" -gt "$COMMIT_LIMIT" ] &>/dev/null)
     then
         if [ "$MODE_FORCE" = force ]
         then
@@ -834,7 +834,7 @@ shGitCommitPushOrSquash() {(set -e
     fi
     # squash commits
     COMMIT_MESSAGE="[squashed $COMMIT_COUNT commits] $COMMIT_MESSAGE"
-    git branch -D __tmp1 &> /dev/null || true
+    git branch -D __tmp1 &>/dev/null || true
     git checkout --orphan __tmp1
     git commit --quiet -am "$COMMIT_MESSAGE" || true
     # reset branch to squashed-commit
@@ -890,12 +890,12 @@ import moduleChildProcess from "child_process";
         moduleChildProcess.spawn(
             "git",
             ["ls-tree", "-lr", "HEAD"],
-            {encoding: "utf8", stdio: ["ignore", "overlapped", 2]}
+            {stdio: ["ignore", "overlapped", 2]}
         ).on("exit", function () {
             resolve(result);
         }).stdout.on("data", function (chunk) {
             result += chunk;
-        });
+        }).setEncoding("utf8");
     });
     result = Array.from(result.matchAll(
         /^(\S+?) +?\S+? +?\S+? +?(\S+?)\t(\S+?)$/gm
@@ -974,7 +974,7 @@ shGithubCheckoutRemote() {(set -e
         # branch - */*/*
         git fetch origin alpha
         # assert latest ci
-        if (git rev-parse "$GITHUB_REF_NAME" &> /dev/null) \
+        if (git rev-parse "$GITHUB_REF_NAME" &>/dev/null) \
             && [ "$(git rev-parse "$GITHUB_REF_NAME")" \
             != "$(git rev-parse origin/alpha)" ]
         then
@@ -998,7 +998,7 @@ shGithubCheckoutRemote() {(set -e
     rm -rf __tmp1
     git reset "origin/$GITHUB_REF_NAME" --hard
     # fetch jslint_ci.sh from trusted source
-    git branch -D __tmp1 &> /dev/null || true
+    git branch -D __tmp1 &>/dev/null || true
     shGitCmdWithGithubToken fetch origin alpha:__tmp1 --depth=1
     for FILE in .ci.sh .ci2.sh jslint_ci.sh myci2.sh
     do
