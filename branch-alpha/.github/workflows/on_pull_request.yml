@@ -3,10 +3,10 @@ name: on-pull-request
 on:
   - pull_request
   - workflow_dispatch
-# shCiBase - start
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
+
+
+  job1:
     strategy:
       matrix:
         architecture:
@@ -21,7 +21,28 @@ jobs:
           - macos-latest
           - ubuntu-latest
           - windows-latest
-    name: node . v${{ matrix.node_version }} . ${{ matrix.architecture }} . ${{ matrix.os }}
+        python_version:
+          - "3.10"
+    env:
+      CI_MATRIX_NAME: >
+        node
+        v${{ matrix.node_version }}
+        ${{ matrix.architecture }}
+        ${{ matrix.os }}
+      CI_MATRIX_NAME_MAIN: "node v18 x64 ubuntu-latest"
+      CI_MATRIX_NODE_VERSION: v${{ matrix.node_version }}
+      CI_MATRIX_NODE_VERSION_MAIN: v18
+      CI_WORKFLOW_NAME: >
+        ${{ github.workflow }}
+        - ${{ github.event_name }}
+        - ${{ github.event.inputs.workflow_dispatch_name }}
+        - ${{ github.ref_name }}
+    name: >
+      node
+      v${{ matrix.node_version }}
+      ${{ matrix.architecture }}
+      ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     steps:
       # disable autocrlf in windows
       - run: git config --global core.autocrlf false
@@ -36,4 +57,3 @@ jobs:
       - run: git fetch origin alpha && git checkout origin/alpha jslint_ci.sh
       # run nodejs coverages and tests
       - run: sh jslint_ci.sh shCiBase
-# shCiBase - end
