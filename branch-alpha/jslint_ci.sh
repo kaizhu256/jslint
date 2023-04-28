@@ -2664,9 +2664,7 @@ function v8CoverageListMerge(processCovs) {
 async function v8CoverageReportCreate({
   consoleError,
   coverageDir,
-  processArgv = [],
-  processEnv,
-  processExit
+  processArgv = []
 }) {
   let cwd;
   let excludeList = [];
@@ -3101,8 +3099,6 @@ function sentinel() {}
 
   await moduleFsInit();
   consoleError = consoleError || console.error;
-  processExit = processExit || process.exit;
-  processEnv = processEnv || process.env;
   cwd = process.cwd().replace((
     /\\/g
   ), "/") + "/";
@@ -3165,12 +3161,6 @@ function sentinel() {}
     );
   }
   consoleError("v8CoverageReportCreate - merging coverage files...");
-  if (processEnv.v8_coverage_report_create_timeout > 0) {
-    setTimeout(
-      processExit,
-      processEnv.v8_coverage_report_create_timeout
-    ).unref();
-  }
   v8CoverageObj = await moduleFs.promises.readdir(coverageDir);
   v8CoverageObj = v8CoverageObj.filter(function (file) {
     return (
