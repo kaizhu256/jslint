@@ -94,6 +94,7 @@
 
 /*jslint beta, node*/
 /*property
+    processEnv, processExit, unref, v8_coverage_report_create_timeout,
     JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
     assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
     beta, bitwise, block, body, browser, c, calls, catch, catch_list,
@@ -10702,7 +10703,9 @@ function v8CoverageListMerge(processCovs) {
 async function v8CoverageReportCreate({
     consoleError,
     coverageDir,
-    processArgv = []
+    processArgv = [],
+    processEnv,
+    processExit
 }) {
 
 // This function will create html-coverage-reports directly from
@@ -11169,6 +11172,8 @@ function sentinel() {}
 
     await moduleFsInit();
     consoleError = consoleError || console.error;
+    processExit = processExit || process.exit;
+    processEnv = processEnv || process.env;
     cwd = process.cwd().replace((
         /\\/g
     ), "/") + "/";
@@ -11231,7 +11236,7 @@ function sentinel() {}
             if ((
                 /^coverage-\d+?-\d+?-\d+?\.json$/
             ).test(file)) {
-                console.error("rm file " + coverageDir + file);
+                consoleError("rm file " + coverageDir + file);
                 await moduleFs.promises.unlink(coverageDir + file);
             }
         }));
@@ -11258,10 +11263,20 @@ function sentinel() {}
                 }
             ).on("exit", resolve);
         });
+        consoleError(
+            `v8CoverageReportCreate - program exited with exitCode=${exitCode}`
+        );
     }
 
 // 2. Merge JSON v8-coverage-files in <coverageDir>.
 
+    consoleError("v8CoverageReportCreate - merging coverage files...");
+    if (processEnv.v8_coverage_report_create_timeout > 0) {
+        setTimeout(
+            processExit,
+            processEnv.v8_coverage_report_create_timeout
+        ).unref();
+    }
     v8CoverageObj = await moduleFs.promises.readdir(coverageDir);
     v8CoverageObj = v8CoverageObj.filter(function (file) {
         return (
@@ -11333,6 +11348,7 @@ function sentinel() {}
 
 // 3. Create html-coverage-reports in <coverageDir>.
 
+    consoleError("v8CoverageReportCreate - creating html-coverage-report...");
     fileDict = Object.create(null);
     await Promise.all(v8CoverageObj.result.map(async function ({
         functions,
