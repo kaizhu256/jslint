@@ -183,6 +183,8 @@ function activate({
         });
     }
 
+// PR-429 - Add manual lint-on-save command.
+
     async function jslintLintAndSave({
         document
     }) {
