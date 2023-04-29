@@ -361,7 +361,7 @@ import moduleChildProcess from "child_process";
     });
 }());
 ' "$@" # '
-    if [ "$(command -v shCiArtifactUploadCustom)" = shCiArtifactUploadCustom ]
+    if (command -v shCiArtifactUploadCustom >/dev/null)
     then
         shCiArtifactUploadCustom
     fi
@@ -425,6 +425,9 @@ shCiBase() {(set -e
 # shCiBaseCustom() {(set -e
 # # this function will run custom-code for base-ci
 #     return
+# )}
+# shCiLintCustom2() {(set -e
+# # this function will run custom-code to lint files
 # )}
     export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
     # validate package.json.fileCount
@@ -554,9 +557,21 @@ import moduleFs from "fs";
 }());
 ' "$@" # '
     JSLINT_BETA=1 node jslint.mjs .
-    if [ "$(command -v shCiBaseCustom)" = shCiBaseCustom ]
+    if (command -v shCiLintCustom >/dev/null)
+    then
+        shCiLintCustom
+    fi
+    if (command -v shCiLintCustom2 >/dev/null)
+    then
+        shCiLintCustom2
+    fi
+    if (command -v shCiBaseCustom >/dev/null)
     then
         shCiBaseCustom
+    fi
+    if (command -v shCiBaseCustom2 >/dev/null)
+    then
+        shCiBaseCustom2
     fi
     git diff
 )}
@@ -593,7 +608,7 @@ shCiNpmPublish() {(set -e
             "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
             package.json
     fi
-    if [ "$(command -v shCiNpmPublishCustom)" = shCiNpmPublishCustom ]
+    if (command -v shCiNpmPublishCustom >/dev/null)
     then
         shCiNpmPublishCustom
     fi
@@ -610,9 +625,13 @@ shCiPre() {(set -e
         . ./myci2.sh :
         shMyciInit
     fi
-    if [ "$(command -v shCiPreCustom)" = shCiPreCustom ]
+    if (command -v shCiPreCustom >/dev/null)
     then
         shCiPreCustom
+    fi
+    if (command -v shCiPreCustom2 >/dev/null)
+    then
+        shCiPreCustom2
     fi
 )}
 
@@ -708,7 +727,7 @@ import moduleUrl from "url";
                 );
                 moduleAssert.ok(
                     res.statusCode < 400,
-                    `shDirHttplinkValidate - ${file} - unreachable link ${url}`
+                    `shDirHttplinkValidate - ${file} - unreachable url ${url}`
                 );
                 req.abort();
                 res.destroy();
@@ -744,7 +763,7 @@ import moduleUrl from "url";
                         exists,
                         (
                             `shDirHttplinkValidate - ${file}`
-                            + `- unreachable link ${url}`
+                            + `- unreachable file ${url}`
                         )
                     );
                 });
@@ -3114,7 +3133,7 @@ function sentinel() {}
       if ((
         /^coverage-\d+?-\d+?-\d+?\.json$/
       ).test(file)) {
-        console.error("rm file " + coverageDir + file);
+        consoleError("rm file " + coverageDir + file);
         await moduleFs.promises.unlink(coverageDir + file);
       }
     }));
@@ -3137,7 +3156,11 @@ function sentinel() {}
         }
       ).on("exit", resolve);
     });
+    consoleError(
+      `v8CoverageReportCreate - program exited with exitCode=${exitCode}`
+    );
   }
+  consoleError("v8CoverageReportCreate - merging coverage files...");
   v8CoverageObj = await moduleFs.promises.readdir(coverageDir);
   v8CoverageObj = v8CoverageObj.filter(function (file) {
     return (
@@ -3182,6 +3205,7 @@ function sentinel() {}
     coverageDir + "v8_coverage_merged.json",
     JSON.stringify(v8CoverageObj, undefined, 1)
   );
+  consoleError("v8CoverageReportCreate - creating html-coverage-report...");
   fileDict = Object.create(null);
   await Promise.all(v8CoverageObj.result.map(async function ({
     functions,
@@ -3412,8 +3436,16 @@ fi
 (set -e
     if [ ! "$1" ]
     then
-        return
+        exit
     fi
+    unset shCiArtifactUploadCustom
+    unset shCiBaseCustom
+    unset shCiBaseCustom2
+    unset shCiLintCustom
+    unset shCiLintCustom2
+    unset shCiNpmPublishCustom
+    unset shCiPreCustom
+    unset shCiPreCustom2
     if [ -f ./myci2.sh ]
     then
         . ./myci2.sh :
