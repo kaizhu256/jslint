@@ -901,34 +901,38 @@ eval("1"); //jslint-ignore-line
 <br><br>
 # Devops Instruction
 - branch-master commit
-    - $ `git checkout alpha`
     - $ `shGitSquashPop <commit-beta> '# v20yy.mm.dd\n<release notes from CHANGELOG.md>'`
         - verify correct-year `20yy`
     - $ `git push origin alpha:branch-v20yy.mm.dd`
     - $ `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
+        - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
     - goto https://github.com/kaizhu256/jslint/pulls
     - click `New pull request`
     - click `base repository: kaizhu256/jslint base:beta`
     - click `head repository: kaizhu256/jslint compare:branch-v20yy.mm.dd`
     - click `Create pull request`
     - verify ci-success for pull-request
+        - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
     - click `Rebase and merge`
     - verify ci-success for upstream-branch-beta
+        - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 ```shell
 git fetch upstream beta
 git diff alpha..upstream/beta
 # verify no diff between alpha..upstream/beta
-git checkout alpha
 git reset upstream/beta
-git push origin alpha :branch-v20yy.mm.dd -f
+git push origin alpha -f
 git push origin alpha:beta
+git push origin :branch-v20yy.mm.dd -f
 git push upstream alpha -f
 ```
     - verify ci-success for upstream-branch-alpha
+        - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - branch-master publish
     - $ `git push upstream beta:master`
     - verify ci-success for upstream-branch-master
+        - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
     - goto https://github.com/kaizhu256/jslint/releases/new
     - input tag `v20yy.mm.dd`
     - click `Create new tag: v20yy.mm.dd on publish`
@@ -940,6 +944,8 @@ git push upstream alpha -f
     - click `Set as the latest release`
     - click `Publish release`
     - verify ci-success for upstream-branch-publish
+        - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+    - verify email notification `Successfully published @kaizhu256/jslint@20yy.mm.dd`
 - vscode-jslint publish
     - goto https://github.com/kaizhu256/jslint/tree/gh-pages/branch-alpha/.artifact/jslint_wrapper_vscode
     - click `vscode-jslint-20yy.mm.dd.vsix`
@@ -948,6 +954,7 @@ git push upstream alpha -f
     - right-click `Update`
     - drag-and-drop downloaded `vscode-jslint-20yy.mm.dd.vsix`
     - click 'Upload'
+    - verify email notification `[Succeeded] Extension publish on Visual Studio Marketplace - vscode-jslint`
 
 
 <!--
