@@ -73,7 +73,7 @@ Douglas Crockford <douglas@crockford.com>
 
 12. [License](#license)
 
-13. [Devops Instructions](#devops-instructions)
+13. [Devops Instruction](#devops-instruction)
 
 
 <br><br>
@@ -899,25 +899,53 @@ eval("1"); //jslint-ignore-line
 
 
 <br><br>
-# Devops Instructions
-- github-ci publish
-    - `git push upstream beta:master`
-    - wait for branch-master ci to finish successfully
+# Devops Instruction
+- branch-master commit
+    - $ `git checkout alpha`
+    - $ `shGitSquashPop <commit-beta> '# v20yy.mm.dd\n<release notes from CHANGELOG.md>'`
+        - verify correct-year `20yy`
+    - $ `git push origin alpha:branch-v20yy.mm.dd`
+    - $ `git push upstream alpha -f`
+    - verify ci-success for upstream-branch-alpha
+    - goto https://github.com/kaizhu256/jslint/pulls
+    - click `New pull request`
+    - click `base repository: kaizhu256/jslint base:beta`
+    - click `head repository: kaizhu256/jslint compare:branch-v20yy.mm.dd`
+    - click `Create pull request`
+    - verify ci-success for pull-request
+    - click `Rebase and merge`
+    - verify ci-success for upstream-branch-beta
+```shell
+git fetch upstream beta
+git diff alpha..upstream/beta
+# verify no diff between alpha..upstream/beta
+git checkout alpha
+git reset upstream/beta
+git push origin alpha :branch-v20yy.mm.dd -f
+git push origin alpha:beta
+git push upstream alpha -f
+```
+    - verify ci-success for upstream-branch-alpha
+- branch-master publish
+    - $ `git push upstream beta:master`
+    - verify ci-success for upstream-branch-master
     - goto https://github.com/kaizhu256/jslint/releases/new
-    - select `Create new tag: v20yy.mm.dd on publish`
-        - verify year 20yy is correct
-    - select `Target: master`
-    - Release title: v20yy.mm.dd - \<description\>
-    - copy-paste commit-message from CHANGELOG.md
+    - input tag `v20yy.mm.dd`
+    - click `Create new tag: v20yy.mm.dd on publish`
+        - verify correct-year `20yy`
+    - click `Target: master`
+    - input `Release title: v20yy.mm.dd - <description>`
+    - copy-paste release notes from CHANGELOG.md
     - click `Generate release notes`
-    - select `Set as the latest release`
+    - click `Set as the latest release`
     - click `Publish release`
+    - verify ci-success for upstream-branch-publish
 - vscode-jslint publish
     - goto https://github.com/kaizhu256/jslint/tree/gh-pages/branch-alpha/.artifact/jslint_wrapper_vscode
     - click `vscode-jslint-20yy.mm.dd.vsix`
     - click `Download`
     - goto https://marketplace.visualstudio.com/manage/publishers/jslint
-    - right-click and select `Update`
+    - right-click `Update`
     - drag-and-drop downloaded `vscode-jslint-20yy.mm.dd.vsix`
     - click 'Upload'
 
