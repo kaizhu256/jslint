@@ -76,6 +76,7 @@ Douglas Crockford <douglas@crockford.com>
 13. [Devops Instruction](#devops-instruction)
     - [branch-master commit](#branch-master-commit)
     - [branch-master publish](#branch-master-publish)
+    - [pull-request merge](#pull-request-merge)
     - [vscode-jslint publish](#vscode-jslint-publish)
 
 
@@ -955,6 +956,16 @@ git push origin :branch-v20yy.mm.dd -f
 - verify ci-success for upstream-branch-publish
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify email-notification `Successfully published @kaizhu256/jslint@20yy.mm.dd`
+
+
+<br><br>
+### pull-request merge
+- verify `commit into jslint-org:beta`
+- verify ci-success for pull-request
+    - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
+- click `Rebase and merge`
+- verify ci-success for upstream-branch-beta
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 
 
 <br><br>
