@@ -73,6 +73,8 @@ Douglas Crockford <douglas@crockford.com>
 
 12. [License](#license)
 
+13. [Devops Instructions](#devops-instructions)
+
 
 <br><br>
 # Web Demo
@@ -894,6 +896,31 @@ eval("1"); //jslint-ignore-line
 - JSLint is under [Unlicense License](LICENSE).
 - CodeMirror editor is under [MIT License](https://github.com/codemirror/codemirror5/blob/d0e3b2e727c41aa4fd89fbad0adfb3815339174c/LICENSE).
 - Function `v8CoverageListMerge` is derived from [MIT Licensed v8-coverage](https://github.com/demurgos/v8-coverage/blob/73446087dc38f61b09832c9867122a23f8577099/ts/LICENSE.md).
+
+
+<br><br>
+# Devops Instructions
+- github-ci publish
+    - `git push upstream beta:master`
+    - wait for branch-master ci to finish successfully
+    - goto https://github.com/kaizhu256/jslint/releases/new
+    - select `Create new tag: v20yy.mm.dd on publish`
+        - verify year 20yy is correct
+    - select `Target: master`
+    - Release title: v20yy.mm.dd - \<description\>
+    - copy-paste commit-message from CHANGELOG.md
+    - click `Generate release notes`
+    - select `Set as the latest release`
+    - click `Publish release`
+- vscode-jslint publish
+    - goto https://github.com/kaizhu256/jslint/tree/gh-pages/branch-alpha/.artifact/jslint_wrapper_vscode
+    - click `vscode-jslint-20yy.mm.dd.vsix`
+    - click `Download`
+    - goto https://marketplace.visualstudio.com/manage/publishers/jslint
+    - right-click and select `Update`
+    - drag-and-drop downloaded `vscode-jslint-20yy.mm.dd.vsix`
+    - click 'Upload'
+
 
 <!--
 Coverage-hack
