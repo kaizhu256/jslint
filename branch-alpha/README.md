@@ -934,6 +934,8 @@ git push origin alpha:beta
 git push upstream alpha -f
 git push origin :branch-v20yy.mm.dd -f
 ```
+- verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify ci-success for upstream-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 
