@@ -31,5 +31,5 @@ htmlcov/
 !.github
 !.gitignore
 !.npmignore
-!__init__.py
+!_*.py
 # base - .gitignore - end
