@@ -10,6 +10,7 @@
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 
 # v2023.5.1-beta
+- ci - Rename shell-function shRawLibFetch() to shRollupFetch().
 - doc - document devop procedures to maintain jslint-repo
 
 # v2023.4.29
