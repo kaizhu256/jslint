@@ -962,6 +962,7 @@ git push origin :branch-v20yy.mm.dd -f
 
 <br><br>
 ### pull-request merge
+- try to anticipate pull-request number if possible, instead of using PR-XXX
 - verify `commit into jslint-org:beta`
 - verify ci-success for pull-request
     - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
