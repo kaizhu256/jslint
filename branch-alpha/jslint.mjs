@@ -6446,6 +6446,20 @@ function jslint_phase3_parse(state) {
 //         }
 
         state.mode_module = true;
+        if (token_nxt.id === "(string)") {
+
+// PR-436 - Add grammar for side-effect import-statement.
+
+            warn("expected_a_b", token_nxt, "{", artifact());
+            advance();
+            semicolon();
+
+// test_cause:
+// ["import \"./aa.mjs\";", "stmt_import", "import_side_effect", "", 0]
+
+            test_cause("import_side_effect");
+            return the_import;
+        }
         if (token_nxt.identifier) {
             name = token_nxt;
             advance();
