@@ -2815,20 +2815,30 @@ function jslint_phase2_lex(state) {
 // Match a group that starts with left paren.
 
                     char_after("(");
-                    if (char === "?") {
-                        char_after("?");
-                        if (char === "=" || char === "!") {
-                            char_after();
-                        } else {
-                            char_after(":");
-                        }
-                    } else if (char === ":") {
+                    switch (char) {
+                    case ":":
 
 // test_cause:
 // ["aa=/(:)/", "lex_regexp_group", "expected_a_before_b", ":", 6]
 // ["aa=/?/", "lex_regexp_group", "expected_a_before_b", "?", 5]
 
                         warn_at("expected_a_before_b", line, column, "?", ":");
+                        break;
+                    case "?":
+                        char_after("?");
+                        switch (char) {
+
+// PR-437 - Add grammar for regexp-named-capture-group.
+
+                        case "!":
+                        case "<":
+                        case "=":
+                            char_after();
+                            break;
+                        default:
+                            char_after(":");
+                        }
+                        break;
                     }
 
 // RegExp
@@ -2862,7 +2872,10 @@ function jslint_phase2_lex(state) {
 // ["aa=/\\/", "lex_regexp_group", "escape", "", 0]
 
                     test_cause("escape");
-                    char_after_escape("BbDdSsWw^${}[]():=!.|*+?");
+
+// PR-437 - Add grammar for regexp-named-backreference.
+
+                    char_after_escape("BbDdkSsWw^${}[]():=!.|*+?");
                     break;
                 case "^":
                     if (snippet !== "^") {

@@ -295,7 +295,6 @@ shCiArtifactUpload() {(set -e
 # # this function will run custom-code to upload build-artifacts
 #     return
 # )}
-    local FILE
     if ! (shCiMatrixIsmainName \
         && [ -f package.json ] \
         && grep -q '^    "shCiArtifactUpload": 1,$' package.json)
@@ -789,7 +788,7 @@ shGitCmdWithGithubToken() {(set -e
         sed -i.bak "s|://.*@|://|g" .git/config
         rm -f .git/config.bak
     fi
-    local CMD="$1"
+    CMD="$1"
     case "$CMD" in
     clone)
         ;;
@@ -877,7 +876,6 @@ shGitGc() {(set -e
 
 shGitInitBase() {(set -e
 # this function will git init && create basic git-template from jslint-org/base
-    local BRANCH
     git init
     git config core.autocrlf input
     git remote remove base 2>/dev/null || true
