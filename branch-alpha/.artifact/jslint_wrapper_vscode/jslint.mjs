@@ -2875,7 +2875,7 @@ function jslint_phase2_lex(state) {
 
 // PR-437 - Add grammar for regexp-named-backreference.
 
-                    char_after_escape("BbDdkSsWw^${}[]():=!.|*+?");
+                    char_after_escape("BbDdSsWw^${}[]():=!.|*+?k");
                     break;
                 case "^":
                     if (snippet !== "^") {
