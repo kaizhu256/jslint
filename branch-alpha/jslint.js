@@ -2827,10 +2827,10 @@ function jslint_phase2_lex(state) {
                     case "?":
                         char_after("?");
                         switch (char) {
+                        case "!":
 
 // PR-437 - Add grammar for regexp-named-capture-group.
 
-                        case "!":
                         case "<":
                         case "=":
                             char_after();
@@ -6463,14 +6463,13 @@ function jslint_phase3_parse(state) {
 
 // PR-436 - Add grammar for side-effect import-statement.
 
-            warn("expected_a_b", token_nxt, "{", artifact());
-            advance();
-            semicolon();
-
 // test_cause:
 // ["import \"./aa.mjs\";", "stmt_import", "import_side_effect", "", 0]
 
             test_cause("import_side_effect");
+            warn("expected_a_b", token_nxt, "{", artifact());
+            advance();
+            semicolon();
             return the_import;
         }
         if (token_nxt.identifier) {
