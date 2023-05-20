@@ -6317,7 +6317,7 @@ function jslint_phase3_parse(state) {
                     }
                 }
 
-// PR-439 - Check export properties are ordered.
+// PR-439 - Check exported properties are ordered.
 
 // test_cause:
 // ["export {bb, aa}", "check_ordered", "expected_a_b_before_c_d", "aa", 13]
