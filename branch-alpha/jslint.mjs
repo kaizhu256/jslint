@@ -6234,7 +6234,7 @@ function jslint_phase3_parse(state) {
             the_export.expression.push(the_thing);
         } else {
 
-// PR-439 - Add grammar for "export async function ..."
+// PR-439 - Add grammar for "export async function ...".
 
             if (token_nxt.id === "function" || token_nxt.id === "async") {
 
