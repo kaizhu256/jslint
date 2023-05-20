@@ -6288,8 +6288,8 @@ function jslint_phase3_parse(state) {
 
                         stop("expected_identifier_a");
                     }
-                    export_list.push(token_nxt);
                     the_id = token_nxt.id;
+                    export_list.push(token_nxt);
                     the_name = token_global.context[the_id];
                     if (the_name === undefined) {
 
