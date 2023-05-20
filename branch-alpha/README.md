@@ -969,6 +969,14 @@ git push origin :branch-v20yy.mm.dd -f
 - click `Rebase and merge`
 - verify ci-success for upstream-branch-beta
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+```shell
+git fetch upstream beta
+git diff upstream/beta
+git reset upstream/beta
+git push -f origin alpha alpha:beta
+shMyciUpdate
+git push -f upstream alpha
+```
 
 
 <br><br>
