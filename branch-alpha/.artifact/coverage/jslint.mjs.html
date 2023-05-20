@@ -6346,8 +6346,8 @@ body {
 <pre><span class="lineno"><a href="#line_6188" id="line_6188"> 6188.</a></span><span class="count                ">      3</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_6189" id="line_6189"> 6189.</a></span><span class="count                ">    627</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6190" id="line_6190"> 6190.</a></span><span class="count                ">     24</span><span>    function stmt_export() {</span></pre>
-<pre><span class="lineno"><a href="#line_6191" id="line_6191"> 6191.</a></span><span class="count                ">     24</span><span>        const the_export = token_now;</span></pre>
-<pre><span class="lineno"><a href="#line_6192" id="line_6192"> 6192.</a></span><span class="count                ">     24</span><span>        let export_list = [];</span></pre>
+<pre><span class="lineno"><a href="#line_6191" id="line_6191"> 6191.</a></span><span class="count                ">     24</span><span>        let export_list = [];</span></pre>
+<pre><span class="lineno"><a href="#line_6192" id="line_6192"> 6192.</a></span><span class="count                ">     24</span><span>        let the_export = token_now;</span></pre>
 <pre><span class="lineno"><a href="#line_6193" id="line_6193"> 6193.</a></span><span class="count                ">     24</span><span>        let the_id;</span></pre>
 <pre><span class="lineno"><a href="#line_6194" id="line_6194"> 6194.</a></span><span class="count                ">     24</span><span>        let the_name;</span></pre>
 <pre><span class="lineno"><a href="#line_6195" id="line_6195"> 6195.</a></span><span class="count                ">     24</span><span>        let the_thing;</span></pre>
@@ -7021,17 +7021,17 @@ body {
 <pre><span class="lineno"><a href="#line_6863" id="line_6863"> 6863.</a></span><span class="count                ">   2316</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6864" id="line_6864"> 6864.</a></span><span class="count                ">   2316</span><span>// A program may use var or let, but not both.</span></pre>
 <pre><span class="lineno"><a href="#line_6865" id="line_6865"> 6865.</a></span><span class="count                ">   2316</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6866" id="line_6866"> 6866.</a></span><span class="count                ">   2035</span><span>        if (!mode_const) {</span></pre>
-<pre><span class="lineno"><a href="#line_6867" id="line_6867"> 6867.</a></span><span class="count                ">   2035</span><span>            if (mode_var === undefined) {</span></pre>
-<pre><span class="lineno"><a href="#line_6868" id="line_6868"> 6868.</a></span><span class="count                ">   2035</span><span>                mode_var = the_variable.id;</span></pre>
-<pre><span class="lineno"><a href="#line_6869" id="line_6869"> 6869.</a></span><span class="count                ">   2035</span><span>            } else if (the_variable.id !== mode_var) {</span></pre>
-<pre><span class="lineno"><a href="#line_6870" id="line_6870"> 6870.</a></span><span class="count                ">   2035</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6871" id="line_6871"> 6871.</a></span><span class="count                ">   2035</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_6872" id="line_6872"> 6872.</a></span><span class="count                ">   2035</span><span>// ["let aa;var aa", "stmt_var", "expected_a_b", "var", 8]</span></pre>
-<pre><span class="lineno"><a href="#line_6873" id="line_6873"> 6873.</a></span><span class="count                ">   2035</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6874" id="line_6874"> 6874.</a></span><span class="count                ">   2035</span><span>                warn("expected_a_b", the_variable, mode_var, the_variable.id);</span></pre>
-<pre><span class="lineno"><a href="#line_6875" id="line_6875"> 6875.</a></span><span class="count                ">   2035</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_6876" id="line_6876"> 6876.</a></span><span class="count                ">   2035</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_6866" id="line_6866"> 6866.</a></span><span class="count                ">   2040</span><span>        if (!mode_const) {</span></pre>
+<pre><span class="lineno"><a href="#line_6867" id="line_6867"> 6867.</a></span><span class="count                ">   2040</span><span>            if (mode_var === undefined) {</span></pre>
+<pre><span class="lineno"><a href="#line_6868" id="line_6868"> 6868.</a></span><span class="count                ">   2040</span><span>                mode_var = the_variable.id;</span></pre>
+<pre><span class="lineno"><a href="#line_6869" id="line_6869"> 6869.</a></span><span class="count                ">   2040</span><span>            } else if (the_variable.id !== mode_var) {</span></pre>
+<pre><span class="lineno"><a href="#line_6870" id="line_6870"> 6870.</a></span><span class="count                ">   2040</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_6871" id="line_6871"> 6871.</a></span><span class="count                ">   2040</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_6872" id="line_6872"> 6872.</a></span><span class="count                ">   2040</span><span>// ["let aa;var aa", "stmt_var", "expected_a_b", "var", 8]</span></pre>
+<pre><span class="lineno"><a href="#line_6873" id="line_6873"> 6873.</a></span><span class="count                ">   2040</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_6874" id="line_6874"> 6874.</a></span><span class="count                ">   2040</span><span>                warn("expected_a_b", the_variable, mode_var, the_variable.id);</span></pre>
+<pre><span class="lineno"><a href="#line_6875" id="line_6875"> 6875.</a></span><span class="count                ">   2040</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_6876" id="line_6876"> 6876.</a></span><span class="count                ">   2040</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_6877" id="line_6877"> 6877.</a></span><span class="count                ">   2316</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6878" id="line_6878"> 6878.</a></span><span class="count                ">   2316</span><span>// We don't expect to see variables created in switch statements.</span></pre>
 <pre><span class="lineno"><a href="#line_6879" id="line_6879"> 6879.</a></span><span class="count                ">   2316</span><span></span></pre>
@@ -7046,7 +7046,7 @@ body {
 <pre><span class="lineno"><a href="#line_6888" id="line_6888"> 6888.</a></span><span class="count                ">   2316</span><span>            Boolean(functionage.statement_prv)</span></pre>
 <pre><span class="lineno"><a href="#line_6889" id="line_6889"> 6889.</a></span><span class="count                ">   1438</span><span>            &amp;&amp; functionage.statement_prv.id</span></pre>
 <pre><span class="lineno"><a href="#line_6890" id="line_6890"> 6890.</a></span><span class="count                ">   2316</span><span>        ) {</span></pre>
-<pre><span class="lineno"><a href="#line_6891" id="line_6891"> 6891.</a></span><span class="count                ">    112</span><span>        case "const":</span></pre>
+<pre><span class="lineno"><a href="#line_6891" id="line_6891"> 6891.</a></span><span class="count                ">    107</span><span>        case "const":</span></pre>
 <pre><span class="lineno"><a href="#line_6892" id="line_6892"> 6892.</a></span><span class="count                ">   1426</span><span>        case "let":</span></pre>
 <pre><span class="lineno"><a href="#line_6893" id="line_6893"> 6893.</a></span><span class="count                ">   1428</span><span>        case "var":</span></pre>
 <pre><span class="lineno"><a href="#line_6894" id="line_6894"> 6894.</a></span><span class="count                ">   1428</span><span></span></pre>

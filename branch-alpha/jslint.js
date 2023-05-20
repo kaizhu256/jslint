@@ -6188,8 +6188,8 @@ function jslint_phase3_parse(state) {
     }
 
     function stmt_export() {
-        const the_export = token_now;
         let export_list = [];
+        let the_export = token_now;
         let the_id;
         let the_name;
         let the_thing;
