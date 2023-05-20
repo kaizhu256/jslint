@@ -10,6 +10,7 @@
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 
 # v2023.5.1-beta
+- jslint - Check exported properties are ordered.
 - jslint - Add grammar for "export async function ...".
 - python - Add shell-function shLintPython().
 - jslint - Add grammar for regexp-named-capture-group and regexp-named-backreference.
