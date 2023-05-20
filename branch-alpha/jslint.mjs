@@ -6232,9 +6232,13 @@ function jslint_phase3_parse(state) {
             export_dict.default = the_thing;
             the_export.expression.push(the_thing);
         } else {
-            if (token_nxt.id === "function") {
+
+// PR-436 - Add grammar for "export async function ..."
+
+            if (token_nxt.id === "function" || token_nxt.id === "async") {
 
 // test_cause:
+// ["export async function aa(){}", "stmt_export", "freeze_exports", "async", 8]
 // ["export function aa(){}", "stmt_export", "freeze_exports", "function", 8]
 
                 warn("freeze_exports");
