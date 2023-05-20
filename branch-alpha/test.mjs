@@ -748,7 +748,7 @@ jstestDescribe((
             module: [
                 "export default Object.freeze();",
 
-// PR-436 - Add grammar for "export async function ..."
+// PR-439 - Add grammar for "export async function ..."
 
                 (
                     "export default Object.freeze(async function () {\n"

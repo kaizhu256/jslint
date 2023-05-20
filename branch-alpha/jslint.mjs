@@ -6189,6 +6189,7 @@ function jslint_phase3_parse(state) {
 
     function stmt_export() {
         const the_export = token_now;
+        let export_list = [];
         let the_id;
         let the_name;
         let the_thing;
@@ -6233,7 +6234,7 @@ function jslint_phase3_parse(state) {
             the_export.expression.push(the_thing);
         } else {
 
-// PR-436 - Add grammar for "export async function ..."
+// PR-439 - Add grammar for "export async function ..."
 
             if (token_nxt.id === "function" || token_nxt.id === "async") {
 
@@ -6287,6 +6288,7 @@ function jslint_phase3_parse(state) {
 
                         stop("expected_identifier_a");
                     }
+                    export_list.push(token_nxt);
                     the_id = token_nxt.id;
                     the_name = token_global.context[the_id];
                     if (the_name === undefined) {
@@ -6314,6 +6316,13 @@ function jslint_phase3_parse(state) {
                         break;
                     }
                 }
+
+// PR-439 - Check export properties are ordered.
+
+// test_cause:
+// ["export {bb, aa}", "check_ordered", "expected_a_b_before_c_d", "aa", 13]
+
+                check_ordered("export", export_list);
                 advance("}");
                 semicolon();
             } else {
