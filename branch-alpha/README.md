@@ -964,6 +964,7 @@ git push upstream beta:master
 - copy-paste release notes from CHANGELOG.md
 - click `Generate release notes`
 - click `Set as the latest release`
+- click `Preview` and review
 - click `Publish release`
 - verify ci-success for upstream-branch-publish
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
