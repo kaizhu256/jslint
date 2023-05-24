@@ -918,6 +918,7 @@ eval("1"); //jslint-ignore-line
 - click `New pull request`
 - click `base repository: kaizhu256/jslint base:beta`
 - click `head repository: kaizhu256/jslint compare:branch-v20yy.mm.dd`
+- verify `commit into jslint-org:beta`
 - click `Create pull request`
 - verify ci-success for pull-request
     - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
@@ -931,12 +932,21 @@ git diff alpha..upstream/beta
 git reset upstream/beta
 git push origin alpha -f
 git push origin alpha:beta
+shMyciUpdate
 git push upstream alpha -f
-git push origin :branch-v20yy.mm.dd -f
 ```
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify ci-success for upstream-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- click `Delete branch`
+```shell
+git push origin beta:master
+git push upstream beta:master
+```
+- verify ci-success for origin-branch-master
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- verify ci-success for upstream-branch-master
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 
 
@@ -964,6 +974,7 @@ git push origin :branch-v20yy.mm.dd -f
 ### pull-request merge
 - find highest issue-number at https://github.com/kaizhu256/jslint/issues/, and add +1 to it for PR-xxx
 - verify `commit into jslint-org:beta`
+- click `Create pull request`
 - verify ci-success for pull-request
     - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
 - click `Rebase and merge`
@@ -971,12 +982,19 @@ git push origin :branch-v20yy.mm.dd -f
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 ```shell
 git fetch upstream beta
-git diff upstream/beta
+git diff alpha..upstream/beta
+# verify no diff between alpha..upstream/beta
 git reset upstream/beta
-git push -f origin alpha alpha:beta
+git push origin alpha -f
+git push origin alpha:beta
 shMyciUpdate
-git push -f upstream alpha
+git push upstream alpha -f
 ```
+- verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- verify ci-success for upstream-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- click `Delete branch`
 
 
 <br><br>
