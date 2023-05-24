@@ -2095,13 +2095,13 @@ body {
 <pre><span class="lineno"><a href="#line_1937" id="line_1937"> 1937.</a></span><span class="count                ">     27</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1938" id="line_1938"> 1938.</a></span><span class="count                ">     27</span><span>        count = 0;</span></pre>
 <pre><span class="lineno"><a href="#line_1939" id="line_1939"> 1939.</a></span><span class="count                ">     27</span><span>        ii = 0;</span></pre>
-<pre><span class="lineno"><a href="#line_1940" id="line_1940"> 1940.</a></span><span class="count                ">  21097</span><span>        while (true) {</span></pre>
-<pre><span class="lineno"><a href="#line_1941" id="line_1941"> 1941.</a></span><span class="count                ">  21097</span><span>            ii = code.indexOf("\n", ii) + 1;</span></pre>
-<pre><span class="lineno"><a href="#line_1942" id="line_1942"> 1942.</a></span><span class="count                ">  21097</span><span>            if (ii === 0) {</span></pre>
-<pre><span class="lineno"><a href="#line_1943" id="line_1943"> 1943.</a></span><span class="count                ">  21097</span><span>                break;</span></pre>
-<pre><span class="lineno"><a href="#line_1944" id="line_1944"> 1944.</a></span><span class="count                ">  21097</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_1945" id="line_1945"> 1945.</a></span><span class="count                ">  21097</span><span>            count += 1;</span></pre>
-<pre><span class="lineno"><a href="#line_1946" id="line_1946"> 1946.</a></span><span class="count                ">  21097</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_1940" id="line_1940"> 1940.</a></span><span class="count                ">  21102</span><span>        while (true) {</span></pre>
+<pre><span class="lineno"><a href="#line_1941" id="line_1941"> 1941.</a></span><span class="count                ">  21102</span><span>            ii = code.indexOf("\n", ii) + 1;</span></pre>
+<pre><span class="lineno"><a href="#line_1942" id="line_1942"> 1942.</a></span><span class="count                ">  21102</span><span>            if (ii === 0) {</span></pre>
+<pre><span class="lineno"><a href="#line_1943" id="line_1943"> 1943.</a></span><span class="count                ">  21102</span><span>                break;</span></pre>
+<pre><span class="lineno"><a href="#line_1944" id="line_1944"> 1944.</a></span><span class="count                ">  21102</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_1945" id="line_1945"> 1945.</a></span><span class="count                ">  21102</span><span>            count += 1;</span></pre>
+<pre><span class="lineno"><a href="#line_1946" id="line_1946"> 1946.</a></span><span class="count                ">  21102</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_1947" id="line_1947"> 1947.</a></span><span class="count                ">     27</span><span>        return count;</span></pre>
 <pre><span class="lineno"><a href="#line_1948" id="line_1948"> 1948.</a></span><span class="count                ">     27</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_1949" id="line_1949"> 1949.</a></span><span class="count                ">     38</span><span></span></pre>
@@ -2231,13 +2231,13 @@ body {
 <pre><span class="lineno"><a href="#line_2073" id="line_2073"> 2073.</a></span><span class="count                ">      4</span><span>            data = await moduleFs.promises.readdir(file, "utf8");</span></pre>
 <pre><span class="lineno"><a href="#line_2074" id="line_2074"> 2074.</a></span><span class="count                ">      4</span><span>        } catch (ignore) {}</span></pre>
 <pre><span class="lineno"><a href="#line_2075" id="line_2075"> 2075.</a></span><span class="count                ">      4</span><span>        if (data) {</span></pre>
-<pre><span class="lineno"><a href="#line_2076" id="line_2076"> 2076.</a></span><span class="count                ">     33</span><span>            await Promise.all(data.map(async function (file2) {</span></pre>
-<pre><span class="lineno"><a href="#line_2077" id="line_2077"> 2077.</a></span><span class="count                ">     33</span><span>                let code;</span></pre>
-<pre><span class="lineno"><a href="#line_2078" id="line_2078"> 2078.</a></span><span class="count                ">     33</span><span>                let time_start = Date.now();</span></pre>
-<pre><span class="lineno"><a href="#line_2079" id="line_2079"> 2079.</a></span><span class="count                ">     33</span><span>                file2 = file + "/" + file2;</span></pre>
-<pre><span class="lineno"><a href="#line_2080" id="line_2080"> 2080.</a></span><span class="count                ">     33</span><span>                switch ((</span></pre>
-<pre><span class="lineno"><a href="#line_2081" id="line_2081"> 2081.</a></span><span class="count                ">     33</span><span>                    /\.\w+?$|$/m</span></pre>
-<pre><span class="lineno"><a href="#line_2082" id="line_2082"> 2082.</a></span><span class="count                ">     33</span><span>                ).exec(file2)[0]) {</span></pre>
+<pre><span class="lineno"><a href="#line_2076" id="line_2076"> 2076.</a></span><span class="count                ">     34</span><span>            await Promise.all(data.map(async function (file2) {</span></pre>
+<pre><span class="lineno"><a href="#line_2077" id="line_2077"> 2077.</a></span><span class="count                ">     34</span><span>                let code;</span></pre>
+<pre><span class="lineno"><a href="#line_2078" id="line_2078"> 2078.</a></span><span class="count                ">     34</span><span>                let time_start = Date.now();</span></pre>
+<pre><span class="lineno"><a href="#line_2079" id="line_2079"> 2079.</a></span><span class="count                ">     34</span><span>                file2 = file + "/" + file2;</span></pre>
+<pre><span class="lineno"><a href="#line_2080" id="line_2080"> 2080.</a></span><span class="count                ">     34</span><span>                switch ((</span></pre>
+<pre><span class="lineno"><a href="#line_2081" id="line_2081"> 2081.</a></span><span class="count                ">     34</span><span>                    /\.\w+?$|$/m</span></pre>
+<pre><span class="lineno"><a href="#line_2082" id="line_2082"> 2082.</a></span><span class="count                ">     34</span><span>                ).exec(file2)[0]) {</span></pre>
 <pre><span class="lineno"><a href="#line_2083" id="line_2083"> 2083.</a></span><span class="count                ">      4</span><span>                case ".cjs":</span></pre>
 <pre><span class="lineno"><a href="#line_2084" id="line_2084"> 2084.</a></span><span class="count                ">      5</span><span>                case ".html":</span></pre>
 <pre><span class="lineno"><a href="#line_2085" id="line_2085"> 2085.</a></span><span class="count                ">      8</span><span>                case ".js":</span></pre>
@@ -2246,8 +2246,8 @@ body {
 <pre><span class="lineno"><a href="#line_2088" id="line_2088"> 2088.</a></span><span class="count                ">     14</span><span>                case ".mjs":</span></pre>
 <pre><span class="lineno"><a href="#line_2089" id="line_2089"> 2089.</a></span><span class="count                ">     16</span><span>                case ".sh":</span></pre>
 <pre><span class="lineno"><a href="#line_2090" id="line_2090"> 2090.</a></span><span class="count                ">     16</span><span>                    break;</span></pre>
-<pre><span class="lineno"><a href="#line_2091" id="line_2091"> 2091.</a></span><span class="count                ">     17</span><span>                default:</span></pre>
-<pre><span class="lineno"><a href="#line_2092" id="line_2092"> 2092.</a></span><span class="count                ">     17</span><span>                    return;</span></pre>
+<pre><span class="lineno"><a href="#line_2091" id="line_2091"> 2091.</a></span><span class="count                ">     18</span><span>                default:</span></pre>
+<pre><span class="lineno"><a href="#line_2092" id="line_2092"> 2092.</a></span><span class="count                ">     18</span><span>                    return;</span></pre>
 <pre><span class="lineno"><a href="#line_2093" id="line_2093"> 2093.</a></span><span class="count                ">     16</span><span>                }</span></pre>
 <pre><span class="lineno"><a href="#line_2094" id="line_2094"> 2094.</a></span><span class="count                ">     16</span><span>                try {</span></pre>
 <pre><span class="lineno"><a href="#line_2095" id="line_2095"> 2095.</a></span><span class="count                ">     16</span><span>                    code = await moduleFs.promises.readFile(file2, "utf8");</span></pre>
@@ -3485,7 +3485,7 @@ body {
 <pre><span class="lineno"><a href="#line_3327" id="line_3327"> 3327.</a></span><span class="count                ">   2591</span><span>        case "this":            // Allow 'this'.</span></pre>
 <pre><span class="lineno"><a href="#line_3328" id="line_3328"> 3328.</a></span><span class="count                ">   2594</span><span>        case "trace":           // Include jslint stack-trace in warnings.</span></pre>
 <pre><span class="lineno"><a href="#line_3329" id="line_3329"> 3329.</a></span><span class="count                ">   2598</span><span>        case "unordered":       // Allow unordered cases, params, properties,</span></pre>
-<pre><span class="lineno"><a href="#line_3330" id="line_3330"> 3330.</a></span><span class="count                ">   2651</span><span>                                // ... and variables.</span></pre>
+<pre><span class="lineno"><a href="#line_3330" id="line_3330"> 3330.</a></span><span class="count                ">   2651</span><span>                                // ... variables, and exports.</span></pre>
 <pre><span class="lineno"><a href="#line_3331" id="line_3331"> 3331.</a></span><span class="count                ">   2602</span><span>        case "variable":        // Allow unordered const and let declarations</span></pre>
 <pre><span class="lineno"><a href="#line_3332" id="line_3332"> 3332.</a></span><span class="count                ">   2651</span><span>                                // ... that are not at top of function-scope.</span></pre>
 <pre><span class="lineno"><a href="#line_3333" id="line_3333"> 3333.</a></span><span class="count                ">   2604</span><span>        case "white":           // Allow messy whitespace.</span></pre>

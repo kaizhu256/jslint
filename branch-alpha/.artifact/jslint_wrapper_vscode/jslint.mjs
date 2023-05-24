@@ -3327,7 +3327,7 @@ function jslint_phase2_lex(state) {
         case "this":            // Allow 'this'.
         case "trace":           // Include jslint stack-trace in warnings.
         case "unordered":       // Allow unordered cases, params, properties,
-                                // ... and variables.
+                                // ... variables, and exports.
         case "variable":        // Allow unordered const and let declarations
                                 // ... that are not at top of function-scope.
         case "white":           // Allow messy whitespace.

@@ -813,7 +813,7 @@ Error
 
 ```js
 /*jslint unordered*/
-// Allow unordered cases, params, properties, and variables.
+// Allow unordered cases, params, properties, variables, and exports.
 
 let foo = {bb: 1, aa: 0};
 
@@ -823,6 +823,11 @@ function bar({
 }) {
     return aa + bb;
 }
+
+export {
+    foo,
+    bar
+};
 ```
 
 <br>
