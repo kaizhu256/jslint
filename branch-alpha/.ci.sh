@@ -321,7 +321,7 @@ import moduleFs from "fs";
                         "type": "extensionHost"
                     }
                 ],
-                "version": "0.2.0"
+                "version": "0.0.1"
             }, undefined, 4)
         }, {
             file: "README.md",
