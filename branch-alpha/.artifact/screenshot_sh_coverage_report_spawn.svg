@@ -275,7 +275,7 @@
     textLength="768"
     x="10"
     y="1000"
->node-pre-gyp info using node-pre-gyp@1.0.10                                                      </tspan>
+>node-pre-gyp info using node-pre-gyp@1.0.11                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -347,7 +347,7 @@
     textLength="768"
     x="10"
     y="1264"
->added 357 packages, and audited 358 packages in 10s                                              </tspan>
+>added 361 packages, and audited 362 packages in 13s                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -359,7 +359,7 @@
     textLength="768"
     x="10"
     y="1308"
->66 packages are looking for funding                                                              </tspan>
+>69 packages are looking for funding                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -377,7 +377,7 @@
     textLength="768"
     x="10"
     y="1374"
->12 vulnerabilities (8 moderate, 1 high, 3 critical)                                              </tspan>
+>4 vulnerabilities (1 high, 3 critical)                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -389,13 +389,13 @@
     textLength="768"
     x="10"
     y="1418"
->To address issues that do not require attention, run:                                            </tspan>
+>To address all issues (including breaking changes), run:                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1440"
->  npm audit fix                                                                                  </tspan>
+>  npm audit fix --force                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -407,13 +407,13 @@
     textLength="768"
     x="10"
     y="1484"
->To address all issues (including breaking changes), run:                                         </tspan>
+>Run `npm audit` for details.                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1506"
->  npm audit fix --force                                                                          </tspan>
+>wrote file /home/runner/work/jslint/jslint/.artifact/coverage_sqlite3_sh//touch.txt              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
