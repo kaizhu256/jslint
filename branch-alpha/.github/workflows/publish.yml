@@ -18,8 +18,8 @@ jobs:
           # - x86
         node_version:
           # - 16
-          # - 18
-          - 20
+          - 18
+          # - 20
         os:
           # - macos-latest
           - ubuntu-latest
