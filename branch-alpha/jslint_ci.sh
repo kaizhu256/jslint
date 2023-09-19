@@ -829,6 +829,8 @@ shGitCommitPushOrSquash() {(set -e
     MODE_FORCE="$4"
     git commit -am "$COMMIT_MESSAGE" || true
     COMMIT_COUNT="$(git rev-list --count HEAD)"
+    printf \
+"shGitCommitPushOrSquash COMMIT_LIMIT=$COMMIT_LIMIT COMMIT_COUNT=$COMMIT_COUNT"
     if (! [ "$COMMIT_COUNT" -gt "$COMMIT_LIMIT" ] &>/dev/null)
     then
         if [ "$MODE_FORCE" = force ]
