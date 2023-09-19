@@ -826,19 +826,18 @@ shGitCommitPushOrSquash() {(set -e
     COMMIT_MESSAGE="${1:-$(git diff HEAD --stat)}"
     COMMIT_LIMIT="$2"
     MODE_NOBACKUP="$3"
-    MODE_FORCE="$4"
+    MODE_SQUASH="$4"
     git commit -am "$COMMIT_MESSAGE" || true
     COMMIT_COUNT="$(git rev-list --count HEAD)"
-    printf \
-"shGitCommitPushOrSquash COMMIT_LIMIT=$COMMIT_LIMIT COMMIT_COUNT=$COMMIT_COUNT"
-    if (! [ "$COMMIT_COUNT" -gt "$COMMIT_LIMIT" ] &>/dev/null)
+    if [ "$MODE_SQUASH" != squash ] && [ "$COMMIT_COUNT" -gt "$COMMIT_LIMIT" ]
     then
-        if [ "$MODE_FORCE" = force ]
-        then
-            shGitCmdWithGithubToken push origin "$BRANCH" -f
-        else
-            shGitCmdWithGithubToken push origin "$BRANCH"
-        fi
+        MODE_SQUASH=squash
+    fi
+    printf "shGitCommitPushOrSquash COMMIT_COUNT=$COMMIT_COUNT \
+COMMIT_LIMIT=$COMMIT_LIMIT MODE_SQUASH=$MODE_SQUASH\n"
+    if [ "$MODE_SQUASH" != squash ]
+    then
+        shGitCmdWithGithubToken push origin "$BRANCH"
         return
     fi
     # backup
