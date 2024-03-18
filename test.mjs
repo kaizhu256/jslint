@@ -880,6 +880,17 @@ jstestDescribe((
                 return [
                     "let [\n    aa, bb = 0\n] = 0;\naa();\nbb();",
                     "let [...aa] = [...aa];\naa();",
+
+// PR-xxx - Allow destructuring-assignment after function-definition.
+
+                    (
+                        "let aa;\n"
+                        + "let bb;\n"
+                        + "function cc() {\n"
+                        + "    return;\n"
+                        + "}\n"
+                        + "[aa, bb] = cc();\n"
+                    ),
                     "let constructor = 0;\nconstructor();",
                     "let {\n    aa: bb\n} = 0;\nbb();",
                     "let {\n    aa: bb,\n    bb: cc\n} = 0;\nbb();\ncc();",
