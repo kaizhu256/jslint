@@ -5147,6 +5147,7 @@ function jslint_phase3_parse(state) {
                 the_label.dead = false;
                 the_label.init = true;
                 the_statement = parse_statement();
+                the_label.dead = true;
                 functionage.statement_prv = the_statement;
                 the_statement.label = the_label;
                 the_statement.statement = true;
@@ -5192,9 +5193,6 @@ function jslint_phase3_parse(state) {
                 warn("unexpected_a", first);
             }
             semicolon();
-        }
-        if (the_label !== undefined) {
-            the_label.dead = true;
         }
         return the_statement;
     }
@@ -6976,7 +6974,6 @@ function jslint_phase3_parse(state) {
                         the_variable.names.push(name);
                         enroll(name, "variable", mode_const);
                     }
-                    name.dead = false;
                     name.init = true;
                     if (token_nxt.id === "=") {
 
@@ -7028,7 +7025,6 @@ function jslint_phase3_parse(state) {
                     advance();
                     the_variable.names.push(name);
                     enroll(name, "variable", mode_const);
-                    name.dead = false;
                     name.init = true;
                     if (ellipsis) {
                         name.ellipsis = true;
@@ -7062,7 +7058,6 @@ function jslint_phase3_parse(state) {
                 enroll(name, "variable", mode_const);
                 if (token_nxt.id === "=" || mode_const) {
                     advance("=");
-                    name.dead = false;
                     name.init = true;
                     name.expression = parse_expression(0);
                 }
