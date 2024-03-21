@@ -287,7 +287,6 @@ git clone https://github.com/tryghost/node-sqlite3 node-sqlite3-sh \
 
 cd node-sqlite3-sh
 npm install
-npm audit fix
 
 # Create V8 coverage report from program `npm run test` in shell.
 

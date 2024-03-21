@@ -996,10 +996,12 @@ shGitPullrequestCleanup() {(set -e
     git fetch upstream beta
     # verify no diff between alpha..upstream/beta
     git diff alpha..upstream/beta
+    git push . HEAD:__pr_upstream_pre -f
     git reset upstream/beta
     git push origin alpha -f
     git push origin alpha:beta
     sh jslint_ci.sh shMyciUpdate
+    git push . HEAD:__pr_upstream -f
 )}
 
 shGitPullrequest() {(set -e
@@ -1083,12 +1085,13 @@ import moduleFs from "fs";
 (set -e
     . ./jslint_ci.sh
     npm run test2
-    git push . HEAD:__alpha_pullrequest_${branchMerge}_pre -f
+    git push . HEAD:__pr_${branchMerge}_pre -f
     shGitSquashPop ${branchCheckpoint} \u0027${commitMessage}\u0027
     git diff origin/${branchPull} || true
     git push origin alpha:${branchPull} -f
     git push origin alpha -f
     shDirHttplinkValidate
+    git push . HEAD:__pr_${branchMerge} -f
 )
             `)
         ],
