@@ -1021,6 +1021,19 @@ shGitPullrequest() {(set -e
 import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
+// init debugInline
+(function () {
+    let consoleError = console.error;
+    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+
+// This function will print <argv> to stderr and then return <argv>[0].
+
+        consoleError("\n\ndebugInline");
+        consoleError(...argList);
+        consoleError("\n");
+        return argList[0];
+    };
+}());
 (async function () {
     let branchCheckpoint = process.argv[2] || "HEAD";
     let branchMerge = process.argv[1] || "beta";
@@ -1061,7 +1074,7 @@ import moduleFs from "fs";
     // update README.md
     data = await moduleFs.promises.readFile("README.md", "utf8");
     data = data.replace(
-        new RegExp(
+        debugInline(new RegExp( //jslint-ignore-line
             (
                 "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
                 + "\\/compare"
@@ -1069,7 +1082,7 @@ import moduleFs from "fs";
                 + `:branch-${version[0]}\\d\\d\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
             ),
             "g"
-        ),
+        )),
         `$1:${version}`
     );
     await moduleFs.promises.writeFile("README.md", data);
