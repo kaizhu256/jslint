@@ -472,7 +472,7 @@ import moduleFs from "fs";
         }
     }));
     Array.from(fileDict["CHANGELOG.md"].matchAll(
-        /\n\n# v(\d\d\d\d\.\d\d?\.\d\d?(-.*?)?)\n/g
+        /\n\n# v(20\d\d\.\d\d?\.\d\d?(-.*?)?)\n/g
     )).slice(0, 2).forEach(function ([
         ignore, version, isBeta
     ]) {
@@ -482,13 +482,22 @@ import moduleFs from "fs";
     await Promise.all([
         {
             file: "README.md",
-            src: fileDict["README.md"].replace((
-                /\bv\d\d\d\d\.\d\d?\.\d\d?\b/m
-            ), `v${versionMaster}`)
+            src: (function () {
+                let data = fileDict["README.md"];
+                data = data.replace(
+                    (/(\[(?:main|master)<br>\()v20\d\d\.\d\d?\.\d\d?\b/g),
+                    `$1v${versionMaster}`
+                );
+                data = data.replace(
+                    (/(\bhttps:\/\/github\.com\/[\w.\-\/]+?\/compare\/[\w.\-\/]+?\.\.\.[\w.:\-\/]+?)-v20\d\d\.\d\d?\.\d\d?\b/g),
+                    `$1-v${versionMaster}`
+                );
+                return data;
+            }())
         }, {
             file: "package.json",
             src: fileDict["package.json"].replace((
-                /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
+                /    "version": "20\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
             ), `    "version": "${versionBeta}"`)
         }, {
             file: fileMain,
@@ -707,33 +716,40 @@ import moduleHttps from "https";
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
         let data;
-        if (file === "CHANGELOG.md" || !(
-            /.\.html$|.\.md$/m
-        ).test(file)) {
+        if (file === "CHANGELOG.md" || !(/.\.html$|.\.md$/m).test(file)) {
             return;
         }
         data = await moduleFs.promises.readFile(file, "utf8");
         // ignore link-rel-preconnect
         data = data.replace((
-            /<link\b.*?\brel="preconnect".*?>/g
+            /<link\b.+?\brel="preconnect".+?>/g
         ), "");
         data.replace((
-            /\bhttps?:\/\/.*?(?:[\s")\]]|\W?$)/gm
-        ), function (url) {
+            /\bhttps?:\/\/.+?([\s")\]]|\W?$)/gm
+        ), function (url, removeLast) {
             let req;
-            url = url.slice(0, -1).replace((
-                /[\u0022\u0027]/g
-            ), "").replace((
-                /\/branch-[a-z]*?\//g
-            ), `/branch-${GITHUB_BRANCH0}/`).replace(new RegExp(
-                `\\b${UPSTREAM_REPOSITORY}\\b`,
-                "g"
-            ), GITHUB_REPOSITORY).replace(new RegExp(
-                `\\b${UPSTREAM_GITHUB_IO}\\b`,
-                "g"
-            ), GITHUB_GITHUB_IO);
+            if (removeLast && removeLast !== "/") {
+                url = url.slice(0, -1);
+            }
+            url = url.replace((/["\u0027]/g), "");
+            url = url.replace(
+                (/\/branch-[a-z]+?\//g),
+                `/branch-${GITHUB_BRANCH0}/`
+            );
+            url = url.replace(
+                (/_2fbranch-[a-z]+?_2f/g),
+                `_2fbranch-${GITHUB_BRANCH0}_2f`
+            );
+            url = url.replace(
+                new RegExp(`\\b${UPSTREAM_REPOSITORY}\\b`, "g"),
+                GITHUB_REPOSITORY
+            );
+            url = url.replace(
+                new RegExp(`\\b${UPSTREAM_GITHUB_IO}\\b`, "g"),
+                GITHUB_GITHUB_IO
+            );
             if ((
-                /^http:\/\/(?:127\.0\.0\.1|localhost|www\.w3\.org\/2000\/svg)(?:[\/:]|$)/m
+                /^http:\/\/(?:127\.0\.0\.1|localhost|www\.w3\.org\/2000\/svg)(?:[\/:]|$)|^https:\/\/github\.com\/[\w.\-\/]+?\/compare\/[\w.\-\/]+?\.\.\.\w/m
             ).test(url)) {
                 return "";
             }
@@ -762,7 +778,7 @@ import moduleHttps from "https";
             return "";
         });
         data.replace((
-            /(\bhref=|\bsrc=|\burl\(|\[[^]*?\]\()("?.*?)(?:[")\]]|$)/gm
+            /(\bhref=|\bsrc=|\burl\(|\[[^]+?\]\()("?.+?)(?:[")\]]|$)/gm
         ), function (ignore, linkType, url) {
             if (!linkType.startsWith("[")) {
                 url = url.slice(1);
@@ -1162,11 +1178,110 @@ shGithubFileUpload() {(set -e
     shGithubFileDownloadUpload upload "$1" "$2"
 )}
 
+shGithubPullAlpha() {(set -e
+# this function will create-and-push a github-pull-commit to origin/alpha
+    node --input-type=module --eval '
+import moduleAssert from "assert";
+import moduleChildProcess from "child_process";
+import moduleFs from "fs";
+(async function () {
+    let branchBeta = process.argv[2] || "beta";
+    let branchPull = process.argv[1] || `branch-${Date.now()}`;
+    let commitMessage;
+    let data;
+    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
+    commitMessage = (
+        /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
+    ).exec(data)[1];
+    branchBeta = branchBeta.trim().replace((/[$\u0027`]/g), "?");
+    branchPull = branchPull.trim().replace((/[$\u0027`]/g), "?");
+    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
+    moduleChildProcess.spawn(
+        "sh",
+        [
+            "-c",
+            (`
+(set -e
+    . ./jslint_ci.sh
+    npm run test2
+    git push . HEAD:__alpha_pull_pre -f
+    shGitSquashPop ${branchBeta} \u0027${commitMessage}\u0027
+    git diff \u0027origin/${branchPull}\u0027 || true
+    git push origin \u0027alpha:${branchPull}\u0027 -f
+    git push origin alpha -f
+    shDirHttplinkValidate
+)
+            `)
+        ],
+        {stdio: ["ignore", 1, 2]}
+    ).on("exit", function (exitCode) {
+        moduleAssert.ok(
+            exitCode === 0,
+            `shGithubPullAlpha - exitCode=${exitCode}`
+        );
+    });
+}());
+' "$@" # '
+)}
+
+shGithubReleaseAlpha() {(set -e
+# this function will create-and-push a github-release-commit to origin/alpha
+    node --input-type=module --eval '
+import moduleAssert from "assert";
+import moduleChildProcess from "child_process";
+import moduleFs from "fs";
+(async function () {
+    let branchBeta = process.argv[2] || "beta";
+    let commitMessage;
+    let data;
+    let versionMaster;
+    versionMaster = process.argv[1] || new Date().toISOString().slice(0, 10);
+    versionMaster = versionMaster.replace((/-0?/g), ".");
+    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
+    data = data.replace(
+        /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
+        `\n\n# v${versionMaster}\n`
+    );
+    await moduleFs.promises.writeFile("CHANGELOG.md", data);
+    commitMessage = new RegExp(
+        `\n\n# v${versionMaster}\n[\\S\\s]+?\n\n`
+    ).exec(data)[0];
+    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
+    versionMaster = versionMaster.trim().replace((/[$\u0027`]/g), "?");
+    moduleChildProcess.spawn(
+        "sh",
+        [
+            "-c",
+            (`
+(set -e
+    . ./jslint_ci.sh
+    npm run test2
+    git push . HEAD:__alpha_release_pre -f
+    shGitSquashPop ${branchBeta} \u0027${commitMessage}\u0027
+    git diff \u0027origin/branch-v${versionMaster}\u0027 || true
+    git push origin \u0027alpha:branch-v${versionMaster}\u0027 -f
+    git push origin alpha -f
+    shDirHttplinkValidate
+)
+            `)
+        ],
+        {stdio: ["ignore", 1, 2]}
+    ).on("exit", function (exitCode) {
+        moduleAssert.ok(
+            exitCode === 0,
+            `shGithubReleaseAlpha - exitCode=${exitCode}`
+        );
+    });
+}());
+' "$@" # '
+)}
+
 shGithubTokenExport() {
 # this function will export $MY_GITHUB_TOKEN from file
     if [ ! "$MY_GITHUB_TOKEN" ]
     then
-        export MY_GITHUB_TOKEN="$(cat ~/.mysecret2/.my_github_token)"
+        export MY_GITHUB_TOKEN="$(cat ~/.mysecret2/.my_github_token)" \
+            || export MY_GTIHUB_TOKEN="$GITHUB_TOKEN"
     fi
 }
 
@@ -1985,7 +2100,7 @@ function replaceListReplace(replaceList, data) {
                     + "repo " + prefix.replace("/blob/", "/tree/") + "\n"
                     + "committed " + new Date(
                         (
-                            /"(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[^"]*?)"/
+                            /"(20\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[^"]*?)"/
                         ).exec(dateCommitted.toString())[1]
                     ).toISOString().replace((/\.\d*?Z/), "Z") + "\n"
                     + "*/"
