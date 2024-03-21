@@ -482,9 +482,18 @@ import moduleFs from "fs";
     await Promise.all([
         {
             file: "README.md",
-            src: fileDict["README.md"].replace((
-                /(\[(?:main|master)<br>|\bhttps:\/\/github\.com\/\S+?\.\.\.\S+?|` template: `(?:# )?)v20\d\d\.\d\d?\.\d\d?\b/g
-            ), `$1v${versionMaster}`)
+            src: (function () {
+                let data = fileDict["README.md"];
+                data = data.replace(
+                    (/(\[(?:main|master)<br>)v20\d\d\.\d\d?\.\d\d?\b/g),
+                    `$1v${versionMaster}`
+                );
+                data = data.replace(
+                    (/(\bhttps:\/\/github\.com\/[\w.\-\/]+?\/compare\/[\w.\-\/]+?\.\.\.[\w.:\-\/]+?)-v20\d\d\.\d\d?\.\d\d?\b/g),
+                    `$1-v${versionMaster}`
+                );
+                return data;
+            }())
         }, {
             file: "package.json",
             src: fileDict["package.json"].replace((
@@ -721,19 +730,22 @@ import moduleHttps from "https";
             /\bhttps?:\/\/.*?(?:[\s")\]]|\W?$)/gm
         ), function (url) {
             let req;
-            url = url.slice(0, -1).replace((
-                /[\u0022\u0027]/g
-            ), "").replace((
-                /\/branch-[a-z]*?\//g
-            ), `/branch-${GITHUB_BRANCH0}/`).replace(new RegExp(
-                `\\b${UPSTREAM_REPOSITORY}\\b`,
-                "g"
-            ), GITHUB_REPOSITORY).replace(new RegExp(
-                `\\b${UPSTREAM_GITHUB_IO}\\b`,
-                "g"
-            ), GITHUB_GITHUB_IO);
+            url = url.slice(0, -1);
+            url = url.replace((/[\u0022\u0027]/g), "");
+            url = url.replace(
+                (/\/branch-[a-z]*?\//g),
+                `/branch-${GITHUB_BRANCH0}/`
+            );
+            url = url.replace(
+                new RegExp(`\\b${UPSTREAM_REPOSITORY}\\b`, "g"),
+                GITHUB_REPOSITORY
+            );
+            url = url.replace(
+                new RegExp(`\\b${UPSTREAM_GITHUB_IO}\\b`, "g"),
+                GITHUB_GITHUB_IO
+            );
             if ((
-                /^http:\/\/(?:127\.0\.0\.1|localhost|www\.w3\.org\/2000\/svg)(?:[\/:]|$)/m
+                /^http:\/\/(?:127\.0\.0\.1|localhost|www\.w3\.org\/2000\/svg)(?:[\/:]|$)|^https:\/\/github\.com\/[\w.\-\/]+?\/compare\/[\w.\-\/]+?\.\.\.\w/m
             ).test(url)) {
                 return "";
             }

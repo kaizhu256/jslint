@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2024.3.21)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
+| Branch | [master<br>(v2011.11.11)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/kaizhu256/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/kaizhu256/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/kaizhu256/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/index.html) | [![coverage](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/index.html) | [![coverage](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/index.html) |
@@ -986,7 +986,7 @@ git push upstream alpha -f
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2024.3.21
 - click `Create pull request`
-- `Add a title` template: `# v2024.3.21`
+- `Add a title` template: `# v2011.11.11`
 - `Add a description` template:
 ```
 <release notes from CHANGELOG.md>
@@ -1032,12 +1032,12 @@ git push upstream beta:master
 - verify ci-success for upstream-branch-master
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/releases/new
-- `Choose a tag` template: `v2024.3.21`
+- `Choose a tag` template: `v2011.11.11`
 - click `Create new tag: v20yy.mm.dd on publish`
     - verify correct-year `20yy`
 - select `Target: master`
 - select `Previous tag:auto`
-- `Release title` template: `v2024.3.21 - <primary-commit-message>`
+- `Release title` template: `v2011.11.11 - <primary-commit-message>`
 - `Describe this release` template:
 ```
 - <primary-commit-message>
