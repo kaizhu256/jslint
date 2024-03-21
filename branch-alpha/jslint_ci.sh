@@ -1007,17 +1007,16 @@ import moduleChildProcess from "child_process";
 shGitPullrequestCleanup() {(set -e
 # this function will cleanup pull-request after merge.
     git fetch upstream beta
-    git diff alpha..upstream/beta
     # verify no diff between alpha..upstream/beta
+    git diff alpha..upstream/beta
     git reset upstream/beta
     git push origin alpha -f
     git push origin alpha:beta
     sh jslint_ci.sh shMyciUpdate
-    # git push upstream alpha -f
 )}
 
 shGitPullrequest() {(set -e
-# this function will create-and-push a github-release-commit to origin/alpha
+# this function will create-and-push a github-pull-commit to origin/alpha
     node --input-type=module --eval '
 import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
@@ -1028,7 +1027,6 @@ import moduleFs from "fs";
     let branchPull = process.argv[3] || new Date().toISOString().slice(0, 10);
     let commitMessage;
     let data;
-    let rgx;
     branchPull = branchPull.replace((/-0?/g), ".");
     [
         branchCheckpoint, branchMerge, branchPull
@@ -1041,6 +1039,7 @@ import moduleFs from "fs";
     switch (branchMerge) {
     case "master":
         branchPull = `branch-v${branchPull}`;
+        // update CHANGELOG.md
         data = data.replace(
             /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
             `\n\n# v${branchPull}\n`
@@ -1056,17 +1055,20 @@ import moduleFs from "fs";
             /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
         ).exec(data)[1];
     }
-    rgx = new RegExp(
-        (
-            "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
-            + "\\/compare"
-            + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
-            + `:${branchPull.slice(0, 8)}20\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
-        ),
-        "g"
-    );
+    // update README.md
     data = await moduleFs.promises.readFile("README.md", "utf8");
-    data = data.replace(rgx, `$1:${branchPull}`);
+    data = data.replace(
+        new RegExp(
+            (
+                "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
+                + "\\/compare"
+                + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
+                + `:${branchPull.slice(0, 8)}20\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
+            ),
+            "g"
+        ),
+        `$1:${branchPull}`
+    );
     await moduleFs.promises.writeFile("README.md", data);
     commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
     moduleChildProcess.spawn(
