@@ -1017,7 +1017,7 @@ shGitPullrequestCleanup() {(set -e
 )}
 
 shGitPullrequest() {(set -e
-# this function will create-and-push a github-release-commit to origin/alpha
+# this function will create-and-push a github-pull-commit to origin/alpha
     node --input-type=module --eval '
 import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
@@ -1041,6 +1041,7 @@ import moduleFs from "fs";
     switch (branchMerge) {
     case "master":
         branchPull = `branch-v${branchPull}`;
+        // update CHANGELOG.md
         data = data.replace(
             /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
             `\n\n# v${branchPull}\n`
@@ -1056,6 +1057,7 @@ import moduleFs from "fs";
             /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
         ).exec(data)[1];
     }
+    // update README.md
     rgx = new RegExp(
         (
             "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
