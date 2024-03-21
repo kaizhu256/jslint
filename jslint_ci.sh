@@ -1178,15 +1178,27 @@ shGithubFileUpload() {(set -e
     shGithubFileDownloadUpload upload "$1" "$2"
 )}
 
-shGithubPullBeta() {(set -e
+shGithubPullCleanup() {(set -e
+# this function will cleanup pull-request after merge.
+    git fetch upstream beta
+    git diff alpha..upstream/beta
+    # verify no diff between alpha..upstream/beta
+    git reset upstream/beta
+    git push origin alpha -f
+    git push origin alpha:beta
+    sh jslint_ci.sh shMyciUpdate
+    # git push upstream alpha -f
+)}
+
+shGithubPullIntoBeta() {(set -e
 # this function will create-and-push a github-pull-commit to origin/alpha
     node --input-type=module --eval '
 import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 (async function () {
-    let branchBeta = process.argv[2] || "beta";
-    let branchPull = process.argv[1] || `branch-${Date.now()}`;
+    let branchBeta = process.argv[1] || "HEAD";
+    let branchPull = `branch-${Date.now()}`;
     let commitMessage;
     let data;
     data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
@@ -1217,25 +1229,25 @@ import moduleFs from "fs";
     ).on("exit", function (exitCode) {
         moduleAssert.ok(
             exitCode === 0,
-            `shGithubPullBeta - exitCode=${exitCode}`
+            `shGithubPullIntoBeta - exitCode=${exitCode}`
         );
     });
 }());
 ' "$@" # '
 )}
 
-shGithubPullMaster() {(set -e
+shGithubPullIntoMaster() {(set -e
 # this function will create-and-push a github-release-commit to origin/alpha
     node --input-type=module --eval '
 import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 (async function () {
-    let branchBeta = process.argv[2] || "beta";
+    let branchBeta = process.argv[1] || "HEAD";
     let commitMessage;
     let data;
     let versionMaster;
-    versionMaster = process.argv[1] || new Date().toISOString().slice(0, 10);
+    versionMaster = process.argv[2] || new Date().toISOString().slice(0, 10);
     versionMaster = versionMaster.replace((/-0?/g), ".");
     data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
     data = data.replace(
@@ -1269,7 +1281,7 @@ import moduleFs from "fs";
     ).on("exit", function (exitCode) {
         moduleAssert.ok(
             exitCode === 0,
-            `shGithubPullMaster - exitCode=${exitCode}`
+            `shGithubPullIntoMaster - exitCode=${exitCode}`
         );
     });
 }());
