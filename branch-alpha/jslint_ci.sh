@@ -1179,18 +1179,20 @@ shGithubFileUpload() {(set -e
 )}
 
 shGithubPullAlpha() {(set -e
-# this function will create-and-push a github-release-commit to origin/alpha
+# this function will create-and-push a github-pull-commit to origin/alpha
     node --input-type=module --eval '
 import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 (async function () {
+    let branchBeta = process.argv[2] || "beta";
+    let branchPull = process.argv[1] || `branch-${Date.now()}`;
     let commitMessage;
     let data;
     data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
-    commitMessage = new RegExp(
-        `\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\\S\\s]+?)\n- `
-    ).exec(data)[0].trim();
+    commitMessage = (
+        /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
+    ).exec(data)[1].trim();
     commitMessage = commitMessage.replace((/[$\u0027`]/g), "?");
     moduleChildProcess.spawn(
         "sh",
@@ -1199,13 +1201,11 @@ import moduleFs from "fs";
             (`
 (set -e
     . ./jslint_ci.sh
-
-
     npm run test2
     git push . HEAD:__alpha_pull_pre -f
-    shGitSquashPop beta \u0027${commitMessage}\u0027
-    git diff origin/branch-xxx || true
-    git push origin alpha:branch-xxx -f
+    shGitSquashPop ${branchBeta} \u0027${commitMessage}\u0027
+    git diff origin/${branchPull} || true
+    git push origin alpha:${branchPull} -f
     git push origin alpha -f
     shDirHttplinkValidate
 )
@@ -1229,10 +1229,11 @@ import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 (async function () {
+    let branchBeta = process.argv[2] || "beta";
     let commitMessage;
     let data;
     let versionMaster;
-    versionMaster = new Date().toISOString().slice(0, 10);
+    versionMaster = process.argv[1] || new Date().toISOString().slice(0, 10);
     versionMaster = versionMaster.replace((/-0?/g), ".");
     data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
     data = data.replace(
@@ -1253,7 +1254,7 @@ import moduleFs from "fs";
     . ./jslint_ci.sh
     npm run test2
     git push . HEAD:__alpha_release_pre -f
-    shGitSquashPop beta \u0027${commitMessage}\u0027
+    shGitSquashPop ${branchBeta} \u0027${commitMessage}\u0027
     git diff origin/branch-v${versionMaster} || true
     git push origin alpha:branch-v${versionMaster} -f
     git push origin alpha -f
