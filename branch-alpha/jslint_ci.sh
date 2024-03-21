@@ -1043,7 +1043,7 @@ import moduleFs from "fs";
         // update CHANGELOG.md
         data = data.replace(
             /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
-            `\n\n# v${branchPull}\n`
+            `\n\n# v${branchPull.slice(6)}\n`
         );
         await moduleFs.promises.writeFile("CHANGELOG.md", data);
         commitMessage = new RegExp(
