@@ -918,10 +918,10 @@ eval("1"); //jslint-ignore-line
 ### pull-request merge
 - find highest issue-number at https://github.com/kaizhu256/jslint/issues/, https://github.com/kaizhu256/jslint/pulls/, and add +1 to it for PR-xxx
 - $ `shGitPullrequest beta beta`
-- verify ci-success for origin-branch-alpha
+    - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - $ `git push upstream alpha -f`
-- verify ci-success for upstream-branch-alpha
+    - verify ci-success for upstream-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-p2024.3.21
 - click `Create pull request`
@@ -940,17 +940,17 @@ this PR will additionally:
 ```
 - verify `commit into jslint-org:beta`
 - click `Create pull request`
-- verify ci-success for pull-request
+    - verify ci-success for pull-request
     - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
 - wait awhile before continuing ...
 - click `Rebase and merge`
-- verify ci-success for upstream-branch-beta
+    - verify ci-success for upstream-branch-beta
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - $ `shGitPullrequestCleanup`
-- verify ci-success for origin-branch-alpha
+    - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - $ `git push upstream alpha -f`
-- verify ci-success for upstream-branch-alpha
+    - verify ci-success for upstream-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - click `Delete branch`
 
@@ -958,10 +958,10 @@ this PR will additionally:
 <br><br>
 ### branch-master commit
 - $ `shGitPullrequest master beta`
-- verify ci-success for origin-branch-alpha
+    - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - $ `git push upstream alpha -f`
-- verify ci-success for upstream-branch-alpha
+    - verify ci-success for upstream-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2023.10.24
 - click `Create pull request`
@@ -973,31 +973,31 @@ this PR will additionally:
 ```
 - verify `commit into jslint-org:beta`
 - click `Create pull request`
-- verify ci-success for pull-request
+    - verify ci-success for pull-request
     - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
 - wait awhile before continuing ...
 - click `Rebase and merge`
-- verify ci-success for upstream-branch-beta
+    - verify ci-success for upstream-branch-beta
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - $ `shGitPullrequestCleanup`
-- verify ci-success for origin-branch-alpha
+    - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - $ `git push upstream alpha -f`
-- verify ci-success for upstream-branch-alpha
+    - verify ci-success for upstream-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - click `Delete branch`
 - $ `git push origin beta:master`
-- verify ci-success for origin-branch-master
-- $ `git push upstream beta:master`
+    - verify ci-success for origin-branch-master
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- verify ci-success for upstream-branch-master
+- $ `git push upstream beta:master`
+    - verify ci-success for upstream-branch-master
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 
 
 <br><br>
 ### branch-master publish
 - $ `git push upstream beta:master`
-- verify ci-success for upstream-branch-master
+    - verify ci-success for upstream-branch-master
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/releases/new
 - input `Choose a tag` with: `v20yy.mm.dd`
@@ -1015,9 +1015,9 @@ this PR will additionally:
 - click `Set as the latest release`
 - click `Preview` and review
 - click `Publish release`
-- verify ci-success for upstream-branch-publish
+    - verify ci-success for upstream-branch-publish
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- verify email-notification `Successfully published @kaizhu256/jslint@20yy.mm.dd`
+    - verify email-notification `Successfully published @kaizhu256/jslint@20yy.mm.dd`
 
 
 <br><br>
