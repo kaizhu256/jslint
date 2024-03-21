@@ -1028,6 +1028,7 @@ import moduleFs from "fs";
     let commitMessage;
     let data;
     branchPull = branchPull.replace((/-0?/g), ".");
+    // security - sanitize branchXxx
     [
         branchCheckpoint, branchMerge, branchPull
     ] = [
@@ -1070,6 +1071,7 @@ import moduleFs from "fs";
         `$1:${branchPull}`
     );
     await moduleFs.promises.writeFile("README.md", data);
+    // security - sanitize commitMessage
     commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
     moduleChildProcess.spawn(
         "sh",
@@ -1081,8 +1083,8 @@ import moduleFs from "fs";
     npm run test2
     git push . HEAD:__alpha_pullrequest_${branchMerge}_pre -f
     shGitSquashPop ${branchCheckpoint} \u0027${commitMessage}\u0027
-    git diff origin/branch-v${branchPull} || true
-    git push origin alpha:branch-v${branchPull} -f
+    git diff origin/${branchPull} || true
+    git push origin alpha:${branchPull} -f
     git push origin alpha -f
     shDirHttplinkValidate
 )
