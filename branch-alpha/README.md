@@ -927,7 +927,7 @@ git push upstream alpha -f
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-xxx
 - click `Create pull request`
-- fill-in `Add a description` with:
+- fill-in `Add your description here...` with:
 ```
 Fixes #xxx.
 - <primary-commit-message>
@@ -982,7 +982,8 @@ git push upstream alpha -f
 - fill-in `Add a title` with: `# v20yy.mm.dd`
 - fill-in `Add a description` with:
 ```
-<release notes from CHANGELOG.md>
+- <primary-commit-message>
+- <secondary-commit-message>
 ```
 - verify `commit into jslint-org:beta`
 - click `Create pull request`
