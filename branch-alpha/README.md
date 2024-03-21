@@ -918,7 +918,7 @@ eval("1"); //jslint-ignore-line
 ### pull-request merge
 - find highest issue-number at https://github.com/kaizhu256/jslint/issues/, https://github.com/kaizhu256/jslint/pulls/, and add +1 to it for PR-xxx
 ```shell
-shGithubPullIntoBeta beta
+shGithubPrIntoBeta beta
 git push upstream alpha -f
 ```
 - verify ci-success for origin-branch-alpha
@@ -947,19 +947,7 @@ this PR will additionally:
 - click `Rebase and merge`
 - verify ci-success for upstream-branch-beta
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-```shell
-(set -e
-git fetch upstream beta
-git diff alpha..upstream/beta
-# verify no diff between alpha..upstream/beta
-git reset upstream/beta
-git push origin alpha -f
-git push origin alpha:beta
-sh jslint_ci.sh shMyciUpdate
-# git push upstream alpha -f
-)
-printf "EXIT_CODE=$?\n"
-```
+- $ `shGithubPrCleanup`
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify ci-success for upstream-branch-alpha
@@ -970,7 +958,7 @@ printf "EXIT_CODE=$?\n"
 <br><br>
 ### branch-master commit
 ```shell
-shGithubPullIntoMaster beta
+shGithubPrIntoMaster beta
 git push upstream alpha -f
 ```
 - verify ci-success for origin-branch-alpha
@@ -992,19 +980,7 @@ git push upstream alpha -f
 - click `Rebase and merge`
 - verify ci-success for upstream-branch-beta
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-```shell
-(set -e
-git fetch upstream beta
-git diff alpha..upstream/beta
-# verify no diff between alpha..upstream/beta
-git reset upstream/beta
-git push origin alpha -f
-git push origin alpha:beta
-sh jslint_ci.sh shMyciUpdate
-# git push upstream alpha -f
-)
-printf "EXIT_CODE=$?\n"
-```
+- $ `shGithubPrCleanup`
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify ci-success for upstream-branch-alpha

@@ -71,13 +71,13 @@
     textLength="768"
     x="10"
     y="252"
->- ci - Add shell-functions shGithubPullIntoBeta(), shGithubPullIntoMaster() to automatically cre\</tspan>
+>- ci - Add shell-functions shGithubPrIntoBeta(), shGithubPrIntoMaster() to automatically create-\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="274"
->  ate-and-push github-pull-commit, github-release-commit to origin/alpha.                        </tspan>
+>  and-push github-pull-commit, github-release-commit to origin/alpha.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
