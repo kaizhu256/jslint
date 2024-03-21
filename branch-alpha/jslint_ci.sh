@@ -728,10 +728,10 @@ import moduleHttps from "https";
             /\bhttps?:\/\/.+?([\s")\]]|\W?$)/gm
         ), function (url, removeLast) {
             let req;
-            if (removeLast) {
+            if (removeLast && removeLast !== "/") {
                 url = url.slice(0, -1);
             }
-            url = url.replace((/[\u0022\u0027]/g), "");
+            url = url.replace((/["\u0027]/g), "");
             url = url.replace(
                 (/\/branch-[a-z]+?\//g),
                 `/branch-${GITHUB_BRANCH0}/`
