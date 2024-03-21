@@ -1013,6 +1013,85 @@ import moduleChildProcess from "child_process";
 ' "$@" # '
 )}
 
+shGitPullrequestCleanup() {(set -e
+# this function will cleanup pull-request after merge.
+    git fetch upstream beta
+    git diff alpha..upstream/beta
+    # verify no diff between alpha..upstream/beta
+    git reset upstream/beta
+    git push origin alpha -f
+    git push origin alpha:beta
+    sh jslint_ci.sh shMyciUpdate
+    # git push upstream alpha -f
+)}
+
+shGitPullrequest() {(set -e
+# this function will create-and-push a github-release-commit to origin/alpha
+    node --input-type=module --eval '
+import moduleAssert from "assert";
+import moduleChildProcess from "child_process";
+import moduleFs from "fs";
+(async function () {
+    let branchCheckpoint = process.argv[1] || "HEAD";
+    let branchMerge = process.argv[2] || "beta";
+    let branchPull = process.argv[3] || new Date().toISOString().slice(0, 10);
+    let commitMessage;
+    let data;
+    branchPull = branchPull.replace((/-0?/g), ".");
+    [
+        branchCheckpoint, branchMerge, branchPull
+    ] = [
+        branchCheckpoint, branchMerge, branchPull
+    ].map(function (branch) {
+        branch.trim().replace((/[^\w.\-]/g), "_");
+    });
+    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
+    switch (branchMerge) {
+    case "master":
+        branchPull = `branch-v${branchPull}`;
+        data = data.replace(
+            /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
+            `\n\n# v${branchPull}\n`
+        );
+        await moduleFs.promises.writeFile("CHANGELOG.md", data);
+        commitMessage = new RegExp(
+            `\n\n# v${branchPull}\n[\\S\\s]+?\n\n`
+        ).exec(data)[0];
+        break;
+    default:
+        branchPull = `branch-p${branchPull}`;
+        commitMessage = (
+            /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
+        ).exec(data)[1];
+    }
+    moduleChildProcess.spawn(
+        "sh",
+        [
+            "-c",
+            (`
+(set -e
+    . ./jslint_ci.sh
+    npm run test2
+    git push . HEAD:__alpha_pullrequest_${branchMerge}_pre -f
+    shGitSquashPop ${branchCheckpoint} ${commitMessage}
+    git diff origin/branch-v${branchPull} || true
+    git push origin alpha:branch-v${branchPull} -f
+    git push origin alpha -f
+    shDirHttplinkValidate
+)
+            `)
+        ],
+        {stdio: ["ignore", 1, 2]}
+    ).on("exit", function (exitCode) {
+        moduleAssert.ok(
+            exitCode === 0,
+            `shGitPullrequest - exitCode=${exitCode}`
+        );
+    });
+}());
+' "$@" # '
+)}
+
 shGitSquashPop() {(set -e
 # this function will squash HEAD to given $COMMIT
 # http://stackoverflow.com/questions/5189560
@@ -1176,85 +1255,6 @@ shGithubFileUpload() {(set -e
 # example use:
 # shGithubFileUpload octocat/hello-world/master/hello.txt hello.txt
     shGithubFileDownloadUpload upload "$1" "$2"
-)}
-
-shGithubPrCleanup() {(set -e
-# this function will cleanup pull-request after merge.
-    git fetch upstream beta
-    git diff alpha..upstream/beta
-    # verify no diff between alpha..upstream/beta
-    git reset upstream/beta
-    git push origin alpha -f
-    git push origin alpha:beta
-    sh jslint_ci.sh shMyciUpdate
-    # git push upstream alpha -f
-)}
-
-shGithubPrIntoMaster() {(set -e
-# this function will create-and-push a github-release-commit to origin/alpha
-    node --input-type=module --eval '
-import moduleAssert from "assert";
-import moduleChildProcess from "child_process";
-import moduleFs from "fs";
-(async function () {
-    let branchCheckpoint = process.argv[1] || "HEAD";
-    let branchMerge = process.argv[2] || "beta";
-    let branchPull = process.argv[3] || new Date().toISOString().slice(0, 10);
-    let commitMessage;
-    let data;
-    branchPull = branchPull.replace((/-0?/g), ".");
-    [
-        branchCheckpoint, branchMerge, branchPull
-    ] = [
-        branchCheckpoint, branchMerge, branchPull
-    ].map(function (branch) {
-        branch.trim().replace((/[^\w.\-]/g), "_");
-    });
-    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
-    switch (branchMerge) {
-    case "master":
-        branchPull = `branch-v${branchPull}`;
-        data = data.replace(
-            /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
-            `\n\n# v${branchPull}\n`
-        );
-        await moduleFs.promises.writeFile("CHANGELOG.md", data);
-        commitMessage = new RegExp(
-            `\n\n# v${branchPull}\n[\\S\\s]+?\n\n`
-        ).exec(data)[0];
-        break;
-    default:
-        branchPull = `branch-p${branchPull}`;
-        commitMessage = (
-            /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
-        ).exec(data)[1];
-    }
-    moduleChildProcess.spawn(
-        "sh",
-        [
-            "-c",
-            (`
-(set -e
-    . ./jslint_ci.sh
-    npm run test2
-    git push . HEAD:__alpha_pullrequest_${branchMerge}_pre -f
-    shGitSquashPop ${branchCheckpoint} ${commitMessage}
-    git diff origin/branch-v${branchPull} || true
-    git push origin alpha:branch-v${branchPull} -f
-    git push origin alpha -f
-    shDirHttplinkValidate
-)
-            `)
-        ],
-        {stdio: ["ignore", 1, 2]}
-    ).on("exit", function (exitCode) {
-        moduleAssert.ok(
-            exitCode === 0,
-            `shGithubPrIntoMaster - exitCode=${exitCode}`
-        );
-    });
-}());
-' "$@" # '
 )}
 
 shGithubTokenExport() {

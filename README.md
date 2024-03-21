@@ -917,7 +917,7 @@ eval("1"); //jslint-ignore-line
 <br><br>
 ### pull-request merge
 - find highest issue-number at https://github.com/jslint-org/jslint/issues/, https://github.com/jslint-org/jslint/pulls/, and add +1 to it for PR-xxx
-- $ `shGithubPrIntoMaster beta`
+- $ `shGitPullrequest beta`
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - $ `git push upstream alpha -f`
@@ -946,7 +946,7 @@ this PR will additionally:
 - click `Rebase and merge`
 - verify ci-success for upstream-branch-beta
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-- $ `shGithubPrCleanup`
+- $ `shGitPullrequestCleanup`
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - $ `git push upstream alpha -f`
@@ -957,7 +957,7 @@ this PR will additionally:
 
 <br><br>
 ### branch-master commit
-- $ `shGithubPrIntoMaster master`
+- $ `shGitPullrequest master`
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - $ `git push upstream alpha -f`
@@ -979,7 +979,7 @@ this PR will additionally:
 - click `Rebase and merge`
 - verify ci-success for upstream-branch-beta
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-- $ `shGithubPrCleanup`
+- $ `shGitPullrequestCleanup`
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - $ `git push upstream alpha -f`
