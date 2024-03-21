@@ -1043,7 +1043,7 @@ import moduleFs from "fs";
     ] = [
         branchCheckpoint, branchMerge, branchPull
     ].map(function (branch) {
-        branch.trim().replace((/[^\w.\-]/g), "_");
+        return branch.trim().replace((/[^\w.\-]/g), "_");
     });
     data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
     switch (branchMerge) {
@@ -1064,6 +1064,7 @@ import moduleFs from "fs";
             /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
         ).exec(data)[1];
     }
+    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
     moduleChildProcess.spawn(
         "sh",
         [
@@ -1073,7 +1074,7 @@ import moduleFs from "fs";
     . ./jslint_ci.sh
     npm run test2
     git push . HEAD:__alpha_pullrequest_${branchMerge}_pre -f
-    shGitSquashPop ${branchCheckpoint} ${commitMessage}
+    shGitSquashPop ${branchCheckpoint} \u0027${commitMessage}\u0027
     git diff origin/branch-v${branchPull} || true
     git push origin alpha:branch-v${branchPull} -f
     git push origin alpha -f
