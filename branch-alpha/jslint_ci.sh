@@ -1192,8 +1192,10 @@ import moduleFs from "fs";
     data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
     commitMessage = (
         /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
-    ).exec(data)[1].trim();
-    commitMessage = commitMessage.replace((/[$\u0027`]/g), "?");
+    ).exec(data)[1];
+    branchBeta = branchBeta.trim().replace((/[$\u0027`]/g), "?");
+    branchPull = branchPull.trim().replace((/[$\u0027`]/g), "?");
+    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
     moduleChildProcess.spawn(
         "sh",
         [
@@ -1204,8 +1206,8 @@ import moduleFs from "fs";
     npm run test2
     git push . HEAD:__alpha_pull_pre -f
     shGitSquashPop ${branchBeta} \u0027${commitMessage}\u0027
-    git diff origin/${branchPull} || true
-    git push origin alpha:${branchPull} -f
+    git diff \u0027origin/${branchPull}\u0027 || true
+    git push origin \u0027alpha:${branchPull}\u0027 -f
     git push origin alpha -f
     shDirHttplinkValidate
 )
@@ -1243,8 +1245,9 @@ import moduleFs from "fs";
     await moduleFs.promises.writeFile("CHANGELOG.md", data);
     commitMessage = new RegExp(
         `\n\n# v${versionMaster}\n[\\S\\s]+?\n\n`
-    ).exec(data)[0].trim();
-    commitMessage = commitMessage.replace((/[$\u0027`]/g), "?");
+    ).exec(data)[0];
+    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
+    versionMaster = versionMaster.trim().replace((/[$\u0027`]/g), "?");
     moduleChildProcess.spawn(
         "sh",
         [
@@ -1255,8 +1258,8 @@ import moduleFs from "fs";
     npm run test2
     git push . HEAD:__alpha_release_pre -f
     shGitSquashPop ${branchBeta} \u0027${commitMessage}\u0027
-    git diff origin/branch-v${versionMaster} || true
-    git push origin alpha:branch-v${versionMaster} -f
+    git diff \u0027origin/branch-v${versionMaster}\u0027 || true
+    git push origin \u0027alpha:branch-v${versionMaster}\u0027 -f
     git push origin alpha -f
     shDirHttplinkValidate
 )

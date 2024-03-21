@@ -918,15 +918,8 @@ eval("1"); //jslint-ignore-line
 ### pull-request merge
 - find highest issue-number at https://github.com/kaizhu256/jslint/issues/, https://github.com/kaizhu256/jslint/pulls/, and add +1 to it for PR-xxx
 ```shell
-(set -e
-npm run test2
-sh jslint_ci.sh shGitSquashPop beta '<commit-message>'
-git diff origin/branch-xxx || true
-git push origin alpha:branch-xxx -f
-git push origin alpha -f
-# git push upstream alpha -f
-)
-printf "EXIT_CODE=$?\n"
+shGithubPullAlpha
+git push upstream alpha -f
 ```
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
