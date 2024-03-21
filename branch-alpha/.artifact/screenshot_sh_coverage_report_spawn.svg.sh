@@ -8,6 +8,7 @@ printf '> #!/bin/sh
 > 
 > cd node-sqlite3-sh
 > npm install
+> npm audit fix
 > 
 > # Create V8 coverage report from program `npm run test` in shell.
 > 
@@ -46,6 +47,7 @@ cd node-sqlite3-sh
 
 git checkout 61194ec2aee4b56e8e17f757021434122772f145
 npm install
+npm audit fix
 
 # Create V8 coverage report from program `npm run test` in shell.
 
