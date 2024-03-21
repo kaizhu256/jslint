@@ -485,7 +485,7 @@ import moduleFs from "fs";
             src: (function () {
                 let data = fileDict["README.md"];
                 data = data.replace(
-                    (/(\[(?:main|master)<br>)v20\d\d\.\d\d?\.\d\d?\b/g),
+                    (/(\[(?:main|master)<br>\()v20\d\d\.\d\d?\.\d\d?\b/g),
                     `$1v${versionMaster}`
                 );
                 data = data.replace(
