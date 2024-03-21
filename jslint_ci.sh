@@ -1178,7 +1178,7 @@ shGithubFileUpload() {(set -e
     shGithubFileDownloadUpload upload "$1" "$2"
 )}
 
-shGithubPullCleanup() {(set -e
+shGithubPrCleanup() {(set -e
 # this function will cleanup pull-request after merge.
     git fetch upstream beta
     git diff alpha..upstream/beta
@@ -1190,7 +1190,7 @@ shGithubPullCleanup() {(set -e
     # git push upstream alpha -f
 )}
 
-shGithubPullIntoBeta() {(set -e
+shGithubPrIntoBeta() {(set -e
 # this function will create-and-push a github-pull-commit to origin/alpha
     node --input-type=module --eval '
 import moduleAssert from "assert";
@@ -1229,14 +1229,14 @@ import moduleFs from "fs";
     ).on("exit", function (exitCode) {
         moduleAssert.ok(
             exitCode === 0,
-            `shGithubPullIntoBeta - exitCode=${exitCode}`
+            `shGithubPrIntoBeta - exitCode=${exitCode}`
         );
     });
 }());
 ' "$@" # '
 )}
 
-shGithubPullIntoMaster() {(set -e
+shGithubPrIntoMaster() {(set -e
 # this function will create-and-push a github-release-commit to origin/alpha
     node --input-type=module --eval '
 import moduleAssert from "assert";
@@ -1281,7 +1281,7 @@ import moduleFs from "fs";
     ).on("exit", function (exitCode) {
         moduleAssert.ok(
             exitCode === 0,
-            `shGithubPullIntoMaster - exitCode=${exitCode}`
+            `shGithubPrIntoMaster - exitCode=${exitCode}`
         );
     });
 }());
