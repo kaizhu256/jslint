@@ -716,18 +716,16 @@ import moduleHttps from "https";
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
         let data;
-        if (file === "CHANGELOG.md" || !(
-            /.\.html$|.\.md$/m
-        ).test(file)) {
+        if (file === "CHANGELOG.md" || !(/.\.html$|.\.md$/m).test(file)) {
             return;
         }
         data = await moduleFs.promises.readFile(file, "utf8");
         // ignore link-rel-preconnect
         data = data.replace((
-            /<link\b.*?\brel="preconnect".*?>/g
+            /<link\b.+?\brel="preconnect".+?>/g
         ), "");
         data.replace((
-            /\bhttps?:\/\/.*?([\s")\]]|\W?$)/gm
+            /\bhttps?:\/\/.+?([\s")\]]|\W?$)/gm
         ), function (url, removeLast) {
             let req;
             if (removeLast) {
@@ -735,8 +733,12 @@ import moduleHttps from "https";
             }
             url = url.replace((/[\u0022\u0027]/g), "");
             url = url.replace(
-                (/\/branch-[a-z]*?\//g),
+                (/\/branch-[a-z]+?\//g),
                 `/branch-${GITHUB_BRANCH0}/`
+            );
+            url = url.replace(
+                (/_2fbranch-[a-z]+?_2f/g),
+                `_2fbranch-${GITHUB_BRANCH0}_2f`
             );
             url = url.replace(
                 new RegExp(`\\b${UPSTREAM_REPOSITORY}\\b`, "g"),
@@ -776,7 +778,7 @@ import moduleHttps from "https";
             return "";
         });
         data.replace((
-            /(\bhref=|\bsrc=|\burl\(|\[[^]*?\]\()("?.*?)(?:[")\]]|$)/gm
+            /(\bhref=|\bsrc=|\burl\(|\[[^]+?\]\()("?.+?)(?:[")\]]|$)/gm
         ), function (ignore, linkType, url) {
             if (!linkType.startsWith("[")) {
                 url = url.slice(1);
