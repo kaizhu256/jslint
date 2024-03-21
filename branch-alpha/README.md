@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2024.3.21)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
+| Branch | [master<br>(v2023.10.24)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/kaizhu256/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/kaizhu256/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/kaizhu256/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/index.html) | [![coverage](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/index.html) | [![coverage](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/index.html) |
@@ -984,7 +984,7 @@ git push upstream alpha -f
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify ci-success for upstream-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2024.3.21
+- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2023.10.24
 - click `Create pull request`
 - `Add a title` template: `# v20yy.mm.dd`
 - `Add a description` template:
