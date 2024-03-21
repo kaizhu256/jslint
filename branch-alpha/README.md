@@ -917,7 +917,7 @@ eval("1"); //jslint-ignore-line
 <br><br>
 ### pull-request merge
 - find highest issue-number at https://github.com/kaizhu256/jslint/issues/, https://github.com/kaizhu256/jslint/pulls/, and add +1 to it for PR-xxx
-- $ `shGitPullrequest beta`
+- $ `shGitPullrequest beta beta`
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - $ `git push upstream alpha -f`
@@ -957,7 +957,7 @@ this PR will additionally:
 
 <br><br>
 ### branch-master commit
-- $ `shGitPullrequest master`
+- $ `shGitPullrequest master beta`
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - $ `git push upstream alpha -f`
