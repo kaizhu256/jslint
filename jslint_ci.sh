@@ -1007,13 +1007,12 @@ import moduleChildProcess from "child_process";
 shGitPullrequestCleanup() {(set -e
 # this function will cleanup pull-request after merge.
     git fetch upstream beta
-    git diff alpha..upstream/beta
     # verify no diff between alpha..upstream/beta
+    git diff alpha..upstream/beta
     git reset upstream/beta
     git push origin alpha -f
     git push origin alpha:beta
     sh jslint_ci.sh shMyciUpdate
-    # git push upstream alpha -f
 )}
 
 shGitPullrequest() {(set -e
@@ -1028,7 +1027,6 @@ import moduleFs from "fs";
     let branchPull = process.argv[3] || new Date().toISOString().slice(0, 10);
     let commitMessage;
     let data;
-    let rgx;
     branchPull = branchPull.replace((/-0?/g), ".");
     [
         branchCheckpoint, branchMerge, branchPull
@@ -1058,17 +1056,19 @@ import moduleFs from "fs";
         ).exec(data)[1];
     }
     // update README.md
-    rgx = new RegExp(
-        (
-            "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
-            + "\\/compare"
-            + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
-            + `:${branchPull.slice(0, 8)}20\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
-        ),
-        "g"
-    );
     data = await moduleFs.promises.readFile("README.md", "utf8");
-    data = data.replace(rgx, `$1:${branchPull}`);
+    data = data.replace(
+        new RegExp(
+            (
+                "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
+                + "\\/compare"
+                + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
+                + `:${branchPull.slice(0, 8)}20\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
+            ),
+            "g"
+        ),
+        `$1:${branchPull}`
+    );
     await moduleFs.promises.writeFile("README.md", data);
     commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
     moduleChildProcess.spawn(
