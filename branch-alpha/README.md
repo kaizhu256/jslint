@@ -89,9 +89,9 @@ Douglas Crockford <douglas@crockford.com>
 
 <br><br>
 # Web Demo Archived
-- [Web Demo 2020](https://www.jslint.com/branch-v2020.11.6/index.html)
-- [Web Demo 2014 (ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
-- [Web Demo 2013 (ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
+- [Web Demo 2020](https://www.jslint.com/branch-v2024.3.21/index.html)
+- [Web Demo 2014 (ES5 only)](https://www.jslint.com/branch-v2024.3.21/jslint.html)
+- [Web Demo 2013 (ES5, CSS, HTML)](https://www.jslint.com/branch-v2024.3.21/jslint.html)
 
 
 <br><br>
@@ -986,7 +986,7 @@ git push upstream alpha -f
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2024.3.21
 - click `Create pull request`
-- `Add a title` template: `# v2011.11.11`
+- `Add a title` template: `# v2024.3.21`
 - `Add a description` template:
 ```
 <release notes from CHANGELOG.md>
@@ -1032,12 +1032,12 @@ git push upstream beta:master
 - verify ci-success for upstream-branch-master
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/releases/new
-- `Choose a tag` template: `v2011.11.11`
-- click `Create new tag: v2011.11.11 on publish`
+- `Choose a tag` template: `v2024.3.21`
+- click `Create new tag: v2024.3.21 on publish`
     - verify correct-year `20yy`
 - select `Target: master`
 - select `Previous tag:auto`
-- `Release title` template: `v2011.11.11 - <primary-commit-message>`
+- `Release title` template: `v2024.3.21 - <primary-commit-message>`
 - `Describe this release` template:
 ```
 - <primary-commit-message>

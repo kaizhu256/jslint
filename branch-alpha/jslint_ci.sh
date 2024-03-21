@@ -483,7 +483,7 @@ import moduleFs from "fs";
         {
             file: "README.md",
             src: fileDict["README.md"].replace((
-                /\bv20\d\d\.\d\d?\.\d\d?\b/
+                /\bv20\d\d\.\d\d?\.\d\d?\b/g
             ), `v${versionMaster}`)
         }, {
             file: "package.json",
@@ -725,9 +725,7 @@ import moduleHttps from "https";
                 /[\u0022\u0027]/g
             ), "").replace((
                 /\/branch-[a-z]*?\//g
-            ), `/branch-${GITHUB_BRANCH0}/`).replace((
-                /:(?:branch-v20yy\.mm\.dd|branch-xxx)$/g
-            ), ":alpha").replace(new RegExp(
+            ), `/branch-${GITHUB_BRANCH0}/`).replace(new RegExp(
                 `\\b${UPSTREAM_REPOSITORY}\\b`,
                 "g"
             ), GITHUB_REPOSITORY).replace(new RegExp(
