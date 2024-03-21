@@ -472,7 +472,7 @@ import moduleFs from "fs";
         }
     }));
     Array.from(fileDict["CHANGELOG.md"].matchAll(
-        /\n\n# v(\d\d\d\d\.\d\d?\.\d\d?(-.*?)?)\n/g
+        /\n\n# v(20\d\d\.\d\d?\.\d\d?(-.*?)?)\n/g
     )).slice(0, 2).forEach(function ([
         ignore, version, isBeta
     ]) {
@@ -497,7 +497,7 @@ import moduleFs from "fs";
         }, {
             file: "package.json",
             src: fileDict["package.json"].replace((
-                /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
+                /    "version": "20\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
             ), `    "version": "${versionBeta}"`)
         }, {
             file: fileMain,
@@ -905,56 +905,6 @@ COMMIT_LIMIT=$COMMIT_LIMIT MODE_SQUASH=$MODE_SQUASH\n"
     shGitCmdWithGithubToken push origin "$BRANCH" -f
 )}
 
-shGithubReleaseAlpha() {(set -e
-# this function will create-and-push a github-release-commit to origin/alpha
-    node --input-type=module --eval '
-import moduleAssert from "assert";
-import moduleChildProcess from "child_process";
-import moduleFs from "fs";
-(async function () {
-    let commitMessage;
-    let data;
-    let versionMaster;
-    versionMaster = new Date().toISOString().slice(0, 10);
-    versionMaster = versionMaster.replace((/-0?/g), ".");
-    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
-    data = data.replace(
-        /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
-        `\n\n# v${versionMaster}\n`
-    );
-    await moduleFs.promises.writeFile("CHANGELOG.md", data);
-    commitMessage = new RegExp(
-        `\n\n# v${versionMaster}\n[\\S\\s]+?\n\n`
-    ).exec(data)[0].trim();
-    commitMessage = commitMessage.replace((/[$\u0027`]/g), "?");
-    moduleChildProcess.spawn(
-        "sh",
-        [
-            "-c",
-            (`
-(set -e
-    . ./jslint_ci.sh
-    npm run test2
-    git push . HEAD:__alpha_release_pre -f
-    shGitSquashPop beta \u0027${commitMessage}\u0027
-    git diff origin/branch-v${versionMaster} || true
-    git push origin alpha:branch-v${versionMaster} -f
-    git push origin alpha -f
-    shDirHttplinkValidate
-)
-            `)
-        ],
-        {stdio: ["ignore", 1, 2]}
-    ).on("exit", function (exitCode) {
-        moduleAssert.ok(
-            exitCode === 0,
-            `shGithubReleaseAlpha - exitCode=${exitCode}`
-        );
-    });
-}());
-' "$@" # '
-)}
-
 shGitGc() {(set -e
 # this function will gc unreachable .git objects
 # http://stackoverflow.com/questions/3797907/how-to-remove-unused-objects-from-a-git-repository
@@ -1226,6 +1176,100 @@ shGithubFileUpload() {(set -e
 # example use:
 # shGithubFileUpload octocat/hello-world/master/hello.txt hello.txt
     shGithubFileDownloadUpload upload "$1" "$2"
+)}
+
+shGithubPullAlpha() {(set -e
+# this function will create-and-push a github-release-commit to origin/alpha
+    node --input-type=module --eval '
+import moduleAssert from "assert";
+import moduleChildProcess from "child_process";
+import moduleFs from "fs";
+(async function () {
+    let commitMessage;
+    let data;
+    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
+    commitMessage = new RegExp(
+        `\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\\S\\s]+?)\n- `
+    ).exec(data)[0].trim();
+    commitMessage = commitMessage.replace((/[$\u0027`]/g), "?");
+    moduleChildProcess.spawn(
+        "sh",
+        [
+            "-c",
+            (`
+(set -e
+    . ./jslint_ci.sh
+
+
+    npm run test2
+    git push . HEAD:__alpha_pull_pre -f
+    shGitSquashPop beta \u0027${commitMessage}\u0027
+    git diff origin/branch-xxx || true
+    git push origin alpha:branch-xxx -f
+    git push origin alpha -f
+    shDirHttplinkValidate
+)
+            `)
+        ],
+        {stdio: ["ignore", 1, 2]}
+    ).on("exit", function (exitCode) {
+        moduleAssert.ok(
+            exitCode === 0,
+            `shGithubPullAlpha - exitCode=${exitCode}`
+        );
+    });
+}());
+' "$@" # '
+)}
+
+shGithubReleaseAlpha() {(set -e
+# this function will create-and-push a github-release-commit to origin/alpha
+    node --input-type=module --eval '
+import moduleAssert from "assert";
+import moduleChildProcess from "child_process";
+import moduleFs from "fs";
+(async function () {
+    let commitMessage;
+    let data;
+    let versionMaster;
+    versionMaster = new Date().toISOString().slice(0, 10);
+    versionMaster = versionMaster.replace((/-0?/g), ".");
+    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
+    data = data.replace(
+        /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
+        `\n\n# v${versionMaster}\n`
+    );
+    await moduleFs.promises.writeFile("CHANGELOG.md", data);
+    commitMessage = new RegExp(
+        `\n\n# v${versionMaster}\n[\\S\\s]+?\n\n`
+    ).exec(data)[0].trim();
+    commitMessage = commitMessage.replace((/[$\u0027`]/g), "?");
+    moduleChildProcess.spawn(
+        "sh",
+        [
+            "-c",
+            (`
+(set -e
+    . ./jslint_ci.sh
+    npm run test2
+    git push . HEAD:__alpha_release_pre -f
+    shGitSquashPop beta \u0027${commitMessage}\u0027
+    git diff origin/branch-v${versionMaster} || true
+    git push origin alpha:branch-v${versionMaster} -f
+    git push origin alpha -f
+    shDirHttplinkValidate
+)
+            `)
+        ],
+        {stdio: ["ignore", 1, 2]}
+    ).on("exit", function (exitCode) {
+        moduleAssert.ok(
+            exitCode === 0,
+            `shGithubReleaseAlpha - exitCode=${exitCode}`
+        );
+    });
+}());
+' "$@" # '
 )}
 
 shGithubTokenExport() {
@@ -2052,7 +2096,7 @@ function replaceListReplace(replaceList, data) {
                     + "repo " + prefix.replace("/blob/", "/tree/") + "\n"
                     + "committed " + new Date(
                         (
-                            /"(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[^"]*?)"/
+                            /"(20\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[^"]*?)"/
                         ).exec(dateCommitted.toString())[1]
                     ).toISOString().replace((/\.\d*?Z/), "Z") + "\n"
                     + "*/"
