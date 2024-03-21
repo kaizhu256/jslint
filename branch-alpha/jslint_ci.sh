@@ -1083,7 +1083,7 @@ import moduleFs from "fs";
             ),
             "g"
         )),
-        `$1:${version}`
+        `$1:${branchPull}`
     );
     await moduleFs.promises.writeFile("README.md", data);
     // security - sanitize commitMessage
