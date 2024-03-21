@@ -1190,52 +1190,6 @@ shGithubPrCleanup() {(set -e
     # git push upstream alpha -f
 )}
 
-shGithubPrIntoBeta() {(set -e
-# this function will create-and-push a github-pull-commit to origin/alpha
-    node --input-type=module --eval '
-import moduleAssert from "assert";
-import moduleChildProcess from "child_process";
-import moduleFs from "fs";
-(async function () {
-    let branchBeta = process.argv[1] || "HEAD";
-    let branchPull = `branch-${Date.now()}`;
-    let commitMessage;
-    let data;
-    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
-    commitMessage = (
-        /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
-    ).exec(data)[1];
-    branchBeta = branchBeta.trim().replace((/[$\u0027`]/g), "?");
-    branchPull = branchPull.trim().replace((/[$\u0027`]/g), "?");
-    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
-    moduleChildProcess.spawn(
-        "sh",
-        [
-            "-c",
-            (`
-(set -e
-    . ./jslint_ci.sh
-    npm run test2
-    git push . HEAD:__alpha_pull_pre -f
-    shGitSquashPop ${branchBeta} \u0027${commitMessage}\u0027
-    git diff \u0027origin/${branchPull}\u0027 || true
-    git push origin \u0027alpha:${branchPull}\u0027 -f
-    git push origin alpha -f
-    shDirHttplinkValidate
-)
-            `)
-        ],
-        {stdio: ["ignore", 1, 2]}
-    ).on("exit", function (exitCode) {
-        moduleAssert.ok(
-            exitCode === 0,
-            `shGithubPrIntoBeta - exitCode=${exitCode}`
-        );
-    });
-}());
-' "$@" # '
-)}
-
 shGithubPrIntoMaster() {(set -e
 # this function will create-and-push a github-release-commit to origin/alpha
     node --input-type=module --eval '
@@ -1243,23 +1197,38 @@ import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 (async function () {
-    let branchBeta = process.argv[1] || "HEAD";
+    let branchCheckpoint = process.argv[1] || "HEAD";
+    let branchMerge = process.argv[2] || "beta";
+    let branchPull = process.argv[3] || new Date().toISOString().slice(0, 10);
     let commitMessage;
     let data;
-    let versionMaster;
-    versionMaster = process.argv[2] || new Date().toISOString().slice(0, 10);
-    versionMaster = versionMaster.replace((/-0?/g), ".");
+    branchPull = branchPull.replace((/-0?/g), ".");
+    [
+        branchCheckpoint, branchMerge, branchPull
+    ] = [
+        branchCheckpoint, branchMerge, branchPull
+    ].map(function (branch) {
+        branch.trim().replace((/[^\w.\-]/g), "_");
+    });
     data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
-    data = data.replace(
-        /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
-        `\n\n# v${versionMaster}\n`
-    );
-    await moduleFs.promises.writeFile("CHANGELOG.md", data);
-    commitMessage = new RegExp(
-        `\n\n# v${versionMaster}\n[\\S\\s]+?\n\n`
-    ).exec(data)[0];
-    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
-    versionMaster = versionMaster.trim().replace((/[$\u0027`]/g), "?");
+    switch (branchMerge) {
+    case "master":
+        branchPull = `branch-v${branchPull}`;
+        data = data.replace(
+            /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
+            `\n\n# v${branchPull}\n`
+        );
+        await moduleFs.promises.writeFile("CHANGELOG.md", data);
+        commitMessage = new RegExp(
+            `\n\n# v${branchPull}\n[\\S\\s]+?\n\n`
+        ).exec(data)[0];
+        break;
+    default:
+        branchPull = `branch-p${branchPull}`;
+        commitMessage = (
+            /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
+        ).exec(data)[1];
+    }
     moduleChildProcess.spawn(
         "sh",
         [
@@ -1268,10 +1237,10 @@ import moduleFs from "fs";
 (set -e
     . ./jslint_ci.sh
     npm run test2
-    git push . HEAD:__alpha_release_pre -f
-    shGitSquashPop ${branchBeta} \u0027${commitMessage}\u0027
-    git diff \u0027origin/branch-v${versionMaster}\u0027 || true
-    git push origin \u0027alpha:branch-v${versionMaster}\u0027 -f
+    git push . HEAD:__alpha_pullrequest_${branchMerge}_pre -f
+    shGitSquashPop ${branchCheckpoint} ${commitMessage}
+    git diff origin/branch-v${branchPull} || true
+    git push origin alpha:branch-v${branchPull} -f
     git push origin alpha -f
     shDirHttplinkValidate
 )
