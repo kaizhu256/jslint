@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2023.10.24)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
+| Branch | [master<br>(v2024.3.21)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/kaizhu256/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/kaizhu256/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/kaizhu256/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/index.html) | [![coverage](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/index.html) | [![coverage](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/coverage/index.html) |
@@ -74,9 +74,9 @@ Douglas Crockford <douglas@crockford.com>
 12. [License](#license)
 
 13. [Devops Instruction](#devops-instruction)
+    - [pull-request merge](#pull-request-merge)
     - [branch-master commit](#branch-master-commit)
     - [branch-master publish](#branch-master-publish)
-    - [pull-request merge](#pull-request-merge)
     - [vscode-jslint publish](#vscode-jslint-publish)
 
 
@@ -915,17 +915,38 @@ eval("1"); //jslint-ignore-line
 
 
 <br><br>
-### branch-master commit
-- $ `shGitSquashPop <commit-beta> '# v20yy.mm.dd\n<release notes from CHANGELOG.md>'`
-    - verify correct-year `20yy`
-- $ `git push origin alpha:branch-v20yy.mm.dd`
-- $ `git push upstream alpha -f`
+### pull-request merge
+- find highest issue-number at https://github.com/kaizhu256/jslint/issues/, https://github.com/kaizhu256/jslint/pulls/, and add +1 to it for PR-xxx
+```shell
+(set -e
+npm run test2
+sh jslint_ci.sh shGitSquashPop beta '<commit-message>'
+git diff origin/branch-xxx || true
+git push origin alpha:branch-xxx -f
+git push origin alpha -f
+# git push upstream alpha -f
+)
+printf "EXIT_CODE=$?\n"
+```
+- verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify ci-success for upstream-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- goto https://github.com/kaizhu256/jslint/pulls
-- click `New pull request`
-- click `base repository: kaizhu256/jslint base:beta`
-- click `head repository: kaizhu256/jslint compare:branch-v20yy.mm.dd`
+- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-xxx
+- click `Create pull request`
+- `Add a description` template:
+```
+Fixes #xxx.
+- <primary-commit-message>
+
+This PR will ...
+
+this PR will additionally:
+- <secondary-commit-message>
+...
+
+<screenshot>
+```
 - verify `commit into jslint-org:beta`
 - click `Create pull request`
 - verify ci-success for pull-request
@@ -934,14 +955,62 @@ eval("1"); //jslint-ignore-line
 - verify ci-success for upstream-branch-beta
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 ```shell
+(set -e
 git fetch upstream beta
 git diff alpha..upstream/beta
 # verify no diff between alpha..upstream/beta
 git reset upstream/beta
 git push origin alpha -f
 git push origin alpha:beta
-shMyciUpdate
+sh jslint_ci.sh shMyciUpdate
+# git push upstream alpha -f
+)
+printf "EXIT_CODE=$?\n"
+```
+- verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- verify ci-success for upstream-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- click `Delete branch`
+
+
+<br><br>
+### branch-master commit
+- update CHANGELOG.md `#v20yy.mm.dd` to today's date
+```shell
+shGithubReleaseAlpha
 git push upstream alpha -f
+```
+- verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- verify ci-success for upstream-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v20yy.mm.dd
+- click `Create pull request`
+- `Add a title` template: `#v20yy.mm.dd`
+- `Add a description` template:
+```
+<release notes from CHANGELOG.md>
+```
+- verify `commit into jslint-org:beta`
+- click `Create pull request`
+- verify ci-success for pull-request
+    - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
+- click `Rebase and merge`
+- verify ci-success for upstream-branch-beta
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+```shell
+(set -e
+git fetch upstream beta
+git diff alpha..upstream/beta
+# verify no diff between alpha..upstream/beta
+git reset upstream/beta
+git push origin alpha -f
+git push origin alpha:beta
+sh jslint_ci.sh shMyciUpdate
+# git push upstream alpha -f
+)
+printf "EXIT_CODE=$?\n"
 ```
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
@@ -964,12 +1033,17 @@ git push upstream beta:master
 - verify ci-success for upstream-branch-master
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/releases/new
-- input tag `v20yy.mm.dd`
+- `Choose a tag` template: `v20yy.mm.dd`
 - click `Create new tag: v20yy.mm.dd on publish`
     - verify correct-year `20yy`
-- click `Target: master`
-- input `Release title: v20yy.mm.dd - <description>`
-- copy-paste release notes from CHANGELOG.md
+- select `Target: master`
+- select `Previous tag:auto`
+- `Release title` template: `v20yy.mm.dd - <primary-commit-message>`
+- `Describe this release` template:
+```
+- <primary-commit-message>
+- <secondary-commit-message>
+```
 - click `Generate release notes`
 - click `Set as the latest release`
 - click `Preview` and review
@@ -977,53 +1051,6 @@ git push upstream beta:master
 - verify ci-success for upstream-branch-publish
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify email-notification `Successfully published @kaizhu256/jslint@20yy.mm.dd`
-
-
-<br><br>
-### pull-request merge
-- find highest issue-number at https://github.com/kaizhu256/jslint/issues/, https://github.com/kaizhu256/jslint/pulls/, and add +1 to it for PR-xxx
-```shell
-git push origin alpha:branch_xxx
-git push upstream alpha
-```
-- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:alpha
-- select branch to merge
-- click `Create pull request`
-- `Add a description` template:
-```
-Fixes #xxx.
-- <primary-commit-message>
-
-This PR will ...
-
-this PR will additionally:
-- <secondary-commit-messages>
-...
-
-<screenshot>
-```
-- verify `commit into jslint-org:beta`
-- click `Create pull request`
-- verify ci-success for pull-request
-    - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
-- click `Rebase and merge`
-- verify ci-success for upstream-branch-beta
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-```shell
-git fetch upstream beta
-git diff alpha..upstream/beta
-# verify no diff between alpha..upstream/beta
-git reset upstream/beta
-git push origin alpha -f
-git push origin alpha:beta
-shMyciUpdate
-git push upstream alpha -f
-```
-- verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- verify ci-success for upstream-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- click `Delete branch`
 
 
 <br><br>

@@ -725,7 +725,9 @@ import moduleHttps from "https";
                 /[\u0022\u0027]/g
             ), "").replace((
                 /\/branch-[a-z]*?\//g
-            ), `/branch-${GITHUB_BRANCH0}/`).replace(new RegExp(
+            ), `/branch-${GITHUB_BRANCH0}/`).replace((
+                /:(?:branch-v20yy\.mm\.dd|branch-xxx)$/g
+            ), ":alpha").replace(new RegExp(
                 `\\b${UPSTREAM_REPOSITORY}\\b`,
                 "g"
             ), GITHUB_REPOSITORY).replace(new RegExp(
@@ -887,6 +889,54 @@ COMMIT_LIMIT=$COMMIT_LIMIT MODE_SQUASH=$MODE_SQUASH\n"
     git checkout "$BRANCH"
     # force-push squashed-commit
     shGitCmdWithGithubToken push origin "$BRANCH" -f
+)}
+
+shGithubReleaseAlpha() {(set -e
+# this function will create-and-push a github-release-commit to origin/alpha
+    node --input-type=module --eval '
+import moduleAssert from "assert";
+import moduleChildProcess from "child_process";
+import moduleFs from "fs";
+(async function () {
+    let commitMessage;
+    let data;
+    let versionMaster;
+    versionMaster = new Date().toISOString().slice(0, 10);
+    versionMaster = versionMaster.replace((/-0?/g), ".");
+    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
+    data = data.replace(
+        /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
+        `\n\n# v${versionMaster}\n`
+    );
+    await moduleFs.promises.writeFile("CHANGELOG.md", data);
+    commitMessage = new RegExp(
+        `\n\n# v${versionMaster}\n[\\S\\s]+?\n\n`
+    ).exec(data)[0].trim();
+    commitMessage = commitMessage.replace((/[$\u0027`]/g), "?");
+    moduleChildProcess.spawn(
+        "sh",
+        [
+            "-c",
+            (`
+(set -e
+    npm run test2
+    git push . HEAD:__alpha_release_pre -f
+    sh ./jslint_ci.sh shGitSquashPop beta \u0027${commitMessage}\u0027
+    git diff origin/branch-v${versionMaster} || true
+    git push origin alpha:branch-v${versionMaster} -f
+    git push origin alpha -f
+)
+            `)
+        ],
+        {stdio: ["ignore", 1, 2]}
+    ).on("exit", function (exitCode) {
+        moduleAssert.ok(
+            exitCode === 0,
+            `shGithubReleaseAlpha - exitCode=${exitCode}`
+        );
+    });
+}());
+' "$@" # '
 )}
 
 shGitGc() {(set -e
