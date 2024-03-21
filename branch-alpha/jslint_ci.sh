@@ -483,7 +483,7 @@ import moduleFs from "fs";
         {
             file: "README.md",
             src: fileDict["README.md"].replace((
-                /\bv20\d\d\.\d\d?\.\d\d?\b/g
+                /\bv20\d\d\.\d\d?\.\d\d?\b/
             ), `v${versionMaster}`)
         }, {
             file: "package.json",
