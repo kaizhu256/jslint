@@ -208,19 +208,6 @@ import moduleFs from "fs";
 import moduleOs from "os";
 import modulePath from "path";
 import moduleUrl from "url";
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
-
-// This function will print <argv> to stderr and then return <argv>[0].
-
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}());
 (async function () {
     let child;
     let exitCode;
@@ -1074,7 +1061,7 @@ import moduleFs from "fs";
     // update README.md
     data = await moduleFs.promises.readFile("README.md", "utf8");
     data = data.replace(
-        debugInline(new RegExp( //jslint-ignore-line
+        new RegExp(
             (
                 "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
                 + "\\/compare"
@@ -1082,7 +1069,7 @@ import moduleFs from "fs";
                 + `:branch-${version[0]}\\d\\d\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
             ),
             "g"
-        )),
+        ),
         `$1:${branchPull}`
     );
     await moduleFs.promises.writeFile("README.md", data);
@@ -1405,19 +1392,6 @@ import moduleHttp from "http";
 import modulePath from "path";
 import moduleRepl from "repl";
 import moduleUrl from "url";
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
-
-// This function will print <argv> to stderr and then return <argv>[0].
-
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}());
 (async function httpFileServer() {
 
 // this function will start http-file-server
@@ -1880,19 +1854,6 @@ import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 import moduleHttps from "https";
 import modulePath from "path";
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
-
-// This function will print <argv> to stderr and then return <argv>[0].
-
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}());
 function objectDeepCopyWithKeysSorted(obj) {
 
 // This function will recursively deep-copy <obj> with keys sorted.
