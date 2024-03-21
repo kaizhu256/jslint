@@ -483,7 +483,7 @@ import moduleFs from "fs";
         {
             file: "README.md",
             src: fileDict["README.md"].replace((
-                /\bv\d\d\d\d\.\d\d?\.\d\d?\b/m
+                /\bv20\d\d\.\d\d?\.\d\d?\b/
             ), `v${versionMaster}`)
         }, {
             file: "package.json",
@@ -905,7 +905,7 @@ import moduleFs from "fs";
     versionMaster = versionMaster.replace((/-0?/g), ".");
     data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
     data = data.replace(
-        /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
+        /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
         `\n\n# v${versionMaster}\n`
     );
     await moduleFs.promises.writeFile("CHANGELOG.md", data);
@@ -919,12 +919,14 @@ import moduleFs from "fs";
             "-c",
             (`
 (set -e
+    . ./jslint_ci.sh
     npm run test2
     git push . HEAD:__alpha_release_pre -f
-    sh ./jslint_ci.sh shGitSquashPop beta \u0027${commitMessage}\u0027
+    shGitSquashPop beta \u0027${commitMessage}\u0027
     git diff origin/branch-v${versionMaster} || true
     git push origin alpha:branch-v${versionMaster} -f
     git push origin alpha -f
+    shDirHttplinkValidate
 )
             `)
         ],

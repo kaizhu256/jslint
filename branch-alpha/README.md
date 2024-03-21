@@ -976,7 +976,6 @@ printf "EXIT_CODE=$?\n"
 
 <br><br>
 ### branch-master commit
-- update CHANGELOG.md `#v20yy.mm.dd` to today's date
 ```shell
 shGithubReleaseAlpha
 git push upstream alpha -f
@@ -985,9 +984,9 @@ git push upstream alpha -f
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify ci-success for upstream-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v20yy.mm.dd
+- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2024.3.21
 - click `Create pull request`
-- `Add a title` template: `#v20yy.mm.dd`
+- `Add a title` template: `# v2011.11.11`
 - `Add a description` template:
 ```
 <release notes from CHANGELOG.md>
@@ -1033,12 +1032,12 @@ git push upstream beta:master
 - verify ci-success for upstream-branch-master
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/releases/new
-- `Choose a tag` template: `v20yy.mm.dd`
-- click `Create new tag: v20yy.mm.dd on publish`
+- `Choose a tag` template: `v2011.11.11`
+- click `Create new tag: v2011.11.11 on publish`
     - verify correct-year `20yy`
 - select `Target: master`
 - select `Previous tag:auto`
-- `Release title` template: `v20yy.mm.dd - <primary-commit-message>`
+- `Release title` template: `v2011.11.11 - <primary-commit-message>`
 - `Describe this release` template:
 ```
 - <primary-commit-message>
