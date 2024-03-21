@@ -769,11 +769,11 @@ body {
 <pre><span class="lineno"><a href="#line_611" id="line_611">  611.</a></span><span class="count                ">    666</span><span>    let import_list = [];       // The array collecting all import-from strings.</span></pre>
 <pre><span class="lineno"><a href="#line_612" id="line_612">  612.</a></span><span class="count                ">    666</span><span>    let line_list = String(     // The array containing source lines.</span></pre>
 <pre><span class="lineno"><a href="#line_613" id="line_613">  613.</a></span><span class="count                ">    666</span><span>        "\n" + source</span></pre>
-<pre><span class="lineno"><a href="#line_614" id="line_614">  614.</a></span><span class="count                "> 105306</span><span>    ).split(jslint_rgx_crlf).map(function (line_source) {</span></pre>
-<pre><span class="lineno"><a href="#line_615" id="line_615">  615.</a></span><span class="count                "> 105306</span><span>        return {</span></pre>
-<pre><span class="lineno"><a href="#line_616" id="line_616">  616.</a></span><span class="count                "> 105306</span><span>            line_source</span></pre>
-<pre><span class="lineno"><a href="#line_617" id="line_617">  617.</a></span><span class="count                "> 105306</span><span>        };</span></pre>
-<pre><span class="lineno"><a href="#line_618" id="line_618">  618.</a></span><span class="count                "> 105306</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_614" id="line_614">  614.</a></span><span class="count                "> 105267</span><span>    ).split(jslint_rgx_crlf).map(function (line_source) {</span></pre>
+<pre><span class="lineno"><a href="#line_615" id="line_615">  615.</a></span><span class="count                "> 105267</span><span>        return {</span></pre>
+<pre><span class="lineno"><a href="#line_616" id="line_616">  616.</a></span><span class="count                "> 105267</span><span>            line_source</span></pre>
+<pre><span class="lineno"><a href="#line_617" id="line_617">  617.</a></span><span class="count                "> 105267</span><span>        };</span></pre>
+<pre><span class="lineno"><a href="#line_618" id="line_618">  618.</a></span><span class="count                "> 105267</span><span>    });</span></pre>
 <pre><span class="lineno"><a href="#line_619" id="line_619">  619.</a></span><span class="count                ">    666</span><span>    let mode_stop = false;      // true if JSLint cannot finish.</span></pre>
 <pre><span class="lineno"><a href="#line_620" id="line_620">  620.</a></span><span class="count                ">    666</span><span>    let property_dict = empty();        // The object containing the tallied</span></pre>
 <pre><span class="lineno"><a href="#line_621" id="line_621">  621.</a></span><span class="count                ">    666</span><span>                                        // ... property names.</span></pre>
@@ -975,10 +975,10 @@ body {
 <pre><span class="lineno"><a href="#line_817" id="line_817">  817.</a></span><span class="count                ">     28</span><span>        throw warn_at(code, line, column, a, b, c, d);</span></pre>
 <pre><span class="lineno"><a href="#line_818" id="line_818">  818.</a></span><span class="count                ">     28</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_819" id="line_819">  819.</a></span><span class="count                ">    666</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_820" id="line_820">  820.</a></span><span class="count                "> 339253</span><span>    function test_cause(code, aa, column) {</span></pre>
-<pre><span class="lineno"><a href="#line_821" id="line_821">  821.</a></span><span class="count                "> 339253</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_822" id="line_822">  822.</a></span><span class="count                "> 339253</span><span>// This function will instrument &lt;cause&gt; to &lt;cause_dict&gt; for test-purposes.</span></pre>
-<pre><span class="lineno"><a href="#line_823" id="line_823">  823.</a></span><span class="count                "> 339253</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_820" id="line_820">  820.</a></span><span class="count                "> 339265</span><span>    function test_cause(code, aa, column) {</span></pre>
+<pre><span class="lineno"><a href="#line_821" id="line_821">  821.</a></span><span class="count                "> 339265</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_822" id="line_822">  822.</a></span><span class="count                "> 339265</span><span>// This function will instrument &lt;cause&gt; to &lt;cause_dict&gt; for test-purposes.</span></pre>
+<pre><span class="lineno"><a href="#line_823" id="line_823">  823.</a></span><span class="count                "> 339265</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_824" id="line_824">  824.</a></span><span class="count                ">   4856</span><span>        if (option_dict.test_cause) {</span></pre>
 <pre><span class="lineno"><a href="#line_825" id="line_825">  825.</a></span><span class="count                ">   4856</span><span>            cause_dict[JSON.stringify([</span></pre>
 <pre><span class="lineno"><a href="#line_826" id="line_826">  826.</a></span><span class="count                ">   4856</span><span>                String(new Error().stack).replace((</span></pre>
@@ -997,7 +997,7 @@ body {
 <pre><span class="lineno"><a href="#line_839" id="line_839">  839.</a></span><span class="count                ">   4856</span><span>                column || 0</span></pre>
 <pre><span class="lineno"><a href="#line_840" id="line_840">  840.</a></span><span class="count                ">   4856</span><span>            ])] = true;</span></pre>
 <pre><span class="lineno"><a href="#line_841" id="line_841">  841.</a></span><span class="count                ">   4856</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_842" id="line_842">  842.</a></span><span class="count                "> 339253</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_842" id="line_842">  842.</a></span><span class="count                "> 339265</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_843" id="line_843">  843.</a></span><span class="count                ">    666</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_844" id="line_844">  844.</a></span><span class="count                ">   1070</span><span>    function warn(code, the_token, a, b, c, d) {</span></pre>
 <pre><span class="lineno"><a href="#line_845" id="line_845">  845.</a></span><span class="count                ">   1070</span><span></span></pre>
@@ -2093,13 +2093,13 @@ body {
 <pre><span class="lineno"><a href="#line_1935" id="line_1935"> 1935.</a></span><span class="count                ">     28</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1936" id="line_1936"> 1936.</a></span><span class="count                ">     28</span><span>        count = 0;</span></pre>
 <pre><span class="lineno"><a href="#line_1937" id="line_1937"> 1937.</a></span><span class="count                ">     28</span><span>        ii = 0;</span></pre>
-<pre><span class="lineno"><a href="#line_1938" id="line_1938"> 1938.</a></span><span class="count                ">  23307</span><span>        while (true) {</span></pre>
-<pre><span class="lineno"><a href="#line_1939" id="line_1939"> 1939.</a></span><span class="count                ">  23307</span><span>            ii = code.indexOf("\n", ii) + 1;</span></pre>
-<pre><span class="lineno"><a href="#line_1940" id="line_1940"> 1940.</a></span><span class="count                ">  23307</span><span>            if (ii === 0) {</span></pre>
-<pre><span class="lineno"><a href="#line_1941" id="line_1941"> 1941.</a></span><span class="count                ">  23307</span><span>                break;</span></pre>
-<pre><span class="lineno"><a href="#line_1942" id="line_1942"> 1942.</a></span><span class="count                ">  23307</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_1943" id="line_1943"> 1943.</a></span><span class="count                ">  23307</span><span>            count += 1;</span></pre>
-<pre><span class="lineno"><a href="#line_1944" id="line_1944"> 1944.</a></span><span class="count                ">  23307</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_1938" id="line_1938"> 1938.</a></span><span class="count                ">  23271</span><span>        while (true) {</span></pre>
+<pre><span class="lineno"><a href="#line_1939" id="line_1939"> 1939.</a></span><span class="count                ">  23271</span><span>            ii = code.indexOf("\n", ii) + 1;</span></pre>
+<pre><span class="lineno"><a href="#line_1940" id="line_1940"> 1940.</a></span><span class="count                ">  23271</span><span>            if (ii === 0) {</span></pre>
+<pre><span class="lineno"><a href="#line_1941" id="line_1941"> 1941.</a></span><span class="count                ">  23271</span><span>                break;</span></pre>
+<pre><span class="lineno"><a href="#line_1942" id="line_1942"> 1942.</a></span><span class="count                ">  23271</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_1943" id="line_1943"> 1943.</a></span><span class="count                ">  23271</span><span>            count += 1;</span></pre>
+<pre><span class="lineno"><a href="#line_1944" id="line_1944"> 1944.</a></span><span class="count                ">  23271</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_1945" id="line_1945"> 1945.</a></span><span class="count                ">     28</span><span>        return count;</span></pre>
 <pre><span class="lineno"><a href="#line_1946" id="line_1946"> 1946.</a></span><span class="count                ">     28</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_1947" id="line_1947"> 1947.</a></span><span class="count                ">     38</span><span></span></pre>
@@ -2358,13 +2358,13 @@ body {
 <pre><span class="lineno"><a href="#line_2200" id="line_2200"> 2200.</a></span><span class="count                ">    666</span><span>// don't provide good warnings. The functions char_after, char_before,</span></pre>
 <pre><span class="lineno"><a href="#line_2201" id="line_2201"> 2201.</a></span><span class="count                ">    666</span><span>// read_digits, and char_after_escape help in the parsing of literals.</span></pre>
 <pre><span class="lineno"><a href="#line_2202" id="line_2202"> 2202.</a></span><span class="count                ">    666</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2203" id="line_2203"> 2203.</a></span><span class="count                "> 238062</span><span>    function char_after(match) {</span></pre>
-<pre><span class="lineno"><a href="#line_2204" id="line_2204"> 2204.</a></span><span class="count                "> 238062</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2205" id="line_2205"> 2205.</a></span><span class="count                "> 238062</span><span>// Get the next character from the source line. Remove it from the line_source,</span></pre>
-<pre><span class="lineno"><a href="#line_2206" id="line_2206"> 2206.</a></span><span class="count                "> 238062</span><span>// and append it to the snippet. Optionally check that the previous character</span></pre>
-<pre><span class="lineno"><a href="#line_2207" id="line_2207"> 2207.</a></span><span class="count                "> 238062</span><span>// matched an expected value.</span></pre>
-<pre><span class="lineno"><a href="#line_2208" id="line_2208"> 2208.</a></span><span class="count                "> 238062</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2209" id="line_2209"> 2209.</a></span><span class="count                ">   5974</span><span>        if (match !== undefined &amp;&amp; char !== match) {</span></pre>
+<pre><span class="lineno"><a href="#line_2203" id="line_2203"> 2203.</a></span><span class="count                "> 238074</span><span>    function char_after(match) {</span></pre>
+<pre><span class="lineno"><a href="#line_2204" id="line_2204"> 2204.</a></span><span class="count                "> 238074</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2205" id="line_2205"> 2205.</a></span><span class="count                "> 238074</span><span>// Get the next character from the source line. Remove it from the line_source,</span></pre>
+<pre><span class="lineno"><a href="#line_2206" id="line_2206"> 2206.</a></span><span class="count                "> 238074</span><span>// and append it to the snippet. Optionally check that the previous character</span></pre>
+<pre><span class="lineno"><a href="#line_2207" id="line_2207"> 2207.</a></span><span class="count                "> 238074</span><span>// matched an expected value.</span></pre>
+<pre><span class="lineno"><a href="#line_2208" id="line_2208"> 2208.</a></span><span class="count                "> 238074</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2209" id="line_2209"> 2209.</a></span><span class="count                ">   5986</span><span>        if (match !== undefined &amp;&amp; char !== match) {</span></pre>
 <pre><span class="lineno"><a href="#line_2210" id="line_2210"> 2210.</a></span><span class="count                ">     10</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2211" id="line_2211"> 2211.</a></span><span class="count                ">     10</span><span>// test_cause:</span></pre>
 <pre><span class="lineno"><a href="#line_2212" id="line_2212"> 2212.</a></span><span class="count                ">     10</span><span>// ["aa=/[", "char_after", "expected_a", "]", 5]</span></pre>
@@ -2375,20 +2375,20 @@ body {
 <pre><span class="lineno"><a href="#line_2217" id="line_2217"> 2217.</a></span><span class="count                ">     10</span><span>                ? stop_at("expected_a", line, column - 1, match)</span></pre>
 <pre><span class="lineno"><a href="#line_2218" id="line_2218"> 2218.</a></span><span class="count                ">     10</span><span>                : stop_at("expected_a_b", line, column, match, char)</span></pre>
 <pre><span class="lineno"><a href="#line_2219" id="line_2219"> 2219.</a></span><span class="count                ">     10</span><span>            );</span></pre>
-<pre><span class="lineno"><a href="#line_2220" id="line_2220"> 2220.</a></span><span class="count                "> 238052</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_2221" id="line_2221"> 2221.</a></span><span class="count                "> 238052</span><span>        char = line_source.slice(0, 1);</span></pre>
-<pre><span class="lineno"><a href="#line_2222" id="line_2222"> 2222.</a></span><span class="count                "> 238052</span><span>        line_source = line_source.slice(1);</span></pre>
-<pre><span class="lineno"><a href="#line_2223" id="line_2223"> 2223.</a></span><span class="count                "> 238052</span><span>        snippet += char || " ";</span></pre>
-<pre><span class="lineno"><a href="#line_2224" id="line_2224"> 2224.</a></span><span class="count                "> 238062</span><span>        column += 1;</span></pre>
-<pre><span class="lineno"><a href="#line_2225" id="line_2225"> 2225.</a></span><span class="count                "> 238062</span><span>        return char;</span></pre>
-<pre><span class="lineno"><a href="#line_2226" id="line_2226"> 2226.</a></span><span class="count                "> 238062</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_2220" id="line_2220"> 2220.</a></span><span class="count                "> 238064</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_2221" id="line_2221"> 2221.</a></span><span class="count                "> 238064</span><span>        char = line_source.slice(0, 1);</span></pre>
+<pre><span class="lineno"><a href="#line_2222" id="line_2222"> 2222.</a></span><span class="count                "> 238064</span><span>        line_source = line_source.slice(1);</span></pre>
+<pre><span class="lineno"><a href="#line_2223" id="line_2223"> 2223.</a></span><span class="count                "> 238064</span><span>        snippet += char || " ";</span></pre>
+<pre><span class="lineno"><a href="#line_2224" id="line_2224"> 2224.</a></span><span class="count                "> 238074</span><span>        column += 1;</span></pre>
+<pre><span class="lineno"><a href="#line_2225" id="line_2225"> 2225.</a></span><span class="count                "> 238074</span><span>        return char;</span></pre>
+<pre><span class="lineno"><a href="#line_2226" id="line_2226"> 2226.</a></span><span class="count                "> 238074</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_2227" id="line_2227"> 2227.</a></span><span class="count                ">    666</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2228" id="line_2228"> 2228.</a></span><span class="count                ">   2945</span><span>    function char_after_escape(extra) {</span></pre>
-<pre><span class="lineno"><a href="#line_2229" id="line_2229"> 2229.</a></span><span class="count                ">   2945</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2230" id="line_2230"> 2230.</a></span><span class="count                ">   2945</span><span>// Validate char after escape "\\".</span></pre>
-<pre><span class="lineno"><a href="#line_2231" id="line_2231"> 2231.</a></span><span class="count                ">   2945</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2232" id="line_2232"> 2232.</a></span><span class="count                ">   2945</span><span>        char_after("\\");</span></pre>
-<pre><span class="lineno"><a href="#line_2233" id="line_2233"> 2233.</a></span><span class="count                ">   2945</span><span>        switch (char) {</span></pre>
+<pre><span class="lineno"><a href="#line_2228" id="line_2228"> 2228.</a></span><span class="count                ">   2957</span><span>    function char_after_escape(extra) {</span></pre>
+<pre><span class="lineno"><a href="#line_2229" id="line_2229"> 2229.</a></span><span class="count                ">   2957</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2230" id="line_2230"> 2230.</a></span><span class="count                ">   2957</span><span>// Validate char after escape "\\".</span></pre>
+<pre><span class="lineno"><a href="#line_2231" id="line_2231"> 2231.</a></span><span class="count                ">   2957</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2232" id="line_2232"> 2232.</a></span><span class="count                ">   2957</span><span>        char_after("\\");</span></pre>
+<pre><span class="lineno"><a href="#line_2233" id="line_2233"> 2233.</a></span><span class="count                ">   2957</span><span>        switch (char) {</span></pre>
 <pre><span class="lineno"><a href="#line_2234" id="line_2234"> 2234.</a></span><span class="count                ">      1</span><span>        case "":</span></pre>
 <pre><span class="lineno"><a href="#line_2235" id="line_2235"> 2235.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2236" id="line_2236"> 2236.</a></span><span class="count                ">      1</span><span>// test_cause:</span></pre>
@@ -2450,17 +2450,17 @@ body {
 <pre><span class="lineno"><a href="#line_2292" id="line_2292"> 2292.</a></span><span class="count                ">    376</span><span>                warn_at("expected_four_digits", line, column);</span></pre>
 <pre><span class="lineno"><a href="#line_2293" id="line_2293"> 2293.</a></span><span class="count                ">    376</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_2294" id="line_2294"> 2294.</a></span><span class="count                ">    376</span><span>            return;</span></pre>
-<pre><span class="lineno"><a href="#line_2295" id="line_2295"> 2295.</a></span><span class="count                ">    850</span><span>        default:</span></pre>
-<pre><span class="lineno"><a href="#line_2296" id="line_2296"> 2296.</a></span><span class="count                ">    850</span><span>            if (extra &amp;&amp; extra.indexOf(char) &gt;= 0) {</span></pre>
-<pre><span class="lineno"><a href="#line_2297" id="line_2297"> 2297.</a></span><span class="count                ">    850</span><span>                return char_after();</span></pre>
-<pre><span class="lineno"><a href="#line_2298" id="line_2298"> 2298.</a></span><span class="count                ">    850</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_2299" id="line_2299"> 2299.</a></span><span class="count                ">    850</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2300" id="line_2300"> 2300.</a></span><span class="count                ">    850</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_2301" id="line_2301"> 2301.</a></span><span class="count                ">    850</span><span>// ["\"\\0\"", "char_after_escape", "unexpected_a_before_b", "0", 3]</span></pre>
-<pre><span class="lineno"><a href="#line_2302" id="line_2302"> 2302.</a></span><span class="count                ">    850</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2303" id="line_2303"> 2303.</a></span><span class="count                ">    850</span><span>            warn_at("unexpected_a_before_b", line, column, "\\", char);</span></pre>
-<pre><span class="lineno"><a href="#line_2304" id="line_2304"> 2304.</a></span><span class="count                ">   2945</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_2305" id="line_2305"> 2305.</a></span><span class="count                ">   2945</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_2295" id="line_2295"> 2295.</a></span><span class="count                ">    862</span><span>        default:</span></pre>
+<pre><span class="lineno"><a href="#line_2296" id="line_2296"> 2296.</a></span><span class="count                ">    862</span><span>            if (extra &amp;&amp; extra.indexOf(char) &gt;= 0) {</span></pre>
+<pre><span class="lineno"><a href="#line_2297" id="line_2297"> 2297.</a></span><span class="count                ">    862</span><span>                return char_after();</span></pre>
+<pre><span class="lineno"><a href="#line_2298" id="line_2298"> 2298.</a></span><span class="count                ">    862</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_2299" id="line_2299"> 2299.</a></span><span class="count                ">    862</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2300" id="line_2300"> 2300.</a></span><span class="count                ">    862</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_2301" id="line_2301"> 2301.</a></span><span class="count                ">    862</span><span>// ["\"\\0\"", "char_after_escape", "unexpected_a_before_b", "0", 3]</span></pre>
+<pre><span class="lineno"><a href="#line_2302" id="line_2302"> 2302.</a></span><span class="count                ">    862</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2303" id="line_2303"> 2303.</a></span><span class="count                ">    862</span><span>            warn_at("unexpected_a_before_b", line, column, "\\", char);</span></pre>
+<pre><span class="lineno"><a href="#line_2304" id="line_2304"> 2304.</a></span><span class="count                ">   2957</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_2305" id="line_2305"> 2305.</a></span><span class="count                ">   2957</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_2306" id="line_2306"> 2306.</a></span><span class="count                ">    666</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2307" id="line_2307"> 2307.</a></span><span class="count                ">  10022</span><span>    function char_before() {</span></pre>
 <pre><span class="lineno"><a href="#line_2308" id="line_2308"> 2308.</a></span><span class="count                ">  10022</span><span></span></pre>
@@ -3360,59 +3360,59 @@ body {
 <pre><span class="lineno"><a href="#line_3202" id="line_3202"> 3202.</a></span><span class="count                "> 252043</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3203" id="line_3203"> 3203.</a></span><span class="count                "> 252043</span><span>// Lex/loop through each whitespace.</span></pre>
 <pre><span class="lineno"><a href="#line_3204" id="line_3204"> 3204.</a></span><span class="count                "> 252043</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3205" id="line_3205"> 3205.</a></span><span class="count                "> 375710</span><span>        while (true) {</span></pre>
-<pre><span class="lineno"><a href="#line_3206" id="line_3206"> 3206.</a></span><span class="count                "> 375710</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3207" id="line_3207"> 3207.</a></span><span class="count                "> 375710</span><span>// Lex/loop through each blank-line.</span></pre>
-<pre><span class="lineno"><a href="#line_3208" id="line_3208"> 3208.</a></span><span class="count                "> 375710</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3209" id="line_3209"> 3209.</a></span><span class="count                "> 375710</span><span>            while (!line_source) {</span></pre>
-<pre><span class="lineno"><a href="#line_3210" id="line_3210"> 3210.</a></span><span class="count                "> 375710</span><span>                line_source = read_line();</span></pre>
-<pre><span class="lineno"><a href="#line_3211" id="line_3211"> 3211.</a></span><span class="count                "> 375710</span><span>                from = 0;</span></pre>
-<pre><span class="lineno"><a href="#line_3212" id="line_3212"> 3212.</a></span><span class="count                "> 375710</span><span>                if (line_source === undefined) {</span></pre>
-<pre><span class="lineno"><a href="#line_3213" id="line_3213"> 3213.</a></span><span class="count                "> 375710</span><span>                    return (</span></pre>
-<pre><span class="lineno"><a href="#line_3214" id="line_3214"> 3214.</a></span><span class="count                "> 375710</span><span>                        mode_mega</span></pre>
-<pre><span class="lineno"><a href="#line_3215" id="line_3215"> 3215.</a></span><span class="count                "> 375710</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3216" id="line_3216"> 3216.</a></span><span class="count                "> 375710</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_3217" id="line_3217"> 3217.</a></span><span class="count                "> 375710</span><span>// ["`${//}`", "lex_token", "unclosed_mega", "", 1]</span></pre>
-<pre><span class="lineno"><a href="#line_3218" id="line_3218"> 3218.</a></span><span class="count                "> 375710</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3219" id="line_3219"> 3219.</a></span><span class="count                "> 375710</span><span>                        ? stop_at("unclosed_mega", line_mega, from_mega)</span></pre>
-<pre><span class="lineno"><a href="#line_3220" id="line_3220"> 3220.</a></span><span class="count                "> 375710</span><span>                        : line_disable !== undefined</span></pre>
-<pre><span class="lineno"><a href="#line_3221" id="line_3221"> 3221.</a></span><span class="count                "> 375710</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3222" id="line_3222"> 3222.</a></span><span class="count                "> 375710</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_3223" id="line_3223"> 3223.</a></span><span class="count                "> 375710</span><span>// ["/*jslint-disable*/", "lex_token", "unclosed_disable", "", 1]</span></pre>
-<pre><span class="lineno"><a href="#line_3224" id="line_3224"> 3224.</a></span><span class="count                "> 375710</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3225" id="line_3225"> 3225.</a></span><span class="count                "> 375710</span><span>                        ? stop_at("unclosed_disable", line_disable)</span></pre>
-<pre><span class="lineno"><a href="#line_3226" id="line_3226"> 3226.</a></span><span class="count                "> 375710</span><span>                        : token_create("(end)")</span></pre>
-<pre><span class="lineno"><a href="#line_3227" id="line_3227"> 3227.</a></span><span class="count                "> 375710</span><span>                    );</span></pre>
-<pre><span class="lineno"><a href="#line_3228" id="line_3228"> 3228.</a></span><span class="count                "> 375710</span><span>                }</span></pre>
-<pre><span class="lineno"><a href="#line_3229" id="line_3229"> 3229.</a></span><span class="count                "> 375710</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_3230" id="line_3230"> 3230.</a></span><span class="count                "> 375710</span><span>            from = column;</span></pre>
-<pre><span class="lineno"><a href="#line_3231" id="line_3231"> 3231.</a></span><span class="count                "> 375710</span><span>            match = line_source.match(jslint_rgx_token);</span></pre>
-<pre><span class="lineno"><a href="#line_3232" id="line_3232"> 3232.</a></span><span class="count                "> 375710</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3233" id="line_3233"> 3233.</a></span><span class="count                "> 375710</span><span>// match[1] token</span></pre>
-<pre><span class="lineno"><a href="#line_3234" id="line_3234"> 3234.</a></span><span class="count                "> 375710</span><span>// match[2] whitespace</span></pre>
-<pre><span class="lineno"><a href="#line_3235" id="line_3235"> 3235.</a></span><span class="count                "> 375710</span><span>// match[3] identifier</span></pre>
-<pre><span class="lineno"><a href="#line_3236" id="line_3236"> 3236.</a></span><span class="count                "> 375710</span><span>// match[4] number</span></pre>
-<pre><span class="lineno"><a href="#line_3237" id="line_3237"> 3237.</a></span><span class="count                "> 375710</span><span>// match[5] rest</span></pre>
-<pre><span class="lineno"><a href="#line_3238" id="line_3238"> 3238.</a></span><span class="count                "> 375710</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3239" id="line_3239"> 3239.</a></span><span class="count                "> 375710</span><span>            if (!match) {</span></pre>
-<pre><span class="lineno"><a href="#line_3240" id="line_3240"> 3240.</a></span><span class="count                "> 375710</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3241" id="line_3241"> 3241.</a></span><span class="count                "> 375710</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_3242" id="line_3242"> 3242.</a></span><span class="count                "> 375710</span><span>// ["#", "lex_token", "unexpected_char_a", "#", 1]</span></pre>
-<pre><span class="lineno"><a href="#line_3243" id="line_3243"> 3243.</a></span><span class="count                "> 375710</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3244" id="line_3244"> 3244.</a></span><span class="count                "> 375710</span><span>                return stop_at(</span></pre>
-<pre><span class="lineno"><a href="#line_3245" id="line_3245"> 3245.</a></span><span class="count                "> 375710</span><span>                    "unexpected_char_a",</span></pre>
-<pre><span class="lineno"><a href="#line_3246" id="line_3246"> 3246.</a></span><span class="count                "> 375710</span><span>                    line,</span></pre>
-<pre><span class="lineno"><a href="#line_3247" id="line_3247"> 3247.</a></span><span class="count                "> 375710</span><span>                    column,</span></pre>
-<pre><span class="lineno"><a href="#line_3248" id="line_3248"> 3248.</a></span><span class="count                "> 375710</span><span>                    line_source[0]</span></pre>
-<pre><span class="lineno"><a href="#line_3249" id="line_3249"> 3249.</a></span><span class="count                "> 375710</span><span>                );</span></pre>
-<pre><span class="lineno"><a href="#line_3250" id="line_3250"> 3250.</a></span><span class="count                "> 375710</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_3251" id="line_3251"> 3251.</a></span><span class="count                "> 375710</span><span>            snippet = match[1];</span></pre>
-<pre><span class="lineno"><a href="#line_3252" id="line_3252"> 3252.</a></span><span class="count                "> 375710</span><span>            column += snippet.length;</span></pre>
-<pre><span class="lineno"><a href="#line_3253" id="line_3253"> 3253.</a></span><span class="count                "> 375710</span><span>            line_source = match[5];</span></pre>
-<pre><span class="lineno"><a href="#line_3254" id="line_3254"> 3254.</a></span><span class="count                "> 375710</span><span>            if (!match[2]) {</span></pre>
-<pre><span class="lineno"><a href="#line_3255" id="line_3255"> 3255.</a></span><span class="count                "> 375710</span><span>                break;</span></pre>
-<pre><span class="lineno"><a href="#line_3256" id="line_3256"> 3256.</a></span><span class="count                "> 375710</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_3257" id="line_3257"> 3257.</a></span><span class="count                "> 375710</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_3205" id="line_3205"> 3205.</a></span><span class="count                "> 375713</span><span>        while (true) {</span></pre>
+<pre><span class="lineno"><a href="#line_3206" id="line_3206"> 3206.</a></span><span class="count                "> 375713</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3207" id="line_3207"> 3207.</a></span><span class="count                "> 375713</span><span>// Lex/loop through each blank-line.</span></pre>
+<pre><span class="lineno"><a href="#line_3208" id="line_3208"> 3208.</a></span><span class="count                "> 375713</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3209" id="line_3209"> 3209.</a></span><span class="count                "> 375713</span><span>            while (!line_source) {</span></pre>
+<pre><span class="lineno"><a href="#line_3210" id="line_3210"> 3210.</a></span><span class="count                "> 375713</span><span>                line_source = read_line();</span></pre>
+<pre><span class="lineno"><a href="#line_3211" id="line_3211"> 3211.</a></span><span class="count                "> 375713</span><span>                from = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_3212" id="line_3212"> 3212.</a></span><span class="count                "> 375713</span><span>                if (line_source === undefined) {</span></pre>
+<pre><span class="lineno"><a href="#line_3213" id="line_3213"> 3213.</a></span><span class="count                "> 375713</span><span>                    return (</span></pre>
+<pre><span class="lineno"><a href="#line_3214" id="line_3214"> 3214.</a></span><span class="count                "> 375713</span><span>                        mode_mega</span></pre>
+<pre><span class="lineno"><a href="#line_3215" id="line_3215"> 3215.</a></span><span class="count                "> 375713</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3216" id="line_3216"> 3216.</a></span><span class="count                "> 375713</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_3217" id="line_3217"> 3217.</a></span><span class="count                "> 375713</span><span>// ["`${//}`", "lex_token", "unclosed_mega", "", 1]</span></pre>
+<pre><span class="lineno"><a href="#line_3218" id="line_3218"> 3218.</a></span><span class="count                "> 375713</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3219" id="line_3219"> 3219.</a></span><span class="count                "> 375713</span><span>                        ? stop_at("unclosed_mega", line_mega, from_mega)</span></pre>
+<pre><span class="lineno"><a href="#line_3220" id="line_3220"> 3220.</a></span><span class="count                "> 375713</span><span>                        : line_disable !== undefined</span></pre>
+<pre><span class="lineno"><a href="#line_3221" id="line_3221"> 3221.</a></span><span class="count                "> 375713</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3222" id="line_3222"> 3222.</a></span><span class="count                "> 375713</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_3223" id="line_3223"> 3223.</a></span><span class="count                "> 375713</span><span>// ["/*jslint-disable*/", "lex_token", "unclosed_disable", "", 1]</span></pre>
+<pre><span class="lineno"><a href="#line_3224" id="line_3224"> 3224.</a></span><span class="count                "> 375713</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3225" id="line_3225"> 3225.</a></span><span class="count                "> 375713</span><span>                        ? stop_at("unclosed_disable", line_disable)</span></pre>
+<pre><span class="lineno"><a href="#line_3226" id="line_3226"> 3226.</a></span><span class="count                "> 375713</span><span>                        : token_create("(end)")</span></pre>
+<pre><span class="lineno"><a href="#line_3227" id="line_3227"> 3227.</a></span><span class="count                "> 375713</span><span>                    );</span></pre>
+<pre><span class="lineno"><a href="#line_3228" id="line_3228"> 3228.</a></span><span class="count                "> 375713</span><span>                }</span></pre>
+<pre><span class="lineno"><a href="#line_3229" id="line_3229"> 3229.</a></span><span class="count                "> 375713</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_3230" id="line_3230"> 3230.</a></span><span class="count                "> 375713</span><span>            from = column;</span></pre>
+<pre><span class="lineno"><a href="#line_3231" id="line_3231"> 3231.</a></span><span class="count                "> 375713</span><span>            match = line_source.match(jslint_rgx_token);</span></pre>
+<pre><span class="lineno"><a href="#line_3232" id="line_3232"> 3232.</a></span><span class="count                "> 375713</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3233" id="line_3233"> 3233.</a></span><span class="count                "> 375713</span><span>// match[1] token</span></pre>
+<pre><span class="lineno"><a href="#line_3234" id="line_3234"> 3234.</a></span><span class="count                "> 375713</span><span>// match[2] whitespace</span></pre>
+<pre><span class="lineno"><a href="#line_3235" id="line_3235"> 3235.</a></span><span class="count                "> 375713</span><span>// match[3] identifier</span></pre>
+<pre><span class="lineno"><a href="#line_3236" id="line_3236"> 3236.</a></span><span class="count                "> 375713</span><span>// match[4] number</span></pre>
+<pre><span class="lineno"><a href="#line_3237" id="line_3237"> 3237.</a></span><span class="count                "> 375713</span><span>// match[5] rest</span></pre>
+<pre><span class="lineno"><a href="#line_3238" id="line_3238"> 3238.</a></span><span class="count                "> 375713</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3239" id="line_3239"> 3239.</a></span><span class="count                "> 375713</span><span>            if (!match) {</span></pre>
+<pre><span class="lineno"><a href="#line_3240" id="line_3240"> 3240.</a></span><span class="count                "> 375713</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3241" id="line_3241"> 3241.</a></span><span class="count                "> 375713</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_3242" id="line_3242"> 3242.</a></span><span class="count                "> 375713</span><span>// ["#", "lex_token", "unexpected_char_a", "#", 1]</span></pre>
+<pre><span class="lineno"><a href="#line_3243" id="line_3243"> 3243.</a></span><span class="count                "> 375713</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3244" id="line_3244"> 3244.</a></span><span class="count                "> 375713</span><span>                return stop_at(</span></pre>
+<pre><span class="lineno"><a href="#line_3245" id="line_3245"> 3245.</a></span><span class="count                "> 375713</span><span>                    "unexpected_char_a",</span></pre>
+<pre><span class="lineno"><a href="#line_3246" id="line_3246"> 3246.</a></span><span class="count                "> 375713</span><span>                    line,</span></pre>
+<pre><span class="lineno"><a href="#line_3247" id="line_3247"> 3247.</a></span><span class="count                "> 375713</span><span>                    column,</span></pre>
+<pre><span class="lineno"><a href="#line_3248" id="line_3248"> 3248.</a></span><span class="count                "> 375713</span><span>                    line_source[0]</span></pre>
+<pre><span class="lineno"><a href="#line_3249" id="line_3249"> 3249.</a></span><span class="count                "> 375713</span><span>                );</span></pre>
+<pre><span class="lineno"><a href="#line_3250" id="line_3250"> 3250.</a></span><span class="count                "> 375713</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_3251" id="line_3251"> 3251.</a></span><span class="count                "> 375713</span><span>            snippet = match[1];</span></pre>
+<pre><span class="lineno"><a href="#line_3252" id="line_3252"> 3252.</a></span><span class="count                "> 375713</span><span>            column += snippet.length;</span></pre>
+<pre><span class="lineno"><a href="#line_3253" id="line_3253"> 3253.</a></span><span class="count                "> 375713</span><span>            line_source = match[5];</span></pre>
+<pre><span class="lineno"><a href="#line_3254" id="line_3254"> 3254.</a></span><span class="count                "> 375713</span><span>            if (!match[2]) {</span></pre>
+<pre><span class="lineno"><a href="#line_3255" id="line_3255"> 3255.</a></span><span class="count                "> 375713</span><span>                break;</span></pre>
+<pre><span class="lineno"><a href="#line_3256" id="line_3256"> 3256.</a></span><span class="count                "> 375713</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_3257" id="line_3257"> 3257.</a></span><span class="count                "> 375713</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_3258" id="line_3258"> 3258.</a></span><span class="count                "> 251402</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3259" id="line_3259"> 3259.</a></span><span class="count                "> 251402</span><span>// The token is an identifier.</span></pre>
 <pre><span class="lineno"><a href="#line_3260" id="line_3260"> 3260.</a></span><span class="count                "> 251402</span><span></span></pre>
@@ -3838,15 +3838,15 @@ body {
 <pre><span class="lineno"><a href="#line_3680" id="line_3680"> 3680.</a></span><span class="count                ">    469</span><span>        return digits.length;</span></pre>
 <pre><span class="lineno"><a href="#line_3681" id="line_3681"> 3681.</a></span><span class="count                ">    469</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_3682" id="line_3682"> 3682.</a></span><span class="count                ">    666</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3683" id="line_3683"> 3683.</a></span><span class="count                "> 105282</span><span>    function read_line() {</span></pre>
-<pre><span class="lineno"><a href="#line_3684" id="line_3684"> 3684.</a></span><span class="count                "> 105282</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3685" id="line_3685"> 3685.</a></span><span class="count                "> 105282</span><span>// Put the next line of source in line_source. If the line contains tabs,</span></pre>
-<pre><span class="lineno"><a href="#line_3686" id="line_3686"> 3686.</a></span><span class="count                "> 105282</span><span>// replace them with spaces and give a warning. Also warn if the line contains</span></pre>
-<pre><span class="lineno"><a href="#line_3687" id="line_3687"> 3687.</a></span><span class="count                "> 105282</span><span>// unsafe characters or is too damn long.</span></pre>
-<pre><span class="lineno"><a href="#line_3688" id="line_3688"> 3688.</a></span><span class="count                "> 105282</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3689" id="line_3689"> 3689.</a></span><span class="count                "> 105282</span><span>        if (</span></pre>
-<pre><span class="lineno"><a href="#line_3690" id="line_3690"> 3690.</a></span><span class="count                "> 105282</span><span>            !option_dict.long</span></pre>
-<pre><span class="lineno"><a href="#line_3691" id="line_3691"> 3691.</a></span><span class="count                "> 105278</span><span>            &amp;&amp; line_whole.length &gt; 80</span></pre>
+<pre><span class="lineno"><a href="#line_3683" id="line_3683"> 3683.</a></span><span class="count                "> 105243</span><span>    function read_line() {</span></pre>
+<pre><span class="lineno"><a href="#line_3684" id="line_3684"> 3684.</a></span><span class="count                "> 105243</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3685" id="line_3685"> 3685.</a></span><span class="count                "> 105243</span><span>// Put the next line of source in line_source. If the line contains tabs,</span></pre>
+<pre><span class="lineno"><a href="#line_3686" id="line_3686"> 3686.</a></span><span class="count                "> 105243</span><span>// replace them with spaces and give a warning. Also warn if the line contains</span></pre>
+<pre><span class="lineno"><a href="#line_3687" id="line_3687"> 3687.</a></span><span class="count                "> 105243</span><span>// unsafe characters or is too damn long.</span></pre>
+<pre><span class="lineno"><a href="#line_3688" id="line_3688"> 3688.</a></span><span class="count                "> 105243</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3689" id="line_3689"> 3689.</a></span><span class="count                "> 105243</span><span>        if (</span></pre>
+<pre><span class="lineno"><a href="#line_3690" id="line_3690"> 3690.</a></span><span class="count                "> 105243</span><span>            !option_dict.long</span></pre>
+<pre><span class="lineno"><a href="#line_3691" id="line_3691"> 3691.</a></span><span class="count                "> 105239</span><span>            &amp;&amp; line_whole.length &gt; 80</span></pre>
 <pre><span class="lineno"><a href="#line_3692" id="line_3692"> 3692.</a></span><span class="count                ">     56</span><span>            &amp;&amp; line_disable === undefined</span></pre>
 <pre><span class="lineno"><a href="#line_3693" id="line_3693"> 3693.</a></span><span class="count                ">     56</span><span>            &amp;&amp; !state.mode_json</span></pre>
 <pre><span class="lineno"><a href="#line_3694" id="line_3694"> 3694.</a></span><span class="count                ">     23</span><span>            &amp;&amp; token_1</span></pre>
@@ -3858,59 +3858,59 @@ body {
 <pre><span class="lineno"><a href="#line_3700" id="line_3700"> 3700.</a></span><span class="count                ">     13</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3701" id="line_3701"> 3701.</a></span><span class="count                ">     13</span><span>            warn_at("too_long", line);</span></pre>
 <pre><span class="lineno"><a href="#line_3702" id="line_3702"> 3702.</a></span><span class="count                ">     13</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_3703" id="line_3703"> 3703.</a></span><span class="count                "> 105282</span><span>        column = 0;</span></pre>
-<pre><span class="lineno"><a href="#line_3704" id="line_3704"> 3704.</a></span><span class="count                "> 105282</span><span>        line += 1;</span></pre>
-<pre><span class="lineno"><a href="#line_3705" id="line_3705"> 3705.</a></span><span class="count                "> 105282</span><span>        mode_regexp = false;</span></pre>
-<pre><span class="lineno"><a href="#line_3706" id="line_3706"> 3706.</a></span><span class="count                "> 105282</span><span>        line_source = undefined;</span></pre>
-<pre><span class="lineno"><a href="#line_3707" id="line_3707"> 3707.</a></span><span class="count                "> 105282</span><span>        line_whole = "";</span></pre>
+<pre><span class="lineno"><a href="#line_3703" id="line_3703"> 3703.</a></span><span class="count                "> 105243</span><span>        column = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_3704" id="line_3704"> 3704.</a></span><span class="count                "> 105243</span><span>        line += 1;</span></pre>
+<pre><span class="lineno"><a href="#line_3705" id="line_3705"> 3705.</a></span><span class="count                "> 105243</span><span>        mode_regexp = false;</span></pre>
+<pre><span class="lineno"><a href="#line_3706" id="line_3706"> 3706.</a></span><span class="count                "> 105243</span><span>        line_source = undefined;</span></pre>
+<pre><span class="lineno"><a href="#line_3707" id="line_3707"> 3707.</a></span><span class="count                "> 105243</span><span>        line_whole = "";</span></pre>
 <pre><span class="lineno"><a href="#line_3708" id="line_3708"> 3708.</a></span><span class="count                ">    643</span><span>        if (line_list[line] === undefined) {</span></pre>
 <pre><span class="lineno"><a href="#line_3709" id="line_3709"> 3709.</a></span><span class="count                ">    643</span><span>            return line_source;</span></pre>
-<pre><span class="lineno"><a href="#line_3710" id="line_3710"> 3710.</a></span><span class="count                "> 104639</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_3711" id="line_3711"> 3711.</a></span><span class="count                "> 104639</span><span>        line_source = line_list[line].line_source;</span></pre>
-<pre><span class="lineno"><a href="#line_3712" id="line_3712"> 3712.</a></span><span class="count                "> 104639</span><span>        line_whole = line_source;</span></pre>
-<pre><span class="lineno"><a href="#line_3713" id="line_3713"> 3713.</a></span><span class="count                "> 104639</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3714" id="line_3714"> 3714.</a></span><span class="count                "> 104639</span><span>// Scan each line for following ignore-directives:</span></pre>
-<pre><span class="lineno"><a href="#line_3715" id="line_3715"> 3715.</a></span><span class="count                "> 104639</span><span>// "/*jslint-disable*/"</span></pre>
-<pre><span class="lineno"><a href="#line_3716" id="line_3716"> 3716.</a></span><span class="count                "> 104639</span><span>// "/*jslint-enable*/"</span></pre>
-<pre><span class="lineno"><a href="#line_3717" id="line_3717"> 3717.</a></span><span class="count                "> 104639</span><span>// "//jslint-ignore-line"</span></pre>
-<pre><span class="lineno"><a href="#line_3718" id="line_3718"> 3718.</a></span><span class="count                "> 104639</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3719" id="line_3719"> 3719.</a></span><span class="count                "> 104639</span><span>        if (line_source === "/*jslint-disable*/") {</span></pre>
+<pre><span class="lineno"><a href="#line_3710" id="line_3710"> 3710.</a></span><span class="count                "> 104600</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_3711" id="line_3711"> 3711.</a></span><span class="count                "> 104600</span><span>        line_source = line_list[line].line_source;</span></pre>
+<pre><span class="lineno"><a href="#line_3712" id="line_3712"> 3712.</a></span><span class="count                "> 104600</span><span>        line_whole = line_source;</span></pre>
+<pre><span class="lineno"><a href="#line_3713" id="line_3713"> 3713.</a></span><span class="count                "> 104600</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3714" id="line_3714"> 3714.</a></span><span class="count                "> 104600</span><span>// Scan each line for following ignore-directives:</span></pre>
+<pre><span class="lineno"><a href="#line_3715" id="line_3715"> 3715.</a></span><span class="count                "> 104600</span><span>// "/*jslint-disable*/"</span></pre>
+<pre><span class="lineno"><a href="#line_3716" id="line_3716"> 3716.</a></span><span class="count                "> 104600</span><span>// "/*jslint-enable*/"</span></pre>
+<pre><span class="lineno"><a href="#line_3717" id="line_3717"> 3717.</a></span><span class="count                "> 104600</span><span>// "//jslint-ignore-line"</span></pre>
+<pre><span class="lineno"><a href="#line_3718" id="line_3718"> 3718.</a></span><span class="count                "> 104600</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3719" id="line_3719"> 3719.</a></span><span class="count                "> 104600</span><span>        if (line_source === "/*jslint-disable*/") {</span></pre>
 <pre><span class="lineno"><a href="#line_3720" id="line_3720"> 3720.</a></span><span class="count                ">      5</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3721" id="line_3721"> 3721.</a></span><span class="count                ">      5</span><span>// test_cause:</span></pre>
 <pre><span class="lineno"><a href="#line_3722" id="line_3722"> 3722.</a></span><span class="count                ">      5</span><span>// ["/*jslint-disable*/", "read_line", "jslint_disable", "", 0]</span></pre>
 <pre><span class="lineno"><a href="#line_3723" id="line_3723"> 3723.</a></span><span class="count                ">      5</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3724" id="line_3724"> 3724.</a></span><span class="count                ">      5</span><span>            test_cause("jslint_disable");</span></pre>
 <pre><span class="lineno"><a href="#line_3725" id="line_3725"> 3725.</a></span><span class="count                ">      5</span><span>            line_disable = line;</span></pre>
-<pre><span class="lineno"><a href="#line_3726" id="line_3726"> 3726.</a></span><span class="count                "> 104634</span><span>        } else if (line_source === "/*jslint-enable*/") {</span></pre>
-<pre><span class="lineno"><a href="#line_3727" id="line_3727"> 3727.</a></span><span class="count                "> 104634</span><span>            if (line_disable === undefined) {</span></pre>
-<pre><span class="lineno"><a href="#line_3728" id="line_3728"> 3728.</a></span><span class="count                "> 104634</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3729" id="line_3729"> 3729.</a></span><span class="count                "> 104634</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_3730" id="line_3730"> 3730.</a></span><span class="count                "> 104634</span><span>// ["/*jslint-enable*/", "read_line", "unopened_enable", "", 1]</span></pre>
-<pre><span class="lineno"><a href="#line_3731" id="line_3731"> 3731.</a></span><span class="count                "> 104634</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3732" id="line_3732"> 3732.</a></span><span class="count                "> 104634</span><span>                stop_at("unopened_enable", line);</span></pre>
-<pre><span class="lineno"><a href="#line_3733" id="line_3733"> 3733.</a></span><span class="count                "> 104634</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_3734" id="line_3734"> 3734.</a></span><span class="count                "> 104634</span><span>            line_disable = undefined;</span></pre>
-<pre><span class="lineno"><a href="#line_3735" id="line_3735"> 3735.</a></span><span class="count                "> 104634</span><span>        } else if (</span></pre>
-<pre><span class="lineno"><a href="#line_3736" id="line_3736"> 3736.</a></span><span class="count                "> 104634</span><span>            line_source.endsWith(" //jslint-ignore-line")</span></pre>
-<pre><span class="lineno"><a href="#line_3737" id="line_3737"> 3737.</a></span><span class="count                "> 104634</span><span>            || line_source.endsWith(" //jslint-quiet")</span></pre>
-<pre><span class="lineno"><a href="#line_3738" id="line_3738"> 3738.</a></span><span class="count                "> 104634</span><span>        ) {</span></pre>
-<pre><span class="lineno"><a href="#line_3739" id="line_3739"> 3739.</a></span><span class="count                "> 104634</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3740" id="line_3740"> 3740.</a></span><span class="count                "> 104634</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_3741" id="line_3741"> 3741.</a></span><span class="count                "> 104634</span><span>// ["0 //jslint-ignore-line", "read_line", "jslint_ignore_line", "", 0]</span></pre>
-<pre><span class="lineno"><a href="#line_3742" id="line_3742"> 3742.</a></span><span class="count                "> 104634</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3743" id="line_3743"> 3743.</a></span><span class="count                "> 104634</span><span>            test_cause("jslint_ignore_line");</span></pre>
-<pre><span class="lineno"><a href="#line_3744" id="line_3744"> 3744.</a></span><span class="count                "> 104634</span><span>            line_list[line].directive_ignore_line = true;</span></pre>
-<pre><span class="lineno"><a href="#line_3745" id="line_3745"> 3745.</a></span><span class="count                "> 104638</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_3746" id="line_3746"> 3746.</a></span><span class="count                "> 104638</span><span>        if (line_disable !== undefined) {</span></pre>
+<pre><span class="lineno"><a href="#line_3726" id="line_3726"> 3726.</a></span><span class="count                "> 104595</span><span>        } else if (line_source === "/*jslint-enable*/") {</span></pre>
+<pre><span class="lineno"><a href="#line_3727" id="line_3727"> 3727.</a></span><span class="count                "> 104595</span><span>            if (line_disable === undefined) {</span></pre>
+<pre><span class="lineno"><a href="#line_3728" id="line_3728"> 3728.</a></span><span class="count                "> 104595</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3729" id="line_3729"> 3729.</a></span><span class="count                "> 104595</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_3730" id="line_3730"> 3730.</a></span><span class="count                "> 104595</span><span>// ["/*jslint-enable*/", "read_line", "unopened_enable", "", 1]</span></pre>
+<pre><span class="lineno"><a href="#line_3731" id="line_3731"> 3731.</a></span><span class="count                "> 104595</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3732" id="line_3732"> 3732.</a></span><span class="count                "> 104595</span><span>                stop_at("unopened_enable", line);</span></pre>
+<pre><span class="lineno"><a href="#line_3733" id="line_3733"> 3733.</a></span><span class="count                "> 104595</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_3734" id="line_3734"> 3734.</a></span><span class="count                "> 104595</span><span>            line_disable = undefined;</span></pre>
+<pre><span class="lineno"><a href="#line_3735" id="line_3735"> 3735.</a></span><span class="count                "> 104595</span><span>        } else if (</span></pre>
+<pre><span class="lineno"><a href="#line_3736" id="line_3736"> 3736.</a></span><span class="count                "> 104595</span><span>            line_source.endsWith(" //jslint-ignore-line")</span></pre>
+<pre><span class="lineno"><a href="#line_3737" id="line_3737"> 3737.</a></span><span class="count                "> 104595</span><span>            || line_source.endsWith(" //jslint-quiet")</span></pre>
+<pre><span class="lineno"><a href="#line_3738" id="line_3738"> 3738.</a></span><span class="count                "> 104595</span><span>        ) {</span></pre>
+<pre><span class="lineno"><a href="#line_3739" id="line_3739"> 3739.</a></span><span class="count                "> 104595</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3740" id="line_3740"> 3740.</a></span><span class="count                "> 104595</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_3741" id="line_3741"> 3741.</a></span><span class="count                "> 104595</span><span>// ["0 //jslint-ignore-line", "read_line", "jslint_ignore_line", "", 0]</span></pre>
+<pre><span class="lineno"><a href="#line_3742" id="line_3742"> 3742.</a></span><span class="count                "> 104595</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_3743" id="line_3743"> 3743.</a></span><span class="count                "> 104595</span><span>            test_cause("jslint_ignore_line");</span></pre>
+<pre><span class="lineno"><a href="#line_3744" id="line_3744"> 3744.</a></span><span class="count                "> 104595</span><span>            line_list[line].directive_ignore_line = true;</span></pre>
+<pre><span class="lineno"><a href="#line_3745" id="line_3745"> 3745.</a></span><span class="count                "> 104599</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_3746" id="line_3746"> 3746.</a></span><span class="count                "> 104599</span><span>        if (line_disable !== undefined) {</span></pre>
 <pre><span class="lineno"><a href="#line_3747" id="line_3747"> 3747.</a></span><span class="count                ">      9</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3748" id="line_3748"> 3748.</a></span><span class="count                ">      9</span><span>// test_cause:</span></pre>
 <pre><span class="lineno"><a href="#line_3749" id="line_3749"> 3749.</a></span><span class="count                ">      9</span><span>// ["/*jslint-disable*/\n0", "read_line", "line_disable", "", 0]</span></pre>
 <pre><span class="lineno"><a href="#line_3750" id="line_3750"> 3750.</a></span><span class="count                ">      9</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3751" id="line_3751"> 3751.</a></span><span class="count                ">      9</span><span>            test_cause("line_disable");</span></pre>
 <pre><span class="lineno"><a href="#line_3752" id="line_3752"> 3752.</a></span><span class="count                ">      9</span><span>            line_source = "";</span></pre>
-<pre><span class="lineno"><a href="#line_3753" id="line_3753"> 3753.</a></span><span class="count                "> 104638</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_3754" id="line_3754"> 3754.</a></span><span class="count                "> 104638</span><span>        // jslint_rgx_tab</span></pre>
-<pre><span class="lineno"><a href="#line_3755" id="line_3755"> 3755.</a></span><span class="count                "> 104638</span><span>        if (line_source.indexOf("\t") &gt;= 0) {</span></pre>
+<pre><span class="lineno"><a href="#line_3753" id="line_3753"> 3753.</a></span><span class="count                "> 104599</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_3754" id="line_3754"> 3754.</a></span><span class="count                "> 104599</span><span>        // jslint_rgx_tab</span></pre>
+<pre><span class="lineno"><a href="#line_3755" id="line_3755"> 3755.</a></span><span class="count                "> 104599</span><span>        if (line_source.indexOf("\t") &gt;= 0) {</span></pre>
 <pre><span class="lineno"><a href="#line_3756" id="line_3756"> 3756.</a></span><span class="count                ">      3</span><span>            if (!option_dict.white) {</span></pre>
 <pre><span class="lineno"><a href="#line_3757" id="line_3757"> 3757.</a></span><span class="count                ">      3</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3758" id="line_3758"> 3758.</a></span><span class="count                ">      3</span><span>// test_cause:</span></pre>
@@ -3919,16 +3919,16 @@ body {
 <pre><span class="lineno"><a href="#line_3761" id="line_3761"> 3761.</a></span><span class="count                ">      3</span><span>                warn_at("use_spaces", line, line_source.indexOf("\t") + 1);</span></pre>
 <pre><span class="lineno"><a href="#line_3762" id="line_3762"> 3762.</a></span><span class="count                ">      3</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_3763" id="line_3763"> 3763.</a></span><span class="count                ">      3</span><span>            line_source = line_source.replace(jslint_rgx_tab, " ");</span></pre>
-<pre><span class="lineno"><a href="#line_3764" id="line_3764"> 3764.</a></span><span class="count                "> 104638</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_3765" id="line_3765"> 3765.</a></span><span class="count                "> 104638</span><span>        if (!option_dict.white &amp;&amp; line_source.endsWith(" ")) {</span></pre>
+<pre><span class="lineno"><a href="#line_3764" id="line_3764"> 3764.</a></span><span class="count                "> 104599</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_3765" id="line_3765"> 3765.</a></span><span class="count                "> 104599</span><span>        if (!option_dict.white &amp;&amp; line_source.endsWith(" ")) {</span></pre>
 <pre><span class="lineno"><a href="#line_3766" id="line_3766"> 3766.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3767" id="line_3767"> 3767.</a></span><span class="count                ">      2</span><span>// test_cause:</span></pre>
 <pre><span class="lineno"><a href="#line_3768" id="line_3768"> 3768.</a></span><span class="count                ">      2</span><span>// [" ", "read_line", "unexpected_trailing_space", "", 1]</span></pre>
 <pre><span class="lineno"><a href="#line_3769" id="line_3769"> 3769.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3770" id="line_3770"> 3770.</a></span><span class="count                ">      2</span><span>            warn_at("unexpected_trailing_space", line, line_source.length - 1);</span></pre>
-<pre><span class="lineno"><a href="#line_3771" id="line_3771"> 3771.</a></span><span class="count                "> 104638</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_3772" id="line_3772"> 3772.</a></span><span class="count                "> 104638</span><span>        return line_source;</span></pre>
-<pre><span class="lineno"><a href="#line_3773" id="line_3773"> 3773.</a></span><span class="count                "> 104638</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_3771" id="line_3771"> 3771.</a></span><span class="count                "> 104599</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_3772" id="line_3772"> 3772.</a></span><span class="count                "> 104599</span><span>        return line_source;</span></pre>
+<pre><span class="lineno"><a href="#line_3773" id="line_3773"> 3773.</a></span><span class="count                "> 104599</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_3774" id="line_3774"> 3774.</a></span><span class="count                ">    666</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3775" id="line_3775"> 3775.</a></span><span class="count                "> 255023</span><span>    function token_create(id, value, identifier) {</span></pre>
 <pre><span class="lineno"><a href="#line_3776" id="line_3776"> 3776.</a></span><span class="count                "> 255023</span><span></span></pre>
@@ -3958,9 +3958,9 @@ body {
 <pre><span class="lineno"><a href="#line_3800" id="line_3800"> 3800.</a></span><span class="count                "> 255023</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3801" id="line_3801"> 3801.</a></span><span class="count                "> 255023</span><span>        if (</span></pre>
 <pre><span class="lineno"><a href="#line_3802" id="line_3802"> 3802.</a></span><span class="count                "> 255023</span><span>            token_prv.line === line</span></pre>
-<pre><span class="lineno"><a href="#line_3803" id="line_3803"> 3803.</a></span><span class="count                "> 185706</span><span>            &amp;&amp; token_prv.thru === from</span></pre>
+<pre><span class="lineno"><a href="#line_3803" id="line_3803"> 3803.</a></span><span class="count                "> 185709</span><span>            &amp;&amp; token_prv.thru === from</span></pre>
 <pre><span class="lineno"><a href="#line_3804" id="line_3804"> 3804.</a></span><span class="count                "> 119845</span><span>            &amp;&amp; (id === "(comment)" || id === "(regexp)" || id === "/")</span></pre>
-<pre><span class="lineno"><a href="#line_3805" id="line_3805"> 3805.</a></span><span class="count                ">    128</span><span>            &amp;&amp; (token_prv.id === "(comment)" || token_prv.id === "(regexp)")</span></pre>
+<pre><span class="lineno"><a href="#line_3805" id="line_3805"> 3805.</a></span><span class="count                ">    125</span><span>            &amp;&amp; (token_prv.id === "(comment)" || token_prv.id === "(regexp)")</span></pre>
 <pre><span class="lineno"><a href="#line_3806" id="line_3806"> 3806.</a></span><span class="count                ">      1</span><span>        ) {</span></pre>
 <pre><span class="lineno"><a href="#line_3807" id="line_3807"> 3807.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3808" id="line_3808"> 3808.</a></span><span class="count                ">      1</span><span>// test_cause:</span></pre>
@@ -8884,12 +8884,12 @@ body {
 <pre><span class="lineno"><a href="#line_8726" id="line_8726"> 8726.</a></span><span class="count                ">    208</span><span>        "&gt;&gt;=", "&gt;&gt;&gt;", "&gt;&gt;&gt;=", "^", "^=", "|", "|=", "||"</span></pre>
 <pre><span class="lineno"><a href="#line_8727" id="line_8727"> 8727.</a></span><span class="count                ">    208</span><span>    ], true);</span></pre>
 <pre><span class="lineno"><a href="#line_8728" id="line_8728"> 8728.</a></span><span class="count                ">    208</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8729" id="line_8729"> 8729.</a></span><span class="count                ">  38055</span><span>    function at_margin(fit) {</span></pre>
-<pre><span class="lineno"><a href="#line_8730" id="line_8730"> 8730.</a></span><span class="count                ">  38055</span><span>        const at = margin + fit;</span></pre>
+<pre><span class="lineno"><a href="#line_8729" id="line_8729"> 8729.</a></span><span class="count                ">  38052</span><span>    function at_margin(fit) {</span></pre>
+<pre><span class="lineno"><a href="#line_8730" id="line_8730"> 8730.</a></span><span class="count                ">  38052</span><span>        const at = margin + fit;</span></pre>
 <pre><span class="lineno"><a href="#line_8731" id="line_8731"> 8731.</a></span><span class="count                ">     21</span><span>        if (right.from !== at) {</span></pre>
 <pre><span class="lineno"><a href="#line_8732" id="line_8732"> 8732.</a></span><span class="count                ">     21</span><span>            return expected_at(at);</span></pre>
 <pre><span class="lineno"><a href="#line_8733" id="line_8733"> 8733.</a></span><span class="count                ">     21</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_8734" id="line_8734"> 8734.</a></span><span class="count                ">  38055</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_8734" id="line_8734"> 8734.</a></span><span class="count                ">  38052</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_8735" id="line_8735"> 8735.</a></span><span class="count                ">    208</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8736" id="line_8736"> 8736.</a></span><span class="count                ">   2061</span><span>    function delve(the_function) {</span></pre>
 <pre><span class="lineno"><a href="#line_8737" id="line_8737"> 8737.</a></span><span class="count                ">  13019</span><span>        Object.keys(the_function.context).forEach(function (id) {</span></pre>
@@ -9032,22 +9032,22 @@ body {
 <pre><span class="lineno"><a href="#line_8874" id="line_8874"> 8874.</a></span><span class="count                ">      5</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_8875" id="line_8875"> 8875.</a></span><span class="count                ">  96002</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_8876" id="line_8876"> 8876.</a></span><span class="count                ">    208</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8877" id="line_8877"> 8877.</a></span><span class="count                ">  46153</span><span>    function one_space() {</span></pre>
-<pre><span class="lineno"><a href="#line_8878" id="line_8878"> 8878.</a></span><span class="count                ">  44256</span><span>        if (left.line === right.line || !open) {</span></pre>
-<pre><span class="lineno"><a href="#line_8879" id="line_8879"> 8879.</a></span><span class="count                ">  44256</span><span>            if (left.thru + 1 !== right.from &amp;&amp; nr_comments_skipped === 0) {</span></pre>
-<pre><span class="lineno"><a href="#line_8880" id="line_8880"> 8880.</a></span><span class="count                ">  44256</span><span>                warn(</span></pre>
-<pre><span class="lineno"><a href="#line_8881" id="line_8881"> 8881.</a></span><span class="count                ">  44256</span><span>                    "expected_space_a_b",</span></pre>
-<pre><span class="lineno"><a href="#line_8882" id="line_8882"> 8882.</a></span><span class="count                ">  44256</span><span>                    right,</span></pre>
-<pre><span class="lineno"><a href="#line_8883" id="line_8883"> 8883.</a></span><span class="count                ">  44256</span><span>                    artifact(left),</span></pre>
-<pre><span class="lineno"><a href="#line_8884" id="line_8884"> 8884.</a></span><span class="count                ">  44256</span><span>                    artifact(right)</span></pre>
-<pre><span class="lineno"><a href="#line_8885" id="line_8885"> 8885.</a></span><span class="count                ">  44256</span><span>                );</span></pre>
-<pre><span class="lineno"><a href="#line_8886" id="line_8886"> 8886.</a></span><span class="count                ">  44256</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_8887" id="line_8887"> 8887.</a></span><span class="count                ">  44256</span><span>        } else {</span></pre>
+<pre><span class="lineno"><a href="#line_8877" id="line_8877"> 8877.</a></span><span class="count                ">  46156</span><span>    function one_space() {</span></pre>
+<pre><span class="lineno"><a href="#line_8878" id="line_8878"> 8878.</a></span><span class="count                ">  44259</span><span>        if (left.line === right.line || !open) {</span></pre>
+<pre><span class="lineno"><a href="#line_8879" id="line_8879"> 8879.</a></span><span class="count                ">  44259</span><span>            if (left.thru + 1 !== right.from &amp;&amp; nr_comments_skipped === 0) {</span></pre>
+<pre><span class="lineno"><a href="#line_8880" id="line_8880"> 8880.</a></span><span class="count                ">  44259</span><span>                warn(</span></pre>
+<pre><span class="lineno"><a href="#line_8881" id="line_8881"> 8881.</a></span><span class="count                ">  44259</span><span>                    "expected_space_a_b",</span></pre>
+<pre><span class="lineno"><a href="#line_8882" id="line_8882"> 8882.</a></span><span class="count                ">  44259</span><span>                    right,</span></pre>
+<pre><span class="lineno"><a href="#line_8883" id="line_8883"> 8883.</a></span><span class="count                ">  44259</span><span>                    artifact(left),</span></pre>
+<pre><span class="lineno"><a href="#line_8884" id="line_8884"> 8884.</a></span><span class="count                ">  44259</span><span>                    artifact(right)</span></pre>
+<pre><span class="lineno"><a href="#line_8885" id="line_8885"> 8885.</a></span><span class="count                ">  44259</span><span>                );</span></pre>
+<pre><span class="lineno"><a href="#line_8886" id="line_8886"> 8886.</a></span><span class="count                ">  44259</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_8887" id="line_8887"> 8887.</a></span><span class="count                ">  44259</span><span>        } else {</span></pre>
 <pre><span class="lineno"><a href="#line_8888" id="line_8888"> 8888.</a></span><span class="count                ">   1897</span><span>            if (right.from !== margin) {</span></pre>
 <pre><span class="lineno"><a href="#line_8889" id="line_8889"> 8889.</a></span><span class="count                ">   1897</span><span>                expected_at(margin);</span></pre>
 <pre><span class="lineno"><a href="#line_8890" id="line_8890"> 8890.</a></span><span class="count                ">   1897</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_8891" id="line_8891"> 8891.</a></span><span class="count                ">   1897</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_8892" id="line_8892"> 8892.</a></span><span class="count                ">  46153</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_8892" id="line_8892"> 8892.</a></span><span class="count                ">  46156</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_8893" id="line_8893"> 8893.</a></span><span class="count                ">    208</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8894" id="line_8894"> 8894.</a></span><span class="count                ">   9349</span><span>    function one_space_only() {</span></pre>
 <pre><span class="lineno"><a href="#line_8895" id="line_8895"> 8895.</a></span><span class="count                ">      8</span><span>        if (left.line !== right.line || left.thru + 1 !== right.from) {</span></pre>
