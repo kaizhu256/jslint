@@ -1022,8 +1022,8 @@ import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 (async function () {
-    let branchCheckpoint = process.argv[1] || "HEAD";
-    let branchMerge = process.argv[2] || "beta";
+    let branchCheckpoint = process.argv[2] || "HEAD";
+    let branchMerge = process.argv[1] || "beta";
     let branchPull = process.argv[3] || new Date().toISOString().slice(0, 10);
     let commitMessage;
     let data;
