@@ -918,7 +918,7 @@ eval("1"); //jslint-ignore-line
 ### pull-request merge
 - find highest issue-number at https://github.com/jslint-org/jslint/issues/, https://github.com/jslint-org/jslint/pulls/, and add +1 to it for PR-xxx
 ```shell
-shGithubPullAlpha
+shGithubPullBeta
 git push upstream alpha -f
 ```
 - verify ci-success for origin-branch-alpha
