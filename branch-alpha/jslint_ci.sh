@@ -727,10 +727,12 @@ import moduleHttps from "https";
             /<link\b.*?\brel="preconnect".*?>/g
         ), "");
         data.replace((
-            /\bhttps?:\/\/.*?(?:[\s")\]]|\W?$)/gm
-        ), function (url) {
+            /\bhttps?:\/\/.*?([\s")\]]|\W?$)/gm
+        ), function (url, removeLast) {
             let req;
-            url = url.slice(0, -1);
+            if (removeLast) {
+                url = url.slice(0, -1);
+            }
             url = url.replace((/[\u0022\u0027]/g), "");
             url = url.replace(
                 (/\/branch-[a-z]*?\//g),
