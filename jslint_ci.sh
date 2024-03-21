@@ -482,29 +482,23 @@ import moduleFs from "fs";
     await Promise.all([
         {
             file: "README.md",
-            src: (function () {
-                let data = fileDict["README.md"];
-                data = data.replace(
-                    (/(\[(?:main|master)<br>\()v20\d\d\.\d\d?\.\d\d?\b/g),
-                    `$1v${versionMaster}`
-                );
-                data = data.replace(
-                    (/(\bhttps:\/\/github\.com\/[\w.\-\/]+?\/compare\/[\w.\-\/]+?\.\.\.[\w.:\-\/]+?)-v20\d\d\.\d\d?\.\d\d?\b/g),
-                    `$1-v${versionMaster}`
-                );
-                return data;
-            }())
+            src: fileDict["README.md"].replace(
+                (/(\[(?:main|master)<br>\()v20\d\d\.\d\d?\.\d\d?\b/g),
+                `$1v${versionMaster}`
+            )
         }, {
             file: "package.json",
-            src: fileDict["package.json"].replace((
-                /    "version": "20\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
-            ), `    "version": "${versionBeta}"`)
+            src: fileDict["package.json"].replace(
+                (/    "version": "20\d\d\.\d\d?\.\d\d?(?:-.*?)?"/),
+                `    "version": "${versionBeta}"`
+            )
         }, {
             file: fileMain,
             // update version
-            src: fileDict[fileMain].replace((
-                /^let version = ".*?";$/m
-            ), `let version = "v${versionBeta}";`)
+            src: fileDict[fileMain].replace(
+                (/^let version = ".*?";$/m),
+                `let version = "v${versionBeta}";`
+            )
         }
     ].map(async function ({
         file,
@@ -1037,6 +1031,7 @@ import moduleFs from "fs";
     let branchPull = process.argv[3] || new Date().toISOString().slice(0, 10);
     let commitMessage;
     let data;
+    let rgx;
     branchPull = branchPull.replace((/-0?/g), ".");
     [
         branchCheckpoint, branchMerge, branchPull
@@ -1064,6 +1059,18 @@ import moduleFs from "fs";
             /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
         ).exec(data)[1];
     }
+    rgx = new RegExp(
+        (
+            "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
+            + "\\/compare"
+            + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
+            + `:${branchPull.slice(0, 8)}20\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
+        ),
+        "g"
+    );
+    data = await moduleFs.promises.readFile("README.md", "utf8");
+    data = data.replace(rgx, `$1:${branchPull}`);
+    await moduleFs.promises.writeFile("README.md", data);
     commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
     moduleChildProcess.spawn(
         "sh",
