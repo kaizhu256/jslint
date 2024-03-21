@@ -923,7 +923,7 @@ eval("1"); //jslint-ignore-line
 - $ `git push upstream alpha -f`
 - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-xxx
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2011.11.11
 - click `Create pull request`
 - fill-in `Add your description here...` with:
 ```

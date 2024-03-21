@@ -1072,6 +1072,7 @@ import moduleFs from "fs";
     data = data.replace(rgx, `$1:${branchPull}`);
     await moduleFs.promises.writeFile("README.md", data);
     commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
+    return;
     moduleChildProcess.spawn(
         "sh",
         [
