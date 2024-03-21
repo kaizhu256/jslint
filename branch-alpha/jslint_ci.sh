@@ -483,8 +483,8 @@ import moduleFs from "fs";
         {
             file: "README.md",
             src: fileDict["README.md"].replace((
-                /\bv20\d\d\.\d\d?\.\d\d?\b/
-            ), `v${versionMaster}`)
+                /(\[(?:main|master)<br>|\bhttps:\/\/github\.com\/\S+?\.\.\.\S+?|` template: `(?:# )?)v20\d\d\.\d\d?\.\d\d?\b/g
+            ), `$1v${versionMaster}`)
         }, {
             file: "package.json",
             src: fileDict["package.json"].replace((

@@ -986,7 +986,7 @@ git push upstream alpha -f
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2024.3.21
 - click `Create pull request`
-- `Add a title` template: `# v2011.11.11`
+- `Add a title` template: `# v2024.3.21`
 - `Add a description` template:
 ```
 <release notes from CHANGELOG.md>
@@ -1032,12 +1032,12 @@ git push upstream beta:master
 - verify ci-success for upstream-branch-master
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/releases/new
-- `Choose a tag` template: `v2011.11.11`
-- click `Create new tag: v2011.11.11 on publish`
+- `Choose a tag` template: `v2024.3.21`
+- click `Create new tag: v20yy.mm.dd on publish`
     - verify correct-year `20yy`
 - select `Target: master`
 - select `Previous tag:auto`
-- `Release title` template: `v2011.11.11 - <primary-commit-message>`
+- `Release title` template: `v2024.3.21 - <primary-commit-message>`
 - `Describe this release` template:
 ```
 - <primary-commit-message>
