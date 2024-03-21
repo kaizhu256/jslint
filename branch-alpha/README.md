@@ -74,9 +74,9 @@ Douglas Crockford <douglas@crockford.com>
 12. [License](#license)
 
 13. [Devops Instruction](#devops-instruction)
-    - [pull-request merge](#pull-request-merge)
     - [branch-master commit](#branch-master-commit)
     - [branch-master publish](#branch-master-publish)
+    - [pull-request merge](#pull-request-merge)
     - [vscode-jslint publish](#vscode-jslint-publish)
 
 
@@ -915,66 +915,6 @@ eval("1"); //jslint-ignore-line
 
 
 <br><br>
-### pull-request merge
-- find highest issue-number at https://github.com/kaizhu256/jslint/issues/, https://github.com/kaizhu256/jslint/pulls/, and add +1 to it for PR-xxx
-```shell
-(set -e
-npm run test2
-sh jslint_ci.sh shGitSquashPop beta '<commit-message>'
-git diff origin/branch-xxx || true
-git push origin alpha:branch-xxx -f
-git push origin alpha -f
-# git push upstream alpha -f
-)
-printf "EXIT_CODE=$?\n"
-```
-- verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- verify ci-success for upstream-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-xxx
-- click `Create pull request`
-- `Add a description` template:
-```
-Fixes #xxx.
-- <primary-commit-message>
-
-This PR will ...
-
-this PR will additionally:
-- <secondary-commit-message>
-...
-
-<screenshot>
-```
-- verify `commit into jslint-org:beta`
-- click `Create pull request`
-- verify ci-success for pull-request
-    - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
-- click `Rebase and merge`
-- verify ci-success for upstream-branch-beta
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-```shell
-(set -e
-git fetch upstream beta
-git diff alpha..upstream/beta
-# verify no diff between alpha..upstream/beta
-git reset upstream/beta
-git push origin alpha -f
-git push origin alpha:beta
-sh jslint_ci.sh shMyciUpdate
-# git push upstream alpha -f
-)
-printf "EXIT_CODE=$?\n"
-```
-- verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- verify ci-success for upstream-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- click `Delete branch`
-
-
-<br><br>
 ### branch-master commit
 ```shell
 shGithubReleaseAlpha
@@ -1050,6 +990,66 @@ git push upstream beta:master
 - verify ci-success for upstream-branch-publish
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify email-notification `Successfully published @kaizhu256/jslint@20yy.mm.dd`
+
+
+<br><br>
+### pull-request merge
+- find highest issue-number at https://github.com/kaizhu256/jslint/issues/, https://github.com/kaizhu256/jslint/pulls/, and add +1 to it for PR-xxx
+```shell
+(set -e
+npm run test2
+sh jslint_ci.sh shGitSquashPop beta '<commit-message>'
+git diff origin/branch-xxx || true
+git push origin alpha:branch-xxx -f
+git push origin alpha -f
+# git push upstream alpha -f
+)
+printf "EXIT_CODE=$?\n"
+```
+- verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- verify ci-success for upstream-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-xxx
+- click `Create pull request`
+- `Add a description` template:
+```
+Fixes #xxx.
+- <primary-commit-message>
+
+This PR will ...
+
+this PR will additionally:
+- <secondary-commit-message>
+...
+
+<screenshot>
+```
+- verify `commit into jslint-org:beta`
+- click `Create pull request`
+- verify ci-success for pull-request
+    - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
+- click `Rebase and merge`
+- verify ci-success for upstream-branch-beta
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+```shell
+(set -e
+git fetch upstream beta
+git diff alpha..upstream/beta
+# verify no diff between alpha..upstream/beta
+git reset upstream/beta
+git push origin alpha -f
+git push origin alpha:beta
+sh jslint_ci.sh shMyciUpdate
+# git push upstream alpha -f
+)
+printf "EXIT_CODE=$?\n"
+```
+- verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- verify ci-success for upstream-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- click `Delete branch`
 
 
 <br><br>
