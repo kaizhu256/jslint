@@ -472,7 +472,7 @@ import moduleFs from "fs";
         }
     }));
     Array.from(fileDict["CHANGELOG.md"].matchAll(
-        /\n\n# v(20\d\d\.\d\d?\.\d\d?(-.*?)?)\n/g
+        /\n\n# v(\d\d\d\d\.\d\d?\.\d\d?(-.*?)?)\n/g
     )).slice(0, 2).forEach(function ([
         ignore, version, isBeta
     ]) {
@@ -482,23 +482,20 @@ import moduleFs from "fs";
     await Promise.all([
         {
             file: "README.md",
-            src: fileDict["README.md"].replace(
-                (/(\[(?:main|master)<br>\()v20\d\d\.\d\d?\.\d\d?\b/g),
-                `$1v${versionMaster}`
-            )
+            src: fileDict["README.md"].replace((
+                /(\[(?:main|master)<br>\()v\d\d\d\d\.\d\d?\.\d\d?\b/g
+            ), `$1v${versionMaster}`)
         }, {
             file: "package.json",
-            src: fileDict["package.json"].replace(
-                (/    "version": "20\d\d\.\d\d?\.\d\d?(?:-.*?)?"/),
-                `    "version": "${versionBeta}"`
-            )
+            src: fileDict["package.json"].replace((
+                /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
+            ), `    "version": "${versionBeta}"`)
         }, {
             file: fileMain,
             // update version
-            src: fileDict[fileMain].replace(
-                (/^let version = ".*?";$/m),
-                `let version = "v${versionBeta}";`
-            )
+            src: fileDict[fileMain].replace((
+                /^let version = ".*?";$/m
+            ), `let version = "v${versionBeta}";`)
         }
     ].map(async function ({
         file,
@@ -1045,7 +1042,7 @@ import moduleFs from "fs";
     case "master":
         branchPull = `branch-v${branchPull}`;
         data = data.replace(
-            /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
             `\n\n# v${branchPull}\n`
         );
         await moduleFs.promises.writeFile("CHANGELOG.md", data);
@@ -1056,7 +1053,7 @@ import moduleFs from "fs";
     default:
         branchPull = `branch-p${branchPull}`;
         commitMessage = (
-            /\n\n# v20\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
         ).exec(data)[1];
     }
     rgx = new RegExp(
@@ -2089,7 +2086,7 @@ function replaceListReplace(replaceList, data) {
                     + "repo " + prefix.replace("/blob/", "/tree/") + "\n"
                     + "committed " + new Date(
                         (
-                            /"(20\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[^"]*?)"/
+                            /"(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[^"]*?)"/
                         ).exec(dateCommitted.toString())[1]
                     ).toISOString().replace((/\.\d*?Z/), "Z") + "\n"
                     + "*/"
