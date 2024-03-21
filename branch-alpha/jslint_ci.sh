@@ -1024,34 +1024,35 @@ import moduleFs from "fs";
 (async function () {
     let branchCheckpoint = process.argv[2] || "HEAD";
     let branchMerge = process.argv[1] || "beta";
-    let branchPull = process.argv[3] || new Date().toISOString().slice(0, 10);
+    let branchPull;
     let commitMessage;
     let data;
-    branchPull = branchPull.replace((/-0?/g), ".");
+    let version = process.argv[3] || new Date().toISOString().slice(0, 10);
+    version = version.replace((/-0?/g), ".");
     // security - sanitize branchXxx
     [
-        branchCheckpoint, branchMerge, branchPull
+        branchCheckpoint, branchMerge, version
     ] = [
-        branchCheckpoint, branchMerge, branchPull
+        branchCheckpoint, branchMerge, version
     ].map(function (branch) {
         return branch.trim().replace((/[^\w.\-]/g), "_");
     });
     data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
     switch (branchMerge) {
     case "master":
-        branchPull = `branch-v${branchPull}`;
+        branchPull = `branch-v${version}`;
         // update CHANGELOG.md
         data = data.replace(
             /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
-            `\n\n# v${branchPull.slice(6)}\n`
+            `\n\n# v${version}\n`
         );
         await moduleFs.promises.writeFile("CHANGELOG.md", data);
         commitMessage = new RegExp(
-            `\n\n# v${branchPull}\n[\\S\\s]+?\n\n`
+            `\n\n# v${version}\n[\\S\\s]+?\n\n`
         ).exec(data)[0];
         break;
     default:
-        branchPull = `branch-p${branchPull}`;
+        branchPull = `branch-p${version}`;
         commitMessage = (
             /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
         ).exec(data)[1];
@@ -1064,11 +1065,11 @@ import moduleFs from "fs";
                 "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
                 + "\\/compare"
                 + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
-                + `:${branchPull.slice(0, 8)}20\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
+                + `:${branchPull.slice(0, 7)}20\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
             ),
             "g"
         ),
-        `$1:${branchPull}`
+        `$1:${version}`
     );
     await moduleFs.promises.writeFile("README.md", data);
     // security - sanitize commitMessage
