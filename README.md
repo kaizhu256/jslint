@@ -917,12 +917,10 @@ eval("1"); //jslint-ignore-line
 <br><br>
 ### pull-request merge
 - find highest issue-number at https://github.com/jslint-org/jslint/issues/, https://github.com/jslint-org/jslint/pulls/, and add +1 to it for PR-xxx
-```shell
-shGithubPrIntoBeta beta
-git push upstream alpha -f
-```
+- $ `shGithubPrIntoBeta beta`
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- $ `git push upstream alpha -f`
 - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 - goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-xxx
@@ -950,6 +948,7 @@ this PR will additionally:
 - $ `shGithubPrCleanup`
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- $ `git push upstream alpha -f`
 - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 - click `Delete branch`
@@ -957,12 +956,10 @@ this PR will additionally:
 
 <br><br>
 ### branch-master commit
-```shell
-shGithubPrIntoMaster beta
-git push upstream alpha -f
-```
+- $ `shGithubPrIntoMaster beta`
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- $ `git push upstream alpha -f`
 - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 - goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2023.10.24
@@ -983,14 +980,13 @@ git push upstream alpha -f
 - $ `shGithubPrCleanup`
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- $ `git push upstream alpha -f`
 - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 - click `Delete branch`
-```shell
-git push origin beta:master
-git push upstream beta:master
-```
+- $ `git push origin beta:master`
 - verify ci-success for origin-branch-master
+- $ `git push upstream beta:master`
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify ci-success for upstream-branch-master
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
