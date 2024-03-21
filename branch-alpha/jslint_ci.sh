@@ -1178,7 +1178,7 @@ shGithubFileUpload() {(set -e
     shGithubFileDownloadUpload upload "$1" "$2"
 )}
 
-shGithubPullAlpha() {(set -e
+shGithubPullBeta() {(set -e
 # this function will create-and-push a github-pull-commit to origin/alpha
     node --input-type=module --eval '
 import moduleAssert from "assert";
@@ -1217,7 +1217,7 @@ import moduleFs from "fs";
     ).on("exit", function (exitCode) {
         moduleAssert.ok(
             exitCode === 0,
-            `shGithubPullAlpha - exitCode=${exitCode}`
+            `shGithubPullBeta - exitCode=${exitCode}`
         );
     });
 }());
