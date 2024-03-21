@@ -1040,23 +1040,24 @@ import moduleFs from "fs";
     data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
     switch (branchMerge) {
     case "master":
-        branchPull = `branch-v${version}`;
+        version = `v${version}`;
         // update CHANGELOG.md
         data = data.replace(
             /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
-            `\n\n# v${version}\n`
+            `\n\n# ${version}\n`
         );
         await moduleFs.promises.writeFile("CHANGELOG.md", data);
         commitMessage = new RegExp(
-            `\n\n# v${version}\n[\\S\\s]+?\n\n`
+            `\n\n# ${version}\n[\\S\\s]+?\n\n`
         ).exec(data)[0];
         break;
     default:
-        branchPull = `branch-p${version}`;
+        version = `p${version}`;
         commitMessage = (
             /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
         ).exec(data)[1];
     }
+    branchPull = `branch-${version}`;
     // update README.md
     data = await moduleFs.promises.readFile("README.md", "utf8");
     data = data.replace(
@@ -1065,7 +1066,7 @@ import moduleFs from "fs";
                 "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
                 + "\\/compare"
                 + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
-                + `:${branchPull.slice(0, 7)}20\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
+                + `:branch-${version[0]}\\d\\d\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
             ),
             "g"
         ),
