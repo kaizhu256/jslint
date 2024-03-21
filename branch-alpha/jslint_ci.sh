@@ -725,9 +725,7 @@ import moduleHttps from "https";
                 /[\u0022\u0027]/g
             ), "").replace((
                 /\/branch-[a-z]*?\//g
-            ), `/branch-${GITHUB_BRANCH0}/`).replace((
-                /:(?:branch-v20yy\.mm\.dd|branch-xxx)$/g
-            ), ":alpha").replace(new RegExp(
+            ), `/branch-${GITHUB_BRANCH0}/`).replace(new RegExp(
                 `\\b${UPSTREAM_REPOSITORY}\\b`,
                 "g"
             ), GITHUB_REPOSITORY).replace(new RegExp(
@@ -890,100 +888,6 @@ COMMIT_LIMIT=$COMMIT_LIMIT MODE_SQUASH=$MODE_SQUASH\n"
     # force-push squashed-commit
     shGitCmdWithGithubToken push origin "$BRANCH" -f
 )}
-
-# !! shGitCommitPushRelease() {(set -e
-# !! # this function will, if $COMMIT_COUNT > $COMMIT_LIMIT,
-    # !! nod\\e --input-type=module --eval '
-# !! import moduleChildProcess from "child_process";
-# !! import moduleFs from "fs";
-# !! import moduleOs from "os";
-# !! import modulePath from "path";
-# !! import moduleUrl from "url";
-# !! // init debugInline
-# !! (function () {
-    # !! let consoleError = console.error;
-    # !! globalThis.debugInline = globalThis.debugInline || function (...argList) {
-
-# !! // This function will print <argv> to stderr and then return <argv>[0].
-
-        # !! consoleError("\n\ndebugInline");
-        # !! consoleError(...argList);
-        # !! consoleError("\n");
-        # !! return argList[0];
-    # !! };
-# !! }());
-# !! (async function () {
-    # !! let child;
-    # !! let exitCode;
-    # !! let file;
-    # !! let timeStart;
-    # !! let tmpdir;
-    # !! let url;
-    # !! if (process.platform !== "linux") {
-        # !! return;
-    # !! }
-    # !! timeStart = Date.now();
-    # !! url = process.argv[1];
-    # !! if (!(
-        # !! /^\w+?:/
-    # !! ).test(url)) {
-        # !! url = modulePath.resolve(url);
-    # !! }
-    # !! file = moduleUrl.parse(url).pathname;
-    # !! // remove prefix $PWD from file
-    # !! if (String(file + "/").startsWith(process.cwd() + "/")) {
-        # !! file = file.replace(process.cwd(), "");
-    # !! }
-    # !! file = ".artifact/screenshot_browser_" + encodeURIComponent(file).replace((
-        # !! /%/g
-    # !! ), "_").toLowerCase() + ".png";
-    # !! tmpdir = await moduleFs.promises.mkdtemp(
-        # !! moduleOs.tmpdir() + "/shBrowserScreenshot-"
-    # !! );
-    # !! child = moduleChildProcess.spawn(
-        # !! (
-            # !! process.platform === "darwin"
-            # !! ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-            # !! : process.platform === "win32"
-            # !! ? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
-            # !! : "/usr/bin/google-chrome-stable"
-        # !! ),
-        # !! [
-            # !! "--headless",
-            # !! "--ignore-certificate-errors",
-            # !! "--incognito",
-            # !! "--screenshot",
-            # !! "--timeout=30000",
-            # !! "--user-data-dir=" + tmpdir,
-            # !! "--window-size=800x600",
-            # !! "-screenshot=" + file,
-            # !! (
-                # !! (process.getuid && process.getuid() === 0)
-                # !! ? "--no-sandbox"
-                # !! : ""
-            # !! ),
-            # !! url
-        # !! ].concat(process.argv.filter(function (elem) {
-            # !! return elem.startsWith("-");
-        # !! })).filter(function (elem) {
-            # !! return elem;
-        # !! }),
-        # !! {stdio: ["ignore", 1, 2]}
-    # !! );
-    # !! exitCode = await new Promise(function (resolve) {
-        # !! child.on("exit", resolve);
-    # !! });
-    # !! await moduleFs.promises.rm(tmpdir, {recursive: true});
-    # !! console.error(
-        # !! "shBrowserScreenshot"
-        # !! + "\n  - url - " + url
-        # !! + "\n  - wrote - " + file
-        # !! + "\n  - timeElapsed - " + (Date.now() - timeStart) + " ms"
-        # !! + "\n  - EXIT_CODE=" + exitCode
-    # !! );
-# !! }());
-# !! ' "$@" # '
-# !! )}
 
 shGitGc() {(set -e
 # this function will gc unreachable .git objects
