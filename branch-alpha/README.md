@@ -925,7 +925,7 @@ eval("1"); //jslint-ignore-line
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-p2024.3.21
 - click `Create pull request`
-- fill-in `Add your description here...` with:
+- input `Add your description here...` with:
 ```
 Fixes #xxx.
 - <primary-commit-message>
@@ -965,8 +965,8 @@ this PR will additionally:
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2023.10.24
 - click `Create pull request`
-- fill-in `Add a title` with: `# v20yy.mm.dd`
-- fill-in `Add a description` with:
+- input `Add a title` with: `# v20yy.mm.dd`
+- input `Add a description` with:
 ```
 - <primary-commit-message>
 - <secondary-commit-message>
@@ -1000,13 +1000,13 @@ this PR will additionally:
 - verify ci-success for upstream-branch-master
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/releases/new
-- fill-in `Choose a tag` with: `v20yy.mm.dd`
+- input `Choose a tag` with: `v20yy.mm.dd`
 - click `Create new tag: v20yy.mm.dd on publish`
     - verify correct-year `20yy`
 - select `Target: master`
 - select `Previous tag:auto`
-- fill-in `Release title` with: `v20yy.mm.dd - <primary-commit-message>`
-- fill-in `Describe this release` with:
+- input `Release title` with: `v20yy.mm.dd - <primary-commit-message>`
+- input `Describe this release` with:
 ```
 - <primary-commit-message>
 - <secondary-commit-message>
