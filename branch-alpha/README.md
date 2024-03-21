@@ -927,7 +927,7 @@ git push upstream alpha -f
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-xxx
 - click `Create pull request`
-- `Add a description` template:
+- fill-in `Add a description` with:
 ```
 Fixes #xxx.
 - <primary-commit-message>
@@ -979,8 +979,8 @@ git push upstream alpha -f
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2023.10.24
 - click `Create pull request`
-- `Add a title` template: `# v20yy.mm.dd`
-- `Add a description` template:
+- fill-in `Add a title` with: `# v20yy.mm.dd`
+- fill-in `Add a description` with:
 ```
 <release notes from CHANGELOG.md>
 ```
@@ -1025,13 +1025,13 @@ git push upstream beta:master
 - verify ci-success for upstream-branch-master
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - goto https://github.com/kaizhu256/jslint/releases/new
-- `Choose a tag` template: `v20yy.mm.dd`
+- fill-in `Choose a tag` with: `v20yy.mm.dd`
 - click `Create new tag: v20yy.mm.dd on publish`
     - verify correct-year `20yy`
 - select `Target: master`
 - select `Previous tag:auto`
-- `Release title` template: `v20yy.mm.dd - <primary-commit-message>`
-- `Describe this release` template:
+- fill-in `Release title` with: `v20yy.mm.dd - <primary-commit-message>`
+- fill-in `Describe this release` with:
 ```
 - <primary-commit-message>
 - <secondary-commit-message>
