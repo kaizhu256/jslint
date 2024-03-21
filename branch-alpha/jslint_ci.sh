@@ -1224,7 +1224,7 @@ import moduleFs from "fs";
 ' "$@" # '
 )}
 
-shGithubReleaseAlpha() {(set -e
+shGithubPullMaster() {(set -e
 # this function will create-and-push a github-release-commit to origin/alpha
     node --input-type=module --eval '
 import moduleAssert from "assert";
@@ -1269,7 +1269,7 @@ import moduleFs from "fs";
     ).on("exit", function (exitCode) {
         moduleAssert.ok(
             exitCode === 0,
-            `shGithubReleaseAlpha - exitCode=${exitCode}`
+            `shGithubPullMaster - exitCode=${exitCode}`
         );
     });
 }());

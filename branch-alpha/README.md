@@ -970,7 +970,7 @@ printf "EXIT_CODE=$?\n"
 <br><br>
 ### branch-master commit
 ```shell
-shGithubReleaseAlpha
+shGithubPullMaster
 git push upstream alpha -f
 ```
 - verify ci-success for origin-branch-alpha

@@ -71,13 +71,13 @@
     textLength="768"
     x="10"
     y="252"
->- ci - Add shell-functions shGithubPullBeta(), shGithubReleaseAlpha() to automatically create-an\</tspan>
+>- ci - Add shell-functions shGithubPullBeta(), shGithubPullMaster() to automatically create-and-\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="274"
->  d-push github-pull-commit, github-release-commit to origin/alpha.                              </tspan>
+>  push github-pull-commit, github-release-commit to origin/alpha.                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
