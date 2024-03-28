@@ -919,10 +919,10 @@ eval("1"); //jslint-ignore-line
 - find highest issue-number at https://github.com/jslint-org/jslint/issues/, https://github.com/jslint-org/jslint/pulls/, and add +1 to it for PR-xxx
 - $ `shGitPullrequest beta beta`
     - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+    - https://github.com/kaizhu256/jslint/actions
 - $ `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+    - https://github.com/jslint-org/jslint/actions
 - goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2024.3.21
 - click `Create pull request`
 - input `Add your description here...` with:
@@ -945,13 +945,13 @@ this PR will additionally:
 - wait awhile before continuing ...
 - click `Rebase and merge`
     - verify ci-success for upstream-branch-beta
-    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+    - https://github.com/jslint-org/jslint/actions
 - $ `shGitPullrequestCleanup`
     - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+    - https://github.com/kaizhu256/jslint/actions
 - $ `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+    - https://github.com/jslint-org/jslint/actions
 - click `Delete branch`
 
 
@@ -959,10 +959,10 @@ this PR will additionally:
 ### branch-master commit
 - $ `shGitPullrequest master beta`
     - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+    - https://github.com/kaizhu256/jslint/actions
 - $ `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+    - https://github.com/jslint-org/jslint/actions
 - goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2024.3.26
 - click `Create pull request`
 - input `Add a title` with: `# v20yy.mm.dd`
@@ -978,27 +978,27 @@ this PR will additionally:
 - wait awhile before continuing ...
 - click `Rebase and merge`
     - verify ci-success for upstream-branch-beta
-    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+    - https://github.com/jslint-org/jslint/actions
 - $ `shGitPullrequestCleanup`
     - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+    - https://github.com/kaizhu256/jslint/actions
 - $ `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+    - https://github.com/jslint-org/jslint/actions
 - click `Delete branch`
 - $ `git push origin beta:master`
     - verify ci-success for origin-branch-master
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+    - https://github.com/kaizhu256/jslint/actions
 - $ `git push upstream beta:master`
     - verify ci-success for upstream-branch-master
-    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+    - https://github.com/jslint-org/jslint/actions
 
 
 <br><br>
 ### branch-master publish
 - $ `git push upstream beta:master`
     - verify ci-success for upstream-branch-master
-    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+    - https://github.com/jslint-org/jslint/actions
 - goto https://github.com/jslint-org/jslint/releases/new
 - input `Choose a tag` with: `v20yy.mm.dd`
 - click `Create new tag: v20yy.mm.dd on publish`
@@ -1016,7 +1016,7 @@ this PR will additionally:
 - click `Preview` and review
 - click `Publish release`
     - verify ci-success for upstream-branch-publish
-    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+    - https://github.com/jslint-org/jslint/actions
     - verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
 
 
