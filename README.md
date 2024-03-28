@@ -1024,10 +1024,10 @@ this PR will additionally:
 ### vscode-jslint publish
 - goto https://github.com/jslint-org/jslint/tree/gh-pages/branch-beta/.artifact/jslint_wrapper_vscode
 - click `vscode-jslint-20yy.mm.dd.vsix`
-- click `Download`
+- click `Raw` to download
 - goto https://marketplace.visualstudio.com/manage/publishers/jslint
 - right-click `Update`
-- drag-and-drop downloaded `vscode-jslint-20yy.mm.dd.vsix`
+- upload downloaded file `vscode-jslint-20yy.mm.dd.vsix`
 - click 'Upload'
 - verify email-notification `[Succeeded] Extension publish on Visual Studio Marketplace - vscode-jslint`
 
