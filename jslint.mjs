@@ -7058,6 +7058,10 @@ function jslint_phase3_parse(state) {
                 enroll(name, "variable", mode_const);
                 if (token_nxt.id === "=" || mode_const) {
                     advance("=");
+
+// test_cause:
+// ["const aa=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 10]
+
                     name.init = true;
                     name.expression = parse_expression(0);
                 }
