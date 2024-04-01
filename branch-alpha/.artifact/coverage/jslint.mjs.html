@@ -7131,11 +7131,11 @@ body {
 <pre><span class="lineno"><a href="#line_6973" id="line_6973"> 6973.</a></span><span class="count                ">   2335</span><span>                        the_variable.names.push(name);</span></pre>
 <pre><span class="lineno"><a href="#line_6974" id="line_6974"> 6974.</a></span><span class="count                ">   2335</span><span>                        enroll(name, "variable", mode_const);</span></pre>
 <pre><span class="lineno"><a href="#line_6975" id="line_6975"> 6975.</a></span><span class="count                ">   2335</span><span>                    }</span></pre>
-<pre><span class="lineno"><a href="#line_6976" id="line_6976"> 6976.</a></span><span class="count                ">   2335</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6977" id="line_6977"> 6977.</a></span><span class="count                ">   2335</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_6978" id="line_6978"> 6978.</a></span><span class="count                ">   2335</span><span>// ["const aa=bb;\nconst {bb}=0;", "lookup", "out_of_scope_a", "bb", 10]</span></pre>
-<pre><span class="lineno"><a href="#line_6979" id="line_6979"> 6979.</a></span><span class="count                ">   2335</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6980" id="line_6980"> 6980.</a></span><span class="count                ">   2335</span><span>                    name.init = true;</span></pre>
+<pre><span class="lineno"><a href="#line_6976" id="line_6976"> 6976.</a></span><span class="count                ">   2335</span><span>                    name.init = true;</span></pre>
+<pre><span class="lineno"><a href="#line_6977" id="line_6977"> 6977.</a></span><span class="count                ">   2335</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_6978" id="line_6978"> 6978.</a></span><span class="count                ">   2335</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_6979" id="line_6979"> 6979.</a></span><span class="count                ">   2335</span><span>// ["const {aa}=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 12]</span></pre>
+<pre><span class="lineno"><a href="#line_6980" id="line_6980"> 6980.</a></span><span class="count                ">   2335</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6981" id="line_6981"> 6981.</a></span><span class="count                ">   2335</span><span>                    if (token_nxt.id === "=") {</span></pre>
 <pre><span class="lineno"><a href="#line_6982" id="line_6982"> 6982.</a></span><span class="count                ">   2335</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6983" id="line_6983"> 6983.</a></span><span class="count                ">   2335</span><span>// test_cause:</span></pre>
@@ -7186,11 +7186,11 @@ body {
 <pre><span class="lineno"><a href="#line_7028" id="line_7028"> 7028.</a></span><span class="count                ">   2335</span><span>                    advance();</span></pre>
 <pre><span class="lineno"><a href="#line_7029" id="line_7029"> 7029.</a></span><span class="count                ">   2335</span><span>                    the_variable.names.push(name);</span></pre>
 <pre><span class="lineno"><a href="#line_7030" id="line_7030"> 7030.</a></span><span class="count                ">   2335</span><span>                    enroll(name, "variable", mode_const);</span></pre>
-<pre><span class="lineno"><a href="#line_7031" id="line_7031"> 7031.</a></span><span class="count                ">   2335</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7032" id="line_7032"> 7032.</a></span><span class="count                ">   2335</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_7033" id="line_7033"> 7033.</a></span><span class="count                ">   2335</span><span>// ["const aa=bb;\nconst [bb]=0;", "lookup", "out_of_scope_a", "bb", 10]</span></pre>
-<pre><span class="lineno"><a href="#line_7034" id="line_7034"> 7034.</a></span><span class="count                ">   2335</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7035" id="line_7035"> 7035.</a></span><span class="count                ">   2335</span><span>                    name.init = true;</span></pre>
+<pre><span class="lineno"><a href="#line_7031" id="line_7031"> 7031.</a></span><span class="count                ">   2335</span><span>                    name.init = true;</span></pre>
+<pre><span class="lineno"><a href="#line_7032" id="line_7032"> 7032.</a></span><span class="count                ">   2335</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_7033" id="line_7033"> 7033.</a></span><span class="count                ">   2335</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_7034" id="line_7034"> 7034.</a></span><span class="count                ">   2335</span><span>// ["const [aa]=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 12]</span></pre>
+<pre><span class="lineno"><a href="#line_7035" id="line_7035"> 7035.</a></span><span class="count                ">   2335</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7036" id="line_7036"> 7036.</a></span><span class="count                ">   2335</span><span>                    if (ellipsis) {</span></pre>
 <pre><span class="lineno"><a href="#line_7037" id="line_7037"> 7037.</a></span><span class="count                ">   2335</span><span>                        name.ellipsis = true;</span></pre>
 <pre><span class="lineno"><a href="#line_7038" id="line_7038"> 7038.</a></span><span class="count                ">   2335</span><span>                        break;</span></pre>
@@ -7223,11 +7223,11 @@ body {
 <pre><span class="lineno"><a href="#line_7065" id="line_7065"> 7065.</a></span><span class="count                ">   2335</span><span>                enroll(name, "variable", mode_const);</span></pre>
 <pre><span class="lineno"><a href="#line_7066" id="line_7066"> 7066.</a></span><span class="count                ">   2335</span><span>                if (token_nxt.id === "=" || mode_const) {</span></pre>
 <pre><span class="lineno"><a href="#line_7067" id="line_7067"> 7067.</a></span><span class="count                ">   2335</span><span>                    advance("=");</span></pre>
-<pre><span class="lineno"><a href="#line_7068" id="line_7068"> 7068.</a></span><span class="count                ">   2335</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7069" id="line_7069"> 7069.</a></span><span class="count                ">   2335</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_7070" id="line_7070"> 7070.</a></span><span class="count                ">   2335</span><span>// ["const aa=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 10]</span></pre>
-<pre><span class="lineno"><a href="#line_7071" id="line_7071"> 7071.</a></span><span class="count                ">   2335</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7072" id="line_7072"> 7072.</a></span><span class="count                ">   2335</span><span>                    name.init = true;</span></pre>
+<pre><span class="lineno"><a href="#line_7068" id="line_7068"> 7068.</a></span><span class="count                ">   2335</span><span>                    name.init = true;</span></pre>
+<pre><span class="lineno"><a href="#line_7069" id="line_7069"> 7069.</a></span><span class="count                ">   2335</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_7070" id="line_7070"> 7070.</a></span><span class="count                ">   2335</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_7071" id="line_7071"> 7071.</a></span><span class="count                ">   2335</span><span>// ["const aa=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 10]</span></pre>
+<pre><span class="lineno"><a href="#line_7072" id="line_7072"> 7072.</a></span><span class="count                ">   2335</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7073" id="line_7073"> 7073.</a></span><span class="count                ">   2335</span><span>                    name.expression = parse_expression(0);</span></pre>
 <pre><span class="lineno"><a href="#line_7074" id="line_7074"> 7074.</a></span><span class="count                ">   2335</span><span>                }</span></pre>
 <pre><span class="lineno"><a href="#line_7075" id="line_7075"> 7075.</a></span><span class="count                ">   2335</span><span>                the_variable.names.push(name);</span></pre>
