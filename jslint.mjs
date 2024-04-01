@@ -6967,13 +6967,16 @@ function jslint_phase3_parse(state) {
                         the_variable.names.push(name);
                         survey(name);
                         enroll(name, "variable", mode_const);
-
                         advance();
                         the_brace.open = true;
                     } else {
                         the_variable.names.push(name);
                         enroll(name, "variable", mode_const);
                     }
+
+// test_cause:
+// ["const aa=bb;\nconst {bb}=0;", "lookup", "out_of_scope_a", "bb", 10]
+
                     name.init = true;
                     if (token_nxt.id === "=") {
 
@@ -7025,6 +7028,10 @@ function jslint_phase3_parse(state) {
                     advance();
                     the_variable.names.push(name);
                     enroll(name, "variable", mode_const);
+
+// test_cause:
+// ["const aa=bb;\nconst [bb]=0;", "lookup", "out_of_scope_a", "bb", 10]
+
                     name.init = true;
                     if (ellipsis) {
                         name.ellipsis = true;
@@ -7058,6 +7065,10 @@ function jslint_phase3_parse(state) {
                 enroll(name, "variable", mode_const);
                 if (token_nxt.id === "=" || mode_const) {
                     advance("=");
+
+// test_cause:
+// ["const aa=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 10]
+
                     name.init = true;
                     name.expression = parse_expression(0);
                 }
@@ -7618,8 +7629,6 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["const aa=bb;\nconst [bb]=0;", "lookup", "out_of_scope_a", "bb", 10]
-// ["const aa=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 10]
 // ["let aa;if(aa){let bb;}bb;", "lookup", "out_of_scope_a", "bb", 23]
 
             warn("out_of_scope_a", thing);
