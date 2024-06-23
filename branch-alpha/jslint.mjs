@@ -163,7 +163,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2024.4.1-beta";
+let jslint_edition = "v2024.6.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -11308,8 +11308,8 @@ function sentinel() {}
                     }),
 
 // https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2
-// If the input to spawn/spawnSync is sanitized, users can now pass
-// { shell: true } as an option to prevent the occurrence of EINVALs errors.
+// Node.js will now error with EINVAL if a .bat or .cmd file is passed to
+// child_process.spawn and child_process.spawnSync without the shell option set.
 
                     shell: (
                         processArgv0.endsWith(".bat")
