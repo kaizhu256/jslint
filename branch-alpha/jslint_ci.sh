@@ -3329,21 +3329,27 @@ function sentinel() {}
       }
     }));
     exitCode = await new Promise(function (resolve) {
+      let processArgv0 = processArgv[0];
+      if (processArgv0 === "npm") {
+        processArgv0 = process.platform.replace(
+          "win32",
+          "npm.cmd"
+        ).replace(
+          process.platform,
+          "npm"
+        );
+      }
       moduleChildProcess.spawn(
-        (
-          processArgv[0] === "npm"
-          ? process.platform.replace("win32", "npm.cmd").replace(
-            process.platform,
-            "npm"
-          )
-          : processArgv[0]
-        ),
+        processArgv0,
         processArgv.slice(1),
         {
           env: Object.assign({}, process.env, {
             NODE_V8_COVERAGE: coverageDir
           }),
-          shell: processArgv[0] === "npm",
+          shell: (
+            processArgv0.endsWith(".bat")
+            || processArgv0.endsWith(".cmd")
+          ),
           stdio: ["ignore", 1, 2]
         }
       ).on("exit", resolve);
