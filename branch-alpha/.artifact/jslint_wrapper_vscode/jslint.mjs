@@ -11307,6 +11307,11 @@ function sentinel() {}
                     env: Object.assign({}, process.env, {
                         NODE_V8_COVERAGE: coverageDir
                     }),
+
+// https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2
+// If the input to spawn/spawnSync is sanitized, users can now pass
+// { shell: true } as an option to prevent the occurrence of EINVALs errors.
+
                     shell: (
                         processArgv0.endsWith(".bat")
                         || processArgv0.endsWith(".cmd")
