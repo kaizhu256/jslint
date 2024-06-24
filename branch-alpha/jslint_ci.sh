@@ -200,8 +200,8 @@ shBashrcWindowsInit() {
 }
 
 shBrowserScreenshot() {(set -e
-# This function will run headless-chrome to screenshot url $1 with.
-# window-size $2
+# This function will run headless-chrome to screenshot url $1 with
+# window-size $2.
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
