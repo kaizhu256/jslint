@@ -611,7 +611,7 @@ shCiPre() {(set -e
 shCiPublishNpm() {(set -e
 # This function will publish npm-package.
 # shCiPublishNpmCustom() {(set -e
-# # This function will run custom-code to npm-publish package.
+# # This function will run custom-code to publish npm-package.
 #     # npm publish --access public
 # )}
     if ! ([ -f package.json ] \
@@ -637,7 +637,7 @@ shCiPublishNpm() {(set -e
 shCiPublishPypi() {(set -e
 # This function will publish pypi-package.
 # shCiPublishPypiCustom() {(set -e
-# # This function will run custom-code to npm-publish package.
+# # This function will run custom-code to publish pypi-package.
 #     # npm publish --access public
 # )}
     if ! ([ -f pyproject.toml ] \
