@@ -963,7 +963,7 @@ this PR will additionally:
 - `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
-- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2024.3.26
+- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2024.6.28
 - click `Create pull request`
 - input `Add a title` with: `# v20yy.mm.dd`
 - input `Add a description` with:
