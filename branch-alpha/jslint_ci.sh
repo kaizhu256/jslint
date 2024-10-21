@@ -1146,6 +1146,7 @@ shGithubCheckoutRemote() {(set -e
     cp __tmp1/.gitconfig .git/config
     rm -rf __tmp1
     git reset "origin/$GITHUB_REF_NAME" --hard
+    git rev-parse HEAD
     # fetch jslint_ci.sh from trusted source
     shGitCmdWithGithubToken fetch origin alpha:__tmp1 --depth=1 -f
     for FILE in .ci.sh .ci2.sh jslint_ci.sh myci2.sh
