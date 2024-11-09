@@ -4733,7 +4733,7 @@ function jslint_phase3_parse(state) {
             check_left(left, the_token);
         }
 
-// PR-xxx - Fix issue #468 - optional dynamic-property/function not recognized.
+// PR-469 - Fix issue #468 - optional dynamic-property/function not recognized.
 
         if (name.id === "[" || name.id === "(") {
             test_cause("dyn_prop_or_func");
