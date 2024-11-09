@@ -163,7 +163,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2024.10.1";
+let jslint_edition = "v2024.11.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -4732,6 +4732,18 @@ function jslint_phase3_parse(state) {
 // ["aa=[]?.aa", "check_left", "unexpected_a", "?.", 6]
 
             check_left(left, the_token);
+        }
+
+// PR-xxx - Fix issue #468 - optional dynamic property access not recognized.
+
+        if (name.id === "[" || name.id === "(") {
+            test_cause("dynamic_property");
+
+// test_cause:
+// ["aa?.(aa)", "infix_option_chain", "dynamic_property", "", 0]
+// ["aa?.[aa]", "infix_option_chain", "dynamic_property", "", 0]
+
+            return left;
         }
         if (!name.identifier) {
 
