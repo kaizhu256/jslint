@@ -4698,8 +4698,7 @@ function jslint_phase3_parse(state) {
 
     function infix_option_chain(left) {
         const the_token = token_now;
-        let name;
-        name = token_nxt;
+        let name = token_nxt;
         if (
             (
                 left.id !== "(string)"
