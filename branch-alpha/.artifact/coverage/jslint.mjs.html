@@ -4891,14 +4891,14 @@ body {
 <pre><span class="lineno"><a href="#line_4733" id="line_4733"> 4733.</a></span><span class="count                ">     12</span><span>            check_left(left, the_token);</span></pre>
 <pre><span class="lineno"><a href="#line_4734" id="line_4734"> 4734.</a></span><span class="count                ">     12</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_4735" id="line_4735"> 4735.</a></span><span class="count                ">     12</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_4736" id="line_4736"> 4736.</a></span><span class="count                ">     12</span><span>// PR-469 - Fix issue #468 - optional dynamic-property/function not recognized.</span></pre>
+<pre><span class="lineno"><a href="#line_4736" id="line_4736"> 4736.</a></span><span class="count                ">     12</span><span>// PR-469 - Fix issue #468 - optional dynamic-property/call not recognized.</span></pre>
 <pre><span class="lineno"><a href="#line_4737" id="line_4737"> 4737.</a></span><span class="count                ">     12</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_4738" id="line_4738"> 4738.</a></span><span class="count                ">     11</span><span>        if (name.id === "[" || name.id === "(") {</span></pre>
-<pre><span class="lineno"><a href="#line_4739" id="line_4739"> 4739.</a></span><span class="count                ">      2</span><span>            test_cause("dyn_prop_or_func");</span></pre>
+<pre><span class="lineno"><a href="#line_4739" id="line_4739"> 4739.</a></span><span class="count                ">      2</span><span>            test_cause("dyn_prop_or_call");</span></pre>
 <pre><span class="lineno"><a href="#line_4740" id="line_4740"> 4740.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_4741" id="line_4741"> 4741.</a></span><span class="count                ">      2</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_4742" id="line_4742"> 4742.</a></span><span class="count                ">      2</span><span>// ["aa?.(aa)", "infix_option_chain", "dyn_prop_or_func", "", 0]</span></pre>
-<pre><span class="lineno"><a href="#line_4743" id="line_4743"> 4743.</a></span><span class="count                ">      2</span><span>// ["aa?.[aa]", "infix_option_chain", "dyn_prop_or_func", "", 0]</span></pre>
+<pre><span class="lineno"><a href="#line_4742" id="line_4742"> 4742.</a></span><span class="count                ">      2</span><span>// ["aa?.(bb)", "infix_option_chain", "dyn_prop_or_call", "", 0]</span></pre>
+<pre><span class="lineno"><a href="#line_4743" id="line_4743"> 4743.</a></span><span class="count                ">      2</span><span>// ["aa?.[bb]", "infix_option_chain", "dyn_prop_or_call", "", 0]</span></pre>
 <pre><span class="lineno"><a href="#line_4744" id="line_4744"> 4744.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_4745" id="line_4745"> 4745.</a></span><span class="count                ">      2</span><span>            return left;</span></pre>
 <pre><span class="lineno"><a href="#line_4746" id="line_4746"> 4746.</a></span><span class="count                ">     10</span><span>        }</span></pre>
