@@ -8,8 +8,8 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
 # v2024.11.24
-- quickstart - bugfix - Fix broken quickstart-jslint-in-codemirror demo.
 - jslint - bugfix - Fix optional dynamic-property/function-call not recognized.
+- quickstart - bugfix - Fix broken quickstart-jslint-in-codemirror demo.
 - ci - Update shell-function shHttpFileServer() to auto-serve /index.html, when url-path is root /.
 
 # v2024.6.28
