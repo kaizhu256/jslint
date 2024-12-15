@@ -1634,7 +1634,7 @@ shImageLogoCreate() {(set -e
     mkdir -p .artifact
     shBrowserScreenshot asset_image_logo_512.html \
         --window-size=544x544 \
-        -screenshot=.artifact/.asset_image_logo_512.png
+        -screenshot=.artifact/asset_image_logo_544.png
     # install graphicsmagick
     if [ "$GITHUB_ACTION" ] && [ ! -f /usr/bin/gm ]
     then
@@ -1642,7 +1642,7 @@ shImageLogoCreate() {(set -e
     fi
     # create various smaller thumbnails
     gm convert -crop 512x512 \
-        .artifact/.asset_image_logo_512.png \
+        .artifact/asset_image_logo_544.png \
         .artifact/asset_image_logo_512.png
     for SIZE in 32 64 128 256 512
     do
