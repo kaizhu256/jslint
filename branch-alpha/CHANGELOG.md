@@ -7,6 +7,9 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
+# v2024.12.1
+- ci - Fix shell-function shImageLogoCreate() missing graphicsmagick in github-ci.
+
 # v2024.11.24
 - jslint - bugfix - Fix optional dynamic-property/function-call not recognized.
 - quickstart - bugfix - Fix broken quickstart-jslint-in-codemirror demo.
