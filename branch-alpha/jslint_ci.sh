@@ -1633,7 +1633,7 @@ shImageLogoCreate() {(set -e
     # screenshot asset_image_logo_512.png
     mkdir -p .artifact
     shBrowserScreenshot asset_image_logo_512.html \
-        --window-size=512x612 \
+        --window-size=512x512 \
         -screenshot=.artifact/asset_image_logo_512.png
     # install graphicsmagick
     if [ "$GITHUB_ACTION" ] && [ ! -f /usr/bin/gm ]
