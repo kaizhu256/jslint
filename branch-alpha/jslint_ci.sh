@@ -244,7 +244,10 @@ import moduleUrl from "url";
             : "/usr/bin/google-chrome-stable"
         ),
         [
-            "--headless",
+            "--disable-gpu",
+            "--hide-scrollbars",
+            //
+            "--headless=old",
             "--ignore-certificate-errors",
             "--incognito",
             "--screenshot",
