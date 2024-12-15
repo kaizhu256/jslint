@@ -244,7 +244,7 @@ import moduleUrl from "url";
             : "/usr/bin/google-chrome-stable"
         ),
         [
-            "--headless",
+            "--headless=new",
             "--ignore-certificate-errors",
             "--incognito",
             "--screenshot",
@@ -1635,10 +1635,16 @@ shImageLogoCreate() {(set -e
     shBrowserScreenshot asset_image_logo_512.html \
         --window-size=512x512 \
         -screenshot=.artifact/asset_image_logo_512.png
+    # install graphicsmagick
+    if [ "$GITHUB_ACTION" ] && [ ! -f /usr/bin/gm ]
+    then
+        sudo apt-get install -y graphicsmagick
+    fi
     # create various smaller thumbnails
     for SIZE in 32 64 128 256
     do
-        convert -resize "${SIZE}x${SIZE}" .artifact/asset_image_logo_512.png \
+        gm convert -resize "${SIZE}x${SIZE}" \
+            .artifact/asset_image_logo_512.png \
             ".artifact/asset_image_logo_$SIZE.png"
         printf \
 "shImageLogoCreate - wrote - .artifact/asset_image_logo_$SIZE.png\n" 1>&2
