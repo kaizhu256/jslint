@@ -255,7 +255,7 @@ import moduleUrl from "url";
             //
             "--disable-audio-input",
             "--disable-audio-output",
-            "--disable-gpu",
+            // "--disable-gpu",
             //
             "-screenshot=" + file,
             (
