@@ -244,13 +244,16 @@ import moduleUrl from "url";
             : "/usr/bin/google-chrome-stable"
         ),
         [
+            "--disable-gpu",
             "--headless",
+            "--hide-scrollbars",
             "--ignore-certificate-errors",
             "--incognito",
+            "--mute-audio",
             "--screenshot",
             "--timeout=30000",
             "--user-data-dir=" + tmpdir,
-            "--window-size=800,600",
+            "--window-size=800,800",
             "-screenshot=" + file,
             (
                 (process.getuid && process.getuid() === 0)
@@ -359,12 +362,6 @@ import moduleChildProcess from "child_process";
     if (command -v shCiArtifactUploadCustom >/dev/null)
     then
         shCiArtifactUploadCustom
-    fi
-    # 1px-border around browser-screenshot
-    if (ls .artifact/screenshot_browser_*.png 2>/dev/null)
-    then
-        gm mogrify -shave 1x1 -bordercolor black -border 1 \
-            .artifact/screenshot_browser_*.png
     fi
     # add dir .artifact
     git add -f .artifact
