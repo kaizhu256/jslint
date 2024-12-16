@@ -1632,8 +1632,8 @@ shImageLogoCreate() {(set -e
     fi
     # screenshot asset_image_logo_256.png
     mkdir -p .artifact
+        # !! --window-size=256,256 \
     shBrowserScreenshot asset_image_logo_256.html \
-        --window-size=256,256 \
         -screenshot=.artifact/asset_image_logo_256.png
     printf \
 "shImageLogoCreate - wrote - .artifact/asset_image_logo_256.png\n" 1>&2
