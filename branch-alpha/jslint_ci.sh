@@ -255,7 +255,7 @@ import moduleUrl from "url";
             //
             "--disable-audio-input",
             "--disable-audio-output",
-            // "--disable-gpu",
+            "--disable-gpu",
             //
             "-screenshot=" + file,
             (
@@ -269,7 +269,7 @@ import moduleUrl from "url";
         })).filter(function (elem) {
             return elem;
         }),
-        {stdio: ["ignore", 1, 2]}
+        {stdio: "ignore"}
     );
     exitCode = await new Promise(function (resolve) {
         child.on("exit", resolve);
@@ -365,6 +365,11 @@ import moduleChildProcess from "child_process";
     if (command -v shCiArtifactUploadCustom >/dev/null)
     then
         shCiArtifactUploadCustom
+    fi
+    # 1px-border around browser-screenshot
+    if (ls .artifact/screenshot_browser_*.png 2>/dev/null)
+    then
+        gm mogrify -crop 800x600 .artifact/screenshot_browser_*.png
     fi
     # add dir .artifact
     git add -f .artifact
@@ -1637,10 +1642,8 @@ shImageLogoCreate() {(set -e
     # screenshot asset_image_logo_256.png
     mkdir -p .artifact
     shBrowserScreenshot asset_image_logo_256.html \
-        -screenshot=.artifact/.asset_image_logo_256.png
-    gm convert -crop 256x256 \
-        .artifact/.asset_image_logo_256.png \
-        .artifact/asset_image_logo_256.png
+        -screenshot=.artifact/asset_image_logo_256.png
+    gm mogrify -crop 256x256 .artifact/asset_image_logo_256.png
     printf \
 "shImageLogoCreate - wrote - .artifact/asset_image_logo_256.png\n" 1>&2
     # convert to svg @ https://convertio.co/png-svg/
