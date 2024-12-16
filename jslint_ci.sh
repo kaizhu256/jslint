@@ -326,10 +326,11 @@ shCiArtifactUpload() {(set -e
     shRunWithScreenshotTxt .artifact/screenshot_package_listing.svg \
         shGitLsTree &
     PID_LIST="$PID_LIST $!"
-    # parallel-task - screenshot logo
-    shImageLogoCreate &
-    PID_LIST="$PID_LIST $!"
+    # !! # parallel-task - screenshot logo
+    # !! shImageLogoCreate &
+    # !! PID_LIST="$PID_LIST $!"
     shPidListWait screenshot "$PID_LIST"
+    shImageLogoCreate
     # shCiArtifactUploadCustom
     if (command -v shCiArtifactUploadCustom >/dev/null)
     then
