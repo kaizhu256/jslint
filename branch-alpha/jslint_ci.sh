@@ -1605,16 +1605,16 @@ import moduleUrl from "url";
 
 shImageLogoCreate() {(set -e
 # This function will create .png logo.
-    if [ ! -f asset_image_logo_256.html ]
+    FILE=".artifact/asset_image_logo_256.png"
+    if [ ! -f "$FILE" ]
     then
         return
     fi
-    # screenshot .artifact/asset_image_logo_256.png
-    FILE="$(node --print 'path.resolve(".artifact/asset_image_logo_256.png")')"
-    shBrowserScreenshot asset_image_logo_256.html "-screenshot=$FILE"
-    gm mogrify -crop 256x256 .artifact/asset_image_logo_256.png
+    shBrowserScreenshot asset_image_logo_256.html \
+        "-screenshot=$(node --print "path.resolve(process.argv[1])" "$FILE")"
+    gm mogrify -crop 256x256 "$FILE"
     printf \
-"shImageLogoCreate - wrote - .artifact/asset_image_logo_256.png\n" 1>&2
+"shImageLogoCreate - wrote - $FILE\n" 1>&2
     # convert to svg @ https://convertio.co/png-svg/
 )}
 
