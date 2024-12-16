@@ -244,16 +244,19 @@ import moduleUrl from "url";
             : "/usr/bin/google-chrome-stable"
         ),
         [
-            "--disable-gpu",
             "--headless",
             "--hide-scrollbars",
             "--ignore-certificate-errors",
             "--incognito",
-            "--mute-audio",
             "--screenshot",
             "--timeout=30000",
             "--user-data-dir=" + tmpdir,
             "--window-size=800,800",
+            //
+            "--disable-audio-input",
+            "--disable-audio-output",
+            "--disable-gpu",
+            //
             "-screenshot=" + file,
             (
                 (process.getuid && process.getuid() === 0)
