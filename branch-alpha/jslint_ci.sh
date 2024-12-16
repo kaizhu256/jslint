@@ -245,7 +245,6 @@ import moduleUrl from "url";
         ),
         [
             "--disable-gpu",
-            "--hide-scrollbars",
             //
             "--headless=old",
             "--ignore-certificate-errors",
