@@ -291,10 +291,9 @@ shCiArtifactUpload() {(set -e
         return
     fi
     # install graphicsmagick
-    if [ "$GITHUB_ACTION" ] && [ ! -f /usr/bin/gm ]
-    then
-        sudo apt-get install -y graphicsmagick
-    fi
+    sudo apt-get install -y graphicsmagick
+    # mkdir .artifact/
+    mkdir -p .artifact/
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
@@ -1631,8 +1630,7 @@ shImageLogoCreate() {(set -e
     then
         return
     fi
-    # screenshot asset_image_logo_256.png
-    mkdir -p .artifact
+    # screenshot .artifact/asset_image_logo_256.png
     FILE="$(node --print 'path.resolve(".artifact/asset_image_logo_256.png")')"
     shBrowserScreenshot asset_image_logo_256.html "-screenshot=$FILE"
     gm mogrify -crop 256x256 .artifact/asset_image_logo_256.png
