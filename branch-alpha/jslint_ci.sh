@@ -202,19 +202,6 @@ shBashrcWindowsInit() {
 shBrowserScreenshot() {(set -e
 # This function will run headless-chrome to screenshot url $1.
     node --input-type=module --eval '
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
-
-// This function will print <argv> to stderr and then return <argv>[0].
-
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}());
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 import moduleOs from "os";
@@ -1647,8 +1634,8 @@ shImageLogoCreate() {(set -e
     fi
     # screenshot asset_image_logo_256.png
     mkdir -p .artifact
-    shBrowserScreenshot asset_image_logo_256.html \
-        -screenshot=.artifact/asset_image_logo_256.png
+    FILE="$(node --print 'path.resolve(".artifact/asset_image_logo_256.png")')"
+    shBrowserScreenshot asset_image_logo_256.html "-screenshot=$FILE"
     gm mogrify -crop 256x256 .artifact/asset_image_logo_256.png
     printf \
 "shImageLogoCreate - wrote - .artifact/asset_image_logo_256.png\n" 1>&2
