@@ -359,7 +359,7 @@ import moduleChildProcess from "child_process";
         shCiArtifactUploadCustom
     fi
     # 1px-border around browser-screenshot
-    if (ls .artifact/screenshot_browser_*.png 2>/dev/null)
+    if (ls .artifact/screenshot_browser_*.png >/dev/null 2>&1)
     then
         gm mogrify -crop 798x598 -bordercolor black -border 1 \
             .artifact/screenshot_browser_*.png
