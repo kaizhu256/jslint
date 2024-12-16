@@ -291,7 +291,10 @@ shCiArtifactUpload() {(set -e
         return
     fi
     # install graphicsmagick
-    sudo apt-get install -y graphicsmagick
+    if (! command -v gm >/dev/null)
+    then
+        sudo apt-get install -y graphicsmagick
+    fi
     # mkdir .artifact/
     mkdir -p .artifact/
     # init .git/config
@@ -314,44 +317,20 @@ shCiArtifactUpload() {(set -e
         printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
     # screenshot changelog and files
-    node --input-type=module --eval '
-import moduleChildProcess from "child_process";
-(function () {
-    [
-        // parallel-task - screenshot changelog
-        [
-            "jslint_ci.sh",
-            "shRunWithScreenshotTxt",
-            ".artifact/screenshot_changelog.svg",
-            "head",
-            "-n50",
-            "CHANGELOG.md"
-        ],
-        // parallel-task - screenshot files
-        [
-            "jslint_ci.sh",
-            "shRunWithScreenshotTxt",
-            ".artifact/screenshot_package_listing.svg",
-            "shGitLsTree"
-        ],
-        // parallel-task - screenshot logo
-        [
-            "jslint_ci.sh",
-            "shImageLogoCreate"
-        ]
-    ].forEach(function (argList) {
-        moduleChildProcess.spawn(
-            "sh",
-            argList,
-            {stdio: ["ignore", 1, 2]}
-        ).on("exit", function (exitCode) {
-            if (exitCode) {
-                process.exit(exitCode);
-            }
-        });
-    });
-}());
-' "$@" # '
+    PID_LIST=""
+    # parallel-task - screenshot changelog
+    shRunWithScreenshotTxt .artifact/screenshot_changelog.svg \
+        head -n50 CHANGELOG.md &
+    PID_LIST="$PID_LIST $!"
+    # parallel-task - screenshot files
+    shRunWithScreenshotTxt .artifact/screenshot_package_listing.svg \
+        shGitLsTree &
+    PID_LIST="$PID_LIST $!"
+    # parallel-task - screenshot logo
+    shImageLogoCreate &
+    PID_LIST="$PID_LIST $!"
+    shPidListWait screenshot "$PID_LIST"
+    # shCiArtifactUploadCustom
     if (command -v shCiArtifactUploadCustom >/dev/null)
     then
         shCiArtifactUploadCustom
