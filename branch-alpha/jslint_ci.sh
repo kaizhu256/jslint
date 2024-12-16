@@ -295,7 +295,6 @@ shCiArtifactUpload() {(set -e
     then
         sudo apt-get install -y graphicsmagick
     fi
-    mkdir -p .artifact
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
