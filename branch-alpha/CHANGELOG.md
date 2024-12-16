@@ -8,7 +8,8 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
 # v2024.12.1-beta
-- ci - Fix shell-function shImageLogoCreate() missing graphicsmagick in github-ci.
+- ci - Fix improperly-cropped, auto-generated logo.
+- ci - Fix failed-ci from missing graphicsmagick library in latest Ubuntu image.
 
 # v2024.11.24
 - jslint - bugfix - Fix optional dynamic-property/function-call not recognized.

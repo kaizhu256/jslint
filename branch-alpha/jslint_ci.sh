@@ -202,6 +202,19 @@ shBashrcWindowsInit() {
 shBrowserScreenshot() {(set -e
 # This function will run headless-chrome to screenshot url $1.
     node --input-type=module --eval '
+// init debugInline
+(function () {
+    let consoleError = console.error;
+    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+
+// This function will print <argv> to stderr and then return <argv>[0].
+
+        consoleError("\n\ndebugInline");
+        consoleError(...argList);
+        consoleError("\n");
+        return argList[0];
+    };
+}());
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 import moduleOs from "os";
@@ -214,9 +227,6 @@ import moduleUrl from "url";
     let timeStart;
     let tmpdir;
     let url;
-    if (process.platform !== "linux") {
-        return;
-    }
     timeStart = Date.now();
     url = process.argv[1];
     if (!(
@@ -257,19 +267,14 @@ import moduleUrl from "url";
             "--disable-audio-output",
             "--disable-gpu",
             //
-            "-screenshot=" + file,
-            (
-                (process.getuid && process.getuid() === 0)
-                ? "--no-sandbox"
-                : ""
-            ),
+            "-screenshot=" + modulePath.resolve(file),
             url
         ].concat(process.argv.filter(function (elem) {
             return elem.startsWith("-");
         })).filter(function (elem) {
             return elem;
         }),
-        {stdio: ["ignore", "ignore", "ignore"]}
+        {stdio: ["ignore", 1, 2]}
     );
     exitCode = await new Promise(function (resolve) {
         child.on("exit", resolve);
