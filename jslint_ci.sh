@@ -326,11 +326,10 @@ shCiArtifactUpload() {(set -e
     shRunWithScreenshotTxt .artifact/screenshot_package_listing.svg \
         shGitLsTree &
     PID_LIST="$PID_LIST $!"
-    # !! # parallel-task - screenshot logo
-    # !! shImageLogoCreate &
-    # !! PID_LIST="$PID_LIST $!"
+    # parallel-task - screenshot logo
+    shImageLogoCreate &
+    PID_LIST="$PID_LIST $!"
     shPidListWait screenshot "$PID_LIST"
-    shImageLogoCreate
     # shCiArtifactUploadCustom
     if (command -v shCiArtifactUploadCustom >/dev/null)
     then
@@ -1606,11 +1605,11 @@ import moduleUrl from "url";
 
 shImageLogoCreate() {(set -e
 # This function will create .png logo.
-    FILE=".artifact/asset_image_logo_256.png"
-    if [ ! -f "$FILE" ]
+    if [ ! -f asset_image_logo_256.html ]
     then
         return
     fi
+    FILE=".artifact/asset_image_logo_256.png"
     shBrowserScreenshot asset_image_logo_256.html \
         "-screenshot=$(node --print "path.resolve(process.argv[1])" "$FILE")"
     gm mogrify -crop 256x256 "$FILE"
