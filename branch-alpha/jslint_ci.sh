@@ -292,6 +292,11 @@ shCiArtifactUpload() {(set -e
     then
         return
     fi
+    # install graphicsmagick
+    if [ "$GITHUB_ACTION" ] && [ ! -f /usr/bin/gm ]
+    then
+        sudo apt-get install -y graphicsmagick
+    fi
     mkdir -p .artifact
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
@@ -356,10 +361,9 @@ import moduleChildProcess from "child_process";
         shCiArtifactUploadCustom
     fi
     # 1px-border around browser-screenshot
-    if (ls .artifact/screenshot_browser_*.png 2>/dev/null \
-            && mogrify -version 2>&1 | grep -i imagemagick)
+    if (ls .artifact/screenshot_browser_*.png 2>/dev/null)
     then
-        mogrify -shave 1x1 -bordercolor black -border 1 \
+        gm mogrify -shave 1x1 -bordercolor black -border 1 \
             .artifact/screenshot_browser_*.png
     fi
     # add dir .artifact
@@ -1633,8 +1637,10 @@ shImageLogoCreate() {(set -e
     # screenshot asset_image_logo_256.png
     mkdir -p .artifact
     shBrowserScreenshot asset_image_logo_256.html \
-        --window-size=256,256 \
-        -screenshot=.artifact/asset_image_logo_256.png
+        -screenshot=.artifact/.asset_image_logo_256.png
+    gm convert -crop 256x256 \
+        .artifact/.asset_image_logo_256.png \
+        .artifact/asset_image_logo_256.png
     printf \
 "shImageLogoCreate - wrote - .artifact/asset_image_logo_256.png\n" 1>&2
     # convert to svg @ https://convertio.co/png-svg/
