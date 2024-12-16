@@ -244,15 +244,13 @@ import moduleUrl from "url";
             : "/usr/bin/google-chrome-stable"
         ),
         [
-            "--disable-gpu",
-            //
-            "--headless=old",
+            "--headless",
             "--ignore-certificate-errors",
             "--incognito",
             "--screenshot",
             "--timeout=30000",
             "--user-data-dir=" + tmpdir,
-            "--window-size=800x600",
+            "--window-size=800,600",
             "-screenshot=" + file,
             (
                 (process.getuid && process.getuid() === 0)
@@ -1635,6 +1633,7 @@ shImageLogoCreate() {(set -e
     # screenshot asset_image_logo_512.png
     mkdir -p .artifact
     shBrowserScreenshot asset_image_logo_512.html \
+        --window-size=512,512 \
         -screenshot=.artifact/asset_image_logo_512.png
     # install graphicsmagick
     if [ "$GITHUB_ACTION" ] && [ ! -f /usr/bin/gm ]
