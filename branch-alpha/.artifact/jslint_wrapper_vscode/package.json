@@ -95,7 +95,7 @@
     "engines": {
         "vscode": "^1.66.0"
     },
-    "icon": "asset_image_logo_512.png",
+    "icon": "asset_image_logo_256.png",
     "keywords": [
         "javascript",
         "jslint",

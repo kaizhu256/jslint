@@ -292,7 +292,7 @@ shCiVscePackageJslintWrapperVscode() {(set -e
     cd .artifact/jslint_wrapper_vscode
     ln -f ../../.npmignore .vscodeignore
     ln -f ../../LICENSE
-    ln -f ../../asset_image_logo_512.png
+    ln -f ../../asset_image_logo_256.png
     ln -f ../../jslint.mjs
     ln -f ../../jslint_wrapper_vscode.js
     node --input-type=module --eval '
@@ -427,7 +427,7 @@ import moduleFs from "fs";
                 "engines": {
                     "vscode": "^1.66.0"
                 },
-                "icon": "asset_image_logo_512.png",
+                "icon": "asset_image_logo_256.png",
                 "keywords": [
                     "javascript",
                     "jslint",

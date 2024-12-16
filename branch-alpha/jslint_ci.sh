@@ -1626,29 +1626,17 @@ import moduleUrl from "url";
 
 shImageLogoCreate() {(set -e
 # This function will create .png logo.
-    if [ ! -f asset_image_logo_512.html ]
+    if [ ! -f asset_image_logo_256.html ]
     then
         return
     fi
-    # screenshot asset_image_logo_512.png
+    # screenshot asset_image_logo_256.png
     mkdir -p .artifact
-    shBrowserScreenshot asset_image_logo_512.html \
-        --window-size=512,512 \
-        -screenshot=.artifact/asset_image_logo_512.png
-    # install graphicsmagick
-    if [ "$GITHUB_ACTION" ] && [ ! -f /usr/bin/gm ]
-    then
-        sudo apt-get install -y graphicsmagick
-    fi
-    # create various smaller thumbnails
-    for SIZE in 32 64 128 256
-    do
-        gm convert -resize "${SIZE}x${SIZE}" \
-            .artifact/asset_image_logo_512.png \
-            ".artifact/asset_image_logo_$SIZE.png"
-        printf \
-"shImageLogoCreate - wrote - .artifact/asset_image_logo_$SIZE.png\n" 1>&2
-    done
+    shBrowserScreenshot asset_image_logo_256.html \
+        --window-size=256,256 \
+        -screenshot=.artifact/asset_image_logo_256.png
+    printf \
+"shImageLogoCreate - wrote - .artifact/asset_image_logo_256.png\n" 1>&2
     # convert to svg @ https://convertio.co/png-svg/
 )}
 
