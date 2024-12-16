@@ -269,7 +269,7 @@ import moduleUrl from "url";
         })).filter(function (elem) {
             return elem;
         }),
-        {stdio: "ignore"}
+        {stdio: ["ignore", "ignore", "ignore"]}
     );
     exitCode = await new Promise(function (resolve) {
         child.on("exit", resolve);
@@ -369,7 +369,8 @@ import moduleChildProcess from "child_process";
     # 1px-border around browser-screenshot
     if (ls .artifact/screenshot_browser_*.png 2>/dev/null)
     then
-        gm mogrify -crop 800x600 .artifact/screenshot_browser_*.png
+        gm mogrify -crop 798x598 -bordercolor black -border 1 \
+            .artifact/screenshot_browser_*.png
     fi
     # add dir .artifact
     git add -f .artifact
