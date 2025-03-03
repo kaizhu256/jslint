@@ -291,11 +291,12 @@ shCiArtifactUpload() {(set -e
         return
     fi
     # install graphicsmagick
-    if [ "$GITHUB_ACTION" ] && [ ! -f /usr/bin/gm ]
+    if (! command -v gm >/dev/null)
     then
         sudo apt-get install -y graphicsmagick
     fi
-    mkdir -p .artifact
+    # mkdir .artifact/
+    mkdir -p .artifact/
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
@@ -316,50 +317,26 @@ shCiArtifactUpload() {(set -e
         printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
     # screenshot changelog and files
-    node --input-type=module --eval '
-import moduleChildProcess from "child_process";
-(function () {
-    [
-        // parallel-task - screenshot changelog
-        [
-            "jslint_ci.sh",
-            "shRunWithScreenshotTxt",
-            ".artifact/screenshot_changelog.svg",
-            "head",
-            "-n50",
-            "CHANGELOG.md"
-        ],
-        // parallel-task - screenshot files
-        [
-            "jslint_ci.sh",
-            "shRunWithScreenshotTxt",
-            ".artifact/screenshot_package_listing.svg",
-            "shGitLsTree"
-        ],
-        // parallel-task - screenshot logo
-        [
-            "jslint_ci.sh",
-            "shImageLogoCreate"
-        ]
-    ].forEach(function (argList) {
-        moduleChildProcess.spawn(
-            "sh",
-            argList,
-            {stdio: ["ignore", 1, 2]}
-        ).on("exit", function (exitCode) {
-            if (exitCode) {
-                process.exit(exitCode);
-            }
-        });
-    });
-}());
-' "$@" # '
+    PID_LIST=""
+    # parallel-task - screenshot changelog
+    shRunWithScreenshotTxt .artifact/screenshot_changelog.svg \
+        head -n50 CHANGELOG.md &
+    PID_LIST="$PID_LIST $!"
+    # parallel-task - screenshot files
+    shRunWithScreenshotTxt .artifact/screenshot_package_listing.svg \
+        shGitLsTree &
+    PID_LIST="$PID_LIST $!"
+    # parallel-task - screenshot logo
+    shImageLogoCreate &
+    PID_LIST="$PID_LIST $!"
+    shPidListWait screenshot "$PID_LIST"
+    # shCiArtifactUploadCustom
     if (command -v shCiArtifactUploadCustom >/dev/null)
     then
         shCiArtifactUploadCustom
     fi
     # 1px-border around browser-screenshot
-    if (ls .artifact/screenshot_browser_*.png 2>/dev/null)
+    if (ls .artifact/screenshot_browser_*.png >/dev/null 2>&1)
     then
         gm mogrify -crop 798x598 -bordercolor black -border 1 \
             .artifact/screenshot_browser_*.png
@@ -696,9 +673,10 @@ import moduleHttps from "https";
             /<link\b.+?\brel="preconnect".+?>/g
         ), "");
         data.replace((
-            /\bhttps?:\/\/.+?([\s")\]]|\W?$)/gm
-        ), function (url, removeLast) {
+            /\bhttps?:\/\/.+?([\s")\]]|\W?$)(<!--no-validate-->)?/gm
+        ), function (url, removeLast, noValidate) {
             let req;
+            let timeStart = Date.now();
             if (removeLast && removeLast !== "/") {
                 url = url.slice(0, -1);
             }
@@ -721,12 +699,12 @@ import moduleHttps from "https";
             );
             if ((
                 /^http:\/\/(?:127\.0\.0\.1|localhost|www\.w3\.org\/2000\/svg)(?:[\/:]|$)|^https:\/\/github\.com\/[\w.\-\/]+?\/compare\/[\w.\-\/]+?\.\.\.\w/m
-            ).test(url)) {
+            ).test(url) || noValidate) {
                 return "";
             }
             moduleAssert.ok(
                 !url.startsWith("http://"),
-                `shDirHttplinkValidate - ${file} - insecure link - ${url}`
+                `shDirHttplinkValidate - ${file} - insecure-link - ${url}`
             );
             // ignore duplicate-link
             if (dict.hasOwnProperty(url)) {
@@ -739,16 +717,21 @@ import moduleHttps from "https";
                 }
             }, function (res) {
                 console.error(
-                    "shDirHttplinkValidate " + res.statusCode + " " + url
+                    `shDirHttplinkValidate ${res.statusCode} ${url}`
+                    + ` - ${Date.now() - timeStart}ms`
                 );
-                moduleAssert.ok(
-                    res.statusCode < 400,
-                    `shDirHttplinkValidate - ${file} - unreachable url ${url}`
-                );
-                req.abort();
+                moduleAssert.ok(res.statusCode < 400);
+                req.destroy();
                 res.destroy();
             });
-            req.setTimeout(30000);
+            req.on("error", function (err) {
+                console.error(
+                    `shDirHttplinkValidate - ${file} - error - ${url}`
+                    + ` - ${Date.now() - timeStart}ms`
+                );
+                throw err;
+            });
+            req.setTimeout(60000);
             req.end();
             return "";
         });
@@ -773,15 +756,9 @@ import moduleHttps from "https";
             ).test(url)) {
                 moduleFs.stat(url.split("?")[0], function (ignore, exists) {
                     console.error(
-                        "shDirHttplinkValidate " + Boolean(exists) + " " + url
+                        `shDirHttplinkValidate ${Boolean(exists)} ${url}`
                     );
-                    moduleAssert.ok(
-                        exists,
-                        (
-                            `shDirHttplinkValidate - ${file}`
-                            + `- unreachable file ${url}`
-                        )
-                    );
+                    moduleAssert.ok(exists);
                 });
             }
             return "";
@@ -1632,13 +1609,12 @@ shImageLogoCreate() {(set -e
     then
         return
     fi
-    # screenshot asset_image_logo_256.png
-    mkdir -p .artifact
-    FILE="$(node --print 'path.resolve(".artifact/asset_image_logo_256.png")')"
-    shBrowserScreenshot asset_image_logo_256.html "-screenshot=$FILE"
-    gm mogrify -crop 256x256 .artifact/asset_image_logo_256.png
+    FILE=".artifact/asset_image_logo_256.png"
+    shBrowserScreenshot asset_image_logo_256.html \
+        "-screenshot=$(node --print "path.resolve(process.argv[1])" "$FILE")"
+    gm mogrify -crop 256x256 "$FILE"
     printf \
-"shImageLogoCreate - wrote - .artifact/asset_image_logo_256.png\n" 1>&2
+"shImageLogoCreate - wrote - $FILE\n" 1>&2
     # convert to svg @ https://convertio.co/png-svg/
 )}
 
