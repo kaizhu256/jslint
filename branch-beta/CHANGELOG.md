@@ -7,9 +7,11 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
-# v2024.12.1-beta
-- jslint - Update shell-function shDirHttplinkValidate() with pragma <\!!--novalidate--\>.
+# v2025.3.31
 - ci - Upgrade nodejs used in ci to v22.
+- ubuntu-ci - bugfix - Fix out-of-date apt-list when installing graphicsmagick.
+- jslint - Cleanup ci-shell-function shRollupFetch().
+- jslint - Update ci-shell-function shDirHttplinkValidate() with pragma <\!!--novalidate--\>.
 - ci - Upgrade python used in ci to v3.12.
 - ci - Auto-create asset_image_logo_256.png from asset_image_logo_256.html.
 - ci - Fix shell-function shRollupFetch() from making excessive github-api-request.
