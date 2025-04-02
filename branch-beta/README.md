@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2024.11.24)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
+| Branch | [master<br>(v2025.3.31)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/kaizhu256/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/kaizhu256/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/kaizhu256/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://kaizhu256.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-beta/.artifact/coverage/index.html) | [![coverage](https://kaizhu256.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-beta/.artifact/coverage/index.html) | [![coverage](https://kaizhu256.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-beta/.artifact/coverage/index.html) |
@@ -963,7 +963,7 @@ This PR will additionally:
 - `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
-- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2024.11.24
+- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2025.3.31
 - click `Create pull request`
 - input `Add a title` with: `# v20yy.mm.dd`
 - input `Add a description` with:
