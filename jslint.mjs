@@ -6382,7 +6382,12 @@ function jslint_phase3_parse(state) {
 
                 warn("unexpected_a");
             }
+            debugInline(token_nxt);
             if (!token_nxt.identifier) {
+
+// test_cause:
+// ["for(var in aa){}", "stmt_for", "expected_identifier_a", "var", 5]
+
                 return stop("expected_identifier_a");
             }
             advance(token_nxt.id);
