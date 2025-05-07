@@ -6378,7 +6378,7 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id === "var") {
 
 // test_cause:
-// ["for(var aa in aa){}", "stmt_for", "unexpected_a", "const", 5]
+// ["for(var aa in aa){}", "stmt_for", "unexpected_a", "var", 5]
 
                 warn("unexpected_a");
             }
