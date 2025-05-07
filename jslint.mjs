@@ -6382,14 +6382,13 @@ function jslint_phase3_parse(state) {
 
                 warn("unexpected_a");
             }
-            if (token_nxt.identifier) {
-                advance(token_nxt.id);
-                the_variable = token_nxt;
-                //!! debugInline(the_variable);
-                the_variable.dead = false;
-                the_variable.init = true;
-                //!! the_variable.names.push(the_variable);
+            if (!token_nxt.identifier) {
+                return stop("expected_identifier_a");
             }
+            advance(token_nxt.id);
+            the_variable = token_nxt;
+            the_variable.dead = false;
+            the_variable.init = true;
             break;
         }
         first = parse_expression(0);
