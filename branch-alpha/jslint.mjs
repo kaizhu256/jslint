@@ -3062,6 +3062,7 @@ function jslint_phase2_lex(state) {
         case "in":
         case "instanceof":
         case "new":
+        case "of":
         case "typeof":
         case "void":
         case "yield":
@@ -6351,6 +6352,7 @@ function jslint_phase3_parse(state) {
     function stmt_for() {
         let first;
         let the_for = token_now;
+        let the_variable;
         if (!option_dict.for) {
 
 // test_cause:
@@ -6373,11 +6375,21 @@ function jslint_phase3_parse(state) {
         case "const":
         case "let":
         case "var":
+            if (token_nxt.id === "var") {
 
 // test_cause:
-// ["for(const aa in aa){}", "stmt_for", "unexpected_a", "const", 5]
+// ["for(var aa in aa){}", "stmt_for", "unexpected_a", "var", 5]
 
-            return stop("unexpected_a");
+                warn("unexpected_a");
+            }
+            if (!token_nxt.identifier) {
+                return stop("expected_identifier_a");
+            }
+            advance(token_nxt.id);
+            the_variable = token_nxt;
+            the_variable.dead = false;
+            the_variable.init = true;
+            break;
         }
         first = parse_expression(0);
         if (first.id === "in") {
@@ -6391,6 +6403,16 @@ function jslint_phase3_parse(state) {
             the_for.name = first.expression[0];
             the_for.expression = first.expression[1];
             warn("expected_a_b", the_for, "Object.keys", "for in");
+        } else if (first.id === "of") {
+            if (first.expression[0].arity !== "variable") {
+
+// test_cause:
+// ["for(0 of aa){}", "stmt_for", "bad_assignment_a", "0", 5]
+
+                warn("bad_assignment_a", first.expression[0]);
+            }
+            the_for.name = first.expression[0];
+            the_for.expression = first.expression[1];
         } else {
             the_for.initial = first;
             advance(";");
@@ -7299,6 +7321,7 @@ function jslint_phase3_parse(state) {
     infix(110, ">=");
     infix(110, "in");
     infix(110, "instanceof");
+    infix(110, "of");
     infix(120, "<<");
     infix(120, ">>");
     infix(120, ">>>");
