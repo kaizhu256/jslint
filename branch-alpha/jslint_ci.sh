@@ -1665,12 +1665,6 @@ shJsonNormalize() {(set -e
 # 3. write normalized json-data back to file $1
     node --input-type=module --eval '
 import moduleFs from "fs";
-function noop(val) {
-
-// This function will do nothing except return <val>.
-
-    return val;
-}
 function objectDeepCopyWithKeysSorted(obj) {
 
 // This function will recursively deep-copy <obj> with keys sorted.
@@ -1695,21 +1689,19 @@ function objectDeepCopyWithKeysSorted(obj) {
     return sorted;
 }
 (async function () {
-    console.error("shJsonNormalize - " + process.argv[1]);
+    let data;
+    let file;
+    file = process.argv[1];
+    console.error("shJsonNormalize - " + file);
+    data = await moduleFs.promises.readFile(file, "utf8");
+    data = JSON.parse(data.replace((/^\ufeff/), ""));
     await moduleFs.promises.writeFile(
-        process.argv[1],
+        file,
         JSON.stringify(
-            objectDeepCopyWithKeysSorted(
-                JSON.parse(
-                    noop(
-                        await moduleFs.promises.readFile(
-                            process.argv[1],
-                            "utf8"
-                        )
-                    ).replace((
-                        /^\ufeff/
-                    ), "")
-                )
+            (
+                process.argv[3] === "--indent-only"
+                ? data
+                : objectDeepCopyWithKeysSorted(data)
             ),
             undefined,
             Number(process.argv[2]) || 4
