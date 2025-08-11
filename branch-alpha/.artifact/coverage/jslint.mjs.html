@@ -11508,27 +11508,27 @@ body {
 <pre><span class="lineno"><a href="#line_11350" id="line_11350">11350.</a></span><span class="count                ">      7</span><span>        let pathnameDict = Object.create(null);</span></pre>
 <pre><span class="lineno"><a href="#line_11351" id="line_11351">11351.</a></span><span class="count                ">      7</span><span>        data = await moduleFs.promises.readFile(coverageDir + file, "utf8");</span></pre>
 <pre><span class="lineno"><a href="#line_11352" id="line_11352">11352.</a></span><span class="count                ">      7</span><span>        data = JSON.parse(data);</span></pre>
-<pre><span class="lineno"><a href="#line_11353" id="line_11353">11353.</a></span><span class="count                ">    485</span><span>        data.result.forEach(function (scriptCov) {</span></pre>
-<pre><span class="lineno"><a href="#line_11354" id="line_11354">11354.</a></span><span class="count                ">    485</span><span>            let pathname = scriptCov.url;</span></pre>
-<pre><span class="lineno"><a href="#line_11355" id="line_11355">11355.</a></span><span class="count                ">    485</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_11356" id="line_11356">11356.</a></span><span class="count                ">    485</span><span>// Filter out internal coverages.</span></pre>
-<pre><span class="lineno"><a href="#line_11357" id="line_11357">11357.</a></span><span class="count                ">    485</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_11358" id="line_11358">11358.</a></span><span class="count                ">    404</span><span>            if (!pathname.startsWith("file:///")) {</span></pre>
-<pre><span class="lineno"><a href="#line_11359" id="line_11359">11359.</a></span><span class="count                ">    404</span><span>                return;</span></pre>
-<pre><span class="lineno"><a href="#line_11360" id="line_11360">11360.</a></span><span class="count                ">    404</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_11361" id="line_11361">11361.</a></span><span class="count                ">     81</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_11362" id="line_11362">11362.</a></span><span class="count                ">     81</span><span>// Normalize pathname.</span></pre>
-<pre><span class="lineno"><a href="#line_11363" id="line_11363">11363.</a></span><span class="count                ">     81</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_11364" id="line_11364">11364.</a></span><span class="count                ">     81</span><span>            pathname = moduleUrl.fileURLToPath(pathname);</span></pre>
-<pre><span class="lineno"><a href="#line_11365" id="line_11365">11365.</a></span><span class="count                ">     81</span><span>            pathname = modulePath.resolve(pathname).replace((</span></pre>
-<pre><span class="lineno"><a href="#line_11366" id="line_11366">11366.</a></span><span class="count                ">     81</span><span>                /\\/g</span></pre>
-<pre><span class="lineno"><a href="#line_11367" id="line_11367">11367.</a></span><span class="count                ">     81</span><span>            ), "/");</span></pre>
-<pre><span class="lineno"><a href="#line_11368" id="line_11368">11368.</a></span><span class="count                ">     81</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_11369" id="line_11369">11369.</a></span><span class="count                ">     81</span><span>// Filter files outside of cwd.</span></pre>
-<pre><span class="lineno"><a href="#line_11370" id="line_11370">11370.</a></span><span class="count                ">     81</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_11371" id="line_11371">11371.</a></span><span class="count                ">     81</span><span>            if (pathname.indexOf("[") &gt;= 0 || !pathname.startsWith(cwd)) {</span></pre>
-<pre><span class="lineno"><a href="#line_11372" id="line_11372">11372.</a></span><span class="count                ">     75</span><span>                return;</span></pre>
-<pre><span class="lineno"><a href="#line_11373" id="line_11373">11373.</a></span><span class="count                ">     75</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_11353" id="line_11353">11353.</a></span><span class="count                ">    446</span><span>        data.result.forEach(function (scriptCov) {</span></pre>
+<pre><span class="lineno"><a href="#line_11354" id="line_11354">11354.</a></span><span class="count                ">    446</span><span>            let pathname = scriptCov.url;</span></pre>
+<pre><span class="lineno"><a href="#line_11355" id="line_11355">11355.</a></span><span class="count                ">    446</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_11356" id="line_11356">11356.</a></span><span class="count                ">    446</span><span>// Filter out internal coverages.</span></pre>
+<pre><span class="lineno"><a href="#line_11357" id="line_11357">11357.</a></span><span class="count                ">    446</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_11358" id="line_11358">11358.</a></span><span class="count                ">    366</span><span>            if (!pathname.startsWith("file:///")) {</span></pre>
+<pre><span class="lineno"><a href="#line_11359" id="line_11359">11359.</a></span><span class="count                ">    366</span><span>                return;</span></pre>
+<pre><span class="lineno"><a href="#line_11360" id="line_11360">11360.</a></span><span class="count                ">    366</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_11361" id="line_11361">11361.</a></span><span class="count                ">     80</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_11362" id="line_11362">11362.</a></span><span class="count                ">     80</span><span>// Normalize pathname.</span></pre>
+<pre><span class="lineno"><a href="#line_11363" id="line_11363">11363.</a></span><span class="count                ">     80</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_11364" id="line_11364">11364.</a></span><span class="count                ">     80</span><span>            pathname = moduleUrl.fileURLToPath(pathname);</span></pre>
+<pre><span class="lineno"><a href="#line_11365" id="line_11365">11365.</a></span><span class="count                ">     80</span><span>            pathname = modulePath.resolve(pathname).replace((</span></pre>
+<pre><span class="lineno"><a href="#line_11366" id="line_11366">11366.</a></span><span class="count                ">     80</span><span>                /\\/g</span></pre>
+<pre><span class="lineno"><a href="#line_11367" id="line_11367">11367.</a></span><span class="count                ">     80</span><span>            ), "/");</span></pre>
+<pre><span class="lineno"><a href="#line_11368" id="line_11368">11368.</a></span><span class="count                ">     80</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_11369" id="line_11369">11369.</a></span><span class="count                ">     80</span><span>// Filter files outside of cwd.</span></pre>
+<pre><span class="lineno"><a href="#line_11370" id="line_11370">11370.</a></span><span class="count                ">     80</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_11371" id="line_11371">11371.</a></span><span class="count                ">     80</span><span>            if (pathname.indexOf("[") &gt;= 0 || !pathname.startsWith(cwd)) {</span></pre>
+<pre><span class="lineno"><a href="#line_11372" id="line_11372">11372.</a></span><span class="count                ">     74</span><span>                return;</span></pre>
+<pre><span class="lineno"><a href="#line_11373" id="line_11373">11373.</a></span><span class="count                ">     74</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_11374" id="line_11374">11374.</a></span><span class="count                ">      7</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_11375" id="line_11375">11375.</a></span><span class="count                ">      7</span><span>// Normalize pathname relative to cwd.</span></pre>
 <pre><span class="lineno"><a href="#line_11376" id="line_11376">11376.</a></span><span class="count                ">      7</span><span></span></pre>
