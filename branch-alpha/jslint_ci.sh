@@ -3513,8 +3513,8 @@ function sentinel() {}
  );
 }
 v8CoverageReportCreate({
-  coverageDir: ".artifact/coverage",
-  processArgv: process.argv.slice(2)
+ coverageDir: ".artifact/coverage",
+ processArgv: process.argv.slice(2)
 });
 ' 0 "$@" # '
 )}
