@@ -3735,6 +3735,7 @@ import moduleHttps from "https";
         } else if (
             line_source.endsWith(" //jslint-ignore-line")
             || line_source.endsWith(" //jslint-quiet")
+            || line_source.endsWith(" //coverage-ignore-line")
         ) {
 
 // test_cause:
@@ -10888,6 +10889,9 @@ body {
     background: #ccc;
 }
 .coverage .coverageLow,
+.coverage .ignore {
+    background: #ddd;
+}
 .coverage .uncovered {
     background: #ebb;
 }
@@ -11119,6 +11123,7 @@ body {
                 let inHole;
                 let lineHtml;
                 let lineId;
+                let lineIgnore = line.endsWith("//coverage-ignore-line");
                 lineHtml = "";
                 lineId = "line_" + (ii + 1);
                 switch (count) {
@@ -11126,7 +11131,11 @@ body {
                 case 0:
                     if (holeList.length === 0) {
                         lineHtml += "</span>";
-                        lineHtml += "<span class=\"uncovered\">";
+                        lineHtml += (
+                            lineIgnore
+                            ? "<span class=\"ignore\">"
+                            : "<span class=\"uncovered\">"
+                        );
                         lineHtml += htmlEscape(line);
                         break;
                     }
@@ -11159,7 +11168,11 @@ body {
 // true.
 
                             if (isHole) {
-                                lineHtml += " class=\"uncovered\"";
+                                lineHtml += (
+                                    lineIgnore
+                                    ? " class=\"ignore\""
+                                    : " class=\"uncovered\""
+                                );
                             }
                             lineHtml += ">";
                             chunk = "";
@@ -11179,7 +11192,9 @@ body {
 </span>
 <span class="count
                 ${(
-                    count <= 0
+                    (count <= 0 && lineIgnore)
+                    ? "ignore"
+                    : count <= 0
                     ? "uncovered"
                     : ""
                 )}"
@@ -11486,9 +11501,10 @@ function sentinel() {}
         });
         linesTotal = lineList.length;
         linesCovered = lineList.filter(function ({
-            count
+            count,
+            line
         }) {
-            return count > 0;
+            return count > 0 || line.endsWith("//coverage-ignore-line");
         }).length;
         await moduleFs.promises.mkdir((
             modulePath.dirname(coverageDir + pathname)

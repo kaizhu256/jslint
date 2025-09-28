@@ -1615,8 +1615,7 @@ shImageLogoCreate() {(set -e
     shBrowserScreenshot asset_image_logo_256.html \
         "-screenshot=$(node --print "path.resolve(process.argv[1])" "$FILE")"
     gm mogrify -crop 256x256 "$FILE"
-    printf \
-"shImageLogoCreate - wrote - $FILE\n" 1>&2
+    printf "shImageLogoCreate - wrote - $FILE\n" 1>&2
     # convert to svg @ https://convertio.co/png-svg/
 )}
 
@@ -2945,6 +2944,9 @@ body {
   background: #ccc;
 }
 .coverage .coverageLow,
+.coverage .ignore {
+  background: #ddd;
+}
 .coverage .uncovered {
   background: #ebb;
 }
@@ -3161,6 +3163,7 @@ body {
         let inHole;
         let lineHtml;
         let lineId;
+        let lineIgnore = line.endsWith("//coverage-ignore-line");
         lineHtml = "";
         lineId = "line_" + (ii + 1);
         switch (count) {
@@ -3168,7 +3171,11 @@ body {
         case 0:
           if (holeList.length === 0) {
             lineHtml += "</span>";
-            lineHtml += "<span class=\"uncovered\">";
+            lineHtml += (
+              lineIgnore
+              ? "<span class=\"ignore\">"
+              : "<span class=\"uncovered\">"
+            );
             lineHtml += htmlEscape(line);
             break;
           }
@@ -3197,7 +3204,11 @@ body {
               lineHtml += htmlEscape(chunk);
               lineHtml += "</span><span";
               if (isHole) {
-                lineHtml += " class=\"uncovered\"";
+                lineHtml += (
+                  lineIgnore
+                  ? " class=\"ignore\""
+                  : " class=\"uncovered\""
+                );
               }
               lineHtml += ">";
               chunk = "";
@@ -3217,7 +3228,9 @@ body {
 </span>
 <span class="count
         ${(
-          count <= 0
+          (count <= 0 && lineIgnore)
+          ? "ignore"
+          : count <= 0
           ? "uncovered"
           : ""
         )}"
@@ -3444,9 +3457,10 @@ function sentinel() {}
     });
     linesTotal = lineList.length;
     linesCovered = lineList.filter(function ({
-      count
+      count,
+      line
     }) {
-      return count > 0;
+      return count > 0 || line.endsWith("//coverage-ignore-line");
     }).length;
     await moduleFs.promises.mkdir((
       modulePath.dirname(coverageDir + pathname)

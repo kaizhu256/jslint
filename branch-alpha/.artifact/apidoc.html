@@ -629,21 +629,21 @@ await jslint.jslint_cli({
     ), "&amp;gt;");
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
+                            }
+                            lineHtml += "&gt;";
+                            chunk = "";
                             inHole = isHole;
                         }
                         chunk += char;
                     });
-                    lineHtml += htmlEscape(chunk);
+                    lineHtml += <span class="apidocCodeKeywordSpan">htmlEscape</span>(chunk);
                     break;
                 default:
-                    lineHtml += <span class="apidocCodeKeywordSpan">htmlEscape</span>(line);
+                    lineHtml += htmlEscape(line);
                 }
                 html += String(`
 &lt;pre&gt;
 &lt;span class="lineno"&gt;
-&lt;a href="#${lineId}" id="${lineId}"&gt;${String(ii + 1).padStart(5, " ")}.&lt;/a&gt;
-&lt;/span&gt;
-&lt;span class="count
 ...</pre></li>
 
 <li>
