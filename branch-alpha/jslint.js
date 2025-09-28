@@ -3735,7 +3735,6 @@ import moduleHttps from "https";
         } else if (
             line_source.endsWith(" //jslint-ignore-line")
             || line_source.endsWith(" //jslint-quiet")
-            || line_source.endsWith(" //coverage-ignore-line")
         ) {
 
 // test_cause:
@@ -10883,14 +10882,14 @@ body {
     background: #9d9;
 }
 .coverage .count {
-    color: #666;
+    color: #333;
 }
 .coverage .coverageIgnore {
-    background: #bbb;
+    background: #ccc;
 }
 .coverage .coverageLow,
 .coverage .ignore {
-    background: #bbb;
+    background: #ccc;
 }
 .coverage .uncovered {
     background: #ebb;
@@ -10917,7 +10916,7 @@ body {
 }
 .coverage pre:hover span.ignore,
 .coverage tr:hover td.coverageIgnore {
-    background: #bbb;
+    background: #ccc;
 }
 .coverage pre:hover span.uncovered,
 .coverage tr:hover td.coverageLow {
