@@ -65,7 +65,7 @@
     textLength="768"
     x="10"
     y="230"
->- coverage - add coverage-macros `/*coverage-disable*/`, `/*coverage-enable*/`.  `//coverage-ign\</tspan>
+>- coverage - Add coverage-macros `/*coverage-disable*/`, `/*coverage-enable*/`.  `//coverage-ign\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
