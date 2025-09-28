@@ -2941,11 +2941,11 @@ body {
   color: #666;
 }
 .coverage .coverageIgnore {
-  background: #ccc;
+  background: #bbb;
 }
 .coverage .coverageLow,
 .coverage .ignore {
-  background: #ccc;
+  background: #bbb;
 }
 .coverage .uncovered {
   background: #ebb;
@@ -2972,7 +2972,7 @@ body {
 }
 .coverage pre:hover span.ignore,
 .coverage tr:hover td.coverageIgnore {
-  background: #ccc;
+  background: #bbb;
 }
 .coverage pre:hover span.uncovered,
 .coverage tr:hover td.coverageLow {
@@ -3175,11 +3175,7 @@ body {
         case 0:
           if (holeList.length === 0) {
             lineHtml += "</span>";
-            lineHtml += (
-              lineIgnore
-              ? "<span class=\"ignore\">"
-              : "<span class=\"uncovered\">"
-            );
+            lineHtml += "<span class=\"uncovered\">";
             lineHtml += htmlEscape(line);
             break;
           }

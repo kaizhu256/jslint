@@ -1447,6 +1447,7 @@ jstestDescribe((
             "v8CoverageReportCreate_high.js", (
                 "switch(0){\n"
                 + "case 0:break;\n"
+                + "case 1:break;//coverage-ignore-line\n"
                 + "}\n"
             )
         ], [
