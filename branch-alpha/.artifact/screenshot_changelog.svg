@@ -65,13 +65,13 @@
     textLength="768"
     x="10"
     y="230"
->- coverage - Add coverage-macros `/*coverage-disable*/`, `/*coverage-enable*/`.  `//coverage-ign\</tspan>
+>- coverage - Add coverage-directives '/*coverage-disable*/', '/*coverage-enable*/'.  '//coverage\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="252"
->  ore-line`.                                                                                     </tspan>
+>  -ignore-line'.                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
