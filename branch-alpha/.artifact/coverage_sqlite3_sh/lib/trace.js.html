@@ -93,7 +93,7 @@ body {
 }
 .coverage .coverageLow,
 .coverage .ignore {
-    background: #ddd;
+    background: #ccc;
 }
 .coverage .uncovered {
     background: #ebb;
@@ -117,6 +117,10 @@ body {
 .coverage pre:hover span,
 .coverage tr:hover td {
     background: #7d7;
+}
+.coverage pre:hover span.ignore,
+.coverage tr:hover td.coverageIgnore {
+    background: #ccc;
 }
 .coverage pre:hover span.uncovered,
 .coverage tr:hover td.coverageLow {
