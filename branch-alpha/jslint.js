@@ -11511,12 +11511,13 @@ function sentinel() {}
             });
         });
         linesTotal = lineList.length;
-        linesCovered = lineList.filter(function ({
+        linesCovered = 0;
+        lineList.forEach(function ({
             count,
             ignoreLine
         }) {
-            return count > 0 || ignoreLine;
-        }).length;
+            linesCovered += count > 0 || ignoreLine;
+        });
         await moduleFs.promises.mkdir((
             modulePath.dirname(coverageDir + pathname)
         ), {
