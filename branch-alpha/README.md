@@ -898,10 +898,13 @@ eval("1"); //jslint-ignore-line
 
 ```js
 /*coverage-disable*/
+
 // JSLint will ignore code-coverage in this region.
-if (0) {
+
+if (false) {
     console.log("hello world"); //coverage-ignore-line
 }
+
 /*coverage-enable*/
 ```
 
@@ -912,7 +915,7 @@ if (0) {
 ```js
 // JSLint will ignore code-coverage at given line.
 
-if (0) {
+if (false) {
     console.log("hello world"); //coverage-ignore-line
 }
 ```
