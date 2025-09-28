@@ -66,6 +66,8 @@ Douglas Crockford <douglas@crockford.com>
     - [Directive `/*property*/`](#directive-property)
     - [Directive `/*jslint-disable*/.../*jslint-enable*/`](#directive-jslint-disablejslint-enable)
     - [Directive `//jslint-ignore-line`](#directive-jslint-ignore-line)
+    - [Directive `/*coverage-disable*/.../*coverage-enable*/`](#directive-coverage-disablecoverage-enable)
+    - [Directive `//coverage-ignore-line`](#directive-coverage-ignore-line)
 
 10. [Package Listing](#package-listing)
 
@@ -888,6 +890,38 @@ Syntax error.
 // JSLint will ignore non-fatal warnings at given line.
 
 eval("1"); //jslint-ignore-line
+```
+
+
+<br><br>
+### Directive `/*coverage-disable*/.../*coverage-enable*/`
+
+```js
+// JSLint will ignore code-coverage in given region.
+
+switch (0) {
+case 0:
+    break;
+/*coverage-disable*/
+case 1:
+    break;
+/*coverage-enable*/
+}
+```
+
+
+<br><br>
+### Directive `//coverage-ignore-line`
+
+```js
+// JSLint will ignore code-coverage at given line.
+
+switch (0) {
+case 0:
+    break;
+case 1: //coverage-ignore-line
+    break; //coverage-ignore-line
+}
 ```
 
 
