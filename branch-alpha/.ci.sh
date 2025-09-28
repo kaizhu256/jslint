@@ -251,10 +251,10 @@ import moduleFs from "fs";
                     ), "").replace((
                         /\n\n\n/g
                     // CL-61b11012 reduce size of string/argument passed
-                    // to nodejs by removing indent
+                    // to nodejs by using 1-space-indent
                     ), "\n").replace((
-                        /\n\s*/g
-                    ), "\n")
+                        /    /g
+                    ), " ")
                     + "\nv8CoverageReportCreate("
                 );
             })
