@@ -897,16 +897,12 @@ eval("1"); //jslint-ignore-line
 ### Directive `/*coverage-disable*/.../*coverage-enable*/`
 
 ```js
-// JSLint will ignore code-coverage in given region.
-
-switch (0) {
-case 0:
-    break;
 /*coverage-disable*/
-case 1:
-    break;
-/*coverage-enable*/
+// JSLint will ignore code-coverage in this region.
+if (0) {
+    console.log("hello world"); //coverage-ignore-line
 }
+/*coverage-enable*/
 ```
 
 
@@ -916,11 +912,8 @@ case 1:
 ```js
 // JSLint will ignore code-coverage at given line.
 
-switch (0) {
-case 0:
-    break;
-case 1: //coverage-ignore-line
-    break; //coverage-ignore-line
+if (0) {
+    console.log("hello world"); //coverage-ignore-line
 }
 ```
 
