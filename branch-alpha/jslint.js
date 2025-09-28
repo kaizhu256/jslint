@@ -106,7 +106,9 @@
     formatted_message, free, freeze, from, froms, fsWriteFileWithParents,
     fud_stmt, functionName, function_list, function_stack, functions, get,
     getset, github_repo, globExclude, global, global_dict, global_list,
-    holeList, htmlEscape, id, identifier, import, import_list, import_meta_url,
+    holeList, htmlEscape, id, identifier,
+    ignoreLine,
+    import, import_list, import_meta_url,
     inc, includeList, indent2, index, indexOf, init, initial, isArray,
     isBlockCoverage, isHole, isNaN, is_equal, is_weird, join, jslint,
     jslint_apidoc, jslint_assert, jslint_charset_ascii, jslint_cli,
@@ -163,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2025.3.31";
+let jslint_edition = "v2025.9.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -11119,6 +11121,7 @@ body {
             lineList.forEach(function ({
                 count,
                 holeList,
+                ignoreLine,
                 line,
                 startOffset
             }, ii) {
@@ -11126,7 +11129,6 @@ body {
                 let inHole;
                 let lineHtml;
                 let lineId;
-                let lineIgnore = line.endsWith("//coverage-ignore-line");
                 lineHtml = "";
                 lineId = "line_" + (ii + 1);
                 switch (count) {
@@ -11168,7 +11170,7 @@ body {
 
                             if (isHole) {
                                 lineHtml += (
-                                    lineIgnore
+                                    ignoreLine
                                     ? " class=\"ignore\""
                                     : " class=\"uncovered\""
                                 );
@@ -11191,7 +11193,7 @@ body {
 </span>
 <span class="count
                 ${(
-                    (count <= 0 && lineIgnore)
+                    (count <= 0 && ignoreLine)
                     ? "ignore"
                     : count <= 0
                     ? "uncovered"
@@ -11430,6 +11432,7 @@ function sentinel() {}
         functions,
         url: pathname
     }) {
+        let ignoreBlock = false;
         let lineList;
         let linesCovered;
         let linesTotal;
@@ -11439,14 +11442,23 @@ function sentinel() {}
         source.replace((
             /^.*$/gm
         ), function (line, startOffset) {
+            if (line === "/*coverage-disable*/") {
+                ignoreBlock = true;
+            }
             lineList[lineList.length - 1].endOffset = startOffset - 1;
             lineList.push({
                 count: -1,
                 endOffset: 0,
                 holeList: [],
+                ignoreLine: (
+                    ignoreBlock || line.endsWith("//coverage-ignore-line")
+                ),
                 line,
                 startOffset
             });
+            if (line === "/*coverage-enable*/") {
+                ignoreBlock = false;
+            }
             return "";
         });
         lineList.shift();
@@ -11501,9 +11513,9 @@ function sentinel() {}
         linesTotal = lineList.length;
         linesCovered = lineList.filter(function ({
             count,
-            line
+            ignoreLine
         }) {
-            return count > 0 || line.endsWith("//coverage-ignore-line");
+            return count > 0 || ignoreLine;
         }).length;
         await moduleFs.promises.mkdir((
             modulePath.dirname(coverageDir + pathname)

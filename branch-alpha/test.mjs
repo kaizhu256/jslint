@@ -1447,7 +1447,6 @@ jstestDescribe((
             "v8CoverageReportCreate_high.js", (
                 "switch(0){\n"
                 + "case 0:break;\n"
-                + "case 1:break;//coverage-ignore-line\n"
                 + "}\n"
             )
         ], [
@@ -1455,6 +1454,10 @@ jstestDescribe((
                 "/*coverage-ignore-file*/\n"
                 + "switch(0){\n"
                 + "case 0:break;\n"
+                + "case 1:break;//coverage-ignore-line\n"
+                + "/*coverage-disable*/\n"
+                + "case 2:break;\n"
+                + "/*coverage-enable*/\n"
                 + "}\n"
             )
         ], [
@@ -1493,6 +1496,20 @@ jstestDescribe((
                 ]
             });
         });
+    });
+    jstestIt((
+        "test coverage-ignore handling-behavior"
+    ), function () {
+        switch (noop() && noop()) { //coverage-ignore-line
+        case 1: //coverage-ignore-line
+            break; //coverage-ignore-line
+/*coverage-disable*/
+        case 2:
+            break;
+/*coverage-enable*/
+        case undefined:
+            break;
+        }
     });
     jstestIt((
         "test npm handling-behavior"
