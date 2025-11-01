@@ -23,7 +23,6 @@ jobs:
           # - x86
         node_version:
           - 24
-          # - 26
         os:
           - macos-latest
           - ubuntu-latest
