@@ -6,7 +6,7 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
-# v2025.11.1-beta
+# v2025.12.1-beta
 - ci - Upgrade nodejs used in ci to v24.
 
 # v2025.10.31

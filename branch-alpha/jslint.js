@@ -163,7 +163,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2025.11.1-beta";
+let jslint_edition = "v2025.12.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -4674,10 +4674,7 @@ function jslint_phase3_parse(state) {
 
             test_cause("free");
             the_paren.free = true;
-            if (
-                the_argument.wrapped === true
-                && the_argument.ellipsis !== true
-            ) {
+            if (the_argument.wrapped === true) {
 
 // test_cause:
 // ["aa((0))", "infix_lparen", "unexpected_a", "(", 3]
@@ -5161,7 +5158,6 @@ function jslint_phase3_parse(state) {
                 the_label.dead = false;
                 the_label.init = true;
                 the_statement = parse_statement();
-                the_label.dead = true;
                 functionage.statement_prv = the_statement;
                 the_statement.label = the_label;
                 the_statement.statement = true;
@@ -5207,6 +5203,9 @@ function jslint_phase3_parse(state) {
                 warn("unexpected_a", first);
             }
             semicolon();
+        }
+        if (the_label !== undefined) {
+            the_label.dead = true;
         }
         return the_statement;
     }
@@ -6981,17 +6980,15 @@ function jslint_phase3_parse(state) {
                         the_variable.names.push(name);
                         survey(name);
                         enroll(name, "variable", mode_const);
+
                         advance();
                         the_brace.open = true;
                     } else {
                         the_variable.names.push(name);
                         enroll(name, "variable", mode_const);
                     }
+                    name.dead = false;
                     name.init = true;
-
-// test_cause:
-// ["const {aa}=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 12]
-
                     if (token_nxt.id === "=") {
 
 // test_cause:
@@ -7042,11 +7039,8 @@ function jslint_phase3_parse(state) {
                     advance();
                     the_variable.names.push(name);
                     enroll(name, "variable", mode_const);
+                    name.dead = false;
                     name.init = true;
-
-// test_cause:
-// ["const [aa]=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 12]
-
                     if (ellipsis) {
                         name.ellipsis = true;
                         break;
@@ -7079,11 +7073,8 @@ function jslint_phase3_parse(state) {
                 enroll(name, "variable", mode_const);
                 if (token_nxt.id === "=" || mode_const) {
                     advance("=");
+                    name.dead = false;
                     name.init = true;
-
-// test_cause:
-// ["const aa=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 10]
-
                     name.expression = parse_expression(0);
                 }
                 the_variable.names.push(name);
