@@ -990,7 +990,7 @@ This PR will additionally:
 ### branch-master commit
 - update ci.yml to latest nodejs-lts
 - checkpoint local-branch-beta
-- `shGitPullrequest master beta # run several times until version propagates`
+- `shGitPullrequest master beta # run until version propagates`
     - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
 - `git push upstream alpha -f`
