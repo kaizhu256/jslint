@@ -1029,14 +1029,12 @@ This PR will additionally:
 
 <br><br>
 ### branch-master publish
-- goto https://www.npmjs.com/package/@kaizhu256/jslint/access
+- goto https://www.npmjs.com/package/@kaizhu256/jslint/access<!--no-validate-->
 - click `Github Actions`
 - input `Organization or user*` with: `jslint-org`
 - input `Repository*` with: `jslint`
 - input `Workflow filename*` with: `publish.yml`
 - click `Set up connection` or `Update Package Settings`
-- goto https://github.com/kaizhu256/jslint/settings/secrets/actions
-    - click `Edit NPM_TOKEN`
 - `git push upstream beta:master`
     - verify ci-success for upstream-branch-master
     - https://github.com/kaizhu256/jslint/actions
