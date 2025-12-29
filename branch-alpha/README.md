@@ -1029,6 +1029,10 @@ This PR will additionally:
 
 <br><br>
 ### branch-master publish
+- goto https://www.npmjs.com/settings/kaizhu/tokens/
+    - click `Generate New Token`
+- goto https://github.com/kaizhu256/jslint/settings/secrets/actions
+    - click `Edit NPM_TOKEN`
 - `git push upstream beta:master`
     - verify ci-success for upstream-branch-master
     - https://github.com/kaizhu256/jslint/actions
