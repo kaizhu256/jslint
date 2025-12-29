@@ -9,7 +9,7 @@ on:
 jobs:
 
 
-  job1:
+  publish_github:
     strategy:
       matrix:
         architecture:
@@ -33,21 +33,6 @@ jobs:
       contents: read
       packages: write
     steps:
-
-      # Setup .npmrc file to publish to npm
-      - run: rm -f /home/runner/work/_temp/.npmrc
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node_version }}
-          architecture: ${{ matrix.architecture }}
-          registry-url: 'https://registry.npmjs.org'
-      # Publish to npm
-      - run: sh jslint_ci.sh shCiPublishNpm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_REGISTRY: npm
-
       # Setup .npmrc file to publish to GitHub Packages
       - run: rm -f /home/runner/work/_temp/.npmrc
       - uses: actions/checkout@v4
@@ -63,4 +48,43 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_REGISTRY: github
+
+
+  publish_npmjs:
+    strategy:
+      matrix:
+        architecture:
+          # - arm64
+          - x64
+          # - x86
+        node_version:
+          - 24
+        os:
+          # - macos-latest
+          - ubuntu-latest
+          # - windows-latest
+    name: >
+      job1
+      node
+      v${{ matrix.node_version }}
+      ${{ matrix.architecture }}
+      ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      # Setup .npmrc file to publish to npm
+      - run: rm -f /home/runner/work/_temp/.npmrc
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node_version }}
+          architecture: ${{ matrix.architecture }}
+          registry-url: 'https://registry.npmjs.org'
+      # Publish to npm
+      - run: sh jslint_ci.sh shCiPublishNpm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_REGISTRY: npm
 # base - .github/workflows/publish.yml - end
