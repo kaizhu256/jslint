@@ -1034,7 +1034,7 @@ This PR will additionally:
 - input `Organization or user*` with: `jslint-org`
 - input `Repository*` with: `jslint`
 - input `Workflow filename*` with: `publish.yml`
-- click `Set up connection`
+- click `Set up connection` or `Update Package Settings`
 - goto https://github.com/kaizhu256/jslint/settings/secrets/actions
     - click `Edit NPM_TOKEN`
 - `git push upstream beta:master`
