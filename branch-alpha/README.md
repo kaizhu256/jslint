@@ -1029,12 +1029,12 @@ This PR will additionally:
 
 <br><br>
 ### branch-master publish
-- goto https://www.npmjs.com/settings/kaizhu/tokens/
-    - click `Generate New Token`
-    - click `Bypass two-factor authentication (2FA)`
-    - click `Read and write` under `Packages and scopes`
-    - click `Read and write` under `Organizations`
-    - click `jslint-org` under `Select organizations`
+- goto https://www.npmjs.com/package/@kaizhu256/jslint/access
+- click `Github Actions`
+- input `Organization or user*` with: `jslint-org`
+- input `Repository*` with: `jslint`
+- input `Workflow filename*` with: `publish.yml`
+- click `Set up connection`
 - goto https://github.com/kaizhu256/jslint/settings/secrets/actions
     - click `Edit NPM_TOKEN`
 - `git push upstream beta:master`
