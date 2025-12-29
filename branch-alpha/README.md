@@ -1029,7 +1029,7 @@ This PR will additionally:
 
 <br><br>
 ### branch-master publish
-- goto https://www.npmjs.com/package/@kaizhu256/jslint/access<!--no-validate-->
+- goto https://www.npmjs.com/package/@kaizhu256/jslint/access <!--no-validate-->
 - click `Github Actions`
 - input `Organization or user*` with: `jslint-org`
 - input `Repository*` with: `jslint`
