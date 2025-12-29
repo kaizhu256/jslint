@@ -1031,6 +1031,10 @@ This PR will additionally:
 ### branch-master publish
 - goto https://www.npmjs.com/settings/kaizhu/tokens/
     - click `Generate New Token`
+    - click `Bypass two-factor authentication (2FA)`
+    - click `Read and write` under `Packages and scopes`
+    - click `Read and write` under `Organizations`
+    - click `jslint-org` under `Select organizations`
 - goto https://github.com/kaizhu256/jslint/settings/secrets/actions
     - click `Edit NPM_TOKEN`
 - `git push upstream beta:master`
