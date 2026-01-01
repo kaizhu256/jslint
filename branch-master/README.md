@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2025.3.31)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
+| Branch | [master<br>(v2025.12.28)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/kaizhu256/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/kaizhu256/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/kaizhu256/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://kaizhu256.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://kaizhu256.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://kaizhu256.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-master/.artifact/coverage/index.html) |
@@ -66,6 +66,8 @@ Douglas Crockford <douglas@crockford.com>
     - [Directive `/*property*/`](#directive-property)
     - [Directive `/*jslint-disable*/.../*jslint-enable*/`](#directive-jslint-disablejslint-enable)
     - [Directive `//jslint-ignore-line`](#directive-jslint-ignore-line)
+    - [Directive `/*coverage-disable*/.../*coverage-enable*/`](#directive-coverage-disablecoverage-enable)
+    - [Directive `//coverage-ignore-line`](#directive-coverage-ignore-line)
 
 10. [Package Listing](#package-listing)
 
@@ -892,6 +894,34 @@ eval("1"); //jslint-ignore-line
 
 
 <br><br>
+### Directive `/*coverage-disable*/.../*coverage-enable*/`
+
+```js
+/*coverage-disable*/
+
+// JSLint will ignore code-coverage in this region.
+
+if (false) {
+    console.log("hello world");
+}
+
+/*coverage-enable*/
+```
+
+
+<br><br>
+### Directive `//coverage-ignore-line`
+
+```js
+// JSLint will ignore code-coverage at given line.
+
+if (false) {
+    console.log("hello world"); //coverage-ignore-line
+}
+```
+
+
+<br><br>
 # Package Listing
 ![screenshot_package_listing.svg](https://kaizhu256.github.io/jslint/branch-master/.artifact/screenshot_package_listing.svg)
 
@@ -917,13 +947,14 @@ eval("1"); //jslint-ignore-line
 <br><br>
 ### pull-request merge
 - find highest issue-number at https://github.com/kaizhu256/jslint/issues/, https://github.com/kaizhu256/jslint/pulls/, and add +1 to it for PR-xxx
+- checkpoint local-branch-beta
 - `shGitPullrequest beta beta`
     - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
 - `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
-- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-p2024.11.24
+- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-p2025.12.14
 - click `Create pull request`
 - input `Add your description here...` with:
 ```
@@ -943,7 +974,7 @@ This PR will additionally:
     - verify ci-success for pull-request
     - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
 - wait awhile before continuing ...
-- click `Rebase and merge`
+- click `Squash and merge`
     - verify ci-success for upstream-branch-beta
     - https://github.com/kaizhu256/jslint/actions
 - `shGitPullrequestCleanup`
@@ -957,13 +988,15 @@ This PR will additionally:
 
 <br><br>
 ### branch-master commit
-- `shGitPullrequest master beta`
+- update ci.yml to latest nodejs-lts
+- checkpoint local-branch-beta
+- `shGitPullrequest master beta # re-run until version propagates`
     - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
 - `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
-- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2025.3.31
+- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2025.12.28
 - click `Create pull request`
 - input `Add a title` with: `# v20yy.mm.dd`
 - input `Add a description` with:
@@ -976,7 +1009,7 @@ This PR will additionally:
     - verify ci-success for pull-request
     - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
 - wait awhile before continuing ...
-- click `Rebase and merge`
+- click `Squash and merge`
     - verify ci-success for upstream-branch-beta
     - https://github.com/kaizhu256/jslint/actions
 - `shGitPullrequestCleanup`
@@ -996,6 +1029,12 @@ This PR will additionally:
 
 <br><br>
 ### branch-master publish
+- goto https://www.npmjs.com/package/@kaizhu256/jslint/access <!--no-validate-->
+- click `Github Actions`
+- input `Organization or user*` with: `jslint-org`
+- input `Repository*` with: `jslint`
+- input `Workflow filename*` with: `publish.yml`
+- click `Set up connection` or `Update Package Settings`
 - `git push upstream beta:master`
     - verify ci-success for upstream-branch-master
     - https://github.com/kaizhu256/jslint/actions
