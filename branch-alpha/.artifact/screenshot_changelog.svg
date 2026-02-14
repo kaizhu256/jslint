@@ -65,7 +65,7 @@
     textLength="768"
     x="10"
     y="230"
->- jslint - Suggest Boolean(...) instead of !! for ternary-expression.                            </tspan>
+>- jslint - Update warning to suggest Boolean(...) instead of !! for ternary-expression.          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
