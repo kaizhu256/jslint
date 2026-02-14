@@ -8195,7 +8195,7 @@ function jslint_phase4_walk(state) {
 // test_cause:
 // ["aa?true:false", "post_t", "expected_a_b", "?", 3]
 
-            warn("expected_a_b", thing, "!!", "?");
+            warn("expected_a_b", thing, "Boolean(...)", "?");
         } else if (
             thing.expression[1].id === "false"
             && thing.expression[2].id === "true"
