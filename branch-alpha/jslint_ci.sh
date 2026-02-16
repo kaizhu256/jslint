@@ -302,7 +302,7 @@ shCiArtifactUpload() {(set -e
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
     # init $GITHUB_BRANCH0
-    export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
+    export GITHUB_BRANCH0="$(git branch --show-current)"
     git pull --unshallow origin "$GITHUB_BRANCH0"
     # init $UPSTREAM_XXX
     export UPSTREAM_REPOSITORY="$(node -p '(
@@ -399,7 +399,7 @@ shCiBase() {(set -e
 # shCiLintCustom() {(set -e
 # # This function will run custom-code to lint files.
 # )}
-    export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
+    export GITHUB_BRANCH0="$(git branch --show-current)"
     # Auto-correct common errors in package.json.
     if [ "$(npm --version | cut -d. -f1)" -ge 9 ]
     then
