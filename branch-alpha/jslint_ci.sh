@@ -454,8 +454,8 @@ import moduleFs from "fs";
         {
             file: "README.md",
             src: fileDict["README.md"].replace((
-                /(\[(?:main|master)<br>\()v\d\d\d\d\.\d\d?\.\d\d?\b/g
-            ), `$1v${versionMaster}`)
+                /(\[(?:main|master)<br>\()v\d\d\d\d\.\d\d?\.\d\d?\b[^)]*?(\))/g
+            ), `$1v${versionMaster}$2`)
         }, {
             file: "package.json",
             src: fileDict["package.json"].replace((
