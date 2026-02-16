@@ -401,7 +401,10 @@ shCiBase() {(set -e
 # )}
     export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
     # Auto-correct common errors in package.json.
-#   npm pkg fix
+    if [ "$(npm --version | cut -d. -f1)" -ge 9 ]
+    then
+        npm pkg fix
+    fi
     # validate package.json.fileCount
     node --input-type=module --eval '
 import moduleFs from "fs";
