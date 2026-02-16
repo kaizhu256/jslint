@@ -401,7 +401,8 @@ shCiBase() {(set -e
 # )}
     export GITHUB_BRANCH0="$(git branch --show-current)"
     # Auto-correct common errors in package.json.
-    if [ "$(npm --version | cut -d. -f1)" -ge 9 ]
+    # Check npm-version >= 9.0.0, before running npm-pkg-fix
+    if [ "$(npm --version | cut -d"." -f1)" -ge 9 ]
     then
         npm pkg fix
     fi
