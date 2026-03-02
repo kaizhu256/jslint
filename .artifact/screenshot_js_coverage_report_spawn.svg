@@ -335,7 +335,7 @@
     textLength="768"
     x="10"
     y="1220"
->(node:4037) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a user\</tspan>
+>(node:4045) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a user\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -353,7 +353,7 @@
     textLength="768"
     x="10"
     y="1286"
->(node:4037) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone t\</tspan>
+>(node:4045) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone t\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -401,7 +401,7 @@
     textLength="768"
     x="10"
     y="1462"
->up to date, audited 396 packages in 2s                                                           </tspan>
+>up to date, audited 396 packages in 3s                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
