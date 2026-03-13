@@ -42,8 +42,8 @@ function! SaveAndJslint(bang)
     if a:bang == "!" | write! | else | write | endif
     "" jslint file (via nodejs)
     let &l:errorformat =
-        \ "%f.<node -e>.js:%n:%l:%c:%m," .
-        \ "%f:%n:%l:%c:%m"
+        \ "%f.<node -e>.js:%n:%l:%c:%m,"
+        \ . "%f:%n:%l:%c:%m"
     let &l:makeprg = "node"
         \ . " \"" . s:dir . "/jslint.mjs\""
         \ . " jslint_wrapper_vim"
