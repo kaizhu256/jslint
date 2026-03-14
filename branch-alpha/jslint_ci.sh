@@ -1748,10 +1748,6 @@ shLintPython() {(set -e
     # Multi-line docstring summary should start at the first line
     OPTION="$OPTION --ignore=D212"
     #
-    # D213 - multi-line-summary-second-line
-    # Multi-line docstring summary should start at the second line
-    OPTION="$OPTION --ignore=D213"
-    #
     # D401 - non-imperative-mood
     # First line of docstring should be in imperative mood: "{first_line}"
     OPTION="$OPTION --ignore=D401"
@@ -1763,6 +1759,14 @@ shLintPython() {(set -e
     # ERA001 - commented-out-code
     # Found commented-out code
     OPTION="$OPTION --ignore=ERA001"
+    #
+    # PLR0912 - too-many-branches
+    # Too many branches ({branches} > {max_branches})
+    OPTION="$OPTION --ignore=PLR0912"
+    #
+    # PLR0913 - too-many-arguments
+    # Too many arguments in function definition ({c_args} > {max_args})
+    OPTION="$OPTION --ignore=PLR0913"
     #
     # PLR0915 - too-many-statements
     # Too many statements ({statements} > {max_statements})
