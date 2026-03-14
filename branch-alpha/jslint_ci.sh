@@ -1795,12 +1795,12 @@ shLintPython() {(set -e
     printf "lint pycodestyle\n"
     OPTION="--ignore="
     #
-    # Unexpected indentation (comment) (E116)
-    # Comments should be indented relative to the code in the block they are in.
+    # E116 - unexpected-indentation-comment
+    # Unexpected indentation (comment)
     OPTION="$OPTION,E116"
     #
-    # At least two spaces before inline comment (E261)
-    # Inline comments should have two spaces before them.
+    # E261 - too-few-spaces-before-inline-comment
+    # Insert at least two spaces before an inline comment
     OPTION="$OPTION,E261"
     #
     # Line break occurred before a binary operator (W503)
