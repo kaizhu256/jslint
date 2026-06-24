@@ -6252,6 +6252,14 @@ function jslint_phase3_parse(state) {
 // Parse/loop through each element in [...].
 
             while (true) {
+                if (!state.mode_json && token_nxt.id === ",") {
+
+// test_cause:
+// [";[,aa]=0", "prefix_lbracket", "ignore", "", 0]
+
+                    test_cause("ignore");
+                    advance(",");
+                }
                 if (!state.mode_json && token_nxt.id === "...") {
 
 // test_cause:
