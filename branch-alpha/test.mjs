@@ -852,11 +852,11 @@ jstestDescribe((
                 "let aa = aa[`!`];"
             ],
             regexp: [
-                "RegExp.escape(\"\");",
-                "function aa() {\n    return /./;\n}",
-                "let aa = /(?!.)(?:.)(?=.)/;",
-                "let aa = /./dgimsuy;",
-                "let aa = /[\\--\\-]/;"
+                `RegExp.escape("");`,
+                `function aa() {\n    return /./;\n}`,
+                `let aa = /(?!.)(?:.)(?=.)/;`,
+                `let aa = /./dgimsuy;`,
+                `let aa = /[\\--\\-]/;`
             ],
             ternary: [
                 (
