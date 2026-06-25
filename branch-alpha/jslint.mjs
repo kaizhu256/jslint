@@ -6103,13 +6103,17 @@ function jslint_phase3_parse(state) {
                     param.names.push(subparam);
 
 // test_cause:
-// ["function aa([aa=aa],aa){}", "param_parse", "id", "", 0]
+// ["function aa([aa=aa],aa){}", "param_parse", "equal", "", 0]
+// ["function aa({aa=aa},aa){}", "param_parse", "equal", "", 0]
 
-                    test_cause("id");
+                    test_cause("equal");
                     if (token_nxt.id === "=") {
                         advance("=");
                         subparam.expression = parse_expression();
                         param.open = true;
+                    }
+                    if (is_brace) {
+                        param.names.push(subparam);
                     }
                     //
                     if (token_nxt.id !== ",") {
@@ -6122,7 +6126,19 @@ function jslint_phase3_parse(state) {
                 }
                 //
                 parameters.push(param);
-                advance("]");
+                if (is_brace) {
+
+// test_cause:
+// ["
+// function aa({bb,aa}){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
+
+                    check_ordered("parameter", param.names);
+                    advance("}");
+                    signature.push("}");
+                } else {
+                    advance("]");
+                }
                 break;
             case "{":
                 if (optional !== undefined) {
@@ -6179,6 +6195,7 @@ function jslint_phase3_parse(state) {
                     }
 
 // test_cause:
+// ["function aa([aa=aa],aa){}", "param_parse", "equal", "", 0]
 // ["function aa({aa=aa},aa){}", "param_parse", "equal", "", 0]
 
                     test_cause("equal");
@@ -6187,7 +6204,9 @@ function jslint_phase3_parse(state) {
                         subparam.expression = parse_expression();
                         param.open = true;
                     }
-                    param.names.push(subparam);
+                    if (is_brace) {
+                        param.names.push(subparam);
+                    }
                     //
                     if (token_nxt.id !== ",") {
                         break;
@@ -6199,15 +6218,19 @@ function jslint_phase3_parse(state) {
                 }
                 //
                 parameters.push(param);
+                if (is_brace) {
 
 // test_cause:
 // ["
 // function aa({bb,aa}){}
 // ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
 
-                check_ordered("parameter", param.names);
-                advance("}");
-                signature.push("}");
+                    check_ordered("parameter", param.names);
+                    advance("}");
+                    signature.push("}");
+                } else {
+                    advance("]");
+                }
                 break;
             default:
                 if (!token_nxt.identifier) {
