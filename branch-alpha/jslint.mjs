@@ -3315,7 +3315,7 @@ function jslint_phase2_lex(state) {
             case "u":
                 break;
 
-// PR-xxx - Add ES2024-feature RegExp v flag with set notation + str-properties.
+// PR-xxx - Add ES2024-feature RegExp v flag with set-notation + str-properties.
 
             case "v":
                 break;
