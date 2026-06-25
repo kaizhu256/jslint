@@ -3299,6 +3299,9 @@ function jslint_phase2_lex(state) {
 // Process dangling flag letters.
 
             switch (!flag[char] && char) {
+
+// PR-xxx - Add ES2022-feature RegExp Match Indices.
+
             case "d":
                 break;
             case "g":
@@ -3310,6 +3313,11 @@ function jslint_phase2_lex(state) {
             case "s":
                 break;
             case "u":
+                break;
+
+// PR-xxx - Add ES2024-feature RegExp v flag with set notation + str-properties.
+
+            case "v":
                 break;
             case "y":
 

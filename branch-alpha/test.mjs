@@ -856,7 +856,7 @@ jstestDescribe((
                 `function aa() {\n    return /./;\n}`,
                 `let aa = /(?!.)(?:.)(?=.)/;`,
                 `let aa = /(?ims-ims:.)/;`,
-                `let aa = /./dgimsuy;`,
+                `let aa = /./dgimsuvy;`,
                 `let aa = /[\\--\\-]/;`
             ],
             ternary: [
