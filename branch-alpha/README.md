@@ -932,7 +932,7 @@ if (false) {
 |  54. | &#x2705; | ES2020 | [`import.meta`](https://github.com/tc39/proposal-import-meta) |
 |  53. | &#x2705; | ES2020 | [`Nullish coalescing Operator`](https://github.com/tc39/proposal-nullish-coalescing) |
 |  52. | &#x2705; | ES2020 | [`Optional Chaining`](https://github.com/tc39/proposal-optional-chaining) |
-|  51. | &#x274c; | ES2020 | [`for-in mechanics`](https://github.com/tc39/proposal-for-in-order) |
+|  51. | &#x2705; | ES2020 | [`for-in mechanics`](https://github.com/tc39/proposal-for-in-order) |
 |  50. | &#x2705; | ES2020 | [`globalThis`](https://github.com/tc39/proposal-global) |
 |  49. | &#x2705; | ES2020 | [`Promise.allSettled`](https://github.com/tc39/proposal-promise-allSettled) |
 |  48. | &#x2705; | ES2020 | [`BigInt`](https://github.com/tc39/proposal-bigint) |
