@@ -3090,11 +3090,17 @@ function jslint_phase2_lex(state) {
                     case "?":
                         char_after("?");
                         switch (char) {
+
+// ES1999-feature Negative lookahead assertion.
+
                         case "!":
 
 // PR-437 - Add grammar for regexp-named-capture-group.
 
                         case "<":
+
+// ES1999-feature Positive lookahead assertion.
+
                         case "=":
                             char_after();
                             break;

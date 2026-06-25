@@ -949,7 +949,7 @@ if (false) {
 |  37. | &#x274c; | ES2018 | [`Asynchronous Iteration`](https://github.com/tc39/proposal-async-iteration) |
 |  36. | &#x2705; | ES2018 | [`Promise.prototype.finally`](https://github.com/tc39/proposal-promise-finally) |
 |  35. | &#x2705; | ES2018 | [`RegExp Unicode Property Escapes`](https://github.com/tc39/proposal-regexp-unicode-property-escapes) |
-|  34. | &#x26a0; | ES2018 | [`RegExp Lookbehind Assertions`](https://github.com/tc39/proposal-regexp-lookbehind) |
+|  34. | &#x2705; | ES2018 | [`RegExp Lookbehind Assertions`](https://github.com/tc39/proposal-regexp-lookbehind) |
 |  33. | &#x2705; | ES2018 | [`Rest/Spread Properties`](https://github.com/tc39/proposal-object-rest-spread) |
 |  32. | &#x2705; | ES2018 | [`RegExp named capture groups`](https://github.com/tc39/proposal-regexp-named-groups) |
 |  31. | &#x2705; | ES2018 | [`s (dotAll) flag for regular expressions`](https://github.com/tc39/proposal-regexp-dotall-flag) |
