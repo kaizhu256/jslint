@@ -6111,10 +6111,14 @@ function jslint_phase3_parse(state) {
                         subparam.expression = parse_expression();
                         param.open = true;
                     }
+                    //
                     if (token_nxt.id !== ",") {
                         break;
                     }
                     advance(",");
+                    if (is_brace) {
+                        signature.push(", ");
+                    }
                 }
                 //
                 parameters.push(param);
@@ -6184,11 +6188,14 @@ function jslint_phase3_parse(state) {
                         param.open = true;
                     }
                     param.names.push(subparam);
+                    //
                     if (token_nxt.id !== ",") {
                         break;
                     }
                     advance(",");
-                    signature.push(", ");
+                    if (is_brace) {
+                        signature.push(", ");
+                    }
                 }
                 //
                 parameters.push(param);
