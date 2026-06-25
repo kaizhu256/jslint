@@ -4394,7 +4394,7 @@ function jslint_phase3_parse(state) {
         ) {
             token_nxt.statement = true;
             advance("(string)");
-            advance(";");
+            semicolon();
         }
         stmts = parse_statements();
         the_block.block = stmts;
@@ -5728,7 +5728,7 @@ function jslint_phase3_parse(state) {
         let ellipsis;
         let mode_const;
         let name;
-        mode_const = the_variable.id === "const";
+        mode_const = the_variable && the_variable.id === "const";
         advance();
         while (true) {
             if (!is_brace && token_nxt.id === ",") {
@@ -6626,7 +6626,7 @@ function jslint_phase3_parse(state) {
             the_break.label = token_nxt;
             advance();
         }
-        advance(";");
+        semicolon();
         return the_break;
     }
 
@@ -6645,7 +6645,7 @@ function jslint_phase3_parse(state) {
         check_not_top_level(the_continue);
         the_continue.disrupt = true;
         warn("unexpected_a", the_continue);
-        advance(";");
+        semicolon();
         return the_continue;
     }
 
@@ -7111,7 +7111,7 @@ function jslint_phase3_parse(state) {
         if (token_nxt.id !== ";" && the_return.line === token_nxt.line) {
             the_return.expression = parse_expression(10);
         }
-        advance(";");
+        semicolon();
         return the_return;
     }
 
@@ -7842,7 +7842,7 @@ function jslint_phase3_parse(state) {
 
     } else if (token_nxt.value === "use strict") {
         advance("(string)");
-        advance(";");
+        semicolon();
     }
     state.token_tree = parse_statements();
     advance("(end)");
