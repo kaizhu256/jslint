@@ -6036,6 +6036,7 @@ function jslint_phase3_parse(state) {
             }
         }
         function param_parse() {
+            const is_brace = token_nxt.id === "{";
             let param;
             switch (token_nxt.id) {
             case "...":
@@ -6070,6 +6071,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["function aa(aa=0,[]){}", "param_parse", "required_a_optional_b", "aa", 18]
+// ["function aa(aa=0,{}){}", "param_parse", "required_a_optional_b", "aa", 18]
 
                     warn(
                         "required_a_optional_b",
@@ -6080,14 +6082,20 @@ function jslint_phase3_parse(state) {
                 }
                 param = token_nxt;
                 param.names = [];
-                advance("[");
-                signature.push("[]");
+                advance();
+                if (is_brace) {
+                    signature.push("{");
+                } else {
+                    signature.push("[]");
+                }
                 while (true) {
                     subparam = token_nxt;
                     if (!subparam.identifier) {
 
 // test_cause:
 // ["function aa(aa=0,[]){}", "param_parse", "expected_identifier_a", "]", 19]
+// ["function aa(aa=0,{}){}", "param_parse", "expected_identifier_a", "}", 19]
+// ["function aa({0}){}", "param_parse", "expected_identifier_a", "0", 14]
 
                         return stop("expected_identifier_a");
                     }
@@ -6096,6 +6104,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["function aa([aa=aa],aa){}", "param_parse", "id", "", 0]
+// ["function aa({aa:0}){}", "param_parse", "expected_identifier_a", "}", 18]
 
                     test_cause("id");
                     if (token_nxt.id === "=") {
@@ -6116,6 +6125,7 @@ function jslint_phase3_parse(state) {
                 if (optional !== undefined) {
 
 // test_cause:
+// ["function aa(aa=0,[]){}", "param_parse", "required_a_optional_b", "aa", 18]
 // ["function aa(aa=0,{}){}", "param_parse", "required_a_optional_b", "aa", 18]
 
                     warn(
@@ -6127,8 +6137,12 @@ function jslint_phase3_parse(state) {
                 }
                 param = token_nxt;
                 param.names = [];
-                advance("{");
-                signature.push("{");
+                advance();
+                if (is_brace) {
+                    signature.push("{");
+                } else {
+                    signature.push("[]");
+                }
                 while (true) {
                     subparam = token_nxt;
                     if (!subparam.identifier) {
