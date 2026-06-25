@@ -6104,7 +6104,6 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["function aa([aa=aa],aa){}", "param_parse", "id", "", 0]
-// ["function aa({aa:0}){}", "param_parse", "expected_identifier_a", "}", 18]
 
                     test_cause("id");
                     if (token_nxt.id === "=") {
@@ -6148,6 +6147,7 @@ function jslint_phase3_parse(state) {
                     if (!subparam.identifier) {
 
 // test_cause:
+// ["function aa(aa=0,[]){}", "param_parse", "expected_identifier_a", "]", 19]
 // ["function aa(aa=0,{}){}", "param_parse", "expected_identifier_a", "}", 19]
 // ["function aa({0}){}", "param_parse", "expected_identifier_a", "0", 14]
 
