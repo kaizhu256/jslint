@@ -918,7 +918,7 @@ if (false) {
 |  68. | &#x2705; | ES2023 | [`Array find from last`](https://github.com/tc39/proposal-array-find-from-last) |
 |  67. | &#x2705; | ES2022 | [`Error Cause`](https://github.com/tc39/proposal-error-cause) |
 |  66. | &#x274c; | ES2022 | [`Class Static Block`](https://github.com/tc39/proposal-class-static-block) |
-|  65. | &#x26a0; | ES2022 | [`Accessible Object.prototype.hasOwnProperty`](https://github.com/tc39/proposal-accessible-object-hasownproperty) |
+|  65. | &#x2705; | ES2022 | [`Accessible Object.prototype.hasOwnProperty`](https://github.com/tc39/proposal-accessible-object-hasownproperty) |
 |  64. | &#x2705; | ES2022 | [`.at()`](https://github.com/tc39/proposal-relative-indexing-method) |
 |  63. | &#x274c; | ES2022 | [`Ergonomic brand checks for Private Fields`](https://github.com/tc39/proposal-private-fields-in-in) |
 |  62. | &#x2705; | ES2022 | [`Top-level await`](https://github.com/tc39/proposal-top-level-await) |

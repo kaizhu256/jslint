@@ -1433,7 +1433,7 @@ body {
 <pre><span class="lineno"><a href="#line_1268" id="line_1268"> 1268.</a></span><span class="count                ">      1</span><span>        case "infix_in":</span></pre>
 <pre><span class="lineno"><a href="#line_1269" id="line_1269"> 1269.</a></span><span class="count                ">      1</span><span>            mm = (</span></pre>
 <pre><span class="lineno"><a href="#line_1270" id="line_1270"> 1270.</a></span><span class="count                ">      1</span><span>                `Unexpected 'in'. Compare with undefined,`</span></pre>
-<pre><span class="lineno"><a href="#line_1271" id="line_1271"> 1271.</a></span><span class="count                ">      1</span><span>                + ` or use the hasOwnProperty method instead.`</span></pre>
+<pre><span class="lineno"><a href="#line_1271" id="line_1271"> 1271.</a></span><span class="count                ">      1</span><span>                + ` or use Object.hasOwn() instead.`</span></pre>
 <pre><span class="lineno"><a href="#line_1272" id="line_1272"> 1272.</a></span><span class="count                ">      1</span><span>            );</span></pre>
 <pre><span class="lineno"><a href="#line_1273" id="line_1273"> 1273.</a></span><span class="count                ">      1</span><span>            break;</span></pre>
 <pre><span class="lineno"><a href="#line_1274" id="line_1274"> 1274.</a></span><span class="count                ">      1</span><span>        case "label_a":</span></pre>
@@ -3956,9 +3956,9 @@ body {
 <pre><span class="lineno"><a href="#line_3791" id="line_3791"> 3791.</a></span><span class="count                ">   2743</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_3792" id="line_3792"> 3792.</a></span><span class="count                ">   2743</span><span>    });</span></pre>
 <pre><span class="lineno"><a href="#line_3793" id="line_3793"> 3793.</a></span><span class="count                ">   2743</span><span>    result.replace((</span></pre>
-<pre><span class="lineno"><a href="#line_3794" id="line_3794"> 3794.</a></span><span class="count                ">   2743</span><span>        /\n- \{\{JSxRef\("(?:Global_Objects\/)?([^"\/]+?)"/g</span></pre>
+<pre><span class="lineno"><a href="#line_3794" id="line_3794"> 3794.</a></span><span class="count                ">   2743</span><span>        /\n- \{\{jsxref\("(?:global_objects\/)?([^"]+?)"/ig</span></pre>
 <pre><span class="lineno"><a href="#line_3795" id="line_3795"> 3795.</a></span><span class="count                ">   2743</span><span>    ), function (ignore, key) {</span></pre>
-<pre><span class="lineno"><a href="#line_3796" id="line_3796"> 3796.</a></span><span class="count                ">   2743</span><span>        if (globalThis.hasOwnProperty(key)) {</span></pre>
+<pre><span class="lineno"><a href="#line_3796" id="line_3796"> 3796.</a></span><span class="count                ">   2743</span><span>        if (Object.hasOwn(globalThis, key)) {</span></pre>
 <pre><span class="lineno"><a href="#line_3797" id="line_3797"> 3797.</a></span><span class="count                ">   2743</span><span>            dict[key] = true;</span></pre>
 <pre><span class="lineno"><a href="#line_3798" id="line_3798"> 3798.</a></span><span class="count                ">   2743</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_3799" id="line_3799"> 3799.</a></span><span class="count                ">   2743</span><span>        return "";</span></pre>

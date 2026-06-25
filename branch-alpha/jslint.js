@@ -1268,7 +1268,7 @@ function jslint(
         case "infix_in":
             mm = (
                 `Unexpected 'in'. Compare with undefined,`
-                + ` or use the hasOwnProperty method instead.`
+                + ` or use Object.hasOwn() instead.`
             );
             break;
         case "label_a":
@@ -3791,9 +3791,9 @@ import https from "https";
         });
     });
     result.replace((
-        /\n- \{\{JSxRef\("(?:Global_Objects\/)?([^"\/]+?)"/g
+        /\n- \{\{jsxref\("(?:global_objects\/)?([^"]+?)"/ig
     ), function (ignore, key) {
-        if (globalThis.hasOwnProperty(key)) {
+        if (Object.hasOwn(globalThis, key)) {
             dict[key] = true;
         }
         return "";
