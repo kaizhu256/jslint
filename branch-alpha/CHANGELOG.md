@@ -12,6 +12,7 @@
 
 # v2026.6.1-beta
 - jslint-ecma - Update README.md, documenting supported ES2015+ features.
+- jslint-ecma - Add ES2027-feature Temporal.
 - jslint-ecma - Expand ES2015-feature-support for destructuring.
 - jslint-ecma - Add ES2018-feature Rest/Spread Properties.
 - jslint-ecma - Add ES2018-feature s (dotall) flag for regular expressions.

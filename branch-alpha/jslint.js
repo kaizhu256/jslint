@@ -3805,6 +3805,7 @@ import https from "https";
                 "String",
                 "Symbol",
                 "SyntaxError",
+                "Temporal",
                 "TypeError",
                 "URIError",
                 "Uint16Array",
