@@ -3310,6 +3310,9 @@ function jslint_phase2_lex(state) {
                 break;
             case "m":
                 break;
+
+// PR-xxx - Add ES2018-feature s (dotall) flag for regular expressions.
+
             case "s":
                 break;
             case "u":
