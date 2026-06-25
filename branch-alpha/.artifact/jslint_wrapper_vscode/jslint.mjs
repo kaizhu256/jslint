@@ -5724,7 +5724,7 @@ function jslint_phase3_parse(state) {
 
     function prefix_destructure(the_variable) {
         const is_brace = token_nxt.id === "{";
-        const mode_const = the_variable && the_variable.id === "const";
+        const mode_const = the_variable.id === "const";
         const the_destructure = token_nxt;
         let ellipsis;
         let name;
