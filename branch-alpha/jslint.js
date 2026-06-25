@@ -3089,6 +3089,36 @@ function jslint_phase2_lex(state) {
                         break;
                     case "?":
                         char_after("?");
+
+// PR-xxx - Add ES2025-feature RegExp Modifiers.
+
+                        switch (char) {
+                        case "i":
+                        case "m":
+                        case "s":
+                            char_after();
+                            break;
+                        }
+                        switch (char) {
+                        case "-":
+                            char_after();
+                            switch (char) {
+                            case "i":
+                            case "m":
+                            case "s":
+                                char_after();
+                                break;
+                            default:
+                                return stop_at(
+                                    "unexpected_a_after_b",
+                                    line,
+                                    column,
+                                    char,
+                                    "(?-"
+                                );
+                            }
+                            break;
+                        }
                         switch (char) {
                         case "!":
 
