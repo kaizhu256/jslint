@@ -6228,12 +6228,11 @@ function jslint_phase3_parse(state) {
         if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
             while (true) {
                 param_parse();
-                if (token_nxt.id === ",") {
-                    advance(",");
-                    signature.push(", ");
-                } else {
+                if (token_nxt.id !== ",") {
                     break;
                 }
+                advance(",");
+                signature.push(", ");
             }
         }
         advance(")");
