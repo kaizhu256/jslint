@@ -855,7 +855,7 @@ jstestDescribe((
                 "RegExp.escape(\"\");",
                 "function aa() {\n    return /./;\n}",
                 "let aa = /(?!.)(?:.)(?=.)/;",
-                "let aa = /./gimsuy;",
+                "let aa = /./dgimsuy;",
                 "let aa = /[\\--\\-]/;"
             ],
             ternary: [

@@ -12,6 +12,7 @@
 
 # v2026.6.1-beta
 - jslint-ecma - Update README.md, documenting supported ES2015+ features.
+- jslint-ecma - Add ES2022-feature RegExp Match Indices.
 - jslint-ecma - Add ES2021-feature Logical Assignment Operators.
 - jslint-ecma - Add ES2027-feature Temporal.
 - jslint-ecma - Expand ES2015-feature-support for destructuring.

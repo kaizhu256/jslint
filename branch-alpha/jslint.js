@@ -3258,6 +3258,8 @@ function jslint_phase2_lex(state) {
 // Process dangling flag letters.
 
             switch (!flag[char] && char) {
+            case "d":
+                break;
             case "g":
                 break;
             case "i":
