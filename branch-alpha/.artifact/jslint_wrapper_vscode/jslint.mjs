@@ -4394,7 +4394,7 @@ function jslint_phase3_parse(state) {
         ) {
             token_nxt.statement = true;
             advance("(string)");
-            advance(";");
+            semicolon();
         }
         stmts = parse_statements();
         the_block.block = stmts;
@@ -6504,7 +6504,7 @@ function jslint_phase3_parse(state) {
             the_break.label = token_nxt;
             advance();
         }
-        advance(";");
+        semicolon();
         return the_break;
     }
 
@@ -6523,7 +6523,7 @@ function jslint_phase3_parse(state) {
         check_not_top_level(the_continue);
         the_continue.disrupt = true;
         warn("unexpected_a", the_continue);
-        advance(";");
+        semicolon();
         return the_continue;
     }
 
@@ -6989,7 +6989,7 @@ function jslint_phase3_parse(state) {
         if (token_nxt.id !== ";" && the_return.line === token_nxt.line) {
             the_return.expression = parse_expression(10);
         }
-        advance(";");
+        semicolon();
         return the_return;
     }
 
@@ -7275,7 +7275,7 @@ function jslint_phase3_parse(state) {
         let the_destructure;
         let the_variable = token_now;
         let variable_prv;
-        function destructure_parse() {
+        function prefix_destructure() {
             const is_brace = token_nxt.id === "{";
             the_destructure = token_nxt;
             advance();
@@ -7283,7 +7283,7 @@ function jslint_phase3_parse(state) {
                 if (!is_brace && token_nxt.id === ",") {
 
 // test_cause:
-// ["let[,aa]=0", "destructure_parse", "ignore", "", 0]
+// ["let[,aa]=0", "prefix_destructure", "ignore", "", 0]
 
                     test_cause("ignore");
                     advance(",");
@@ -7292,8 +7292,8 @@ function jslint_phase3_parse(state) {
                 if (ellipsis) {
 
 // test_cause:
-// ["let[...aa]=0", "destructure_parse", "ellipsis", "", 0]
-// ["let{...aa}=0", "destructure_parse", "ellipsis", "", 0]
+// ["let[...aa]=0", "prefix_destructure", "ellipsis", "", 0]
+// ["let{...aa}=0", "prefix_destructure", "ellipsis", "", 0]
 
                     test_cause("ellipsis");
                     advance("...");
@@ -7302,8 +7302,8 @@ function jslint_phase3_parse(state) {
                 if (!name.identifier) {
 
 // test_cause:
-// ["let[0]", "destructure_parse", "expected_identifier_a", "0", 5]
-// ["let{0}", "destructure_parse", "expected_identifier_a", "0", 5]
+// ["let[0]", "prefix_destructure", "expected_identifier_a", "0", 5]
+// ["let{0}", "prefix_destructure", "expected_identifier_a", "0", 5]
 
                     return stop("expected_identifier_a");
                 }
@@ -7314,20 +7314,20 @@ function jslint_phase3_parse(state) {
                 if (is_brace && token_nxt.id === ":") {
                     advance(":");
 
-// Recurse destructure_parse().
+// Recurse prefix_destructure().
 
                     if (token_nxt.id === "{" || token_nxt.id === "[") {
 
 // test_cause:
-// ["let{aa:{aa}}", "destructure_parse", "recurse", "", 0]
+// ["let{aa:{aa}}", "prefix_destructure", "recurse", "", 0]
 
                         test_cause("recurse");
-                        destructure_parse();
+                        prefix_destructure();
                     } else {
                         if (!token_nxt.identifier) {
 
 // test_cause:
-// ["let{aa:0}", "destructure_parse", "expected_identifier_a", "0", 8]
+// ["let{aa:0}", "prefix_destructure", "expected_identifier_a", "0", 8]
 
                             return stop("expected_identifier_a");
                         }
@@ -7368,8 +7368,8 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id === "=") {
 
 // test_cause:
-// ["let[aa=0]", "destructure_parse", "assign", "", 0]
-// ["let{aa=0}", "destructure_parse", "assign", "", 0]
+// ["let[aa=0]", "prefix_destructure", "assign", "", 0]
+// ["let{aa=0}", "prefix_destructure", "assign", "", 0]
 
                     test_cause("assign");
                     advance("=");
@@ -7468,7 +7468,7 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", the_variable);
                 }
-                destructure_parse();
+                prefix_destructure();
                 advance("=");
                 the_variable.expression = parse_expression(0);
             } else if (token_nxt.identifier) {
@@ -7839,7 +7839,7 @@ function jslint_phase3_parse(state) {
 
     } else if (token_nxt.value === "use strict") {
         advance("(string)");
-        advance(";");
+        semicolon();
     }
     state.token_tree = parse_statements();
     advance("(end)");
