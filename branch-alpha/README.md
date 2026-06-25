@@ -904,7 +904,7 @@ if (false) {
 |  82. | &#x2705; | ES2025 | [`Import Attributes`](https://github.com/tc39/proposal-import-attributes) |
 |  81. | &#x2705; | ES2025 | [`RegExp Modifiers`](https://github.com/tc39/proposal-regexp-modifiers) |
 |  80. | &#x2705; | ES2025 | [`New Set methods`](https://github.com/tc39/proposal-set-methods) |
-|  79. | &#x274c; | ES2025 | [`Duplicate named capture groups`](https://github.com/tc39/proposal-duplicate-named-capturing-groups) |
+|  79. | &#x2705; | ES2025 | [`Duplicate named capture groups`](https://github.com/tc39/proposal-duplicate-named-capturing-groups) |
 |  78. | &#x2705; | ES2024 | [`ArrayBuffer transfer`](https://github.com/tc39/proposal-arraybuffer-transfer) |
 |  77. | &#x2705; | ES2024 | [`Promise.withResolvers`](https://github.com/tc39/proposal-promise-with-resolvers) |
 |  76. | &#x2705; | ES2024 | [`Array Grouping`](https://github.com/tc39/proposal-array-grouping) |
