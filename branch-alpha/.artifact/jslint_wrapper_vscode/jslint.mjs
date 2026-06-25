@@ -6099,24 +6099,69 @@ function jslint_phase3_parse(state) {
 
                         return stop("expected_identifier_a");
                     }
-                    advance();
-                    param.names.push(subparam);
+
+
+
+                    if (is_brace) {
+                        survey(subparam);
+                        advance();
+                        signature.push(subparam.id);
+                        if (token_nxt.id === ":") {
+                            advance(":");
+                            advance();
+                            token_now.label = subparam;
+                            subparam = token_now;
+                            if (!subparam.identifier) {
+
+// test_cause:
+// ["function aa({aa:0}){}", "param_parse", "expected_identifier_a", "}", 18]
+
+                                return stop(
+                                    "expected_identifier_a",
+                                    token_nxt
+                                );
+                            }
+                        }
+
+// test_cause:
+// ["function aa({aa=aa},aa){}", "param_parse", "equal", "", 0]
+
+                        test_cause("equal");
+                        if (token_nxt.id === "=") {
+                            advance("=");
+                            subparam.expression = parse_expression();
+                            param.open = true;
+                        }
+                        param.names.push(subparam);
+                        if (token_nxt.id === ",") {
+                            advance(",");
+                            signature.push(", ");
+                        } else {
+                            break;
+                        }
+                    } else {
+                        advance();
+                        param.names.push(subparam);
 
 // test_cause:
 // ["function aa([aa=aa],aa){}", "param_parse", "id", "", 0]
 
-                    test_cause("id");
-                    if (token_nxt.id === "=") {
-                        advance("=");
-                        subparam.expression = parse_expression();
-                        param.open = true;
-                    }
-                    if (token_nxt.id === ",") {
-                        advance(",");
-                    } else {
-                        break;
+                        test_cause("id");
+                        if (token_nxt.id === "=") {
+                            advance("=");
+                            subparam.expression = parse_expression();
+                            param.open = true;
+                        }
+                        if (token_nxt.id === ",") {
+                            advance(",");
+                        } else {
+                            break;
+                        }
                     }
                 }
+
+
+
                 parameters.push(param);
                 advance("]");
                 break;
@@ -6153,43 +6198,69 @@ function jslint_phase3_parse(state) {
 
                         return stop("expected_identifier_a");
                     }
-                    survey(subparam);
-                    advance();
-                    signature.push(subparam.id);
-                    if (token_nxt.id === ":") {
-                        advance(":");
+
+
+
+                    if (is_brace) {
+                        survey(subparam);
                         advance();
-                        token_now.label = subparam;
-                        subparam = token_now;
-                        if (!subparam.identifier) {
+                        signature.push(subparam.id);
+                        if (token_nxt.id === ":") {
+                            advance(":");
+                            advance();
+                            token_now.label = subparam;
+                            subparam = token_now;
+                            if (!subparam.identifier) {
 
 // test_cause:
 // ["function aa({aa:0}){}", "param_parse", "expected_identifier_a", "}", 18]
 
-                            return stop(
-                                "expected_identifier_a",
-                                token_nxt
-                            );
+                                return stop(
+                                    "expected_identifier_a",
+                                    token_nxt
+                                );
+                            }
                         }
-                    }
 
 // test_cause:
 // ["function aa({aa=aa},aa){}", "param_parse", "equal", "", 0]
 
-                    test_cause("equal");
-                    if (token_nxt.id === "=") {
-                        advance("=");
-                        subparam.expression = parse_expression();
-                        param.open = true;
-                    }
-                    param.names.push(subparam);
-                    if (token_nxt.id === ",") {
-                        advance(",");
-                        signature.push(", ");
+                        test_cause("equal");
+                        if (token_nxt.id === "=") {
+                            advance("=");
+                            subparam.expression = parse_expression();
+                            param.open = true;
+                        }
+                        param.names.push(subparam);
+                        if (token_nxt.id === ",") {
+                            advance(",");
+                            signature.push(", ");
+                        } else {
+                            break;
+                        }
                     } else {
-                        break;
+                        advance();
+                        param.names.push(subparam);
+
+// test_cause:
+// ["function aa([aa=aa],aa){}", "param_parse", "id", "", 0]
+
+                        test_cause("id");
+                        if (token_nxt.id === "=") {
+                            advance("=");
+                            subparam.expression = parse_expression();
+                            param.open = true;
+                        }
+                        if (token_nxt.id === ",") {
+                            advance(",");
+                        } else {
+                            break;
+                        }
                     }
                 }
+
+
+
                 parameters.push(param);
 
 // test_cause:
