@@ -855,6 +855,7 @@ jstestDescribe((
                 `RegExp.escape("");`,
                 `function aa() {\n    return /./;\n}`,
                 `let aa = /(?!.)(?:.)(?=.)/;`,
+                `let aa = /(?ims-ims:.)/;`,
                 `let aa = /./dgimsuy;`,
                 `let aa = /[\\--\\-]/;`
             ],

@@ -3112,12 +3112,17 @@ function jslint_phase2_lex(state) {
                                     break;
                                 }
                                 switch (char) {
+                                case "-":
                                 case "i":
                                 case "m":
                                 case "s":
                                     char_after();
                                     break;
                                 default:
+
+// test_cause:
+// ["aa=/(?-.", "lex_regexp_group", "unexpected_a_after_b", "(?-", 8]
+
                                     return stop_at(
                                         "unexpected_a_after_b",
                                         line,
