@@ -6116,6 +6116,7 @@ function jslint_phase3_parse(state) {
                     }
                     advance(",");
                 }
+                //
                 parameters.push(param);
                 advance("]");
                 break;
@@ -6189,6 +6190,7 @@ function jslint_phase3_parse(state) {
                     advance(",");
                     signature.push(", ");
                 }
+                //
                 parameters.push(param);
 
 // test_cause:
