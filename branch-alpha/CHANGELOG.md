@@ -12,6 +12,7 @@
 
 # v2026.6.1-beta
 - jslint-ecma - Update README.md, documenting supported ES2015+ features.
+- jslint - Update warning infix_in to recommend Object.hasOwn() over hasOwnProperty().
 - jslint-ecma - Add ES2025-feature RegExp Modifiers.
 - jslint-ecma - Add ES2022-feature RegExp Match Indices.
 - jslint-ecma - Add ES2021-feature Logical Assignment Operators.
