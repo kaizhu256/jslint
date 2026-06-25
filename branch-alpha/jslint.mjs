@@ -5722,6 +5722,128 @@ function jslint_phase3_parse(state) {
         return the_await;
     }
 
+    function prefix_destructure(the_variable) {
+        const is_brace = token_nxt.id === "{";
+        const the_destructure = token_nxt;
+        let ellipsis;
+        let mode_const;
+        let name;
+        mode_const = the_variable.id === "const";
+        advance();
+        while (true) {
+            if (!is_brace && token_nxt.id === ",") {
+
+// test_cause:
+// ["let[,aa]=0", "prefix_destructure", "ignore", "", 0]
+
+                test_cause("ignore");
+                advance(",");
+            }
+            ellipsis = token_nxt.id === "...";
+            if (ellipsis) {
+
+// test_cause:
+// ["let[...aa]=0", "prefix_destructure", "ellipsis", "", 0]
+// ["let{...aa}=0", "prefix_destructure", "ellipsis", "", 0]
+
+                test_cause("ellipsis");
+                advance("...");
+            }
+            name = token_nxt;
+            if (!name.identifier) {
+
+// test_cause:
+// ["let[0]", "prefix_destructure", "expected_identifier_a", "0", 5]
+// ["let{0}", "prefix_destructure", "expected_identifier_a", "0", 5]
+
+                return stop("expected_identifier_a");
+            }
+            if (is_brace) {
+                survey(name);
+            }
+            advance();
+            if (is_brace && token_nxt.id === ":") {
+                advance(":");
+
+// Recurse prefix_destructure().
+
+                if (token_nxt.id === "{" || token_nxt.id === "[") {
+
+// test_cause:
+// ["let{aa:{aa}}", "prefix_destructure", "recurse", "", 0]
+
+                    test_cause("recurse");
+                    prefix_destructure();
+                } else {
+                    if (!token_nxt.identifier) {
+
+// test_cause:
+// ["let{aa:0}", "prefix_destructure", "expected_identifier_a", "0", 8]
+
+                        return stop("expected_identifier_a");
+                    }
+
+// PR-363 - Bugfix
+// Add test against false-warning <uninitialized 'bb'> in code
+// '/*jslint node*/\nlet {aa:bb} = {}; bb();'.
+//
+//                         token_nxt.label = name;
+//                         the_variable.names.push(token_nxt);
+//                         enroll(token_nxt, "variable", mode_const);
+
+                    name = token_nxt;
+                    the_variable.names.push(name);
+                    survey(name);
+                    enroll(name, "variable", mode_const);
+                    advance();
+                    the_destructure.open = true;
+                }
+            } else {
+                the_variable.names.push(name);
+                enroll(name, "variable", mode_const);
+            }
+
+// Issue #458 - Regression - Warn about variable usage before initialization.
+
+//                    name.dead = false;
+
+            name.init = true;
+            if (ellipsis) {
+                break;
+            }
+
+// test_cause:
+// ["const[aa]=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 11]
+// ["const{aa}=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 11]
+
+            if (token_nxt.id === "=") {
+
+// test_cause:
+// ["let[aa=0]", "prefix_destructure", "assign", "", 0]
+// ["let{aa=0}", "prefix_destructure", "assign", "", 0]
+
+                test_cause("assign");
+                advance("=");
+                name.expression = parse_expression();
+                the_destructure.open = true;
+            }
+            if (token_nxt.id !== ",") {
+                break;
+            }
+            advance(",");
+        }
+        if (is_brace) {
+
+// test_cause:
+// ["let{bb,aa}", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
+
+            check_ordered(the_variable.id, the_variable.names);
+            advance("}");
+        } else {
+            advance("]");
+        }
+    }
+
     function prefix_ellipsis() {
         let after_ellipsis;
         advance("...");
@@ -7269,129 +7391,10 @@ function jslint_phase3_parse(state) {
     }
 
     function stmt_var() {
-        let ellipsis;
         let mode_const;
         let name;
-        let the_destructure;
         let the_variable = token_now;
         let variable_prv;
-        function destructure_parse() {
-            const is_brace = token_nxt.id === "{";
-            the_destructure = token_nxt;
-            advance();
-            while (true) {
-                if (!is_brace && token_nxt.id === ",") {
-
-// test_cause:
-// ["let[,aa]=0", "destructure_parse", "ignore", "", 0]
-
-                    test_cause("ignore");
-                    advance(",");
-                }
-                ellipsis = token_nxt.id === "...";
-                if (ellipsis) {
-
-// test_cause:
-// ["let[...aa]=0", "destructure_parse", "ellipsis", "", 0]
-// ["let{...aa}=0", "destructure_parse", "ellipsis", "", 0]
-
-                    test_cause("ellipsis");
-                    advance("...");
-                }
-                name = token_nxt;
-                if (!name.identifier) {
-
-// test_cause:
-// ["let[0]", "destructure_parse", "expected_identifier_a", "0", 5]
-// ["let{0}", "destructure_parse", "expected_identifier_a", "0", 5]
-
-                    return stop("expected_identifier_a");
-                }
-                if (is_brace) {
-                    survey(name);
-                }
-                advance();
-                if (is_brace && token_nxt.id === ":") {
-                    advance(":");
-
-// Recurse destructure_parse().
-
-                    if (token_nxt.id === "{" || token_nxt.id === "[") {
-
-// test_cause:
-// ["let{aa:{aa}}", "destructure_parse", "recurse", "", 0]
-
-                        test_cause("recurse");
-                        destructure_parse();
-                    } else {
-                        if (!token_nxt.identifier) {
-
-// test_cause:
-// ["let{aa:0}", "destructure_parse", "expected_identifier_a", "0", 8]
-
-                            return stop("expected_identifier_a");
-                        }
-
-// PR-363 - Bugfix
-// Add test against false-warning <uninitialized 'bb'> in code
-// '/*jslint node*/\nlet {aa:bb} = {}; bb();'.
-//
-//                         token_nxt.label = name;
-//                         the_variable.names.push(token_nxt);
-//                         enroll(token_nxt, "variable", mode_const);
-
-                        name = token_nxt;
-                        the_variable.names.push(name);
-                        survey(name);
-                        enroll(name, "variable", mode_const);
-                        advance();
-                        the_destructure.open = true;
-                    }
-                } else {
-                    the_variable.names.push(name);
-                    enroll(name, "variable", mode_const);
-                }
-
-// Issue #458 - Regression - Warn about variable usage before initialization.
-
-//                    name.dead = false;
-
-                name.init = true;
-                if (ellipsis) {
-                    break;
-                }
-
-// test_cause:
-// ["const[aa]=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 11]
-// ["const{aa}=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 11]
-
-                if (token_nxt.id === "=") {
-
-// test_cause:
-// ["let[aa=0]", "destructure_parse", "assign", "", 0]
-// ["let{aa=0}", "destructure_parse", "assign", "", 0]
-
-                    test_cause("assign");
-                    advance("=");
-                    name.expression = parse_expression();
-                    the_destructure.open = true;
-                }
-                if (token_nxt.id !== ",") {
-                    break;
-                }
-                advance(",");
-            }
-            if (is_brace) {
-
-// test_cause:
-// ["let{bb,aa}", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
-
-                check_ordered(the_variable.id, the_variable.names);
-                advance("}");
-            } else {
-                advance("]");
-            }
-        }
         mode_const = the_variable.id === "const";
         the_variable.names = [];
 
@@ -7468,7 +7471,7 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", the_variable);
                 }
-                destructure_parse();
+                prefix_destructure(the_variable);
                 advance("=");
                 the_variable.expression = parse_expression(0);
             } else if (token_nxt.identifier) {
