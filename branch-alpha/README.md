@@ -925,7 +925,7 @@ if (false) {
 |  61. | &#x26a0; | ES2022 | [`RegExp Match Indices`](https://github.com/tc39/proposal-regexp-match-indices) |
 |  60. | &#x274c; | ES2022 | [`Class Public Instance Fields & Private Instance Fields`](https://github.com/tc39/proposal-class-fields) |
 |  59. | &#x2705; | ES2021 | [`Numeric separators`](https://github.com/tc39/proposal-numeric-separator) |
-|  58. | &#x26a0; | ES2021 | [`Logical Assignment Operators`](https://github.com/tc39/proposal-logical-assignment) |
+|  58. | &#x2705; | ES2021 | [`Logical Assignment Operators`](https://github.com/tc39/proposal-logical-assignment) |
 |  57. | &#x2705; | ES2021 | [`WeakRefs`](https://github.com/tc39/proposal-weakrefs) |
 |  56. | &#x2705; | ES2021 | [`Promise.any`](https://github.com/tc39/proposal-promise-any) |
 |  55. | &#x2705; | ES2021 | [`String.prototype.replaceAll`](https://github.com/tc39/proposal-string-replaceall) |

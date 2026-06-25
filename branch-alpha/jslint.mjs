@@ -489,6 +489,7 @@ let jslint_rgx_token = new RegExp(
     + "(\\s+)"
     + "|([a-zA-Z_$][a-zA-Z0-9_$]*)"
     + "|[(){}\\[\\],:;'\"~\\`]"
+    + "|\\?\\?="
     + "|\\?[?.]?"
     + "|=(?:==?|>)?"
     + "|\\.+"
@@ -497,9 +498,10 @@ let jslint_rgx_token = new RegExp(
     + "|\\+[=+]?"
     + "|-[=\\-]?"
     + "|[\\^%]=?"
+    + "|&&="
     + "|&[&=]?"
-    + "|\\"
-    + "|[|=]?"
+    + "|\\|\\|="
+    + "|\\|[|=]?"
     + "|>{1,3}=?"
     + "|<<?=?"
     + "|!(?:!|==?)?"
@@ -7623,6 +7625,7 @@ function jslint_phase3_parse(state) {
 // Begin defining the language.
 
     assignment("%=");
+    assignment("&&=");
     assignment("&=");
     assignment("*=");
     assignment("+=");
@@ -7632,8 +7635,10 @@ function jslint_phase3_parse(state) {
     assignment("=");
     assignment(">>=");
     assignment(">>>=");
+    assignment("??=");
     assignment("^=");
     assignment("|=");
+    assignment("||=");
     constant("(number)", "number");
     constant("(regexp)", "regexp");
     constant("(string)", "string");
@@ -9091,9 +9096,20 @@ function jslint_phase5_whitage(state) {
 // This is the set of infix operators that require a space on each side.
 
     let spaceop = object_assign_from_list(empty(), [
-        "!=", "!==", "%", "%=", "&", "&&", "&=", "*", "*=", "+=", "-=", "/",
-        "/=", "<", "<<", "<<=", "<=", "=", "==", "===", "=>", ">", ">=", ">>",
-        ">>=", ">>>", ">>>=", "^", "^=", "|", "|=", "||"
+        "!=", "!==",
+        "%", "%=",
+        "&", "&&", "&&=", "&=",
+        "*", "*=",
+        "+=",
+        "-=",
+        "/", "/=",
+        "<", "<<", "<<=", "<=",
+        "=", "==", "===", "=>",
+        ">", ">=", ">>", ">>=", ">>>", ">>>=",
+        "??", "??=",
+        "^",
+        "^=",
+        "|", "|=", "||", "||="
     ], true);
 
     function at_margin(fit) {

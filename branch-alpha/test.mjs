@@ -778,6 +778,11 @@ jstestDescribe((
                 "String(\"\".at());",
                 "String([].at());"
             ],
+            logical_assignment: [
+                "let aa = 0;\naa &&= 0;",
+                "let aa = 0;\naa ??= 0;",
+                "let aa = 0;\naa ||= 0;"
+            ],
             loop: [
                 (
                     "function aa() {\n"
