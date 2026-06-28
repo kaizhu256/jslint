@@ -58,7 +58,7 @@
 
 shBashrcDebianInit() {
 # This function will init debian:stable /etc/skel/.bashrc.
-# https://sources.debian.org/data/main/b/bash/5.2.37-2/debian/skel.bashrc
+# https://sources.debian.org/src/bash/5.0-4/debian/skel.bashrc
     # ~/.bashrc: executed by bash(1) for non-login shells.
     # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
     # for examples
