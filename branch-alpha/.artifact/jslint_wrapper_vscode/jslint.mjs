@@ -8443,9 +8443,20 @@ function jslint_phase4_walk(state) {
     function post_s_var(thing) {
         thing.names.forEach(function (name) {
             name.dead = false;
-            if (name.expression !== undefined) {
+            if (name.expression) {
+
+// test_cause:
+// ["let aa=0", "post_s_var", "let aa=0", "", 0]
+
+                test_cause("let aa=0");
                 walk_expression(name.expression);
                 name.init = true;
+            } else {
+
+// test_cause:
+// ["let aa", "post_s_var", "let aa", "", 0]
+
+                test_cause("let aa");
             }
             blockage.live.push(name);
         });
@@ -8810,6 +8821,19 @@ function jslint_phase4_walk(state) {
             }
         }
         thing.names.forEach(function (name) {
+            if (name.expression) {
+
+// test_cause:
+// ["function aa(aa=0){}", "pre_s_function", "(aa=0)", "", 0]
+
+                test_cause("(aa=0)");
+            } else {
+
+// test_cause:
+// ["function aa(aa){}", "pre_s_function", "(aa)", "", 0]
+
+                test_cause("(aa)");
+            }
             walk_expression(name.expression);
             name.dead = false;
             name.init = true;
