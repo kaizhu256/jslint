@@ -1054,7 +1054,7 @@ This PR will additionally:
 ### branch-master commit
 - [ ] update ci.yml to latest nodejs-lts
 - [ ] checkpoint local-branch-beta
-- [ ] `shGitPullrequest master beta # re-run until version propagates`
+- [ ] `sh jslint_ci.sh shGitPullrequest master beta # re-run until version propagates`
     - [ ] verify ci-success for origin-branch-alpha
     - [ ] https://github.com/kaizhu256/jslint/actions
 - [ ] `git push upstream alpha -f`
@@ -1065,8 +1065,8 @@ This PR will additionally:
 - [ ] input `Add a title` with: `# v20yy.mm.dd`
 - [ ] input `Add a description` with:
 ```
-- [ ] <primary-commit-message>
-- [ ] <secondary-commit-message>
+- <primary-commit-message>
+- <secondary-commit-message>
 ```
 - [ ] verify `commit into jslint-org:beta`
 - [ ] click `Create pull request`
@@ -1076,7 +1076,7 @@ This PR will additionally:
 - [ ] click `Squash and merge`
     - [ ] verify ci-success for upstream-branch-beta
     - [ ] https://github.com/kaizhu256/jslint/actions
-- [ ] `shGitPullrequestCleanup`
+- [ ] `sh jslint_ci.sh shGitPullrequestCleanup`
     - [ ] verify ci-success for origin-branch-alpha
     - [ ] https://github.com/kaizhu256/jslint/actions
 - [ ] `git push upstream alpha -f`
@@ -1111,8 +1111,8 @@ This PR will additionally:
 - [ ] input `Release title` with: `v20yy.mm.dd - <primary-commit-message>`
 - [ ] input `Describe this release` with:
 ```
-- [ ] <primary-commit-message>
-- [ ] <secondary-commit-message>
+- <primary-commit-message>
+- <secondary-commit-message>
 ```
 - [ ] click `Generate release notes`
 - [ ] click `Set as the latest release`
