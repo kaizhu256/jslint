@@ -89,7 +89,7 @@
     textLength="768"
     x="10"
     y="318"
->- jslint-ci - Rename ci-functions shGitPullrequestXxx to shGithubPullrequestXxx.                 </tspan>
+>- jslint-ci - Rename ci-functions shGitPullrequestXxx to shGithubPrXxx.                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

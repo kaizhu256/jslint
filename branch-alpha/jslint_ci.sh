@@ -1135,7 +1135,7 @@ shGithubFileUpload() {(set -e
     shGithubFileDownloadUpload upload "$1" "$2"
 )}
 
-shGithubPullrequest() {(set -e
+shGithubPrCreate() {(set -e
 # This function will create-and-push a github-pull-commit to origin/alpha.
     node --input-type=module --eval '
 // init debugInline
@@ -1230,14 +1230,14 @@ import moduleFs from "fs";
     ).on("exit", function (exitCode) {
         moduleAssert.ok(
             exitCode === 0,
-            `shGithubPullrequest - exitCode=${exitCode}`
+            `shGithubPrCreate - exitCode=${exitCode}`
         );
     });
 }());
 ' "$@" # '
 )}
 
-shGithubPullrequestCleanup() {(set -e
+shGithubPrCleanup() {(set -e
 # This function will cleanup pull-request after merge.
     git checkout alpha
     git push . alpha:__pr_upstream_pre -f
