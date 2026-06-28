@@ -58,7 +58,7 @@
 
 shBashrcDebianInit() {
 # This function will init debian:stable /etc/skel/.bashrc.
-# https://sources.debian.org/src/bash/4.4-5/debian/skel.bashrc/
+# https://sources.debian.org/data/main/b/bash/5.2.37-2/debian/skel.bashrc
     # ~/.bashrc: executed by bash(1) for non-login shells.
     # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
     # for examples
@@ -89,7 +89,7 @@ shBashrcDebianInit() {
     #shopt -s globstar
 
     # make less more friendly for non-text input files, see lesspipe(1)
-    [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+    #[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
     # set variable identifying the chroot you work in (used in the prompt below)
     if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
@@ -140,7 +140,7 @@ shBashrcDebianInit() {
         #alias dir='dir --color=auto'
         #alias vdir='vdir --color=auto'
 
-        alias grep='grep --color=auto'
+        #alias grep='grep --color=auto'
         #alias fgrep='fgrep --color=auto'
         #alias egrep='egrep --color=auto'
     fi
@@ -149,7 +149,7 @@ shBashrcDebianInit() {
     #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
     # some more ls aliases
-    alias ll='ls -alF'
+    #alias ll='ls -l'
     #alias la='ls -A'
     #alias l='ls -CF'
 
@@ -166,11 +166,11 @@ shBashrcDebianInit() {
     # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
     # sources /etc/bash.bashrc).
     if ! shopt -oq posix; then
-        if [ -f /usr/share/bash-completion/bash_completion ]; then
-            . /usr/share/bash-completion/bash_completion
-        elif [ -f /etc/bash_completion ]; then
-            . /etc/bash_completion
-        fi
+      if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+      elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+      fi
     fi
 }
 
