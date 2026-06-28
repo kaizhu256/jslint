@@ -1012,7 +1012,7 @@ if (false) {
 ### pull-request merge
 - [ ] find highest issue-number at https://github.com/kaizhu256/jslint/issues/, https://github.com/kaizhu256/jslint/pulls/, and add +1 to it for PR-xxx
 - [ ] checkpoint local-branch-beta
-- [ ] `shGitPullrequest beta beta`
+- [ ] `sh jslint_ci.sh shGitPullrequest beta beta`
     - [ ] verify ci-success for origin-branch-alpha
     - [ ] https://github.com/kaizhu256/jslint/actions
 - [ ] `git push upstream alpha -f`
@@ -1023,12 +1023,12 @@ if (false) {
 - [ ] input `Add your description here...` with:
 ```
 Fixes #xxx.
-- [ ] <primary-commit-message>
+- <primary-commit-message>
 
 This PR will ...
 
 This PR will additionally:
-- [ ] <secondary-commit-message>
+- <secondary-commit-message>
 ...
 
 <screenshot>
@@ -1041,7 +1041,7 @@ This PR will additionally:
 - [ ] click `Squash and merge`
     - [ ] verify ci-success for upstream-branch-beta
     - [ ] https://github.com/kaizhu256/jslint/actions
-- [ ] `shGitPullrequestCleanup`
+- [ ] `sh jslint_ci.sh shGitPullrequestCleanup`
     - [ ] verify ci-success for origin-branch-alpha
     - [ ] https://github.com/kaizhu256/jslint/actions
 - [ ] `git push upstream alpha -f`
