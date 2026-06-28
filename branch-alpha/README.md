@@ -1012,7 +1012,7 @@ if (false) {
 ### pull-request merge
 - find highest issue-number at https://github.com/kaizhu256/jslint/issues/, https://github.com/kaizhu256/jslint/pulls/, and add +1 to it for PR-xxx
 - checkpoint local-branch-beta
-- ```sh jslint_ci.sh shGitPullrequest beta beta```
+- `shGitPullrequest beta beta`
     - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
 - `git push upstream alpha -f`
