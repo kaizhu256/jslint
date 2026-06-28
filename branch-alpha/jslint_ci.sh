@@ -609,7 +609,7 @@ shCiPublishNpm() {(set -e
     if [ "$NPM_REGISTRY" = github ]
     then
         sed -i.bak \
-            "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
+            -e "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
             package.json && \
             rm -f package.json.bak
     fi
@@ -786,7 +786,7 @@ shGitCmdWithGithubToken() {(set -e
     if [ -f .git/config ]
     then
         # security - scrub token from url
-        sed -i.bak "s|://.*@|://|g" .git/config && \
+        sed -i.bak -e "s|://.*@|://|g" .git/config && \
             rm -f .git/config.bak
     fi
     CMD="$1"
@@ -889,7 +889,7 @@ shGitInitBase() {(set -e
         git branch -D "$BRANCH" 2>/dev/null || true
         git checkout -b "$BRANCH" base/base
     done
-    sed -i.bak "s|owner/repo|${1:-owner/repo}|" .gitconfig && \
+    sed -i.bak -e "s|owner/repo|${1:-owner/repo}|" .gitconfig && \
         rm -f .gitconfig.bak
     cp .gitconfig .git/config
     git commit -am "update owner/repo to $1" || true
