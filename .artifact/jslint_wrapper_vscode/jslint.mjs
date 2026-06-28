@@ -2443,7 +2443,7 @@ function jslint_phase2_lex(state) {
                                 // ... literal.
     let mode_regexp;            // true if regular expression literal seen on
                                 // ... this line.
-    let opener_popped = empty();        // Last popped token from opener_stack.
+    let opener_popped = empty();        // Last token popped from opener_stack.
     let opener_stack = [];      // Stack of opener tokens: (, [.
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.
@@ -4872,7 +4872,7 @@ function jslint_phase3_parse(state) {
         the_symbol.led_infix = function (left) {
             const the_token = token_now;
             the_token.arity = "binary";
-            if (typeof f === "function") {
+            if (f) {
                 return f(left);
             }
             the_token.expression = [left, parse_expression(bp)];
@@ -5651,7 +5651,7 @@ function jslint_phase3_parse(state) {
         the_symbol.nud_prefix = function () {
             const the_token = token_now;
             the_token.arity = "unary";
-            if (typeof f === "function") {
+            if (f) {
                 return f();
             }
             the_token.expression = parse_expression(150);
@@ -5762,14 +5762,14 @@ function jslint_phase3_parse(state) {
         }
         function name_list_push(name) {
             name_list.push(name);
-            if (typeof enroll === "function") {
-                enroll(name, role, readonly);
-                name.init = true;
-            }
 
 // PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
 
             name.arity = role;
+            if (enroll) {
+                enroll(name, role, readonly);
+                name.init = true;
+            }
         }
         function name_parse() {
             let name = token_nxt;
@@ -8001,9 +8001,9 @@ function jslint_phase4_walk(state) {
 // PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
 
 // test_cause:
-// [";[aa]=0", "post_a", "[aa]=0", "", 0]
+// [";[aa]=0", "post_a", ";[aa]=0", "", 0]
 
-                    test_cause("[aa]=0");
+                    test_cause(";[aa]=0");
                     thing.names.forEach(init_variable);
                 } else {
 
