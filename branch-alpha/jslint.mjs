@@ -5746,17 +5746,18 @@ function jslint_phase3_parse(state) {
         the_function_toplevel
     ) {
         const is_brace = token_now.id === "{";
-        const signature = the_function?.signature || [];
         const the_destructure = token_now;
         let optional;
         function advance_and_signature_push(id) {
             advance(id);
-            signature.push(id);
-            switch (id) {
-            case ",":
-            case ":":
-                signature.push(" ");
-                break;
+            if (the_function?.signature) {
+                the_function.signature.push(id);
+                switch (id) {
+                case ",":
+                case ":":
+                    the_function.signature.push(" ");
+                    break;
+                }
             }
         }
         function name_list_push(name) {
