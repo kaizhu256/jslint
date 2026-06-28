@@ -5911,6 +5911,8 @@ function jslint_phase3_parse(state) {
             if (!is_brace && !the_function_toplevel && token_nxt.id === ",") {
 
 // test_cause:
+// ["(,aa)=>0", "name_parse", "expected_identifier_a", ",", 2]
+// ["([,aa])=>0", "prefix_destructure", "ignore", "", 0]
 // [";[,aa]=0", "prefix_destructure", "ignore", "", 0]
 // ["let[,aa]=0", "prefix_destructure", "ignore", "", 0]
 
