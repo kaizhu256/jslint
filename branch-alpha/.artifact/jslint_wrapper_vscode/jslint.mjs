@@ -5762,14 +5762,14 @@ function jslint_phase3_parse(state) {
         }
         function name_list_push(name) {
             name_list.push(name);
-            if (enroll) {
-                enroll(name, role, readonly);
-                name.init = true;
-            }
 
 // PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
 
             name.arity = role;
+            if (enroll) {
+                enroll(name, role, readonly);
+                name.init = true;
+            }
         }
         function name_parse() {
             let name = token_nxt;
@@ -8001,9 +8001,9 @@ function jslint_phase4_walk(state) {
 // PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
 
 // test_cause:
-// [";[aa]=0", "post_a", "[aa]=0", "", 0]
+// [";[aa]=0", "post_a", ";[aa]=0", "", 0]
 
-                    test_cause("[aa]=0");
+                    test_cause(";[aa]=0");
                     thing.names.forEach(init_variable);
                 } else {
 
