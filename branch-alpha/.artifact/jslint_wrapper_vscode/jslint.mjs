@@ -5234,6 +5234,7 @@ function jslint_phase3_parse(state) {
         Object.assign(the_fart, {
             arity: "binary",
             context: empty(),
+            fart: true,
             finally: 0,
             level: functionage.level + 1,
             loop: 0,
@@ -5801,7 +5802,7 @@ function jslint_phase3_parse(state) {
                 return true;
             case "[":
             case "{":
-                if (the_function?.id === "=>" && !option_dict.fart) {
+                if (the_function?.fart && !option_dict.fart) {
 
 // test_cause:
 // ["([aa])=>0", "name_parse", "use_function_not_fart", "=>", 7]
@@ -6116,7 +6117,7 @@ function jslint_phase3_parse(state) {
 
     function prefix_function_parameter(the_function) {
 
-// This function will parse input parameters at beginning of <the_function>
+// This function will parse input <parameters> at beginning of <the_function>
 
         the_function.names = [];
         the_function.parameter_count = 0;
