@@ -297,7 +297,7 @@
     package_name,
     padEnd,
     padStart,
-    parameters,
+    parameter_count,
     parent,
     parentIi,
     parse,
@@ -5275,7 +5275,7 @@ function jslint_phase3_parse(state) {
             warn("wrap_fart_parameter", token_now);
             the_fart.name = "anonymous";
             the_fart.names = [token_prv];
-            the_fart.parameters = 1;
+            the_fart.parameter_count = 1;
             the_fart.signature = token_prv.id;
             enroll(token_prv, "parameter", false);
         } else {
@@ -5908,7 +5908,7 @@ function jslint_phase3_parse(state) {
             }
         }
         while (true) {
-            if (!is_brace && token_nxt.id === ",") {
+            if (!is_brace && !the_function_toplevel && token_nxt.id === ",") {
 
 // test_cause:
 // [";[,aa]=0", "prefix_destructure", "ignore", "", 0]
@@ -5916,12 +5916,9 @@ function jslint_phase3_parse(state) {
 
                 test_cause("ignore");
                 advance_and_signature_push(",");
-                if (the_function_toplevel) {
-                    the_function.parameters += 1;
-                }
             }
             if (the_function_toplevel) {
-                the_function.parameters += 1;
+                the_function.parameter_count += 1;
             }
             if (name_parse()) {
 
@@ -6119,10 +6116,10 @@ function jslint_phase3_parse(state) {
 
     function prefix_function_parameter(the_function) {
 
-// This function will parse input <parameters> at beginning of <the_function>
+// This function will parse input parameters at beginning of <the_function>
 
         the_function.names = [];
-        the_function.parameters = 0;
+        the_function.parameter_count = 0;
         the_function.signature = ["("];
         token_now.free = false;
         if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
@@ -8790,7 +8787,7 @@ function jslint_phase4_walk(state) {
             thing.name.init = true;
         }
         if (thing.extra === "get") {
-            if (thing.parameters !== 0) {
+            if (thing.parameter_count !== 0) {
 
 // test_cause:
 // ["
@@ -8801,7 +8798,7 @@ function jslint_phase4_walk(state) {
                 warn("bad_get", thing);
             }
         } else if (thing.extra === "set") {
-            if (thing.parameters !== 1) {
+            if (thing.parameter_count !== 1) {
 
 // test_cause:
 // ["
