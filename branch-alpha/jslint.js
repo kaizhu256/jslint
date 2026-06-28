@@ -5275,7 +5275,7 @@ function jslint_phase3_parse(state) {
             warn("wrap_fart_parameter", token_now);
             the_fart.name = "anonymous";
             the_fart.names = [token_prv];
-            the_fart.parameters = [token_prv];
+            the_fart.parameters = 1;
             the_fart.signature = token_prv.id;
             enroll(token_prv, "parameter", false);
         } else {
@@ -5824,20 +5824,6 @@ function jslint_phase3_parse(state) {
 
                 test_cause("recurse_element");
                 advance_and_signature_push(token_nxt.id);
-                if (the_function_toplevel) {
-                    the_function.parameters.push(name);
-                    name.names = [];
-                    prefix_destructure(
-                        enroll,         // enroll
-                        role,           // role
-                        readonly,       // readonly
-                        name.names,     // name_list
-                        the_function,   // the_function
-                        false           // the_function_toplevel
-                    );
-                    name_list.push(...name.names);
-                    return;
-                }
                 prefix_destructure(
                     enroll,             // enroll
                     role,               // role
@@ -5888,15 +5874,9 @@ function jslint_phase3_parse(state) {
                 }
                 token_nxt.label = name;
                 name = token_nxt;
-                if (the_function_toplevel) {
-                    the_function.parameters.push(name);
-                }
                 name_list_push(name);
                 advance_and_signature_push(token_nxt.id);
                 return;
-            }
-            if (the_function_toplevel) {
-                the_function.parameters.push(name);
             }
             name_list_push(name);
 
@@ -5936,6 +5916,12 @@ function jslint_phase3_parse(state) {
 
                 test_cause("ignore");
                 advance_and_signature_push(",");
+                if (the_function_toplevel) {
+                    the_function.parameters += 1;
+                }
+            }
+            if (the_function_toplevel) {
+                the_function.parameters += 1;
             }
             if (name_parse()) {
 
@@ -6136,7 +6122,7 @@ function jslint_phase3_parse(state) {
 // This function will parse input <parameters> at beginning of <the_function>
 
         the_function.names = [];
-        the_function.parameters = [];
+        the_function.parameters = 0;
         the_function.signature = ["("];
         token_now.free = false;
         if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
@@ -8804,7 +8790,7 @@ function jslint_phase4_walk(state) {
             thing.name.init = true;
         }
         if (thing.extra === "get") {
-            if (thing.parameters.length !== 0) {
+            if (thing.parameters !== 0) {
 
 // test_cause:
 // ["
@@ -8815,7 +8801,7 @@ function jslint_phase4_walk(state) {
                 warn("bad_get", thing);
             }
         } else if (thing.extra === "set") {
-            if (thing.parameters.length !== 1) {
+            if (thing.parameters !== 1) {
 
 // test_cause:
 // ["
