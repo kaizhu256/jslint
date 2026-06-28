@@ -309,12 +309,12 @@ shCiArtifactUpload() {(set -e
 ).exec(require("./package.json").repository.url)[1]
 ')" # '
     export UPSTREAM_GITHUB_IO="$(
-        printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
+        printf "$UPSTREAM_REPOSITORY" | sed "s|/|.github.io/|"
     )"
     # init $GITHUB_XXX
     export GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-$UPSTREAM_REPOSITORY}"
     export GITHUB_GITHUB_IO="$(
-        printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
+        printf "$GITHUB_REPOSITORY" | sed "s|/|.github.io/|"
     )"
     # screenshot changelog and files
     PID_LIST=""
@@ -609,7 +609,7 @@ shCiPublishNpm() {(set -e
     if [ "$NPM_REGISTRY" = github ]
     then
         sed -i.bak \
-            -e "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
+            "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
             package.json && \
             rm -f package.json.bak
     fi
@@ -646,12 +646,12 @@ shDirHttplinkValidate() {(set -e
 ).exec(require("./package.json").repository.url)[1]
 ')" # '
     export UPSTREAM_GITHUB_IO="$(
-        printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
+        printf "$UPSTREAM_REPOSITORY" | sed "s|/|.github.io/|"
     )"
     # init $GITHUB_XXX
     export GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-$UPSTREAM_REPOSITORY}"
     export GITHUB_GITHUB_IO="$(
-        printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
+        printf "$GITHUB_REPOSITORY" | sed "s|/|.github.io/|"
     )"
     node --input-type=module --eval '
 import moduleAssert from "assert";
@@ -786,7 +786,7 @@ shGitCmdWithGithubToken() {(set -e
     if [ -f .git/config ]
     then
         # security - scrub token from url
-        sed -i.bak -e "s|://.*@|://|g" .git/config && \
+        sed -i.bak "s|://.*@|://|g" .git/config && \
             rm -f .git/config.bak
     fi
     CMD="$1"
@@ -814,7 +814,7 @@ shGitCmdWithGithubToken() {(set -e
     then
         URL="$(
             printf "$URL" \
-            | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
+            | sed "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
         )"
     fi
     EXIT_CODE=0
@@ -889,7 +889,7 @@ shGitInitBase() {(set -e
         git branch -D "$BRANCH" 2>/dev/null || true
         git checkout -b "$BRANCH" base/base
     done
-    sed -i.bak -e "s|owner/repo|${1:-owner/repo}|" .gitconfig && \
+    sed -i.bak "s|owner/repo|${1:-owner/repo}|" .gitconfig && \
         rm -f .gitconfig.bak
     cp .gitconfig .git/config
     git commit -am "update owner/repo to $1" || true
