@@ -8824,15 +8824,16 @@ function jslint_phase4_walk(state) {
             if (name.expression) {
 
 // test_cause:
-// ["function aa(aa=0){}", "pre_s_function", "(aa=0)", "", 0]
+// ["(aa=0)=>0", "pre_s_function", "(aa=0)=>0", "", 0]
 
-                test_cause("(aa=0)");
+                test_cause("(aa=0)=>0");
             } else {
 
 // test_cause:
-// ["function aa(aa){}", "pre_s_function", "(aa)", "", 0]
+// ["(aa)=>0", "pre_s_function", "(aa)=>0", "", 0]
+// ["aa=>0", "pre_s_function", "(aa)=>0", "", 0]
 
-                test_cause("(aa)");
+                test_cause("(aa)=>0");
             }
             walk_expression(name.expression);
             name.dead = false;
