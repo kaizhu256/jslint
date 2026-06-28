@@ -4872,7 +4872,7 @@ function jslint_phase3_parse(state) {
         the_symbol.led_infix = function (left) {
             const the_token = token_now;
             the_token.arity = "binary";
-            if (typeof f === "function") {
+            if (f) {
                 return f(left);
             }
             the_token.expression = [left, parse_expression(bp)];
@@ -5651,7 +5651,7 @@ function jslint_phase3_parse(state) {
         the_symbol.nud_prefix = function () {
             const the_token = token_now;
             the_token.arity = "unary";
-            if (typeof f === "function") {
+            if (f) {
                 return f();
             }
             the_token.expression = parse_expression(150);
@@ -5762,7 +5762,7 @@ function jslint_phase3_parse(state) {
         }
         function name_list_push(name) {
             name_list.push(name);
-            if (typeof enroll === "function") {
+            if (enroll) {
                 enroll(name, role, readonly);
                 name.init = true;
             }
