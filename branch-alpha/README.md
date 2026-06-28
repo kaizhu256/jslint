@@ -1012,7 +1012,7 @@ if (false) {
 ### pull-request merge
 - [ ] find highest issue-number at https://github.com/kaizhu256/jslint/issues/, https://github.com/kaizhu256/jslint/pulls/, and add +1 to it for PR-xxx
 - [ ] checkpoint local-branch-beta
-- [ ] `sh jslint_ci.sh shGitPullrequest beta beta`
+- [ ] `sh jslint_ci.sh shGithubPullrequest beta beta # 20xx-xx-xx`
     - [ ] verify ci-success for origin-branch-alpha
     - [ ] https://github.com/kaizhu256/jslint/actions
 - [ ] `git push upstream alpha -f`
@@ -1041,7 +1041,7 @@ This PR will additionally:
 - [ ] click `Squash and merge`
     - [ ] verify ci-success for upstream-branch-beta
     - [ ] https://github.com/kaizhu256/jslint/actions
-- [ ] `sh jslint_ci.sh shGitPullrequestCleanup`
+- [ ] `sh jslint_ci.sh shGithubPullrequestCleanup`
     - [ ] verify ci-success for origin-branch-alpha
     - [ ] https://github.com/kaizhu256/jslint/actions
 - [ ] `git push upstream alpha -f`
@@ -1054,7 +1054,7 @@ This PR will additionally:
 ### branch-master commit
 - [ ] update ci.yml to latest nodejs-lts
 - [ ] checkpoint local-branch-beta
-- [ ] `sh jslint_ci.sh shGitPullrequest master beta # re-run until version propagates`
+- [ ] `sh jslint_ci.sh shGithubPullrequest master beta # re-run until version propagates`
     - [ ] verify ci-success for origin-branch-alpha
     - [ ] https://github.com/kaizhu256/jslint/actions
 - [ ] `git push upstream alpha -f`
@@ -1076,7 +1076,7 @@ This PR will additionally:
 - [ ] click `Squash and merge`
     - [ ] verify ci-success for upstream-branch-beta
     - [ ] https://github.com/kaizhu256/jslint/actions
-- [ ] `sh jslint_ci.sh shGitPullrequestCleanup`
+- [ ] `sh jslint_ci.sh shGithubPullrequestCleanup`
     - [ ] verify ci-success for origin-branch-alpha
     - [ ] https://github.com/kaizhu256/jslint/actions
 - [ ] `git push upstream alpha -f`
