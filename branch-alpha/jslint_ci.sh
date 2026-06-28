@@ -375,7 +375,8 @@ shCiArtifactUpload() {(set -e
         -e "s|\\b$UPSTREAM_GITHUB_IO\\b|$GITHUB_GITHUB_IO|g" \
         -e "s|\\b$UPSTREAM_REPOSITORY\\b|$GITHUB_REPOSITORY|g" \
         -e "s|_2fbranch-[a-z]*_2f|_2fbranch-${GITHUB_BRANCH0}_2f|g" \
-        "branch-$GITHUB_BRANCH0/README.md"
+        "branch-$GITHUB_BRANCH0/README.md" && \
+        rm -f "branch-$GITHUB_BRANCH0/README.md".bak
     git status
     # git push
     shGitCommitPushOrSquash "" 50
@@ -609,7 +610,8 @@ shCiPublishNpm() {(set -e
     then
         sed -i \
             "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
-            package.json
+            package.json && \
+            rm -f package.json.bak
     fi
     if (command -v shCiPublishNpmCustom >/dev/null)
     then
@@ -784,8 +786,8 @@ shGitCmdWithGithubToken() {(set -e
     if [ -f .git/config ]
     then
         # security - scrub token from url
-        sed -i.bak "s|://.*@|://|g" .git/config
-        rm -f .git/config.bak
+        sed -i.bak "s|://.*@|://|g" .git/config && \
+            rm -f .git/config.bak
     fi
     CMD="$1"
     case "$CMD" in
@@ -887,8 +889,8 @@ shGitInitBase() {(set -e
         git branch -D "$BRANCH" 2>/dev/null || true
         git checkout -b "$BRANCH" base/base
     done
-    sed -i.bak "s|owner/repo|${1:-owner/repo}|" .gitconfig
-    rm -f .gitconfig.bak
+    sed -i.bak "s|owner/repo|${1:-owner/repo}|" .gitconfig && \
+        rm -f .gitconfig.bak
     cp .gitconfig .git/config
     git commit -am "update owner/repo to $1" || true
 )}
