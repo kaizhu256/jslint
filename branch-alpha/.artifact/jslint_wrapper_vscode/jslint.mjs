@@ -8462,18 +8462,6 @@ function jslint_phase4_walk(state) {
             name.dead = false;
             if (name.expression !== undefined) {
                 walk_expression(name.expression);
-
-// Probably deadcode.
-// if (name.id === "{" || name.id === "[") {
-//     name.names.forEach(subactivate);
-// } else {
-//     name.init = true;
-// }
-
-                jslint_assert(
-                    !(name.id === "{" || name.id === "["),
-                    `Expected !(name.id === "{" || name.id === "[").`
-                );
                 name.init = true;
             }
             blockage.live.push(name);
@@ -8838,14 +8826,10 @@ function jslint_phase4_walk(state) {
                 warn("bad_set", thing);
             }
         }
-        thing.parameters.forEach(function (name) {
+        thing.names.forEach(function (name) {
             walk_expression(name.expression);
-            if (name.id === "{" || name.id === "[") {
-                name.names.forEach(subactivate);
-            } else {
-                name.dead = false;
-                name.init = true;
-            }
+            name.dead = false;
+            name.init = true;
         });
     }
 
@@ -8871,12 +8855,6 @@ function jslint_phase4_walk(state) {
             thing.variable = the_variable;
             the_variable.used += 1;
         }
-    }
-
-    function subactivate(name) {
-        name.init = true;
-        name.dead = false;
-        blockage.live.push(name);
     }
 
     function walk_expression(thing) {
