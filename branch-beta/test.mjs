@@ -690,35 +690,7 @@ jstestDescribe((
                 "let aa = aa.aa().getTime();"
             ],
             destructure: [
-
-// PR-xxx - Unify ES2015-destructure-logic.
-
-                [
-                    `(function ({expr}) {\n    aa(bb, cc, dd, zz);\n}());`,
-                    `const {expr}`,
-                    `let [aa, bb, cc, dd, zz] = 0;\n{expr}`,
-                    `let {expr}`
-                ].map(function (source) {
-                    source = source.replace("{expr}", (
-                        `[{\n`
-                        + `    aa,\n`
-                        + `    bb = 0,\n`
-                        + `    bb: cc,\n`
-                        + `    dd: [{dd}],\n`
-                        + `    ...zz\n`
-                        + `}]`
-                    ));
-                    if (!(/function/).test(source)) {
-                        source = (
-                            `${source} = (function () {\n`
-                            + `    return;\n`
-                            + `}());\n`
-                            + `aa(bb, cc, dd, zz);\n`
-                        );
-                    }
-                    source = `/*jslint node*/\n${source}`;
-                    return source;
-                }),
+                "let [\n    , aa, bb = 0, ...cc\n] = 0;\naa(bb, cc);",
 
 // PR-459 - Allow destructuring-assignment after function-definition.
 
@@ -729,8 +701,16 @@ jstestDescribe((
                     + "    return;\n"
                     + "}\n"
                     + "[aa, bb] = cc();\n"
+                ),
+                (
+                    "let {\n"
+                    + "    aa,\n"
+                    + "    bb = 0,\n"
+                    + "    cc: dd,\n"
+                    + "    ...ee\n"
+                    + "} = 0;\n"
                 )
-            ].flat(),
+            ],
             directive: [
                 "#!\n/*jslint browser:false, node*/\n\"use strict\";",
                 "/*property aa bb*/"
@@ -948,6 +928,11 @@ jstestDescribe((
                 )
             ],
             var: [
+
+// PR-363 - Bugfix
+// Add test against false-warning <uninitialized 'bb'> in code
+// '/*jslint node*/\nlet {aa:bb} = {}; bb();'.
+
                 "/*jslint node*/\n",
                 ""
             ].map(function (directive) {
@@ -955,29 +940,29 @@ jstestDescribe((
                     "const aa = 0;\naa();\n",
                     "let aa = 0;\naa();\n",
                     "var aa = 0;\naa();\n"
-                ].map(function (source) {
-                    return directive + source;
+                ].map(function (code) {
+                    return directive + code;
                 });
             }).flat()
         }).forEach(function (codeList) {
             let elemPrv = "";
-            codeList.forEach(function (source) {
+            codeList.forEach(function (code) {
                 let warnings;
                 // Assert codeList is sorted.
-                assertOrThrow(elemPrv < source, JSON.stringify([
-                    elemPrv, source
+                assertOrThrow(elemPrv < code, JSON.stringify([
+                    elemPrv, code
                 ], undefined, 4));
-                elemPrv = source;
+                elemPrv = code;
                 [
                     jslint.jslint,
                     jslintCjs.jslint
                 ].forEach(function (jslint) {
-                    warnings = jslint(source, {
+                    warnings = jslint(code, {
                         beta: true
                     }).warnings;
                     assertOrThrow(
                         warnings.length === 0,
-                        `${source}\n${JSON.stringify(warnings, undefined, 4)}`
+                        JSON.stringify([code, warnings])
                     );
                 });
             });
@@ -1108,14 +1093,15 @@ jstestDescribe((
                 jslintCjs.jslint
             ].forEach(function (jslint) {
                 // test jslint's option handling-behavior
-                let warnings = jslint(
-                    source,
-                    option_dict,
-                    global_list
-                ).warnings;
                 assertOrThrow(
-                    warnings.length === warningsLength,
-                    `${source}\n${JSON.stringify(warnings, undefined, 4)}`
+                    jslint(
+                        source,
+                        option_dict,
+                        global_list
+                    ).warnings.length === warningsLength,
+                    "jslint.jslint(" + JSON.stringify([
+                        source, option_dict, global_list
+                    ]) + ")"
                 );
                 // test jslint's directive handling-behavior
                 source = (
