@@ -8822,6 +8822,9 @@ function jslint_phase4_walk(state) {
                 warn("bad_set", thing);
             }
         }
+
+// PR-xxx - Unify property the_function.parameters into the_function.names.
+
         thing.names.forEach(function (name) {
             if (name.expression) {
 
