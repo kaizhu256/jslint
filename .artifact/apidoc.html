@@ -1062,15 +1062,16 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
                                 // ... literal.
     let mode_regexp;            // true if regular expression literal seen on
                                 // ... this line.
-    let paren_backtrack_list = [];      // List of most recent "(" tokens at any
-                                        // ... paren-depth.
-    let paren_depth = 0;        // Keeps track of current paren-depth.
+    let opener_popped = empty();        // Last token popped from opener_stack.
+    let opener_stack = [];      // Stack of opener tokens: (, [.
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.
     let token_prv = token_global;       // The previous token including
                                         // ... comments.
     let token_prv_expr = token_global;  // The previous token excluding
-                                        // ... comm...
+                                        // ... comments.
+
+// Most tokens, including the identifiers, operators, and pu...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
