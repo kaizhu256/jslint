@@ -5741,12 +5741,11 @@ function jslint_phase3_parse(state) {
         enroll,
         role,
         readonly,
-        names,
+        name_list,
         the_function,
         the_function_toplevel
     ) {
         const is_brace = token_now.id === "{";
-        const name_list = [];
         const signature = the_function?.signature || [];
         const the_destructure = token_now;
         let optional;
@@ -5831,7 +5830,7 @@ function jslint_phase3_parse(state) {
                         enroll,         // enroll
                         role,           // role
                         readonly,       // readonly
-                        name.names,     // names
+                        name.names,     // name_list
                         the_function,   // the_function
                         false           // the_function_toplevel
                     );
@@ -5842,7 +5841,7 @@ function jslint_phase3_parse(state) {
                     enroll,             // enroll
                     role,               // role
                     readonly,           // readonly
-                    names,              // names
+                    name_list,          // name_list
                     the_function,       // the_function
                     false               // the_function_toplevel
                 );
@@ -5963,7 +5962,6 @@ function jslint_phase3_parse(state) {
         } else {
             advance_and_signature_push("]");
         }
-        names.push(...name_list);
         return the_destructure;
     }
 
@@ -6148,7 +6146,7 @@ function jslint_phase3_parse(state) {
                 enroll,                 // enroll
                 "parameter",            // role
                 false,                  // readonly
-                the_function.names,     // names
+                the_function.names,     // name_list
                 the_function,           // the_function
                 true                    // the_function_toplevel
             );
@@ -6350,7 +6348,7 @@ function jslint_phase3_parse(state) {
                 undefined,              // enroll
                 "variable",             // role
                 false,                  // readonly
-                the_token.names,        // names
+                the_token.names,        // name_list
                 undefined,              // the_function
                 false                   // the_function_toplevel
             );
@@ -7398,7 +7396,7 @@ function jslint_phase3_parse(state) {
                     enroll,             // enroll
                     "variable",         // role
                     readonly,           // readonly
-                    the_variable.names, // names
+                    the_variable.names, // name_list
                     undefined,          // the_function
                     false               // the_function_toplevel
                 );
