@@ -370,7 +370,7 @@ shCiArtifactUpload() {(set -e
         done
     fi
     # update README.md with branch-$GITHUB_BRANCH0 and $GITHUB_REPOSITORY
-    sed -i \
+    sed -i.bak \
         -e "s|/branch-[a-z]*/|/branch-$GITHUB_BRANCH0/|g" \
         -e "s|\\b$UPSTREAM_GITHUB_IO\\b|$GITHUB_GITHUB_IO|g" \
         -e "s|\\b$UPSTREAM_REPOSITORY\\b|$GITHUB_REPOSITORY|g" \
@@ -608,7 +608,7 @@ shCiPublishNpm() {(set -e
     # update package-name
     if [ "$NPM_REGISTRY" = github ]
     then
-        sed -i \
+        sed -i.bak \
             "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
             package.json && \
             rm -f package.json.bak
