@@ -1010,129 +1010,129 @@ if (false) {
 
 <br><br>
 ### pull-request merge
-- find highest issue-number at https://github.com/kaizhu256/jslint/issues/, https://github.com/kaizhu256/jslint/pulls/, and add +1 to it for PR-xxx
-- checkpoint local-branch-beta
-- `shGitPullrequest beta beta`
-    - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-- `git push upstream alpha -f`
-    - verify ci-success for upstream-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-p2026.6.28
-- click `Create pull request`
-- input `Add your description here...` with:
+- [ ] find highest issue-number at https://github.com/kaizhu256/jslint/issues/, https://github.com/kaizhu256/jslint/pulls/, and add +1 to it for PR-xxx
+- [ ] checkpoint local-branch-beta
+- [ ] `shGitPullrequest beta beta`
+    - [ ] verify ci-success for origin-branch-alpha
+    - [ ] https://github.com/kaizhu256/jslint/actions
+- [ ] `git push upstream alpha -f`
+    - [ ] verify ci-success for upstream-branch-alpha
+    - [ ] https://github.com/kaizhu256/jslint/actions
+- [ ] goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-p2026.6.28
+- [ ] click `Create pull request`
+- [ ] input `Add your description here...` with:
 ```
 Fixes #xxx.
-- <primary-commit-message>
+- [ ] <primary-commit-message>
 
 This PR will ...
 
 This PR will additionally:
-- <secondary-commit-message>
+- [ ] <secondary-commit-message>
 ...
 
 <screenshot>
 ```
-- verify `commit into jslint-org:beta`
-- click `Create pull request`
-    - verify ci-success for pull-request
-    - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
-- wait awhile before continuing ...
-- click `Squash and merge`
-    - verify ci-success for upstream-branch-beta
-    - https://github.com/kaizhu256/jslint/actions
-- `shGitPullrequestCleanup`
-    - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-- `git push upstream alpha -f`
-    - verify ci-success for upstream-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-- click `Delete branch`
+- [ ] verify `commit into jslint-org:beta`
+- [ ] click `Create pull request`
+    - [ ] verify ci-success for pull-request
+    - [ ] https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
+- [ ] wait awhile before continuing ...
+- [ ] click `Squash and merge`
+    - [ ] verify ci-success for upstream-branch-beta
+    - [ ] https://github.com/kaizhu256/jslint/actions
+- [ ] `shGitPullrequestCleanup`
+    - [ ] verify ci-success for origin-branch-alpha
+    - [ ] https://github.com/kaizhu256/jslint/actions
+- [ ] `git push upstream alpha -f`
+    - [ ] verify ci-success for upstream-branch-alpha
+    - [ ] https://github.com/kaizhu256/jslint/actions
+- [ ] click `Delete branch`
 
 
 <br><br>
 ### branch-master commit
-- update ci.yml to latest nodejs-lts
-- checkpoint local-branch-beta
-- `shGitPullrequest master beta # re-run until version propagates`
-    - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-- `git push upstream alpha -f`
-    - verify ci-success for upstream-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-- goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2026.4.30
-- click `Create pull request`
-- input `Add a title` with: `# v20yy.mm.dd`
-- input `Add a description` with:
+- [ ] update ci.yml to latest nodejs-lts
+- [ ] checkpoint local-branch-beta
+- [ ] `shGitPullrequest master beta # re-run until version propagates`
+    - [ ] verify ci-success for origin-branch-alpha
+    - [ ] https://github.com/kaizhu256/jslint/actions
+- [ ] `git push upstream alpha -f`
+    - [ ] verify ci-success for upstream-branch-alpha
+    - [ ] https://github.com/kaizhu256/jslint/actions
+- [ ] goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2026.4.30
+- [ ] click `Create pull request`
+- [ ] input `Add a title` with: `# v20yy.mm.dd`
+- [ ] input `Add a description` with:
 ```
-- <primary-commit-message>
-- <secondary-commit-message>
+- [ ] <primary-commit-message>
+- [ ] <secondary-commit-message>
 ```
-- verify `commit into jslint-org:beta`
-- click `Create pull request`
-    - verify ci-success for pull-request
-    - https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
-- wait awhile before continuing ...
-- click `Squash and merge`
-    - verify ci-success for upstream-branch-beta
-    - https://github.com/kaizhu256/jslint/actions
-- `shGitPullrequestCleanup`
-    - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-- `git push upstream alpha -f`
-    - verify ci-success for upstream-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-- click `Delete branch`
-- `git push origin beta:master`
-    - verify ci-success for origin-branch-master
-    - https://github.com/kaizhu256/jslint/actions
-- `git push upstream beta:master`
-    - verify ci-success for upstream-branch-master
-    - https://github.com/kaizhu256/jslint/actions
+- [ ] verify `commit into jslint-org:beta`
+- [ ] click `Create pull request`
+    - [ ] verify ci-success for pull-request
+    - [ ] https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
+- [ ] wait awhile before continuing ...
+- [ ] click `Squash and merge`
+    - [ ] verify ci-success for upstream-branch-beta
+    - [ ] https://github.com/kaizhu256/jslint/actions
+- [ ] `shGitPullrequestCleanup`
+    - [ ] verify ci-success for origin-branch-alpha
+    - [ ] https://github.com/kaizhu256/jslint/actions
+- [ ] `git push upstream alpha -f`
+    - [ ] verify ci-success for upstream-branch-alpha
+    - [ ] https://github.com/kaizhu256/jslint/actions
+- [ ] click `Delete branch`
+- [ ] `git push origin beta:master`
+    - [ ] verify ci-success for origin-branch-master
+    - [ ] https://github.com/kaizhu256/jslint/actions
+- [ ] `git push upstream beta:master`
+    - [ ] verify ci-success for upstream-branch-master
+    - [ ] https://github.com/kaizhu256/jslint/actions
 
 
 <br><br>
 ### branch-master publish
-- goto https://www.npmjs.com/package/@kaizhu256/jslint/access <!--no-validate-->
-- click `Github Actions`
-- input `Organization or user*` with: `jslint-org`
-- input `Repository*` with: `jslint`
-- input `Workflow filename*` with: `publish.yml`
-- click `Set up connection` or `Update Package Settings`
-- `git push upstream beta:master`
-    - verify ci-success for upstream-branch-master
-    - https://github.com/kaizhu256/jslint/actions
-- goto https://github.com/kaizhu256/jslint/releases/new
-- input `Choose a tag` with: `v20yy.mm.dd`
-- click `Create new tag: v20yy.mm.dd on publish`
-    - verify correct-year `20yy`
-- select `Target: master`
-- select `Previous tag:auto`
-- input `Release title` with: `v20yy.mm.dd - <primary-commit-message>`
-- input `Describe this release` with:
+- [ ] goto https://www.npmjs.com/package/@kaizhu256/jslint/access <!--no-validate-->
+- [ ] click `Github Actions`
+- [ ] input `Organization or user*` with: `jslint-org`
+- [ ] input `Repository*` with: `jslint`
+- [ ] input `Workflow filename*` with: `publish.yml`
+- [ ] click `Set up connection` or `Update Package Settings`
+- [ ] `git push upstream beta:master`
+    - [ ] verify ci-success for upstream-branch-master
+    - [ ] https://github.com/kaizhu256/jslint/actions
+- [ ] goto https://github.com/kaizhu256/jslint/releases/new
+- [ ] input `Choose a tag` with: `v20yy.mm.dd`
+- [ ] click `Create new tag: v20yy.mm.dd on publish`
+    - [ ] verify correct-year `20yy`
+- [ ] select `Target: master`
+- [ ] select `Previous tag:auto`
+- [ ] input `Release title` with: `v20yy.mm.dd - <primary-commit-message>`
+- [ ] input `Describe this release` with:
 ```
-- <primary-commit-message>
-- <secondary-commit-message>
+- [ ] <primary-commit-message>
+- [ ] <secondary-commit-message>
 ```
-- click `Generate release notes`
-- click `Set as the latest release`
-- click `Preview` and review
-- click `Publish release`
-    - verify ci-success for upstream-branch-publish
-    - https://github.com/kaizhu256/jslint/actions
-    - verify email-notification `Successfully published @kaizhu256/jslint@20yy.mm.dd`
+- [ ] click `Generate release notes`
+- [ ] click `Set as the latest release`
+- [ ] click `Preview` and review
+- [ ] click `Publish release`
+    - [ ] verify ci-success for upstream-branch-publish
+    - [ ] https://github.com/kaizhu256/jslint/actions
+    - [ ] verify email-notification `Successfully published @kaizhu256/jslint@20yy.mm.dd`
 
 
 <br><br>
 ### vscode-jslint publish
-- goto https://github.com/kaizhu256/jslint/tree/gh-pages/branch-alpha/.artifact/jslint_wrapper_vscode
-- click `vscode-jslint-20yy.mm.dd.vsix`
-- click `Raw` to download
-- goto https://marketplace.visualstudio.com/manage/publishers/jslint
-- right-click `Update`
-- upload downloaded file `vscode-jslint-20yy.mm.dd.vsix`
-- click 'Upload'
-- verify email-notification `[Succeeded] Extension publish on Visual Studio Marketplace - vscode-jslint`
+- [ ] goto https://github.com/kaizhu256/jslint/tree/gh-pages/branch-alpha/.artifact/jslint_wrapper_vscode
+- [ ] click `vscode-jslint-20yy.mm.dd.vsix`
+- [ ] click `Raw` to download
+- [ ] goto https://marketplace.visualstudio.com/manage/publishers/jslint
+- [ ] right-click `Update`
+- [ ] upload downloaded file `vscode-jslint-20yy.mm.dd.vsix`
+- [ ] click 'Upload'
+- [ ] verify email-notification `[Succeeded] Extension publish on Visual Studio Marketplace - vscode-jslint`
 
 
 <!--
