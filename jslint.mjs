@@ -124,6 +124,7 @@
     closure,
     code,
     column,
+    comma,
     concat,
     consoleError,
     console_error,
@@ -3631,6 +3632,7 @@ function jslint_phase2_lex(state) {
         case "beta":            // Enable experimental warnings.
         case "bitwise":         // Allow bitwise operator.
         case "browser":         // Assume browser environment.
+        case "comma":           // Allow dangling comma.
         case "convert":         // Allow conversion operator.
         case "couch":           // Assume CouchDb environment.
         case "devel":           // Allow console.log() and friends.
@@ -5854,7 +5856,9 @@ function jslint_phase3_parse(state) {
             advance_and_signature_push(token_nxt.id);
             if (is_brace && token_nxt.id === ":") {
                 advance_and_signature_push(":");
-                the_destructure.open = !the_function_toplevel;
+                if (!the_function_toplevel) {
+                    the_destructure.open = true;
+                }
                 if (token_nxt.id === "...") {
 
 // test_cause:
@@ -5887,7 +5891,9 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id === "=") {
                 optional = the_function_toplevel && token_now;
                 advance_and_signature_push("=");
-                the_destructure.open = !the_function_toplevel;
+                if (!the_function_toplevel) {
+                    the_destructure.open = true;
+                }
                 name.expression = parse_expression(0);
 
 // test_cause:
@@ -5932,6 +5938,26 @@ function jslint_phase3_parse(state) {
                 break;
             }
             advance_and_signature_push(",");
+            if (
+                token_nxt.id === ")"
+                || token_nxt.id === "]"
+                || token_nxt.id === "}"
+            ) {
+
+// PR-500 - Add ES2017-feature Trailing commas in function parameter lists.
+
+// test_cause:
+// ["([aa,])=>0", "prefix_destructure", "dangling_comma", "", 0]
+// ["(aa,)=>0", "prefix_destructure", "dangling_comma", "", 0]
+// [";[aa,]=0", "prefix_destructure", "dangling_comma", "", 0]
+// ["let[aa,]=0", "prefix_destructure", "dangling_comma", "", 0]
+
+                test_cause("dangling_comma");
+                if (!option_dict.comma) {
+                    warn("unexpected_a", token_nxt);
+                }
+                break;
+            }
         }
         if (the_function_toplevel) {
             advance_and_signature_push(")");
