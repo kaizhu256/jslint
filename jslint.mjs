@@ -1422,14 +1422,14 @@ function jslint(
             mm = `Use double quotes, not single quotes.`;
             break;
 
-// PR-386 - Fix issue #382 - Make fart-related warnings more readable.
-
-        case "use_function_not_fart":
-            mm = (
-                `Use 'function (...)', not '(...) =>' when arrow functions`
-                + ` become too complex.`
-            );
-            break;
+// // PR-386 - Fix issue #382 - Make fart-related warnings more readable.
+//
+//         case "use_function_not_fart":
+//             mm = (
+//                 `Use 'function (...)', not '(...) =>' when arrow functions`
+//                 + ` become too complex.`
+//             );
+//             break;
         case "use_open":
             mm = (
                 `Wrap a ternary expression in parens,`
@@ -5291,13 +5291,13 @@ function jslint_phase3_parse(state) {
 // The function's body is a block.
 
         if (token_nxt.id === "{") {
-            if (!option_dict.fart) {
-
-// test_cause:
-// ["()=>{}", "parse_fart", "use_function_not_fart", "=>", 3]
-
-                warn("use_function_not_fart", the_fart);
-            }
+//             if (!option_dict.fart) {
+//
+// // test_cause:
+// // ["()=>{}", "parse_fart", "use_function_not_fart", "=>", 3]
+//
+//                 warn("use_function_not_fart", the_fart);
+//             }
             the_fart.block = block("body");
 
 // The function's body is an expression.
@@ -5682,13 +5682,13 @@ function jslint_phase3_parse(state) {
             the_function = Object.assign(token_now.fart, {
                 async: 1
             });
-            if (!option_dict.fart) {
-
-// test_cause:
-// ["async()=>0", "prefix_async", "use_function_not_fart", "=>", 8]
-
-                warn("use_function_not_fart", the_function);
-            }
+//             if (!option_dict.fart) {
+//
+// // test_cause:
+// // ["async()=>0", "prefix_async", "use_function_not_fart", "=>", 8]
+//
+//                 warn("use_function_not_fart", the_function);
+//             }
             prefix_lparen();
 
 // Parse async function.
@@ -5803,14 +5803,14 @@ function jslint_phase3_parse(state) {
                 return true;
             case "[":
             case "{":
-                if (the_function?.id === "=>" && !option_dict.fart) {
-
-// test_cause:
-// ["([aa])=>0", "name_parse", "use_function_not_fart", "=>", 7]
-// ["({aa})=>0", "name_parse", "use_function_not_fart", "=>", 7]
-
-                    warn("use_function_not_fart", the_function);
-                }
+//                 if (the_function?.id === "=>" && !option_dict.fart) {
+//
+// // test_cause:
+// // ["([aa])=>0", "name_parse", "use_function_not_fart", "=>", 7]
+// // ["({aa})=>0", "name_parse", "use_function_not_fart", "=>", 7]
+//
+//                     warn("use_function_not_fart", the_function);
+//                 }
                 if (optional) {
 
 // test_cause:
