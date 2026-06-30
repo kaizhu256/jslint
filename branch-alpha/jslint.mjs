@@ -5928,10 +5928,7 @@ function jslint_phase3_parse(state) {
                     the_function.name = name;
                     name.calls = empty();
                     role = "variable";
-                    name_enroll(name, "variable", true);
-
-// PR-331 - Bugfix - Fixes issue #272 - function hoisting not allowed.
-
+                    name_enroll(name, role, true);
                     name.dead = false;
                     name.init = true;
                     advance();
@@ -5956,10 +5953,10 @@ function jslint_phase3_parse(state) {
 // ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]
 
                 test_cause("expression", name.id);
-                name_enroll(name, "function", true);
+                name_enroll(name, role, true);
                 name.dead = false;
                 name.init = true;
-                name.used = 1;
+                name.used = Number(the_function.arity !== "statement");
             }
         }
 
