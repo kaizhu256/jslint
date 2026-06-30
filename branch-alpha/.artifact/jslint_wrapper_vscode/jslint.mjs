@@ -5907,7 +5907,6 @@ function jslint_phase3_parse(state) {
     function prefix_function(the_function, mode_fart, mode_infix_fart) {
         let name;
         let role = "function";
-        noop(role);
         if (!mode_fart) {
             name = the_function?.name;
             if (!the_function) {
@@ -5929,7 +5928,8 @@ function jslint_phase3_parse(state) {
                     name.calls = empty();
                     role = "variable";
                     advance();
-                } else if (!name) {
+                }
+                if (!name) {
 
 // A function expression may have an optional name.
 
