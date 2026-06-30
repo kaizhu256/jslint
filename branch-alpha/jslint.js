@@ -5921,9 +5921,9 @@ function jslint_phase3_parse(state) {
                         return stop("expected_identifier_a", token_nxt);
                     }
                     name = token_nxt;
-                    name_enroll(name, "variable", true);
                     the_function.name = name;
                     name.calls = empty();
+                    name_enroll(name, "variable", true);
 
 // PR-331 - Bugfix - Fixes issue #272 - function hoisting not allowed.
 
