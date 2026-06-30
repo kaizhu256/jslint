@@ -6069,46 +6069,46 @@ body {
 <pre><span class="lineno"><a href="#line_5904" id="line_5904"> 5904.</a></span><span class="count                ">    674</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5905" id="line_5905"> 5905.</a></span><span class="count                ">   2039</span><span>    function prefix_function(the_function, mode_fart, mode_infix_fart) {</span></pre>
 <pre><span class="lineno"><a href="#line_5906" id="line_5906"> 5906.</a></span><span class="count                ">     33</span><span>        let name = the_function?.name;</span></pre>
-<pre><span class="lineno"><a href="#line_5907" id="line_5907"> 5907.</a></span><span class="count                ">     22</span><span>        if (mode_fart) {</span></pre>
-<pre><span class="lineno"><a href="#line_5908" id="line_5908"> 5908.</a></span><span class="count                ">     22</span><span>            the_function.arity = "binary";</span></pre>
-<pre><span class="lineno"><a href="#line_5909" id="line_5909"> 5909.</a></span><span class="count                ">     22</span><span>            the_function.name = anon;</span></pre>
-<pre><span class="lineno"><a href="#line_5910" id="line_5910"> 5910.</a></span><span class="count                ">     22</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_5911" id="line_5911"> 5911.</a></span><span class="count                ">   2006</span><span>        if (!the_function) {</span></pre>
-<pre><span class="lineno"><a href="#line_5912" id="line_5912"> 5912.</a></span><span class="count                ">   2006</span><span>            the_function = token_now;</span></pre>
-<pre><span class="lineno"><a href="#line_5913" id="line_5913"> 5913.</a></span><span class="count                ">   2006</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5914" id="line_5914"> 5914.</a></span><span class="count                ">   2006</span><span>// A function statement must have a name that will be in the parent's scope.</span></pre>
-<pre><span class="lineno"><a href="#line_5915" id="line_5915"> 5915.</a></span><span class="count                ">   2006</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5916" id="line_5916"> 5916.</a></span><span class="count                ">   2006</span><span>            if (the_function.arity === "statement") {</span></pre>
-<pre><span class="lineno"><a href="#line_5917" id="line_5917"> 5917.</a></span><span class="count                ">   2006</span><span>                if (!token_nxt.identifier) {</span></pre>
+<pre><span class="lineno"><a href="#line_5907" id="line_5907"> 5907.</a></span><span class="count                ">   2006</span><span>        if (!the_function) {</span></pre>
+<pre><span class="lineno"><a href="#line_5908" id="line_5908"> 5908.</a></span><span class="count                ">   2006</span><span>            the_function = token_now;</span></pre>
+<pre><span class="lineno"><a href="#line_5909" id="line_5909"> 5909.</a></span><span class="count                ">   2006</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5910" id="line_5910"> 5910.</a></span><span class="count                ">   2006</span><span>// A function statement must have a name that will be in the parent's scope.</span></pre>
+<pre><span class="lineno"><a href="#line_5911" id="line_5911"> 5911.</a></span><span class="count                ">   2006</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5912" id="line_5912"> 5912.</a></span><span class="count                ">   2006</span><span>            if (the_function.arity === "statement") {</span></pre>
+<pre><span class="lineno"><a href="#line_5913" id="line_5913"> 5913.</a></span><span class="count                ">   2006</span><span>                if (!token_nxt.identifier) {</span></pre>
+<pre><span class="lineno"><a href="#line_5914" id="line_5914"> 5914.</a></span><span class="count                ">   2006</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5915" id="line_5915"> 5915.</a></span><span class="count                ">   2006</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_5916" id="line_5916"> 5916.</a></span><span class="count                ">   2006</span><span>// ["function(){}", "prefix_function", "expected_identifier_a", "(", 9]</span></pre>
+<pre><span class="lineno"><a href="#line_5917" id="line_5917"> 5917.</a></span><span class="count                ">   2006</span><span>// ["function*aa(){}", "prefix_function", "expected_identifier_a", "*", 9]</span></pre>
 <pre><span class="lineno"><a href="#line_5918" id="line_5918"> 5918.</a></span><span class="count                ">   2006</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5919" id="line_5919"> 5919.</a></span><span class="count                ">   2006</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_5920" id="line_5920"> 5920.</a></span><span class="count                ">   2006</span><span>// ["function(){}", "prefix_function", "expected_identifier_a", "(", 9]</span></pre>
-<pre><span class="lineno"><a href="#line_5921" id="line_5921"> 5921.</a></span><span class="count                ">   2006</span><span>// ["function*aa(){}", "prefix_function", "expected_identifier_a", "*", 9]</span></pre>
-<pre><span class="lineno"><a href="#line_5922" id="line_5922"> 5922.</a></span><span class="count                ">   2006</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5923" id="line_5923"> 5923.</a></span><span class="count                ">   2006</span><span>                    return stop("expected_identifier_a", token_nxt);</span></pre>
-<pre><span class="lineno"><a href="#line_5924" id="line_5924"> 5924.</a></span><span class="count                ">   2006</span><span>                }</span></pre>
-<pre><span class="lineno"><a href="#line_5925" id="line_5925"> 5925.</a></span><span class="count                ">   2006</span><span>                name = token_nxt;</span></pre>
-<pre><span class="lineno"><a href="#line_5926" id="line_5926"> 5926.</a></span><span class="count                ">   2006</span><span>                name_enroll(name, "variable", true);</span></pre>
-<pre><span class="lineno"><a href="#line_5927" id="line_5927"> 5927.</a></span><span class="count                ">   2006</span><span>                the_function.name = Object.assign(name, {</span></pre>
-<pre><span class="lineno"><a href="#line_5928" id="line_5928"> 5928.</a></span><span class="count                ">   2006</span><span>                    calls: empty(),</span></pre>
-<pre><span class="lineno"><a href="#line_5929" id="line_5929"> 5929.</a></span><span class="count                ">   2006</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5930" id="line_5930"> 5930.</a></span><span class="count                ">   2006</span><span>// PR-331 - Bugfix - Fixes issue #272 - function hoisting not allowed.</span></pre>
-<pre><span class="lineno"><a href="#line_5931" id="line_5931"> 5931.</a></span><span class="count                ">   2006</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5932" id="line_5932"> 5932.</a></span><span class="count                ">   2006</span><span>                    dead: false,</span></pre>
-<pre><span class="lineno"><a href="#line_5933" id="line_5933"> 5933.</a></span><span class="count                ">   2006</span><span>                    init: true</span></pre>
-<pre><span class="lineno"><a href="#line_5934" id="line_5934"> 5934.</a></span><span class="count                ">   2006</span><span>                });</span></pre>
-<pre><span class="lineno"><a href="#line_5935" id="line_5935"> 5935.</a></span><span class="count                ">   2006</span><span>                advance();</span></pre>
-<pre><span class="lineno"><a href="#line_5936" id="line_5936"> 5936.</a></span><span class="count                ">   2006</span><span>            } else if (!name) {</span></pre>
-<pre><span class="lineno"><a href="#line_5937" id="line_5937"> 5937.</a></span><span class="count                ">   2006</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5938" id="line_5938"> 5938.</a></span><span class="count                ">   2006</span><span>// A function expression may have an optional name.</span></pre>
-<pre><span class="lineno"><a href="#line_5939" id="line_5939"> 5939.</a></span><span class="count                ">   2006</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5940" id="line_5940"> 5940.</a></span><span class="count                ">   2006</span><span>                the_function.name = anon;</span></pre>
-<pre><span class="lineno"><a href="#line_5941" id="line_5941"> 5941.</a></span><span class="count                ">   2006</span><span>                if (token_nxt.identifier) {</span></pre>
-<pre><span class="lineno"><a href="#line_5942" id="line_5942"> 5942.</a></span><span class="count                ">   2006</span><span>                    name = token_nxt;</span></pre>
-<pre><span class="lineno"><a href="#line_5943" id="line_5943"> 5943.</a></span><span class="count                ">   2006</span><span>                    the_function.name = name;</span></pre>
-<pre><span class="lineno"><a href="#line_5944" id="line_5944"> 5944.</a></span><span class="count                ">   2006</span><span>                    advance();</span></pre>
-<pre><span class="lineno"><a href="#line_5945" id="line_5945"> 5945.</a></span><span class="count                ">   2006</span><span>                }</span></pre>
-<pre><span class="lineno"><a href="#line_5946" id="line_5946"> 5946.</a></span><span class="count                ">   2006</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_5919" id="line_5919"> 5919.</a></span><span class="count                ">   2006</span><span>                    return stop("expected_identifier_a", token_nxt);</span></pre>
+<pre><span class="lineno"><a href="#line_5920" id="line_5920"> 5920.</a></span><span class="count                ">   2006</span><span>                }</span></pre>
+<pre><span class="lineno"><a href="#line_5921" id="line_5921"> 5921.</a></span><span class="count                ">   2006</span><span>                name = token_nxt;</span></pre>
+<pre><span class="lineno"><a href="#line_5922" id="line_5922"> 5922.</a></span><span class="count                ">   2006</span><span>                name_enroll(name, "variable", true);</span></pre>
+<pre><span class="lineno"><a href="#line_5923" id="line_5923"> 5923.</a></span><span class="count                ">   2006</span><span>                the_function.name = Object.assign(name, {</span></pre>
+<pre><span class="lineno"><a href="#line_5924" id="line_5924"> 5924.</a></span><span class="count                ">   2006</span><span>                    calls: empty(),</span></pre>
+<pre><span class="lineno"><a href="#line_5925" id="line_5925"> 5925.</a></span><span class="count                ">   2006</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5926" id="line_5926"> 5926.</a></span><span class="count                ">   2006</span><span>// PR-331 - Bugfix - Fixes issue #272 - function hoisting not allowed.</span></pre>
+<pre><span class="lineno"><a href="#line_5927" id="line_5927"> 5927.</a></span><span class="count                ">   2006</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5928" id="line_5928"> 5928.</a></span><span class="count                ">   2006</span><span>                    dead: false,</span></pre>
+<pre><span class="lineno"><a href="#line_5929" id="line_5929"> 5929.</a></span><span class="count                ">   2006</span><span>                    init: true</span></pre>
+<pre><span class="lineno"><a href="#line_5930" id="line_5930"> 5930.</a></span><span class="count                ">   2006</span><span>                });</span></pre>
+<pre><span class="lineno"><a href="#line_5931" id="line_5931"> 5931.</a></span><span class="count                ">   2006</span><span>                advance();</span></pre>
+<pre><span class="lineno"><a href="#line_5932" id="line_5932"> 5932.</a></span><span class="count                ">   2006</span><span>            } else if (!name) {</span></pre>
+<pre><span class="lineno"><a href="#line_5933" id="line_5933"> 5933.</a></span><span class="count                ">   2006</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5934" id="line_5934"> 5934.</a></span><span class="count                ">   2006</span><span>// A function expression may have an optional name.</span></pre>
+<pre><span class="lineno"><a href="#line_5935" id="line_5935"> 5935.</a></span><span class="count                ">   2006</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5936" id="line_5936"> 5936.</a></span><span class="count                ">   2006</span><span>                the_function.name = anon;</span></pre>
+<pre><span class="lineno"><a href="#line_5937" id="line_5937"> 5937.</a></span><span class="count                ">   2006</span><span>                if (token_nxt.identifier) {</span></pre>
+<pre><span class="lineno"><a href="#line_5938" id="line_5938"> 5938.</a></span><span class="count                ">   2006</span><span>                    name = token_nxt;</span></pre>
+<pre><span class="lineno"><a href="#line_5939" id="line_5939"> 5939.</a></span><span class="count                ">   2006</span><span>                    the_function.name = name;</span></pre>
+<pre><span class="lineno"><a href="#line_5940" id="line_5940"> 5940.</a></span><span class="count                ">   2006</span><span>                    advance();</span></pre>
+<pre><span class="lineno"><a href="#line_5941" id="line_5941"> 5941.</a></span><span class="count                ">   2006</span><span>                }</span></pre>
+<pre><span class="lineno"><a href="#line_5942" id="line_5942"> 5942.</a></span><span class="count                ">   2006</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_5943" id="line_5943"> 5943.</a></span><span class="count                ">   2037</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_5944" id="line_5944"> 5944.</a></span><span class="count                ">   2037</span><span>        if (mode_fart) {</span></pre>
+<pre><span class="lineno"><a href="#line_5945" id="line_5945"> 5945.</a></span><span class="count                ">     22</span><span>            the_function.arity = "binary";</span></pre>
+<pre><span class="lineno"><a href="#line_5946" id="line_5946"> 5946.</a></span><span class="count                ">     22</span><span>            the_function.name = anon;</span></pre>
 <pre><span class="lineno"><a href="#line_5947" id="line_5947"> 5947.</a></span><span class="count                ">   2037</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_5948" id="line_5948"> 5948.</a></span><span class="count                ">   2037</span><span>        if (</span></pre>
 <pre><span class="lineno"><a href="#line_5949" id="line_5949"> 5949.</a></span><span class="count                ">   2037</span><span>            !mode_fart</span></pre>

@@ -5904,7 +5904,7 @@ function jslint_phase3_parse(state) {
 
     function prefix_function(the_function, mode_fart, mode_infix_fart) {
         let name = the_function?.name;
-        if (!the_function) {
+        if (!mode_fart && !the_function) {
             the_function = token_now;
 
 // A function statement must have a name that will be in the parent's scope.
