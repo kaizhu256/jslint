@@ -5143,7 +5143,9 @@ function jslint_phase3_parse(state) {
         if (enroll) {
             name_enroll(name, role, readonly);
         }
-        name.arity = role;
+        if (role === "variable") {
+            name.arity = "variable";
+        }
         name.init = init;
     }
 
@@ -5904,6 +5906,8 @@ function jslint_phase3_parse(state) {
 
     function prefix_function(the_function, mode_fart, mode_infix_fart) {
         let name;
+        let role = "function";
+        noop(role);
         if (!mode_fart) {
             name = the_function?.name;
             if (!the_function) {
@@ -5923,6 +5927,7 @@ function jslint_phase3_parse(state) {
                     name = token_nxt;
                     the_function.name = name;
                     name.calls = empty();
+                    role = "variable";
                     name_enroll(name, "variable", true);
 
 // PR-331 - Bugfix - Fixes issue #272 - function hoisting not allowed.
