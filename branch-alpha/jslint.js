@@ -4366,7 +4366,7 @@ function jslint_phase3_parse(state) {
             right = parse_expression(20 - 1);
             if (id === "=" && left.arity === "variable") {
                 the_token.name_list = [];       // 1. name_list for "aa = ..."
-                name_push(
+                name_list_push(
                     the_token.name_list,        // name_list
                     left,               // name
                     undefined,          // enroll
@@ -4826,7 +4826,7 @@ function jslint_phase3_parse(state) {
             if (earlier.role === "variable") {
 
 // test_cause:
-// ["let ignore;function aa(ignore){}", "enroll", "redefinition_a_b", "1", 24]
+// ["let ignore;(ignore)=>0", "enroll", "redefinition_a_b", "1", 13]
 
                 warn("redefinition_a_b", name, id, earlier.line);
             }
@@ -5114,9 +5114,9 @@ function jslint_phase3_parse(state) {
         return the_symbol;
     }
 
-// PR-xxx - Unify name_list.push() logic with helper-function name_push().
+// PR-xxx - Unify name_list.push() logic with helper-function name_list_push().
 
-    function name_push(name_list, name, enroll, role, readonly, init) {
+    function name_list_push(name_list, name, enroll, role, readonly, init) {
 
 // This function will:
 // 1. Push variable or function-parameter <name> to <name_list>.
@@ -5871,11 +5871,11 @@ function jslint_phase3_parse(state) {
                 }
                 token_nxt.label = name;
                 name = token_nxt;
-                name_push(sub_list, name, enroll, role, readonly, true);
+                name_list_push(sub_list, name, enroll, role, readonly, true);
                 advance_and_signature_push(token_nxt.id);
                 return;
             }
-            name_push(sub_list, name, enroll, role, readonly, true);
+            name_list_push(sub_list, name, enroll, role, readonly, true);
             if (token_nxt.id === "=") {
                 optional = the_function_toplevel && token_now;
                 advance_and_signature_push("=");
@@ -6142,7 +6142,7 @@ function jslint_phase3_parse(state) {
             the_function.name = "anonymous";
             the_function.parameter_count = 1;
             the_function.signature = token_prv.id;
-            name_push(
+            name_list_push(
                 the_function.name_list, // name_list
                 token_prv,              // name
                 enroll,                 // enroll
@@ -6936,7 +6936,7 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", name);
                 }
-                name_push(
+                name_list_push(
                     the_import.name_list,       // name_list
                     name,               // name
                     enroll,             // enroll
@@ -6969,7 +6969,7 @@ function jslint_phase3_parse(state) {
 
                             warn("unexpected_a", name);
                         }
-                        name_push(
+                        name_list_push(
                             the_import.name_list,       // name_list
                             name,       // name
                             enroll,     // enroll
@@ -7300,7 +7300,7 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id !== "ignore") {
                     ignored = undefined;
                     the_catch.name = token_nxt;
-                    name_push(
+                    name_list_push(
                         [],             // name_list
                         token_nxt,      // name
                         enroll,         // enroll
@@ -7455,7 +7455,7 @@ function jslint_phase3_parse(state) {
                     name.expression = parse_expression(0);
                     name_init = true;
                 }
-                name_push(
+                name_list_push(
                     the_variable.name_list,     // name_list
                     name,               // name
                     enroll,             // enroll
