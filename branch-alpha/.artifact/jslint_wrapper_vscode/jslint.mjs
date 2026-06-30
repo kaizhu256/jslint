@@ -5942,6 +5942,22 @@ function jslint_phase3_parse(state) {
             }
         }
 
+// PR-384 - Relax warning "function_in_loop".
+//
+//         if (functionage.loop > 0) {
+
+// // test_cause:
+// // ["while(0){aa.map(()=>0);}", "parse_fart", "function_in_loop", "=>", 19]
+//
+//             warn("function_in_loop", the_function);
+//         }
+
+// Push the current function context and establish a new one.
+
+        function_list.push(the_function);
+        function_stack.push(functionage);
+        functionage = the_function;
+
 // Give the function properties for storing its names and for observing the
 // depth of loops and switches.
 
@@ -5958,10 +5974,8 @@ function jslint_phase3_parse(state) {
         if (mode_fart) {
             the_function.arity = "binary";
             the_function.name = anon;
-        }
-        if (
-            !mode_fart
-            && the_function.arity !== "statement"
+        } else if (
+            the_function.arity !== "statement"
             && typeof name === "object"
         ) {
 
@@ -5974,22 +5988,6 @@ function jslint_phase3_parse(state) {
             name.init = true;
             name.used = 1;
         }
-
-// PR-384 - Relax warning "function_in_loop".
-//
-//         if (functionage.loop > 0) {
-
-// // test_cause:
-// // ["while(0){aa.map(()=>0);}", "parse_fart", "function_in_loop", "=>", 19]
-//
-//             warn("function_in_loop", the_function);
-//         }
-
-// Push the current function context and establish a new one.
-
-        function_list.push(the_function);
-        function_stack.push(functionage);
-        functionage = the_function;
 
 // Parse the parameter list.
 
