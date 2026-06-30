@@ -1000,15 +1000,15 @@ body {
 <pre><span class="lineno"><a href="#line_835" id="line_835">  835.</a></span><span class="count                ">    181</span><span>    };</span></pre>
 <pre><span class="lineno"><a href="#line_836" id="line_836">  836.</a></span><span class="count                ">    181</span><span>}</span></pre>
 <pre><span class="lineno"><a href="#line_837" id="line_837">  837.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_838" id="line_838">  838.</a></span><span class="count                ">  17326</span><span>function htmlEscape(str) {</span></pre>
-<pre><span class="lineno"><a href="#line_839" id="line_839">  839.</a></span><span class="count                ">  17326</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_840" id="line_840">  840.</a></span><span class="count                ">  17326</span><span>// This function will make &lt;str&gt; html-safe by escaping &amp; &lt; &gt;.</span></pre>
-<pre><span class="lineno"><a href="#line_841" id="line_841">  841.</a></span><span class="count                ">  17326</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_842" id="line_842">  842.</a></span><span class="count                ">  17326</span><span>    return String(str)</span></pre>
-<pre><span class="lineno"><a href="#line_843" id="line_843">  843.</a></span><span class="count                ">  17326</span><span>        .replace((/&amp;/g), "&amp;amp;")</span></pre>
-<pre><span class="lineno"><a href="#line_844" id="line_844">  844.</a></span><span class="count                ">  17326</span><span>        .replace((/&lt;/g), "&amp;lt;")</span></pre>
-<pre><span class="lineno"><a href="#line_845" id="line_845">  845.</a></span><span class="count                ">  17326</span><span>        .replace((/&gt;/g), "&amp;gt;");</span></pre>
-<pre><span class="lineno"><a href="#line_846" id="line_846">  846.</a></span><span class="count                ">  17326</span><span>}</span></pre>
+<pre><span class="lineno"><a href="#line_838" id="line_838">  838.</a></span><span class="count                ">  17328</span><span>function htmlEscape(str) {</span></pre>
+<pre><span class="lineno"><a href="#line_839" id="line_839">  839.</a></span><span class="count                ">  17328</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_840" id="line_840">  840.</a></span><span class="count                ">  17328</span><span>// This function will make &lt;str&gt; html-safe by escaping &amp; &lt; &gt;.</span></pre>
+<pre><span class="lineno"><a href="#line_841" id="line_841">  841.</a></span><span class="count                ">  17328</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_842" id="line_842">  842.</a></span><span class="count                ">  17328</span><span>    return String(str)</span></pre>
+<pre><span class="lineno"><a href="#line_843" id="line_843">  843.</a></span><span class="count                ">  17328</span><span>        .replace((/&amp;/g), "&amp;amp;")</span></pre>
+<pre><span class="lineno"><a href="#line_844" id="line_844">  844.</a></span><span class="count                ">  17328</span><span>        .replace((/&lt;/g), "&amp;lt;")</span></pre>
+<pre><span class="lineno"><a href="#line_845" id="line_845">  845.</a></span><span class="count                ">  17328</span><span>        .replace((/&gt;/g), "&amp;gt;");</span></pre>
+<pre><span class="lineno"><a href="#line_846" id="line_846">  846.</a></span><span class="count                ">  17328</span><span>}</span></pre>
 <pre><span class="lineno"><a href="#line_847" id="line_847">  847.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_848" id="line_848">  848.</a></span><span class="count                ">    714</span><span>function jslint(</span></pre>
 <pre><span class="lineno"><a href="#line_849" id="line_849">  849.</a></span><span class="count                ">    714</span><span>    source = "",                // A text to analyze.</span></pre>
@@ -5227,7 +5227,7 @@ body {
 <pre><span class="lineno"><a href="#line_5062" id="line_5062"> 5062.</a></span><span class="count                ">  10934</span><span>        function_stack.forEach(function ({</span></pre>
 <pre><span class="lineno"><a href="#line_5063" id="line_5063"> 5063.</a></span><span class="count                ">  10934</span><span>            context</span></pre>
 <pre><span class="lineno"><a href="#line_5064" id="line_5064"> 5064.</a></span><span class="count                ">  10934</span><span>        }) {</span></pre>
-<pre><span class="lineno"><a href="#line_5065" id="line_5065"> 5065.</a></span><span class="count                ">  10777</span><span>            earlier = context[id] || earlier;</span></pre>
+<pre><span class="lineno"><a href="#line_5065" id="line_5065"> 5065.</a></span><span class="count                ">  10782</span><span>            earlier = context[id] || earlier;</span></pre>
 <pre><span class="lineno"><a href="#line_5066" id="line_5066"> 5066.</a></span><span class="count                ">  10934</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_5067" id="line_5067"> 5067.</a></span><span class="count                ">   6458</span><span>        if (earlier &amp;&amp; id === "ignore") {</span></pre>
 <pre><span class="lineno"><a href="#line_5068" id="line_5068"> 5068.</a></span><span class="count                ">      4</span><span>            if (earlier.role === "variable") {</span></pre>
@@ -5281,7 +5281,7 @@ body {
 <pre><span class="lineno"><a href="#line_5116" id="line_5116"> 5116.</a></span><span class="count                ">    674</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5117" id="line_5117"> 5117.</a></span><span class="count                ">    674</span><span>// PR-xxx - Unify name_list.push() logic with helper-function name_push().</span></pre>
 <pre><span class="lineno"><a href="#line_5118" id="line_5118"> 5118.</a></span><span class="count                ">    674</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5119" id="line_5119"> 5119.</a></span><span class="count                ">   8217</span><span>    function name_push(name_list, name, name_enroll, role, readonly, init) {</span></pre>
+<pre><span class="lineno"><a href="#line_5119" id="line_5119"> 5119.</a></span><span class="count                ">   8217</span><span>    function name_push(name_list, name, enroll, role, readonly, init) {</span></pre>
 <pre><span class="lineno"><a href="#line_5120" id="line_5120"> 5120.</a></span><span class="count                ">   8217</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5121" id="line_5121"> 5121.</a></span><span class="count                ">   8217</span><span>// This function will:</span></pre>
 <pre><span class="lineno"><a href="#line_5122" id="line_5122"> 5122.</a></span><span class="count                ">   8217</span><span>// 1. Push variable or function-parameter &lt;name&gt; to &lt;name_list&gt;.</span></pre>
@@ -5290,7 +5290,7 @@ body {
 <pre><span class="lineno"><a href="#line_5125" id="line_5125"> 5125.</a></span><span class="count                ">   8217</span><span>//    function-parameter.</span></pre>
 <pre><span class="lineno"><a href="#line_5126" id="line_5126"> 5126.</a></span><span class="count                ">   8217</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5127" id="line_5127"> 5127.</a></span><span class="count                ">   8217</span><span>        name_list.push(name);</span></pre>
-<pre><span class="lineno"><a href="#line_5128" id="line_5128"> 5128.</a></span><span class="count                ">   5349</span><span>        if (name_enroll) {</span></pre>
+<pre><span class="lineno"><a href="#line_5128" id="line_5128"> 5128.</a></span><span class="count                ">   5349</span><span>        if (enroll) {</span></pre>
 <pre><span class="lineno"><a href="#line_5129" id="line_5129"> 5129.</a></span><span class="count                ">   5349</span><span>            name_enroll(name, role, readonly);</span></pre>
 <pre><span class="lineno"><a href="#line_5130" id="line_5130"> 5130.</a></span><span class="count                ">   5349</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_5131" id="line_5131"> 5131.</a></span><span class="count                ">   8217</span><span>        name.arity = role;</span></pre>
@@ -8128,7 +8128,7 @@ body {
 <pre><span class="lineno"><a href="#line_7963" id="line_7963"> 7963.</a></span><span class="count                ">  31626</span><span>// If it isn't local, search all the other contexts. If there are name</span></pre>
 <pre><span class="lineno"><a href="#line_7964" id="line_7964"> 7964.</a></span><span class="count                ">  31626</span><span>// collisions, take the most recent.</span></pre>
 <pre><span class="lineno"><a href="#line_7965" id="line_7965"> 7965.</a></span><span class="count                ">  31626</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7966" id="line_7966"> 7966.</a></span><span class="count                ">  24535</span><span>        if (the_variable &amp;&amp; the_variable.role === "label") {</span></pre>
+<pre><span class="lineno"><a href="#line_7966" id="line_7966"> 7966.</a></span><span class="count                ">  24530</span><span>        if (the_variable &amp;&amp; the_variable.role === "label") {</span></pre>
 <pre><span class="lineno"><a href="#line_7967" id="line_7967"> 7967.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7968" id="line_7968"> 7968.</a></span><span class="count                ">      1</span><span>// test_cause:</span></pre>
 <pre><span class="lineno"><a href="#line_7969" id="line_7969"> 7969.</a></span><span class="count                ">      1</span><span>// ["aa:while(0){aa;}", "name_lookup", "label_a", "aa", 13]</span></pre>
@@ -8137,52 +8137,52 @@ body {
 <pre><span class="lineno"><a href="#line_7972" id="line_7972"> 7972.</a></span><span class="count                ">      1</span><span>            return the_variable;</span></pre>
 <pre><span class="lineno"><a href="#line_7973" id="line_7973"> 7973.</a></span><span class="count                ">  31624</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_7974" id="line_7974"> 7974.</a></span><span class="count                ">  31624</span><span>        if (!the_variable) {</span></pre>
-<pre><span class="lineno"><a href="#line_7975" id="line_7975"> 7975.</a></span><span class="count                ">  15310</span><span>            function_stack.forEach(function ({</span></pre>
-<pre><span class="lineno"><a href="#line_7976" id="line_7976"> 7976.</a></span><span class="count                ">  15310</span><span>                context</span></pre>
-<pre><span class="lineno"><a href="#line_7977" id="line_7977"> 7977.</a></span><span class="count                ">  15310</span><span>            }) {</span></pre>
-<pre><span class="lineno"><a href="#line_7978" id="line_7978"> 7978.</a></span><span class="count                ">   7090</span><span>                if (context[id] &amp;&amp; context[id].role !== "label") {</span></pre>
-<pre><span class="lineno"><a href="#line_7979" id="line_7979"> 7979.</a></span><span class="count                ">   7090</span><span>                    the_variable = context[id];</span></pre>
-<pre><span class="lineno"><a href="#line_7980" id="line_7980"> 7980.</a></span><span class="count                ">   7090</span><span>                }</span></pre>
-<pre><span class="lineno"><a href="#line_7981" id="line_7981"> 7981.</a></span><span class="count                ">  15310</span><span>            });</span></pre>
-<pre><span class="lineno"><a href="#line_7982" id="line_7982"> 7982.</a></span><span class="count                ">   7090</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7983" id="line_7983"> 7983.</a></span><span class="count                ">   7090</span><span>// If it isn't in any of those either, perhaps it is a predefined global.</span></pre>
-<pre><span class="lineno"><a href="#line_7984" id="line_7984"> 7984.</a></span><span class="count                ">   7090</span><span>// If so, add it to the global context.</span></pre>
-<pre><span class="lineno"><a href="#line_7985" id="line_7985"> 7985.</a></span><span class="count                ">   7090</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7986" id="line_7986"> 7986.</a></span><span class="count                ">   7090</span><span>            if (!the_variable &amp;&amp; global_dict[id] === undefined) {</span></pre>
-<pre><span class="lineno"><a href="#line_7987" id="line_7987"> 7987.</a></span><span class="count                ">   7090</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7988" id="line_7988"> 7988.</a></span><span class="count                ">   7090</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_7989" id="line_7989"> 7989.</a></span><span class="count                ">   7090</span><span>// ["aa", "name_lookup", "undeclared_a", "aa", 1]</span></pre>
-<pre><span class="lineno"><a href="#line_7990" id="line_7990"> 7990.</a></span><span class="count                ">   7090</span><span>// ["class aa{}", "name_lookup", "undeclared_a", "aa", 7]</span></pre>
-<pre><span class="lineno"><a href="#line_7991" id="line_7991"> 7991.</a></span><span class="count                ">   7090</span><span>// ["</span></pre>
-<pre><span class="lineno"><a href="#line_7992" id="line_7992"> 7992.</a></span><span class="count                ">   7090</span><span>// let aa=0;try{aa();}catch(bb){bb();}bb();</span></pre>
-<pre><span class="lineno"><a href="#line_7993" id="line_7993"> 7993.</a></span><span class="count                ">   7090</span><span>// ", "name_lookup", "undeclared_a", "bb", 36]</span></pre>
-<pre><span class="lineno"><a href="#line_7994" id="line_7994"> 7994.</a></span><span class="count                ">   7090</span><span>// ["</span></pre>
-<pre><span class="lineno"><a href="#line_7995" id="line_7995"> 7995.</a></span><span class="count                ">   7090</span><span>// let aa=0;try{aa();}catch(ignore){bb();}</span></pre>
-<pre><span class="lineno"><a href="#line_7996" id="line_7996"> 7996.</a></span><span class="count                ">   7090</span><span>// ", "name_lookup", "undeclared_a", "bb", 34]</span></pre>
-<pre><span class="lineno"><a href="#line_7997" id="line_7997"> 7997.</a></span><span class="count                ">   7090</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7998" id="line_7998"> 7998.</a></span><span class="count                ">   7090</span><span>                warn("undeclared_a", thing);</span></pre>
-<pre><span class="lineno"><a href="#line_7999" id="line_7999"> 7999.</a></span><span class="count                ">   7090</span><span>                return;</span></pre>
-<pre><span class="lineno"><a href="#line_8000" id="line_8000"> 8000.</a></span><span class="count                ">   7090</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_8001" id="line_8001"> 8001.</a></span><span class="count                ">   7090</span><span>            if (!the_variable) {</span></pre>
-<pre><span class="lineno"><a href="#line_8002" id="line_8002"> 8002.</a></span><span class="count                ">   7090</span><span>                the_variable = {</span></pre>
-<pre><span class="lineno"><a href="#line_8003" id="line_8003"> 8003.</a></span><span class="count                ">   7090</span><span>                    dead: false,</span></pre>
-<pre><span class="lineno"><a href="#line_8004" id="line_8004"> 8004.</a></span><span class="count                ">   7090</span><span>                    id,</span></pre>
-<pre><span class="lineno"><a href="#line_8005" id="line_8005"> 8005.</a></span><span class="count                ">   7090</span><span>                    init: true,</span></pre>
-<pre><span class="lineno"><a href="#line_8006" id="line_8006"> 8006.</a></span><span class="count                ">   7090</span><span>                    parent: token_global,</span></pre>
-<pre><span class="lineno"><a href="#line_8007" id="line_8007"> 8007.</a></span><span class="count                ">   7090</span><span>                    readonly: true,</span></pre>
-<pre><span class="lineno"><a href="#line_8008" id="line_8008"> 8008.</a></span><span class="count                ">   7090</span><span>                    role: "variable",</span></pre>
-<pre><span class="lineno"><a href="#line_8009" id="line_8009"> 8009.</a></span><span class="count                ">   7090</span><span>                    used: 0</span></pre>
-<pre><span class="lineno"><a href="#line_8010" id="line_8010"> 8010.</a></span><span class="count                ">   7090</span><span>                };</span></pre>
-<pre><span class="lineno"><a href="#line_8011" id="line_8011"> 8011.</a></span><span class="count                ">   7090</span><span>                token_global.context[id] = the_variable;</span></pre>
-<pre><span class="lineno"><a href="#line_8012" id="line_8012"> 8012.</a></span><span class="count                ">   7090</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_8013" id="line_8013"> 8013.</a></span><span class="count                ">   7090</span><span>            the_variable.closure = true;</span></pre>
-<pre><span class="lineno"><a href="#line_8014" id="line_8014"> 8014.</a></span><span class="count                ">   7090</span><span>            functionage.context[id] = the_variable;</span></pre>
+<pre><span class="lineno"><a href="#line_7975" id="line_7975"> 7975.</a></span><span class="count                ">  15320</span><span>            function_stack.forEach(function ({</span></pre>
+<pre><span class="lineno"><a href="#line_7976" id="line_7976"> 7976.</a></span><span class="count                ">  15320</span><span>                context</span></pre>
+<pre><span class="lineno"><a href="#line_7977" id="line_7977"> 7977.</a></span><span class="count                ">  15320</span><span>            }) {</span></pre>
+<pre><span class="lineno"><a href="#line_7978" id="line_7978"> 7978.</a></span><span class="count                ">   7095</span><span>                if (context[id] &amp;&amp; context[id].role !== "label") {</span></pre>
+<pre><span class="lineno"><a href="#line_7979" id="line_7979"> 7979.</a></span><span class="count                ">   7095</span><span>                    the_variable = context[id];</span></pre>
+<pre><span class="lineno"><a href="#line_7980" id="line_7980"> 7980.</a></span><span class="count                ">   7095</span><span>                }</span></pre>
+<pre><span class="lineno"><a href="#line_7981" id="line_7981"> 7981.</a></span><span class="count                ">  15320</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_7982" id="line_7982"> 7982.</a></span><span class="count                ">   7095</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_7983" id="line_7983"> 7983.</a></span><span class="count                ">   7095</span><span>// If it isn't in any of those either, perhaps it is a predefined global.</span></pre>
+<pre><span class="lineno"><a href="#line_7984" id="line_7984"> 7984.</a></span><span class="count                ">   7095</span><span>// If so, add it to the global context.</span></pre>
+<pre><span class="lineno"><a href="#line_7985" id="line_7985"> 7985.</a></span><span class="count                ">   7095</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_7986" id="line_7986"> 7986.</a></span><span class="count                ">   7095</span><span>            if (!the_variable &amp;&amp; global_dict[id] === undefined) {</span></pre>
+<pre><span class="lineno"><a href="#line_7987" id="line_7987"> 7987.</a></span><span class="count                ">   7095</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_7988" id="line_7988"> 7988.</a></span><span class="count                ">   7095</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_7989" id="line_7989"> 7989.</a></span><span class="count                ">   7095</span><span>// ["aa", "name_lookup", "undeclared_a", "aa", 1]</span></pre>
+<pre><span class="lineno"><a href="#line_7990" id="line_7990"> 7990.</a></span><span class="count                ">   7095</span><span>// ["class aa{}", "name_lookup", "undeclared_a", "aa", 7]</span></pre>
+<pre><span class="lineno"><a href="#line_7991" id="line_7991"> 7991.</a></span><span class="count                ">   7095</span><span>// ["</span></pre>
+<pre><span class="lineno"><a href="#line_7992" id="line_7992"> 7992.</a></span><span class="count                ">   7095</span><span>// let aa=0;try{aa();}catch(bb){bb();}bb();</span></pre>
+<pre><span class="lineno"><a href="#line_7993" id="line_7993"> 7993.</a></span><span class="count                ">   7095</span><span>// ", "name_lookup", "undeclared_a", "bb", 36]</span></pre>
+<pre><span class="lineno"><a href="#line_7994" id="line_7994"> 7994.</a></span><span class="count                ">   7095</span><span>// ["</span></pre>
+<pre><span class="lineno"><a href="#line_7995" id="line_7995"> 7995.</a></span><span class="count                ">   7095</span><span>// let aa=0;try{aa();}catch(ignore){bb();}</span></pre>
+<pre><span class="lineno"><a href="#line_7996" id="line_7996"> 7996.</a></span><span class="count                ">   7095</span><span>// ", "name_lookup", "undeclared_a", "bb", 34]</span></pre>
+<pre><span class="lineno"><a href="#line_7997" id="line_7997"> 7997.</a></span><span class="count                ">   7095</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_7998" id="line_7998"> 7998.</a></span><span class="count                ">   7095</span><span>                warn("undeclared_a", thing);</span></pre>
+<pre><span class="lineno"><a href="#line_7999" id="line_7999"> 7999.</a></span><span class="count                ">   7095</span><span>                return;</span></pre>
+<pre><span class="lineno"><a href="#line_8000" id="line_8000"> 8000.</a></span><span class="count                ">   7095</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_8001" id="line_8001"> 8001.</a></span><span class="count                ">   7095</span><span>            if (!the_variable) {</span></pre>
+<pre><span class="lineno"><a href="#line_8002" id="line_8002"> 8002.</a></span><span class="count                ">   7095</span><span>                the_variable = {</span></pre>
+<pre><span class="lineno"><a href="#line_8003" id="line_8003"> 8003.</a></span><span class="count                ">   7095</span><span>                    dead: false,</span></pre>
+<pre><span class="lineno"><a href="#line_8004" id="line_8004"> 8004.</a></span><span class="count                ">   7095</span><span>                    id,</span></pre>
+<pre><span class="lineno"><a href="#line_8005" id="line_8005"> 8005.</a></span><span class="count                ">   7095</span><span>                    init: true,</span></pre>
+<pre><span class="lineno"><a href="#line_8006" id="line_8006"> 8006.</a></span><span class="count                ">   7095</span><span>                    parent: token_global,</span></pre>
+<pre><span class="lineno"><a href="#line_8007" id="line_8007"> 8007.</a></span><span class="count                ">   7095</span><span>                    readonly: true,</span></pre>
+<pre><span class="lineno"><a href="#line_8008" id="line_8008"> 8008.</a></span><span class="count                ">   7095</span><span>                    role: "variable",</span></pre>
+<pre><span class="lineno"><a href="#line_8009" id="line_8009"> 8009.</a></span><span class="count                ">   7095</span><span>                    used: 0</span></pre>
+<pre><span class="lineno"><a href="#line_8010" id="line_8010"> 8010.</a></span><span class="count                ">   7095</span><span>                };</span></pre>
+<pre><span class="lineno"><a href="#line_8011" id="line_8011"> 8011.</a></span><span class="count                ">   7095</span><span>                token_global.context[id] = the_variable;</span></pre>
+<pre><span class="lineno"><a href="#line_8012" id="line_8012"> 8012.</a></span><span class="count                ">   7095</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_8013" id="line_8013"> 8013.</a></span><span class="count                ">   7095</span><span>            the_variable.closure = true;</span></pre>
+<pre><span class="lineno"><a href="#line_8014" id="line_8014"> 8014.</a></span><span class="count                ">   7095</span><span>            functionage.context[id] = the_variable;</span></pre>
 <pre><span class="lineno"><a href="#line_8015" id="line_8015"> 8015.</a></span><span class="count                ">  31480</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_8016" id="line_8016"> 8016.</a></span><span class="count                ">  31480</span><span>        if (</span></pre>
 <pre><span class="lineno"><a href="#line_8017" id="line_8017"> 8017.</a></span><span class="count                ">  31480</span><span>            (</span></pre>
 <pre><span class="lineno"><a href="#line_8018" id="line_8018"> 8018.</a></span><span class="count                ">  31480</span><span>                the_variable.calls === undefined</span></pre>
 <pre><span class="lineno"><a href="#line_8019" id="line_8019"> 8019.</a></span><span class="count                ">  31480</span><span>                || functionage.name === undefined</span></pre>
-<pre><span class="lineno"><a href="#line_8020" id="line_8020"> 8020.</a></span><span class="count                ">   4374</span><span>                || the_variable.calls[functionage.name.id] === undefined</span></pre>
+<pre><span class="lineno"><a href="#line_8020" id="line_8020"> 8020.</a></span><span class="count                ">   4379</span><span>                || the_variable.calls[functionage.name.id] === undefined</span></pre>
 <pre><span class="lineno"><a href="#line_8021" id="line_8021"> 8021.</a></span><span class="count                ">  31626</span><span>            )</span></pre>
 <pre><span class="lineno"><a href="#line_8022" id="line_8022"> 8022.</a></span><span class="count                ">  31290</span><span>            &amp;&amp; the_variable.dead</span></pre>
 <pre><span class="lineno"><a href="#line_8023" id="line_8023"> 8023.</a></span><span class="count                ">     13</span><span>        ) {</span></pre>
@@ -8919,25 +8919,25 @@ body {
 <pre><span class="lineno"><a href="#line_8754" id="line_8754"> 8754.</a></span><span class="count                ">  10330</span><span>        if (</span></pre>
 <pre><span class="lineno"><a href="#line_8755" id="line_8755"> 8755.</a></span><span class="count                ">  10330</span><span>            left.identifier</span></pre>
 <pre><span class="lineno"><a href="#line_8756" id="line_8756"> 8756.</a></span><span class="count                ">   6671</span><span>            &amp;&amp; functionage.context[left.id] === undefined</span></pre>
-<pre><span class="lineno"><a href="#line_8757" id="line_8757"> 8757.</a></span><span class="count                ">   3165</span><span>            &amp;&amp; typeof functionage.name === "object"</span></pre>
-<pre><span class="lineno"><a href="#line_8758" id="line_8758"> 8758.</a></span><span class="count                ">   2480</span><span>        ) {</span></pre>
-<pre><span class="lineno"><a href="#line_8759" id="line_8759"> 8759.</a></span><span class="count                ">   2480</span><span>            parent = functionage.name.parent;</span></pre>
-<pre><span class="lineno"><a href="#line_8760" id="line_8760"> 8760.</a></span><span class="count                ">   2480</span><span>            if (parent) {</span></pre>
-<pre><span class="lineno"><a href="#line_8761" id="line_8761"> 8761.</a></span><span class="count                ">   2480</span><span>                left_variable = parent.context[left.id];</span></pre>
-<pre><span class="lineno"><a href="#line_8762" id="line_8762"> 8762.</a></span><span class="count                ">   2480</span><span>                if (</span></pre>
-<pre><span class="lineno"><a href="#line_8763" id="line_8763"> 8763.</a></span><span class="count                ">   2480</span><span>                    left_variable !== undefined</span></pre>
-<pre><span class="lineno"><a href="#line_8764" id="line_8764"> 8764.</a></span><span class="count                ">   2480</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8765" id="line_8765"> 8765.</a></span><span class="count                ">   2480</span><span>// Probably deadcode.</span></pre>
-<pre><span class="lineno"><a href="#line_8766" id="line_8766"> 8766.</a></span><span class="count                ">   2480</span><span>// &amp;&amp; left_variable.dead</span></pre>
-<pre><span class="lineno"><a href="#line_8767" id="line_8767"> 8767.</a></span><span class="count                ">   2480</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8768" id="line_8768"> 8768.</a></span><span class="count                ">   2480</span><span>                    &amp;&amp; left_variable.parent === parent</span></pre>
-<pre><span class="lineno"><a href="#line_8769" id="line_8769"> 8769.</a></span><span class="count                ">   2480</span><span>                    &amp;&amp; left_variable.calls !== undefined</span></pre>
-<pre><span class="lineno"><a href="#line_8770" id="line_8770"> 8770.</a></span><span class="count                ">   2480</span><span>                    &amp;&amp; left_variable.calls[functionage.name.id] !== undefined</span></pre>
-<pre><span class="lineno"><a href="#line_8771" id="line_8771"> 8771.</a></span><span class="count                ">   2480</span><span>                ) {</span></pre>
-<pre><span class="lineno"><a href="#line_8772" id="line_8772"> 8772.</a></span><span class="count                ">   2480</span><span>                    left_variable.dead = false;</span></pre>
-<pre><span class="lineno"><a href="#line_8773" id="line_8773"> 8773.</a></span><span class="count                ">   2480</span><span>                }</span></pre>
-<pre><span class="lineno"><a href="#line_8774" id="line_8774"> 8774.</a></span><span class="count                ">   2480</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_8775" id="line_8775"> 8775.</a></span><span class="count                ">   2480</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_8757" id="line_8757"> 8757.</a></span><span class="count                ">   3170</span><span>            &amp;&amp; typeof functionage.name === "object"</span></pre>
+<pre><span class="lineno"><a href="#line_8758" id="line_8758"> 8758.</a></span><span class="count                ">   2485</span><span>        ) {</span></pre>
+<pre><span class="lineno"><a href="#line_8759" id="line_8759"> 8759.</a></span><span class="count                ">   2485</span><span>            parent = functionage.name.parent;</span></pre>
+<pre><span class="lineno"><a href="#line_8760" id="line_8760"> 8760.</a></span><span class="count                ">   2485</span><span>            if (parent) {</span></pre>
+<pre><span class="lineno"><a href="#line_8761" id="line_8761"> 8761.</a></span><span class="count                ">   2485</span><span>                left_variable = parent.context[left.id];</span></pre>
+<pre><span class="lineno"><a href="#line_8762" id="line_8762"> 8762.</a></span><span class="count                ">   2485</span><span>                if (</span></pre>
+<pre><span class="lineno"><a href="#line_8763" id="line_8763"> 8763.</a></span><span class="count                ">   2485</span><span>                    left_variable !== undefined</span></pre>
+<pre><span class="lineno"><a href="#line_8764" id="line_8764"> 8764.</a></span><span class="count                ">   2485</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_8765" id="line_8765"> 8765.</a></span><span class="count                ">   2485</span><span>// Probably deadcode.</span></pre>
+<pre><span class="lineno"><a href="#line_8766" id="line_8766"> 8766.</a></span><span class="count                ">   2485</span><span>// &amp;&amp; left_variable.dead</span></pre>
+<pre><span class="lineno"><a href="#line_8767" id="line_8767"> 8767.</a></span><span class="count                ">   2485</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_8768" id="line_8768"> 8768.</a></span><span class="count                ">   2485</span><span>                    &amp;&amp; left_variable.parent === parent</span></pre>
+<pre><span class="lineno"><a href="#line_8769" id="line_8769"> 8769.</a></span><span class="count                ">   2485</span><span>                    &amp;&amp; left_variable.calls !== undefined</span></pre>
+<pre><span class="lineno"><a href="#line_8770" id="line_8770"> 8770.</a></span><span class="count                ">   2485</span><span>                    &amp;&amp; left_variable.calls[functionage.name.id] !== undefined</span></pre>
+<pre><span class="lineno"><a href="#line_8771" id="line_8771"> 8771.</a></span><span class="count                ">   2485</span><span>                ) {</span></pre>
+<pre><span class="lineno"><a href="#line_8772" id="line_8772"> 8772.</a></span><span class="count                ">   2485</span><span>                    left_variable.dead = false;</span></pre>
+<pre><span class="lineno"><a href="#line_8773" id="line_8773"> 8773.</a></span><span class="count                ">   2485</span><span>                }</span></pre>
+<pre><span class="lineno"><a href="#line_8774" id="line_8774"> 8774.</a></span><span class="count                ">   2485</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_8775" id="line_8775"> 8775.</a></span><span class="count                ">   2485</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_8776" id="line_8776"> 8776.</a></span><span class="count                ">  10330</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_8777" id="line_8777"> 8777.</a></span><span class="count                ">    564</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8778" id="line_8778"> 8778.</a></span><span class="count                ">      1</span><span>    function pre_b_noteq(thing) {</span></pre>
@@ -9304,9 +9304,9 @@ body {
 <pre><span class="lineno"><a href="#line_9139" id="line_9139"> 9139.</a></span><span class="count                ">  37468</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_9140" id="line_9140"> 9140.</a></span><span class="count                ">    219</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9141" id="line_9141"> 9141.</a></span><span class="count                ">   2075</span><span>    function delve(the_function) {</span></pre>
-<pre><span class="lineno"><a href="#line_9142" id="line_9142"> 9142.</a></span><span class="count                ">  13280</span><span>        Object.keys(the_function.context).forEach(function (id) {</span></pre>
-<pre><span class="lineno"><a href="#line_9143" id="line_9143"> 9143.</a></span><span class="count                ">  13280</span><span>            const name = the_function.context[id];</span></pre>
-<pre><span class="lineno"><a href="#line_9144" id="line_9144"> 9144.</a></span><span class="count                ">  13240</span><span>            if (id !== "ignore" &amp;&amp; name.parent === the_function) {</span></pre>
+<pre><span class="lineno"><a href="#line_9142" id="line_9142"> 9142.</a></span><span class="count                ">  13285</span><span>        Object.keys(the_function.context).forEach(function (id) {</span></pre>
+<pre><span class="lineno"><a href="#line_9143" id="line_9143"> 9143.</a></span><span class="count                ">  13285</span><span>            const name = the_function.context[id];</span></pre>
+<pre><span class="lineno"><a href="#line_9144" id="line_9144"> 9144.</a></span><span class="count                ">  13245</span><span>            if (id !== "ignore" &amp;&amp; name.parent === the_function) {</span></pre>
 <pre><span class="lineno"><a href="#line_9145" id="line_9145"> 9145.</a></span><span class="count                ">   6348</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9146" id="line_9146"> 9146.</a></span><span class="count                ">   6348</span><span>// test_cause:</span></pre>
 <pre><span class="lineno"><a href="#line_9147" id="line_9147"> 9147.</a></span><span class="count                ">   6348</span><span>// ["function aa(aa) {return aa;}", "delve", "id", "", 0]</span></pre>
@@ -9341,7 +9341,7 @@ body {
 <pre><span class="lineno"><a href="#line_9176" id="line_9176"> 9176.</a></span><span class="count                ">   6348</span><span>                    warn("uninitialized_a", name);</span></pre>
 <pre><span class="lineno"><a href="#line_9177" id="line_9177"> 9177.</a></span><span class="count                ">   6348</span><span>                }</span></pre>
 <pre><span class="lineno"><a href="#line_9178" id="line_9178"> 9178.</a></span><span class="count                ">   6348</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_9179" id="line_9179"> 9179.</a></span><span class="count                ">  13280</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_9179" id="line_9179"> 9179.</a></span><span class="count                ">  13285</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_9180" id="line_9180"> 9180.</a></span><span class="count                ">   2075</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_9181" id="line_9181"> 9181.</a></span><span class="count                ">    219</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9182" id="line_9182"> 9182.</a></span><span class="count                ">     25</span><span>    function expected_at(at) {</span></pre>
@@ -9986,17 +9986,17 @@ body {
 <pre><span class="lineno"><a href="#line_9821" id="line_9821"> 9821.</a></span><span class="count                ">   2277</span><span>    function detail(title, list) {</span></pre>
 <pre><span class="lineno"><a href="#line_9822" id="line_9822"> 9822.</a></span><span class="count                ">   2277</span><span>        return (</span></pre>
 <pre><span class="lineno"><a href="#line_9823" id="line_9823"> 9823.</a></span><span class="count                ">   2277</span><span>            (Array.isArray(list) &amp;&amp; list.length &gt; 0)</span></pre>
-<pre><span class="lineno"><a href="#line_9824" id="line_9824"> 9824.</a></span><span class="count                ">    781</span><span>            ? (</span></pre>
-<pre><span class="lineno"><a href="#line_9825" id="line_9825"> 9825.</a></span><span class="count                ">    781</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9826" id="line_9826"> 9826.</a></span><span class="count                ">    781</span><span>// Google Lighthouse Accessibility - &lt;dl&gt;'s do not contain only properly-ordered</span></pre>
-<pre><span class="lineno"><a href="#line_9827" id="line_9827"> 9827.</a></span><span class="count                ">    781</span><span>// &lt;dt&gt; and &lt;dd&gt; groups, &lt;script&gt;, &lt;template&gt; or &lt;div&gt; elements.</span></pre>
-<pre><span class="lineno"><a href="#line_9828" id="line_9828"> 9828.</a></span><span class="count                ">    781</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9829" id="line_9829"> 9829.</a></span><span class="count                ">    781</span><span>                "&lt;dl&gt;" +</span></pre>
-<pre><span class="lineno"><a href="#line_9830" id="line_9830"> 9830.</a></span><span class="count                ">    781</span><span>                "&lt;dt&gt;" + htmlEscape(title) + "&lt;/dt&gt;" +</span></pre>
-<pre><span class="lineno"><a href="#line_9831" id="line_9831"> 9831.</a></span><span class="count                ">    781</span><span>                "&lt;dd&gt;" + list.map(htmlEscape).join(", ") + "&lt;/dd&gt;" +</span></pre>
-<pre><span class="lineno"><a href="#line_9832" id="line_9832"> 9832.</a></span><span class="count                ">    781</span><span>                "&lt;/dl&gt;"</span></pre>
-<pre><span class="lineno"><a href="#line_9833" id="line_9833"> 9833.</a></span><span class="count                ">    781</span><span>            )</span></pre>
-<pre><span class="lineno"><a href="#line_9834" id="line_9834"> 9834.</a></span><span class="count                ">   1496</span><span>            : ""</span></pre>
+<pre><span class="lineno"><a href="#line_9824" id="line_9824"> 9824.</a></span><span class="count                ">    782</span><span>            ? (</span></pre>
+<pre><span class="lineno"><a href="#line_9825" id="line_9825"> 9825.</a></span><span class="count                ">    782</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_9826" id="line_9826"> 9826.</a></span><span class="count                ">    782</span><span>// Google Lighthouse Accessibility - &lt;dl&gt;'s do not contain only properly-ordered</span></pre>
+<pre><span class="lineno"><a href="#line_9827" id="line_9827"> 9827.</a></span><span class="count                ">    782</span><span>// &lt;dt&gt; and &lt;dd&gt; groups, &lt;script&gt;, &lt;template&gt; or &lt;div&gt; elements.</span></pre>
+<pre><span class="lineno"><a href="#line_9828" id="line_9828"> 9828.</a></span><span class="count                ">    782</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_9829" id="line_9829"> 9829.</a></span><span class="count                ">    782</span><span>                "&lt;dl&gt;" +</span></pre>
+<pre><span class="lineno"><a href="#line_9830" id="line_9830"> 9830.</a></span><span class="count                ">    782</span><span>                "&lt;dt&gt;" + htmlEscape(title) + "&lt;/dt&gt;" +</span></pre>
+<pre><span class="lineno"><a href="#line_9831" id="line_9831"> 9831.</a></span><span class="count                ">    782</span><span>                "&lt;dd&gt;" + list.map(htmlEscape).join(", ") + "&lt;/dd&gt;" +</span></pre>
+<pre><span class="lineno"><a href="#line_9832" id="line_9832"> 9832.</a></span><span class="count                ">    782</span><span>                "&lt;/dl&gt;"</span></pre>
+<pre><span class="lineno"><a href="#line_9833" id="line_9833"> 9833.</a></span><span class="count                ">    782</span><span>            )</span></pre>
+<pre><span class="lineno"><a href="#line_9834" id="line_9834"> 9834.</a></span><span class="count                ">   1495</span><span>            : ""</span></pre>
 <pre><span class="lineno"><a href="#line_9835" id="line_9835"> 9835.</a></span><span class="count                ">   2277</span><span>        );</span></pre>
 <pre><span class="lineno"><a href="#line_9836" id="line_9836"> 9836.</a></span><span class="count                ">   2277</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_9837" id="line_9837"> 9837.</a></span><span class="count                ">      6</span><span></span></pre>
@@ -10503,33 +10503,33 @@ body {
 <pre><span class="lineno"><a href="#line_10338" id="line_10338">10338.</a></span><span class="count                ">    445</span><span>            return id;</span></pre>
 <pre><span class="lineno"><a href="#line_10339" id="line_10339">10339.</a></span><span class="count                ">    445</span><span>        }).sort());</span></pre>
 <pre><span class="lineno"><a href="#line_10340" id="line_10340">10340.</a></span><span class="count                ">    324</span><span>        list.sort();</span></pre>
-<pre><span class="lineno"><a href="#line_10341" id="line_10341">10341.</a></span><span class="count                ">   2251</span><span>        html += detail("variable", list.filter(function (id) {</span></pre>
-<pre><span class="lineno"><a href="#line_10342" id="line_10342">10342.</a></span><span class="count                ">   2251</span><span>            return (</span></pre>
-<pre><span class="lineno"><a href="#line_10343" id="line_10343">10343.</a></span><span class="count                ">   2251</span><span>                context[id].role === "variable"</span></pre>
-<pre><span class="lineno"><a href="#line_10344" id="line_10344">10344.</a></span><span class="count                ">   1719</span><span>                &amp;&amp; context[id].parent === the_function</span></pre>
-<pre><span class="lineno"><a href="#line_10345" id="line_10345">10345.</a></span><span class="count                ">   2251</span><span>            );</span></pre>
-<pre><span class="lineno"><a href="#line_10346" id="line_10346">10346.</a></span><span class="count                ">   2251</span><span>        }));</span></pre>
-<pre><span class="lineno"><a href="#line_10347" id="line_10347">10347.</a></span><span class="count                ">   2251</span><span>        html += detail("exception", list.filter(function (id) {</span></pre>
-<pre><span class="lineno"><a href="#line_10348" id="line_10348">10348.</a></span><span class="count                ">   2251</span><span>            return context[id].role === "exception";</span></pre>
-<pre><span class="lineno"><a href="#line_10349" id="line_10349">10349.</a></span><span class="count                ">   2251</span><span>        }));</span></pre>
-<pre><span class="lineno"><a href="#line_10350" id="line_10350">10350.</a></span><span class="count                ">   2251</span><span>        html += detail("closure", list.filter(function (id) {</span></pre>
-<pre><span class="lineno"><a href="#line_10351" id="line_10351">10351.</a></span><span class="count                ">   2251</span><span>            return (</span></pre>
-<pre><span class="lineno"><a href="#line_10352" id="line_10352">10352.</a></span><span class="count                ">   2251</span><span>                context[id].closure === true</span></pre>
-<pre><span class="lineno"><a href="#line_10353" id="line_10353">10353.</a></span><span class="count                ">   1544</span><span>                &amp;&amp; context[id].parent === the_function</span></pre>
-<pre><span class="lineno"><a href="#line_10354" id="line_10354">10354.</a></span><span class="count                ">   2251</span><span>            );</span></pre>
-<pre><span class="lineno"><a href="#line_10355" id="line_10355">10355.</a></span><span class="count                ">   2251</span><span>        }));</span></pre>
-<pre><span class="lineno"><a href="#line_10356" id="line_10356">10356.</a></span><span class="count                ">   2251</span><span>        html += detail("outer", list.filter(function (id) {</span></pre>
-<pre><span class="lineno"><a href="#line_10357" id="line_10357">10357.</a></span><span class="count                ">   2251</span><span>            return (</span></pre>
-<pre><span class="lineno"><a href="#line_10358" id="line_10358">10358.</a></span><span class="count                ">   2251</span><span>                context[id].parent !== the_function</span></pre>
-<pre><span class="lineno"><a href="#line_10359" id="line_10359">10359.</a></span><span class="count                ">   1228</span><span>                &amp;&amp; context[id].parent.id !== "(global)"</span></pre>
-<pre><span class="lineno"><a href="#line_10360" id="line_10360">10360.</a></span><span class="count                ">   2251</span><span>            );</span></pre>
-<pre><span class="lineno"><a href="#line_10361" id="line_10361">10361.</a></span><span class="count                ">   2251</span><span>        }));</span></pre>
-<pre><span class="lineno"><a href="#line_10362" id="line_10362">10362.</a></span><span class="count                ">   2251</span><span>        html += detail(module, list.filter(function (id) {</span></pre>
-<pre><span class="lineno"><a href="#line_10363" id="line_10363">10363.</a></span><span class="count                ">   2251</span><span>            return context[id].parent.id === "(global)";</span></pre>
-<pre><span class="lineno"><a href="#line_10364" id="line_10364">10364.</a></span><span class="count                ">   2251</span><span>        }));</span></pre>
-<pre><span class="lineno"><a href="#line_10365" id="line_10365">10365.</a></span><span class="count                ">   2251</span><span>        html += detail("label", list.filter(function (id) {</span></pre>
-<pre><span class="lineno"><a href="#line_10366" id="line_10366">10366.</a></span><span class="count                ">   2251</span><span>            return context[id].role === "label";</span></pre>
-<pre><span class="lineno"><a href="#line_10367" id="line_10367">10367.</a></span><span class="count                ">   2251</span><span>        }));</span></pre>
+<pre><span class="lineno"><a href="#line_10341" id="line_10341">10341.</a></span><span class="count                ">   2252</span><span>        html += detail("variable", list.filter(function (id) {</span></pre>
+<pre><span class="lineno"><a href="#line_10342" id="line_10342">10342.</a></span><span class="count                ">   2252</span><span>            return (</span></pre>
+<pre><span class="lineno"><a href="#line_10343" id="line_10343">10343.</a></span><span class="count                ">   2252</span><span>                context[id].role === "variable"</span></pre>
+<pre><span class="lineno"><a href="#line_10344" id="line_10344">10344.</a></span><span class="count                ">   1720</span><span>                &amp;&amp; context[id].parent === the_function</span></pre>
+<pre><span class="lineno"><a href="#line_10345" id="line_10345">10345.</a></span><span class="count                ">   2252</span><span>            );</span></pre>
+<pre><span class="lineno"><a href="#line_10346" id="line_10346">10346.</a></span><span class="count                ">   2252</span><span>        }));</span></pre>
+<pre><span class="lineno"><a href="#line_10347" id="line_10347">10347.</a></span><span class="count                ">   2252</span><span>        html += detail("exception", list.filter(function (id) {</span></pre>
+<pre><span class="lineno"><a href="#line_10348" id="line_10348">10348.</a></span><span class="count                ">   2252</span><span>            return context[id].role === "exception";</span></pre>
+<pre><span class="lineno"><a href="#line_10349" id="line_10349">10349.</a></span><span class="count                ">   2252</span><span>        }));</span></pre>
+<pre><span class="lineno"><a href="#line_10350" id="line_10350">10350.</a></span><span class="count                ">   2252</span><span>        html += detail("closure", list.filter(function (id) {</span></pre>
+<pre><span class="lineno"><a href="#line_10351" id="line_10351">10351.</a></span><span class="count                ">   2252</span><span>            return (</span></pre>
+<pre><span class="lineno"><a href="#line_10352" id="line_10352">10352.</a></span><span class="count                ">   2252</span><span>                context[id].closure === true</span></pre>
+<pre><span class="lineno"><a href="#line_10353" id="line_10353">10353.</a></span><span class="count                ">   1545</span><span>                &amp;&amp; context[id].parent === the_function</span></pre>
+<pre><span class="lineno"><a href="#line_10354" id="line_10354">10354.</a></span><span class="count                ">   2252</span><span>            );</span></pre>
+<pre><span class="lineno"><a href="#line_10355" id="line_10355">10355.</a></span><span class="count                ">   2252</span><span>        }));</span></pre>
+<pre><span class="lineno"><a href="#line_10356" id="line_10356">10356.</a></span><span class="count                ">   2252</span><span>        html += detail("outer", list.filter(function (id) {</span></pre>
+<pre><span class="lineno"><a href="#line_10357" id="line_10357">10357.</a></span><span class="count                ">   2252</span><span>            return (</span></pre>
+<pre><span class="lineno"><a href="#line_10358" id="line_10358">10358.</a></span><span class="count                ">   2252</span><span>                context[id].parent !== the_function</span></pre>
+<pre><span class="lineno"><a href="#line_10359" id="line_10359">10359.</a></span><span class="count                ">   1229</span><span>                &amp;&amp; context[id].parent.id !== "(global)"</span></pre>
+<pre><span class="lineno"><a href="#line_10360" id="line_10360">10360.</a></span><span class="count                ">   2252</span><span>            );</span></pre>
+<pre><span class="lineno"><a href="#line_10361" id="line_10361">10361.</a></span><span class="count                ">   2252</span><span>        }));</span></pre>
+<pre><span class="lineno"><a href="#line_10362" id="line_10362">10362.</a></span><span class="count                ">   2252</span><span>        html += detail(module, list.filter(function (id) {</span></pre>
+<pre><span class="lineno"><a href="#line_10363" id="line_10363">10363.</a></span><span class="count                ">   2252</span><span>            return context[id].parent.id === "(global)";</span></pre>
+<pre><span class="lineno"><a href="#line_10364" id="line_10364">10364.</a></span><span class="count                ">   2252</span><span>        }));</span></pre>
+<pre><span class="lineno"><a href="#line_10365" id="line_10365">10365.</a></span><span class="count                ">   2252</span><span>        html += detail("label", list.filter(function (id) {</span></pre>
+<pre><span class="lineno"><a href="#line_10366" id="line_10366">10366.</a></span><span class="count                ">   2252</span><span>            return context[id].role === "label";</span></pre>
+<pre><span class="lineno"><a href="#line_10367" id="line_10367">10367.</a></span><span class="count                ">   2252</span><span>        }));</span></pre>
 <pre><span class="lineno"><a href="#line_10368" id="line_10368">10368.</a></span><span class="count                ">    324</span><span>        html += "&lt;/div&gt;\n";</span></pre>
 <pre><span class="lineno"><a href="#line_10369" id="line_10369">10369.</a></span><span class="count                ">    324</span><span>    });</span></pre>
 <pre><span class="lineno"><a href="#line_10370" id="line_10370">10370.</a></span><span class="count                ">      6</span><span>    html += "&lt;/div&gt;\n";</span></pre>
