@@ -7955,7 +7955,7 @@ function jslint_phase4_walk(state) {
 
 // Set variable as initialized, if lookup was from an assignment.
 
-        if (init && name && !name.readonly && noop()) {
+        if (init && name && !name.readonly) {
             name.init = true;
         }
 
@@ -8795,7 +8795,7 @@ function jslint_phase4_walk(state) {
         let the_variable;
         if (thing.name !== undefined) {
             thing.name.dead = false;
-            the_variable = name_lookup(thing.name);
+            the_variable = name_lookup(thing.name, true);
             if (the_variable !== undefined) {
                 if (the_variable.init && the_variable.readonly) {
 
@@ -8804,7 +8804,6 @@ function jslint_phase4_walk(state) {
 
                     warn("bad_assignment_a", thing.name);
                 }
-                the_variable.init = true;
             }
         }
 
