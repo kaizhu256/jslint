@@ -5885,13 +5885,13 @@ function jslint_phase3_parse(state) {
                 name.expression = parse_expression(0);
 
 // test_cause:
-// ["function aa([aa=aa]){}", "name_lookup", "out_of_scope_a", "aa", 17]
+// ["function aa([aa=aa]){}", "lookup", "out_of_scope_a", "aa", 17]
 // ["function aa([aa=aa]){}", "name_parse", "optional", "aa", 0]
-// ["function aa({aa=aa}){}", "name_lookup", "out_of_scope_a", "aa", 17]
+// ["function aa({aa=aa}){}", "lookup", "out_of_scope_a", "aa", 17]
 // ["function aa({aa=aa}){}", "name_parse", "optional", "aa", 0]
-// ["let[aa=bb]=0;let bb", "name_lookup", "out_of_scope_a", "bb", 8]
+// ["let[aa=bb]=0;let bb", "lookup", "out_of_scope_a", "bb", 8]
 // ["let[aa=bb]=0;let bb", "name_parse", "optional", "aa", 0]
-// ["let{aa=bb}=0;let bb", "name_lookup", "out_of_scope_a", "bb", 8]
+// ["let{aa=bb}=0;let bb", "lookup", "out_of_scope_a", "bb", 8]
 // ["let{aa=bb}=0;let bb", "name_parse", "optional", "aa", 0]
 
                 test_cause("optional", name.id);
@@ -7943,7 +7943,7 @@ function jslint_phase4_walk(state) {
         };
     }
 
-    function name_lookup(thing, init) {
+    function lookup(thing, init) {
 
 // This function will:
 // 1. Lookup and return variable or function-parameter <the_variable> in current
@@ -7966,7 +7966,7 @@ function jslint_phase4_walk(state) {
         if (the_variable && the_variable.role === "label") {
 
 // test_cause:
-// ["aa:while(0){aa;}", "name_lookup", "label_a", "aa", 13]
+// ["aa:while(0){aa;}", "lookup", "label_a", "aa", 13]
 
             warn("label_a", thing);
             return the_variable;
@@ -7986,14 +7986,14 @@ function jslint_phase4_walk(state) {
             if (!the_variable && global_dict[id] === undefined) {
 
 // test_cause:
-// ["aa", "name_lookup", "undeclared_a", "aa", 1]
-// ["class aa{}", "name_lookup", "undeclared_a", "aa", 7]
+// ["aa", "lookup", "undeclared_a", "aa", 1]
+// ["class aa{}", "lookup", "undeclared_a", "aa", 7]
 // ["
 // let aa=0;try{aa();}catch(bb){bb();}bb();
-// ", "name_lookup", "undeclared_a", "bb", 36]
+// ", "lookup", "undeclared_a", "bb", 36]
 // ["
 // let aa=0;try{aa();}catch(ignore){bb();}
-// ", "name_lookup", "undeclared_a", "bb", 34]
+// ", "lookup", "undeclared_a", "bb", 34]
 
                 warn("undeclared_a", thing);
                 return;
@@ -8023,9 +8023,9 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["(aa=aa)=>0", "name_lookup", "out_of_scope_a", "aa", 5]
-// ["let aa;if(aa){let bb;}bb;", "name_lookup", "out_of_scope_a", "bb", 23]
-// ["let aa=bb;let bb=0;", "name_lookup", "out_of_scope_a", "bb", 8]
+// ["(aa=aa)=>0", "lookup", "out_of_scope_a", "aa", 5]
+// ["let aa;if(aa){let bb;}bb;", "lookup", "out_of_scope_a", "bb", 23]
+// ["let aa=bb;let bb=0;", "lookup", "out_of_scope_a", "bb", 8]
 
             warn("out_of_scope_a", thing);
         }
@@ -8084,7 +8084,7 @@ function jslint_phase4_walk(state) {
         }
         if (thing.name_list) {
             thing.name_list.forEach(function (name) {
-                const the_variable = name_lookup(name, true);
+                const the_variable = lookup(name, true);
                 if (!the_variable || the_variable.readonly) {
 
 // test_cause:
@@ -8799,7 +8799,7 @@ function jslint_phase4_walk(state) {
         let the_variable;
         if (thing.name !== undefined) {
             thing.name.dead = false;
-            the_variable = name_lookup(thing.name, true);
+            the_variable = lookup(thing.name, true);
             if (the_variable !== undefined) {
                 if (the_variable.init && the_variable.readonly) {
 
@@ -8899,7 +8899,7 @@ function jslint_phase4_walk(state) {
     }
 
     function pre_v(thing) {
-        const the_variable = name_lookup(thing, false);
+        const the_variable = lookup(thing, false);
         if (the_variable !== undefined) {
             thing.variable = the_variable;
             the_variable.used += 1;
