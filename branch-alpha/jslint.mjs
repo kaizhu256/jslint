@@ -4369,7 +4369,7 @@ function jslint_phase3_parse(state) {
                 name_push(
                     the_token.name_list,        // name_list
                     left,               // name
-                    undefined,          // enroll
+                    false,              // enroll
                     "variable",         // role
                     false,              // readonly
                     true                // init
@@ -5743,7 +5743,7 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_destructure(
-        name_enroll,
+        enroll,
         role,
         readonly,
         name_list,
@@ -5820,7 +5820,7 @@ function jslint_phase3_parse(state) {
                 test_cause("recurse_element");
                 advance_and_signature_push(token_nxt.id);
                 prefix_destructure(
-                    name_enroll,        // enroll
+                    enroll,        // enroll
                     role,               // role
                     readonly,           // readonly
                     name_list,          // name_list
@@ -5871,11 +5871,11 @@ function jslint_phase3_parse(state) {
                 }
                 token_nxt.label = name;
                 name = token_nxt;
-                name_push(sub_list, name, name_enroll, role, readonly, true);
+                name_push(sub_list, name, enroll, role, readonly, true);
                 advance_and_signature_push(token_nxt.id);
                 return;
             }
-            name_push(sub_list, name, name_enroll, role, readonly, true);
+            name_push(sub_list, name, enroll, role, readonly, true);
             if (token_nxt.id === "=") {
                 optional = the_function_toplevel && token_now;
                 advance_and_signature_push("=");
@@ -6360,7 +6360,7 @@ function jslint_phase3_parse(state) {
 // PR-500 - Unify ES2015-destructure-logic. - [aa] = ...;
 
             element = prefix_destructure(
-                undefined,              // enroll
+                false,                  // enroll
                 "variable",             // role
                 false,                  // readonly
                 the_token.name_list,    // name_list
