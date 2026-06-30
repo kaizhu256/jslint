@@ -5920,14 +5920,13 @@ function jslint_phase3_parse(state) {
                 }
                 name = token_nxt;
                 name_enroll(name, "variable", true);
-                the_function.name = Object.assign(name, {
-                    calls: empty(),
+                the_function.name = name;
+                name.calls = empty();
 
 // PR-331 - Bugfix - Fixes issue #272 - function hoisting not allowed.
 
-                    dead: false,
-                    init: true
-                });
+                name.dead = false;
+                name.init = true;
                 advance();
             } else if (!name) {
 
