@@ -4891,6 +4891,21 @@ function jslint_phase3_parse(state) {
     }
 
     function infix_fart_unwrapped() {
+        if (!token_prv.identifier) {
+
+// test_cause:
+// ["0=>0", "infix_fart_unwrapped", "expected_identifier_a", "0", 1]
+
+            return stop("expected_identifier_a", token_prv);
+        }
+
+// PR-499 - Update ES2015-feature arrow, to continue parsing unwrapped-form
+// with warning, instead of stopping.
+
+// test_cause:
+// ["aa=>0", "infix_fart_unwrapped", "wrap_fart_parameter", "=>", 3]
+
+        warn("wrap_fart_parameter", token_now);
         return parse_fart(token_now, true);
     }
 
@@ -6124,21 +6139,6 @@ function jslint_phase3_parse(state) {
 
         the_function.name_list = [];    // 2. name_list for "function (aa)"
         if (mode_infix_fart) {
-            if (!token_prv.identifier) {
-
-// test_cause:
-// ["0=>0", "prefix_function_parameter", "expected_identifier_a", "0", 1]
-
-                return stop("expected_identifier_a", token_prv);
-            }
-
-// PR-499 - Update ES2015-feature arrow, to continue parsing unwrapped-form
-// with warning, instead of stopping.
-
-// test_cause:
-// ["aa=>0", "prefix_function_parameter", "wrap_fart_parameter", "=>", 3]
-
-            warn("wrap_fart_parameter", token_now);
             the_function.name = "anonymous";
             the_function.parameter_count = 1;
             the_function.signature = token_prv.id;
