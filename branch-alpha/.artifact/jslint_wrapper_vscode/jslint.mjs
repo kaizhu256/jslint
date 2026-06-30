@@ -5941,6 +5941,39 @@ function jslint_phase3_parse(state) {
                 }
             }
         }
+        if (mode_fart) {
+            the_function.arity = "binary";
+            the_function.name = anon;
+        }
+        if (
+            !mode_fart
+            && the_function.arity !== "statement"
+            && typeof name === "object"
+        ) {
+
+// test_cause:
+// ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]
+
+            test_cause("expression", name.id);
+            name_enroll(name, "function", true);
+            name.dead = false;
+            name.init = true;
+            name.used = 1;
+        }
+
+// Give the function properties for storing its names and for observing the
+// depth of loops and switches.
+
+        Object.assign(the_function, {
+            async: the_function.async || 0,
+            context: empty(),
+            finally: 0,
+            level: functionage.level + 1,
+            loop: 0,
+            statement_prv: undefined,
+            switch: 0,
+            try: 0
+        });
 
 // PR-384 - Relax warning "function_in_loop".
 //
@@ -5957,37 +5990,6 @@ function jslint_phase3_parse(state) {
         function_list.push(the_function);
         function_stack.push(functionage);
         functionage = the_function;
-
-// Give the function properties for storing its names and for observing the
-// depth of loops and switches.
-
-        Object.assign(the_function, {
-            async: the_function.async || 0,
-            context: empty(),
-            finally: 0,
-            level: functionage.level + 1,
-            loop: 0,
-            statement_prv: undefined,
-            switch: 0,
-            try: 0
-        });
-        if (mode_fart) {
-            the_function.arity = "binary";
-            the_function.name = anon;
-        } else if (
-            the_function.arity !== "statement"
-            && typeof name === "object"
-        ) {
-
-// test_cause:
-// ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]
-
-            test_cause("expression", name.id);
-            name_enroll(name, "function", true);
-            name.dead = false;
-            name.init = true;
-            name.used = 1;
-        }
 
 // Parse the parameter list.
 
