@@ -5941,6 +5941,21 @@ function jslint_phase3_parse(state) {
                 }
             }
         }
+        if (
+            !mode_fart
+            && the_function.arity !== "statement"
+            && typeof name === "object"
+        ) {
+
+// test_cause:
+// ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]
+
+            test_cause("expression", name.id);
+            name_enroll(name, "function", true);
+            name.dead = false;
+            name.init = true;
+            name.used = 1;
+        }
 
 // Give the function properties for storing its names and for observing the
 // depth of loops and switches.
@@ -5958,21 +5973,6 @@ function jslint_phase3_parse(state) {
         if (mode_fart) {
             the_function.arity = "binary";
             the_function.name = anon;
-        }
-        if (
-            !mode_fart
-            && the_function.arity !== "statement"
-            && typeof name === "object"
-        ) {
-
-// test_cause:
-// ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]
-
-            test_cause("expression", name.id);
-            name_enroll(name, "function", true);
-            name.dead = false;
-            name.init = true;
-            name.used = 1;
         }
 
 // PR-384 - Relax warning "function_in_loop".
@@ -5998,10 +5998,8 @@ function jslint_phase3_parse(state) {
             token_now.arity = "function";
         }
         prefix_function_parameter(the_function, mode_infix_fart);
-        if (mode_fart) {
-            if (!mode_infix_fart) {
-                advance("=>");
-            }
+        if (mode_fart && !mode_infix_fart) {
+            advance("=>");
         }
         if (mode_fart && token_nxt.id !== "{") {
 
