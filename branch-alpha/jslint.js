@@ -6023,9 +6023,6 @@ function jslint_phase3_parse(state) {
             token_now.arity = "function";
             prefix_function_parameter(the_function);
         }
-
-// The function's body is a block.
-
         if (mode_fart && token_nxt.id !== "{") {
 
 // The function's body is an expression.
@@ -6049,6 +6046,9 @@ function jslint_phase3_parse(state) {
             }
             the_function.expression = parse_expression(0);
         } else if (mode_fart) {
+
+// The function's body is a block.
+
             if (!option_dict.fart) {
 
 // test_cause:

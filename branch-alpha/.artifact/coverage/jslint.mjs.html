@@ -6188,32 +6188,32 @@ body {
 <pre><span class="lineno"><a href="#line_6023" id="line_6023"> 6023.</a></span><span class="count                ">   2015</span><span>            token_now.arity = "function";</span></pre>
 <pre><span class="lineno"><a href="#line_6024" id="line_6024"> 6024.</a></span><span class="count                ">   2015</span><span>            prefix_function_parameter(the_function);</span></pre>
 <pre><span class="lineno"><a href="#line_6025" id="line_6025"> 6025.</a></span><span class="count                ">   2028</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_6026" id="line_6026"> 6026.</a></span><span class="count                ">   2028</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6027" id="line_6027"> 6027.</a></span><span class="count                ">   2028</span><span>// The function's body is a block.</span></pre>
-<pre><span class="lineno"><a href="#line_6028" id="line_6028"> 6028.</a></span><span class="count                ">   2028</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6029" id="line_6029"> 6029.</a></span><span class="count                ">   2028</span><span>        if (mode_fart &amp;&amp; token_nxt.id !== "{") {</span></pre>
-<pre><span class="lineno"><a href="#line_6030" id="line_6030"> 6030.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6031" id="line_6031"> 6031.</a></span><span class="count                ">     18</span><span>// The function's body is an expression.</span></pre>
-<pre><span class="lineno"><a href="#line_6032" id="line_6032"> 6032.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6033" id="line_6033"> 6033.</a></span><span class="count                ">     18</span><span>// PR-384 - Bugfix - Fixes issue #379 - warn against naked-statement in fart.</span></pre>
-<pre><span class="lineno"><a href="#line_6034" id="line_6034"> 6034.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6035" id="line_6035"> 6035.</a></span><span class="count                ">     18</span><span>            if (</span></pre>
-<pre><span class="lineno"><a href="#line_6036" id="line_6036"> 6036.</a></span><span class="count                ">     18</span><span>                syntax_dict[token_nxt.id]</span></pre>
-<pre><span class="lineno"><a href="#line_6037" id="line_6037"> 6037.</a></span><span class="count                ">     18</span><span>                &amp;&amp; syntax_dict[token_nxt.id].fud_stmt</span></pre>
-<pre><span class="lineno"><a href="#line_6038" id="line_6038"> 6038.</a></span><span class="count                ">     18</span><span>            ) {</span></pre>
+<pre><span class="lineno"><a href="#line_6026" id="line_6026"> 6026.</a></span><span class="count                ">   2028</span><span>        if (mode_fart &amp;&amp; token_nxt.id !== "{") {</span></pre>
+<pre><span class="lineno"><a href="#line_6027" id="line_6027"> 6027.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_6028" id="line_6028"> 6028.</a></span><span class="count                ">     18</span><span>// The function's body is an expression.</span></pre>
+<pre><span class="lineno"><a href="#line_6029" id="line_6029"> 6029.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_6030" id="line_6030"> 6030.</a></span><span class="count                ">     18</span><span>// PR-384 - Bugfix - Fixes issue #379 - warn against naked-statement in fart.</span></pre>
+<pre><span class="lineno"><a href="#line_6031" id="line_6031"> 6031.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_6032" id="line_6032"> 6032.</a></span><span class="count                ">     18</span><span>            if (</span></pre>
+<pre><span class="lineno"><a href="#line_6033" id="line_6033"> 6033.</a></span><span class="count                ">     18</span><span>                syntax_dict[token_nxt.id]</span></pre>
+<pre><span class="lineno"><a href="#line_6034" id="line_6034"> 6034.</a></span><span class="count                ">     18</span><span>                &amp;&amp; syntax_dict[token_nxt.id].fud_stmt</span></pre>
+<pre><span class="lineno"><a href="#line_6035" id="line_6035"> 6035.</a></span><span class="count                ">     18</span><span>            ) {</span></pre>
+<pre><span class="lineno"><a href="#line_6036" id="line_6036"> 6036.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_6037" id="line_6037"> 6037.</a></span><span class="count                ">     18</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_6038" id="line_6038"> 6038.</a></span><span class="count                ">     18</span><span>// ["()=&gt;delete aa", "prefix_function", "unexpected_a_after_b", "=&gt;", 5]</span></pre>
 <pre><span class="lineno"><a href="#line_6039" id="line_6039"> 6039.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6040" id="line_6040"> 6040.</a></span><span class="count                ">     18</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_6041" id="line_6041"> 6041.</a></span><span class="count                ">     18</span><span>// ["()=&gt;delete aa", "prefix_function", "unexpected_a_after_b", "=&gt;", 5]</span></pre>
-<pre><span class="lineno"><a href="#line_6042" id="line_6042"> 6042.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6043" id="line_6043"> 6043.</a></span><span class="count                ">     18</span><span>                return stop(</span></pre>
-<pre><span class="lineno"><a href="#line_6044" id="line_6044"> 6044.</a></span><span class="count                ">     18</span><span>                    "unexpected_a_after_b",</span></pre>
-<pre><span class="lineno"><a href="#line_6045" id="line_6045"> 6045.</a></span><span class="count                ">     18</span><span>                    token_nxt,</span></pre>
-<pre><span class="lineno"><a href="#line_6046" id="line_6046"> 6046.</a></span><span class="count                ">     18</span><span>                    token_nxt.id,</span></pre>
-<pre><span class="lineno"><a href="#line_6047" id="line_6047"> 6047.</a></span><span class="count                ">     18</span><span>                    "=&gt;"</span></pre>
-<pre><span class="lineno"><a href="#line_6048" id="line_6048"> 6048.</a></span><span class="count                ">     18</span><span>                );</span></pre>
-<pre><span class="lineno"><a href="#line_6049" id="line_6049"> 6049.</a></span><span class="count                ">     18</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_6050" id="line_6050"> 6050.</a></span><span class="count                ">     18</span><span>            the_function.expression = parse_expression(0);</span></pre>
-<pre><span class="lineno"><a href="#line_6051" id="line_6051"> 6051.</a></span><span class="count                ">   2010</span><span>        } else if (mode_fart) {</span></pre>
+<pre><span class="lineno"><a href="#line_6040" id="line_6040"> 6040.</a></span><span class="count                ">     18</span><span>                return stop(</span></pre>
+<pre><span class="lineno"><a href="#line_6041" id="line_6041"> 6041.</a></span><span class="count                ">     18</span><span>                    "unexpected_a_after_b",</span></pre>
+<pre><span class="lineno"><a href="#line_6042" id="line_6042"> 6042.</a></span><span class="count                ">     18</span><span>                    token_nxt,</span></pre>
+<pre><span class="lineno"><a href="#line_6043" id="line_6043"> 6043.</a></span><span class="count                ">     18</span><span>                    token_nxt.id,</span></pre>
+<pre><span class="lineno"><a href="#line_6044" id="line_6044"> 6044.</a></span><span class="count                ">     18</span><span>                    "=&gt;"</span></pre>
+<pre><span class="lineno"><a href="#line_6045" id="line_6045"> 6045.</a></span><span class="count                ">     18</span><span>                );</span></pre>
+<pre><span class="lineno"><a href="#line_6046" id="line_6046"> 6046.</a></span><span class="count                ">     18</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_6047" id="line_6047"> 6047.</a></span><span class="count                ">     18</span><span>            the_function.expression = parse_expression(0);</span></pre>
+<pre><span class="lineno"><a href="#line_6048" id="line_6048"> 6048.</a></span><span class="count                ">   2010</span><span>        } else if (mode_fart) {</span></pre>
+<pre><span class="lineno"><a href="#line_6049" id="line_6049"> 6049.</a></span><span class="count                ">   2010</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_6050" id="line_6050"> 6050.</a></span><span class="count                ">   2010</span><span>// The function's body is a block.</span></pre>
+<pre><span class="lineno"><a href="#line_6051" id="line_6051"> 6051.</a></span><span class="count                ">   2010</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6052" id="line_6052"> 6052.</a></span><span class="count                ">   2010</span><span>            if (!option_dict.fart) {</span></pre>
 <pre><span class="lineno"><a href="#line_6053" id="line_6053"> 6053.</a></span><span class="count                ">   2010</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6054" id="line_6054"> 6054.</a></span><span class="count                ">   2010</span><span>// test_cause:</span></pre>
