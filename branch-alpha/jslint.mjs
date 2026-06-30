@@ -5820,7 +5820,7 @@ function jslint_phase3_parse(state) {
                 test_cause("recurse_element");
                 advance_and_signature_push(token_nxt.id);
                 prefix_destructure(
-                    enroll,        // enroll
+                    enroll,             // enroll
                     role,               // role
                     readonly,           // readonly
                     name_list,          // name_list
@@ -6145,7 +6145,7 @@ function jslint_phase3_parse(state) {
             name_push(
                 the_function.name_list, // name_list
                 token_prv,              // name
-                name_enroll,            // enroll
+                true,                   // enroll
                 "parameter",            // role
                 false,                  // readonly
                 true                    // init
@@ -6160,7 +6160,7 @@ function jslint_phase3_parse(state) {
 // PR-500 - Unify ES2015-destructure-logic. - function ([aa]) {...}
 
             prefix_destructure(
-                name_enroll,            // enroll
+                true,                   // enroll
                 "parameter",            // role
                 false,                  // readonly
                 the_function.name_list, // name_list
@@ -6939,7 +6939,7 @@ function jslint_phase3_parse(state) {
                 name_push(
                     the_import.name_list,       // name_list
                     name,               // name
-                    name_enroll,        // enroll
+                    true,               // enroll
                     "variable",         // role
                     true,               // readonly
                     true                // init
@@ -6972,7 +6972,7 @@ function jslint_phase3_parse(state) {
                         name_push(
                             the_import.name_list,       // name_list
                             name,       // name
-                            name_enroll,        // enroll
+                            true,        // enroll
                             "variable", // role
                             true,       // readonly
                             true        // init
@@ -7303,7 +7303,7 @@ function jslint_phase3_parse(state) {
                     name_push(
                         [],             // name_list
                         token_nxt,      // name
-                        name_enroll,    // enroll
+                        true,           // enroll
                         "exception",    // role
                         true,           // readonly
                         true            // init
@@ -7429,7 +7429,7 @@ function jslint_phase3_parse(state) {
 // PR-500 - Unify ES2015-destructure-logic. - let [aa] = ...;
 
                 prefix_destructure(
-                    name_enroll,        // enroll
+                    true,               // enroll
                     "variable",         // role
                     readonly,           // readonly
                     the_variable.name_list,     // name_list
@@ -7458,7 +7458,7 @@ function jslint_phase3_parse(state) {
                 name_push(
                     the_variable.name_list,     // name_list
                     name,               // name
-                    name_enroll,        // enroll
+                    true,               // enroll
                     "variable",         // role
                     readonly,           // readonly
                     name_init           // init
