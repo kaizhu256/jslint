@@ -1,5 +1,5 @@
-<svg height="646" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="646" fill="#222" width="800"></rect>
+<svg height="1262" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1262" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -53,25 +53,25 @@
     textLength="768"
     x="10"
     y="186"
->jslint - 79ms - ./.ci.sh                                                                         </tspan>
+>jslint - 59ms - ./.ci.sh                                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="208"
->jslint - 88ms - ./CHANGELOG.md                                                                   </tspan>
+>jslint - 61ms - ./CHANGELOG.md                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="230"
->jslint - 104ms - ./README.md                                                                     </tspan>
+>jslint - 81ms - ./README.md                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="252"
->jslint - 106ms - ./asset_image_logo_256.html                                                     </tspan>
+>jslint - 81ms - ./asset_image_logo_256.html                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -107,73 +107,241 @@
     textLength="768"
     x="10"
     y="384"
->jslint - 107ms - ./hello.js                                                                      </tspan>
+>jslint - 85ms - ./hello.js                                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="406"
->jslint - 123ms - ./index.html                                                                    </tspan>
+>jslint - 99ms - ./index.html                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="428"
->jslint - 256ms - ./jslint.js                                                                     </tspan>
+>jslint ./jslint.js                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="450"
->jslint - 364ms - ./jslint.mjs                                                                    </tspan>
+> 1. Unused 'parse_fart'. // line 5270, column 14                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="472"
->jslint - 404ms - ./jslint_ci.sh                                                                  </tspan>
+>    function parse_fart(the_function, mode_fart, mode_infix_fart) {                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="494"
->jslint - 404ms - ./jslint_wrapper_cjs.cjs                                                        </tspan>
+>Error                                                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="516"
->jslint - 405ms - ./jslint_wrapper_codemirror.html                                                </tspan>
+>    at warn_at (file:///home/runner/work/jslint/jslint/jslint.mjs:1494:35)                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="538"
->jslint - 407ms - ./jslint_wrapper_codemirror.js                                                  </tspan>
+>    at warn (file:///home/runner/work/jslint/jslint/jslint.mjs:1115:23)                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="560"
->jslint - 410ms - ./jslint_wrapper_vscode.js                                                      </tspan>
+>    at file:///home/runner/work/jslint/jslint/jslint.mjs:9351:21                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="582"
->jslint - 411ms - ./package.json                                                                  </tspan>
+>    at Array.forEach (&lt;anonymous&gt;)                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="604"
->jslint - 424ms - ./test.mjs                                                                      </tspan>
+>    at delve (file:///home/runner/work/jslint/jslint/jslint.mjs:9323:43)                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="626"
->jslint - 487ms - ./test_coverage_merge_data.json                                                 </tspan>
+>    at Array.forEach (&lt;anonymous&gt;)                                                               </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="648"
+>    at jslint_phase5_whitage (file:///home/runner/work/jslint/jslint/jslint.mjs:9926:19)         </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="670"
+>    at jslint (file:///home/runner/work/jslint/jslint/jslint.mjs:1596:13)                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="692"
+>    at jslint_from_file (file:///home/runner/work/jslint/jslint/jslint.mjs:2120:32)              </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="714"
+>    at file:///home/runner/work/jslint/jslint/jslint.mjs:2365:17                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="736"
+>jslint - 255ms - ./jslint.js                                                                     </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="758"
+>jslint ./jslint.mjs                                                                              </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="780"
+> 1. Unused 'parse_fart'. // line 5270, column 14                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="802"
+>    function parse_fart(the_function, mode_fart, mode_infix_fart) {                              </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="824"
+>Error                                                                                            </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="846"
+>    at warn_at (file:///home/runner/work/jslint/jslint/jslint.mjs:1494:35)                       </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="868"
+>    at warn (file:///home/runner/work/jslint/jslint/jslint.mjs:1115:23)                          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="890"
+>    at file:///home/runner/work/jslint/jslint/jslint.mjs:9351:21                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="912"
+>    at Array.forEach (&lt;anonymous&gt;)                                                               </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="934"
+>    at delve (file:///home/runner/work/jslint/jslint/jslint.mjs:9323:43)                         </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="956"
+>    at Array.forEach (&lt;anonymous&gt;)                                                               </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="978"
+>    at jslint_phase5_whitage (file:///home/runner/work/jslint/jslint/jslint.mjs:9926:19)         </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1000"
+>    at jslint (file:///home/runner/work/jslint/jslint/jslint.mjs:1596:13)                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1022"
+>    at jslint_from_file (file:///home/runner/work/jslint/jslint/jslint.mjs:2120:32)              </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1044"
+>    at file:///home/runner/work/jslint/jslint/jslint.mjs:2365:17                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1066"
+>jslint - 382ms - ./jslint.mjs                                                                    </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1088"
+>jslint - 420ms - ./jslint_ci.sh                                                                  </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1110"
+>jslint - 420ms - ./jslint_wrapper_cjs.cjs                                                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1132"
+>jslint - 420ms - ./jslint_wrapper_codemirror.html                                                </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1154"
+>jslint - 422ms - ./jslint_wrapper_codemirror.js                                                  </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1176"
+>jslint - 424ms - ./jslint_wrapper_vscode.js                                                      </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1198"
+>jslint - 425ms - ./package.json                                                                  </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1220"
+>jslint - 438ms - ./test.mjs                                                                      </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1242"
+>jslint - 506ms - ./test_coverage_merge_data.json                                                 </tspan>
 
 </text>
 </svg>

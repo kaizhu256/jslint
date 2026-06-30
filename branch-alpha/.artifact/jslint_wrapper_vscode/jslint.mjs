@@ -5267,6 +5267,212 @@ function jslint_phase3_parse(state) {
         return left;
     }
 
+    function parse_fart(the_function, mode_fart, mode_infix_fart) {
+        let name = the_function?.name;
+        if (mode_fart) {
+            the_function.arity = "binary";
+            the_function.name = anon;
+        } else if (!the_function) {
+            the_function = token_now;
+
+// A function statement must have a name that will be in the parent's scope.
+
+            if (the_function.arity === "statement") {
+                if (!token_nxt.identifier) {
+
+// test_cause:
+// ["function(){}", "prefix_function", "expected_identifier_a", "(", 9]
+// ["function*aa(){}", "prefix_function", "expected_identifier_a", "*", 9]
+
+                    return stop("expected_identifier_a", token_nxt);
+                }
+                name = token_nxt;
+                name_enroll(name, "variable", true);
+                the_function.name = Object.assign(name, {
+                    calls: empty(),
+
+// PR-331 - Bugfix - Fixes issue #272 - function hoisting not allowed.
+
+                    dead: false,
+                    init: true
+                });
+                advance();
+            } else if (!name) {
+
+// A function expression may have an optional name.
+
+                the_function.name = anon;
+                if (token_nxt.identifier) {
+                    name = token_nxt;
+                    the_function.name = name;
+                    advance();
+                }
+            }
+        }
+        if (
+            !mode_fart
+            && the_function.arity !== "statement"
+            && typeof name === "object"
+        ) {
+
+// test_cause:
+// ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]
+
+            test_cause("expression", name.id);
+            name_enroll(name, "function", true);
+            name.dead = false;
+            name.init = true;
+            name.used = 1;
+        }
+
+//  Probably deadcode.
+//  if (mode_mega) {
+//      warn("unexpected_a", the_function);
+//  }
+//  jslint_assert(!mode_mega, `Expected !mode_mega.`);
+
+// PR-378 - Relax warning "function_in_loop".
+//
+// // Don't create functions in loops. It is inefficient, and it can lead to
+// // scoping errors.
+//
+//         if (functionage.loop > 0) {
+//
+// // test_cause:
+// // ["
+// // while(0){aa.map(function(){});}
+// // ", "prefix_function", "function_in_loop", "function", 17]
+//
+//             warn("function_in_loop", the_function);
+//         }
+
+// Give the function properties for storing its names and for observing the
+// depth of loops and switches.
+
+        Object.assign(the_function, {
+            async: the_function.async || 0,
+            context: empty(),
+            finally: 0,
+            level: functionage.level + 1,
+            loop: 0,
+            statement_prv: undefined,
+            switch: 0,
+            try: 0
+        });
+
+// PR-384 - Relax warning "function_in_loop".
+//
+//         if (functionage.loop > 0) {
+
+// // test_cause:
+// // ["while(0){aa.map(()=>0);}", "parse_fart", "function_in_loop", "=>", 19]
+//
+//             warn("function_in_loop", the_function);
+//         }
+
+// Push the current function context and establish a new one.
+
+        function_list.push(the_function);
+        function_stack.push(functionage);
+        functionage = the_function;
+
+// Parse the parameter list.
+
+        if (mode_fart) {
+            prefix_function_parameter(the_function, mode_infix_fart);
+            if (!mode_infix_fart) {
+                advance("=>");
+            }
+        } else {
+            advance("(");
+            token_now.arity = "function";
+            prefix_function_parameter(the_function);
+        }
+
+// The function's body is a block.
+
+        if (mode_fart && token_nxt.id !== "{") {
+
+// The function's body is an expression.
+
+// PR-384 - Bugfix - Fixes issue #379 - warn against naked-statement in fart.
+
+            if (
+                syntax_dict[token_nxt.id]
+                && syntax_dict[token_nxt.id].fud_stmt
+            ) {
+
+// test_cause:
+// ["()=>delete aa", "parse_fart", "unexpected_a_after_b", "=>", 5]
+
+                return stop(
+                    "unexpected_a_after_b",
+                    token_nxt,
+                    token_nxt.id,
+                    "=>"
+                );
+            }
+            the_function.expression = parse_expression(0);
+        } else if (mode_fart) {
+            if (!option_dict.fart) {
+
+// test_cause:
+// ["()=>{}", "parse_fart", "use_function_not_fart", "=>", 3]
+
+                warn("use_function_not_fart", the_function);
+            }
+            the_function.block = block("body");
+        } else {
+            the_function.block = block("body");
+            if (
+                the_function.arity === "statement"
+                && token_nxt.line === token_now.line
+            ) {
+
+// test_cause:
+// ["function aa(){}0", "prefix_function", "unexpected_a", "0", 16]
+
+                return stop("unexpected_a");
+            }
+            if (
+                token_nxt.id === "."
+                || token_nxt.id === "?."
+
+// PR-459 - Allow destructuring-assignment after function-definition.
+
+                // || token_nxt.id === "["
+            ) {
+
+// test_cause:
+// ["function aa(){}\n.aa", "prefix_function", "unexpected_a", ".", 1]
+// ["function aa(){}\n?.aa", "prefix_function", "unexpected_a", "?.", 1]
+
+                warn("unexpected_a");
+            }
+
+// Check functions are ordered.
+
+            check_ordered(
+                "function",
+                function_list.slice(
+                    function_list.indexOf(the_function) + 1
+                ).map(function ({
+                    level,
+                    name
+                }) {
+                    return (level === the_function.level + 1) && name;
+                }).filter(function (name) {
+                    return option_dict.beta && name && name.id;
+                })
+            );
+        }
+
+// Restore the previous context.
+
+        functionage = function_stack.pop();
+        return the_function;
+    }
+
     function parse_json() {
         let container;
         let is_dup;
@@ -6038,7 +6244,7 @@ function jslint_phase3_parse(state) {
             ) {
 
 // test_cause:
-// ["()=>delete aa", "prefix_function", "unexpected_a_after_b", "=>", 5]
+// ["()=>delete aa", "parse_fart", "unexpected_a_after_b", "=>", 5]
 
                 return stop(
                     "unexpected_a_after_b",
@@ -6052,7 +6258,7 @@ function jslint_phase3_parse(state) {
             if (!option_dict.fart) {
 
 // test_cause:
-// ["()=>{}", "prefix_function", "use_function_not_fart", "=>", 3]
+// ["()=>{}", "parse_fart", "use_function_not_fart", "=>", 3]
 
                 warn("use_function_not_fart", the_function);
             }
