@@ -5993,15 +5993,15 @@ function jslint_phase3_parse(state) {
 
 // Parse the parameter list.
 
+        if (!mode_fart) {
+            advance("(");
+            token_now.arity = "function";
+        }
+        prefix_function_parameter(the_function, mode_infix_fart);
         if (mode_fart) {
-            prefix_function_parameter(the_function, mode_infix_fart);
             if (!mode_infix_fart) {
                 advance("=>");
             }
-        } else {
-            advance("(");
-            token_now.arity = "function";
-            prefix_function_parameter(the_function);
         }
         if (mode_fart && token_nxt.id !== "{") {
 
