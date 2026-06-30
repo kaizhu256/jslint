@@ -5269,7 +5269,6 @@ function jslint_phase3_parse(state) {
 
     function parse_fart(the_function, mode_fart, mode_infix_fart) {
         let name = the_function?.name;
-        noop(name);
         if (mode_fart) {
             the_function.arity = "binary";
             the_function.name = anon;
@@ -6096,7 +6095,6 @@ function jslint_phase3_parse(state) {
 
     function prefix_function(the_function, mode_fart, mode_infix_fart) {
         let name = the_function?.name;
-        noop(name);
         if (mode_fart) {
             the_function.arity = "binary";
             the_function.name = anon;
