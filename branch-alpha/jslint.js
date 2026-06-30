@@ -7953,12 +7953,6 @@ function jslint_phase4_walk(state) {
 
         the_variable = functionage.context[id] || catchage.context[id];
 
-// Set variable as initialized, if lookup was from an assignment.
-
-        if (init && the_variable && !the_variable.readonly) {
-            the_variable.init = true;
-        }
-
 // If it isn't local, search all the other contexts. If there are name
 // collisions, take the most recent.
 
@@ -8028,8 +8022,11 @@ function jslint_phase4_walk(state) {
 
             warn("out_of_scope_a", thing);
         }
-        if (init && !the_variable.init) {
-            debugInline(the_variable);
+
+// Set variable as initialized, if lookup was from an assignment.
+
+        if (init && the_variable && !the_variable.readonly) {
+            the_variable.init = true;
         }
         return the_variable;
     }
@@ -8093,10 +8090,6 @@ function jslint_phase4_walk(state) {
                     warn("bad_assignment_a", name);
                     return;
                 }
-                //!! if (the_variable?.init !== true) {
-                    //!! debugInline(the_variable);
-                //!! }
-                the_variable.init = true;
             });
             return;
         }
