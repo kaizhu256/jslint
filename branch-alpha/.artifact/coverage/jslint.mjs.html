@@ -6106,59 +6106,59 @@ body {
 <pre><span class="lineno"><a href="#line_5941" id="line_5941"> 5941.</a></span><span class="count                ">   2006</span><span>                }</span></pre>
 <pre><span class="lineno"><a href="#line_5942" id="line_5942"> 5942.</a></span><span class="count                ">   2006</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_5943" id="line_5943"> 5943.</a></span><span class="count                ">   2037</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_5944" id="line_5944"> 5944.</a></span><span class="count                ">   2037</span><span>        if (mode_fart) {</span></pre>
-<pre><span class="lineno"><a href="#line_5945" id="line_5945"> 5945.</a></span><span class="count                ">     22</span><span>            the_function.arity = "binary";</span></pre>
-<pre><span class="lineno"><a href="#line_5946" id="line_5946"> 5946.</a></span><span class="count                ">     22</span><span>            the_function.name = anon;</span></pre>
-<pre><span class="lineno"><a href="#line_5947" id="line_5947"> 5947.</a></span><span class="count                ">   2037</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_5948" id="line_5948"> 5948.</a></span><span class="count                ">   2037</span><span>        if (</span></pre>
-<pre><span class="lineno"><a href="#line_5949" id="line_5949"> 5949.</a></span><span class="count                ">   2037</span><span>            !mode_fart</span></pre>
-<pre><span class="lineno"><a href="#line_5950" id="line_5950"> 5950.</a></span><span class="count                ">   2037</span><span>            &amp;&amp; the_function.arity !== "statement"</span></pre>
-<pre><span class="lineno"><a href="#line_5951" id="line_5951"> 5951.</a></span><span class="count                ">    942</span><span>            &amp;&amp; typeof name === "object"</span></pre>
-<pre><span class="lineno"><a href="#line_5952" id="line_5952"> 5952.</a></span><span class="count                ">     28</span><span>        ) {</span></pre>
-<pre><span class="lineno"><a href="#line_5953" id="line_5953"> 5953.</a></span><span class="count                ">     28</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5954" id="line_5954"> 5954.</a></span><span class="count                ">     28</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_5955" id="line_5955"> 5955.</a></span><span class="count                ">     28</span><span>// ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]</span></pre>
-<pre><span class="lineno"><a href="#line_5956" id="line_5956"> 5956.</a></span><span class="count                ">     28</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5957" id="line_5957"> 5957.</a></span><span class="count                ">     28</span><span>            test_cause("expression", name.id);</span></pre>
-<pre><span class="lineno"><a href="#line_5958" id="line_5958"> 5958.</a></span><span class="count                ">     28</span><span>            name_enroll(name, "function", true);</span></pre>
-<pre><span class="lineno"><a href="#line_5959" id="line_5959"> 5959.</a></span><span class="count                ">     28</span><span>            name.dead = false;</span></pre>
-<pre><span class="lineno"><a href="#line_5960" id="line_5960"> 5960.</a></span><span class="count                ">     28</span><span>            name.init = true;</span></pre>
-<pre><span class="lineno"><a href="#line_5961" id="line_5961"> 5961.</a></span><span class="count                ">     28</span><span>            name.used = 1;</span></pre>
-<pre><span class="lineno"><a href="#line_5962" id="line_5962"> 5962.</a></span><span class="count                ">   2037</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_5963" id="line_5963"> 5963.</a></span><span class="count                ">   2037</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5964" id="line_5964"> 5964.</a></span><span class="count                ">   2037</span><span>// Give the function properties for storing its names and for observing the</span></pre>
-<pre><span class="lineno"><a href="#line_5965" id="line_5965"> 5965.</a></span><span class="count                ">   2037</span><span>// depth of loops and switches.</span></pre>
-<pre><span class="lineno"><a href="#line_5966" id="line_5966"> 5966.</a></span><span class="count                ">   2037</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5967" id="line_5967"> 5967.</a></span><span class="count                ">   2037</span><span>        Object.assign(the_function, {</span></pre>
-<pre><span class="lineno"><a href="#line_5968" id="line_5968"> 5968.</a></span><span class="count                ">   2037</span><span>            async: the_function.async || 0,</span></pre>
-<pre><span class="lineno"><a href="#line_5969" id="line_5969"> 5969.</a></span><span class="count                ">   2039</span><span>            context: empty(),</span></pre>
-<pre><span class="lineno"><a href="#line_5970" id="line_5970"> 5970.</a></span><span class="count                ">   2039</span><span>            finally: 0,</span></pre>
-<pre><span class="lineno"><a href="#line_5971" id="line_5971"> 5971.</a></span><span class="count                ">   2039</span><span>            level: functionage.level + 1,</span></pre>
-<pre><span class="lineno"><a href="#line_5972" id="line_5972"> 5972.</a></span><span class="count                ">   2039</span><span>            loop: 0,</span></pre>
-<pre><span class="lineno"><a href="#line_5973" id="line_5973"> 5973.</a></span><span class="count                ">   2039</span><span>            statement_prv: undefined,</span></pre>
-<pre><span class="lineno"><a href="#line_5974" id="line_5974"> 5974.</a></span><span class="count                ">   2039</span><span>            switch: 0,</span></pre>
-<pre><span class="lineno"><a href="#line_5975" id="line_5975"> 5975.</a></span><span class="count                ">   2039</span><span>            try: 0</span></pre>
-<pre><span class="lineno"><a href="#line_5976" id="line_5976"> 5976.</a></span><span class="count                ">   2039</span><span>        });</span></pre>
-<pre><span class="lineno"><a href="#line_5977" id="line_5977"> 5977.</a></span><span class="count                ">   2039</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5978" id="line_5978"> 5978.</a></span><span class="count                ">   2039</span><span>// PR-384 - Relax warning "function_in_loop".</span></pre>
-<pre><span class="lineno"><a href="#line_5979" id="line_5979"> 5979.</a></span><span class="count                ">   2039</span><span>//</span></pre>
-<pre><span class="lineno"><a href="#line_5980" id="line_5980"> 5980.</a></span><span class="count                ">   2039</span><span>//         if (functionage.loop &gt; 0) {</span></pre>
-<pre><span class="lineno"><a href="#line_5981" id="line_5981"> 5981.</a></span><span class="count                ">   2039</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5982" id="line_5982"> 5982.</a></span><span class="count                ">   2039</span><span>// // test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_5983" id="line_5983"> 5983.</a></span><span class="count                ">   2039</span><span>// // ["while(0){aa.map(()=&gt;0);}", "parse_fart", "function_in_loop", "=&gt;", 19]</span></pre>
-<pre><span class="lineno"><a href="#line_5984" id="line_5984"> 5984.</a></span><span class="count                ">   2039</span><span>//</span></pre>
-<pre><span class="lineno"><a href="#line_5985" id="line_5985"> 5985.</a></span><span class="count                ">   2039</span><span>//             warn("function_in_loop", the_function);</span></pre>
-<pre><span class="lineno"><a href="#line_5986" id="line_5986"> 5986.</a></span><span class="count                ">   2039</span><span>//         }</span></pre>
-<pre><span class="lineno"><a href="#line_5987" id="line_5987"> 5987.</a></span><span class="count                ">   2039</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5988" id="line_5988"> 5988.</a></span><span class="count                ">   2039</span><span>// Push the current function context and establish a new one.</span></pre>
-<pre><span class="lineno"><a href="#line_5989" id="line_5989"> 5989.</a></span><span class="count                ">   2039</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5990" id="line_5990"> 5990.</a></span><span class="count                ">   2039</span><span>        function_list.push(the_function);</span></pre>
-<pre><span class="lineno"><a href="#line_5991" id="line_5991"> 5991.</a></span><span class="count                ">   2039</span><span>        function_stack.push(functionage);</span></pre>
-<pre><span class="lineno"><a href="#line_5992" id="line_5992"> 5992.</a></span><span class="count                ">   2039</span><span>        functionage = the_function;</span></pre>
-<pre><span class="lineno"><a href="#line_5993" id="line_5993"> 5993.</a></span><span class="count                ">   2039</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5994" id="line_5994"> 5994.</a></span><span class="count                ">   2039</span><span>// Parse the parameter list.</span></pre>
-<pre><span class="lineno"><a href="#line_5995" id="line_5995"> 5995.</a></span><span class="count                ">   2039</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5996" id="line_5996"> 5996.</a></span><span class="count                ">     22</span><span>        if (mode_fart) {</span></pre>
+<pre><span class="lineno"><a href="#line_5944" id="line_5944"> 5944.</a></span><span class="count                ">   2037</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5945" id="line_5945"> 5945.</a></span><span class="count                ">   2037</span><span>// Give the function properties for storing its names and for observing the</span></pre>
+<pre><span class="lineno"><a href="#line_5946" id="line_5946"> 5946.</a></span><span class="count                ">   2037</span><span>// depth of loops and switches.</span></pre>
+<pre><span class="lineno"><a href="#line_5947" id="line_5947"> 5947.</a></span><span class="count                ">   2037</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5948" id="line_5948"> 5948.</a></span><span class="count                ">   2037</span><span>        Object.assign(the_function, {</span></pre>
+<pre><span class="lineno"><a href="#line_5949" id="line_5949"> 5949.</a></span><span class="count                ">   2037</span><span>            async: the_function.async || 0,</span></pre>
+<pre><span class="lineno"><a href="#line_5950" id="line_5950"> 5950.</a></span><span class="count                ">   2039</span><span>            context: empty(),</span></pre>
+<pre><span class="lineno"><a href="#line_5951" id="line_5951"> 5951.</a></span><span class="count                ">   2039</span><span>            finally: 0,</span></pre>
+<pre><span class="lineno"><a href="#line_5952" id="line_5952"> 5952.</a></span><span class="count                ">   2039</span><span>            level: functionage.level + 1,</span></pre>
+<pre><span class="lineno"><a href="#line_5953" id="line_5953"> 5953.</a></span><span class="count                ">   2039</span><span>            loop: 0,</span></pre>
+<pre><span class="lineno"><a href="#line_5954" id="line_5954"> 5954.</a></span><span class="count                ">   2039</span><span>            statement_prv: undefined,</span></pre>
+<pre><span class="lineno"><a href="#line_5955" id="line_5955"> 5955.</a></span><span class="count                ">   2039</span><span>            switch: 0,</span></pre>
+<pre><span class="lineno"><a href="#line_5956" id="line_5956"> 5956.</a></span><span class="count                ">   2039</span><span>            try: 0</span></pre>
+<pre><span class="lineno"><a href="#line_5957" id="line_5957"> 5957.</a></span><span class="count                ">   2039</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_5958" id="line_5958"> 5958.</a></span><span class="count                ">     22</span><span>        if (mode_fart) {</span></pre>
+<pre><span class="lineno"><a href="#line_5959" id="line_5959"> 5959.</a></span><span class="count                ">     22</span><span>            the_function.arity = "binary";</span></pre>
+<pre><span class="lineno"><a href="#line_5960" id="line_5960"> 5960.</a></span><span class="count                ">     22</span><span>            the_function.name = anon;</span></pre>
+<pre><span class="lineno"><a href="#line_5961" id="line_5961"> 5961.</a></span><span class="count                ">   2037</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_5962" id="line_5962"> 5962.</a></span><span class="count                ">   2037</span><span>        if (</span></pre>
+<pre><span class="lineno"><a href="#line_5963" id="line_5963"> 5963.</a></span><span class="count                ">   2037</span><span>            !mode_fart</span></pre>
+<pre><span class="lineno"><a href="#line_5964" id="line_5964"> 5964.</a></span><span class="count                ">   2037</span><span>            &amp;&amp; the_function.arity !== "statement"</span></pre>
+<pre><span class="lineno"><a href="#line_5965" id="line_5965"> 5965.</a></span><span class="count                ">    942</span><span>            &amp;&amp; typeof name === "object"</span></pre>
+<pre><span class="lineno"><a href="#line_5966" id="line_5966"> 5966.</a></span><span class="count                ">     28</span><span>        ) {</span></pre>
+<pre><span class="lineno"><a href="#line_5967" id="line_5967"> 5967.</a></span><span class="count                ">     28</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5968" id="line_5968"> 5968.</a></span><span class="count                ">     28</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_5969" id="line_5969"> 5969.</a></span><span class="count                ">     28</span><span>// ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]</span></pre>
+<pre><span class="lineno"><a href="#line_5970" id="line_5970"> 5970.</a></span><span class="count                ">     28</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5971" id="line_5971"> 5971.</a></span><span class="count                ">     28</span><span>            test_cause("expression", name.id);</span></pre>
+<pre><span class="lineno"><a href="#line_5972" id="line_5972"> 5972.</a></span><span class="count                ">     28</span><span>            name_enroll(name, "function", true);</span></pre>
+<pre><span class="lineno"><a href="#line_5973" id="line_5973"> 5973.</a></span><span class="count                ">     28</span><span>            name.dead = false;</span></pre>
+<pre><span class="lineno"><a href="#line_5974" id="line_5974"> 5974.</a></span><span class="count                ">     28</span><span>            name.init = true;</span></pre>
+<pre><span class="lineno"><a href="#line_5975" id="line_5975"> 5975.</a></span><span class="count                ">     28</span><span>            name.used = 1;</span></pre>
+<pre><span class="lineno"><a href="#line_5976" id="line_5976"> 5976.</a></span><span class="count                ">   2037</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_5977" id="line_5977"> 5977.</a></span><span class="count                ">   2037</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5978" id="line_5978"> 5978.</a></span><span class="count                ">   2037</span><span>// PR-384 - Relax warning "function_in_loop".</span></pre>
+<pre><span class="lineno"><a href="#line_5979" id="line_5979"> 5979.</a></span><span class="count                ">   2037</span><span>//</span></pre>
+<pre><span class="lineno"><a href="#line_5980" id="line_5980"> 5980.</a></span><span class="count                ">   2037</span><span>//         if (functionage.loop &gt; 0) {</span></pre>
+<pre><span class="lineno"><a href="#line_5981" id="line_5981"> 5981.</a></span><span class="count                ">   2037</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5982" id="line_5982"> 5982.</a></span><span class="count                ">   2037</span><span>// // test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_5983" id="line_5983"> 5983.</a></span><span class="count                ">   2037</span><span>// // ["while(0){aa.map(()=&gt;0);}", "parse_fart", "function_in_loop", "=&gt;", 19]</span></pre>
+<pre><span class="lineno"><a href="#line_5984" id="line_5984"> 5984.</a></span><span class="count                ">   2037</span><span>//</span></pre>
+<pre><span class="lineno"><a href="#line_5985" id="line_5985"> 5985.</a></span><span class="count                ">   2037</span><span>//             warn("function_in_loop", the_function);</span></pre>
+<pre><span class="lineno"><a href="#line_5986" id="line_5986"> 5986.</a></span><span class="count                ">   2037</span><span>//         }</span></pre>
+<pre><span class="lineno"><a href="#line_5987" id="line_5987"> 5987.</a></span><span class="count                ">   2037</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5988" id="line_5988"> 5988.</a></span><span class="count                ">   2037</span><span>// Push the current function context and establish a new one.</span></pre>
+<pre><span class="lineno"><a href="#line_5989" id="line_5989"> 5989.</a></span><span class="count                ">   2037</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5990" id="line_5990"> 5990.</a></span><span class="count                ">   2037</span><span>        function_list.push(the_function);</span></pre>
+<pre><span class="lineno"><a href="#line_5991" id="line_5991"> 5991.</a></span><span class="count                ">   2037</span><span>        function_stack.push(functionage);</span></pre>
+<pre><span class="lineno"><a href="#line_5992" id="line_5992"> 5992.</a></span><span class="count                ">   2037</span><span>        functionage = the_function;</span></pre>
+<pre><span class="lineno"><a href="#line_5993" id="line_5993"> 5993.</a></span><span class="count                ">   2037</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5994" id="line_5994"> 5994.</a></span><span class="count                ">   2037</span><span>// Parse the parameter list.</span></pre>
+<pre><span class="lineno"><a href="#line_5995" id="line_5995"> 5995.</a></span><span class="count                ">   2037</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5996" id="line_5996"> 5996.</a></span><span class="count                ">   2037</span><span>        if (mode_fart) {</span></pre>
 <pre><span class="lineno"><a href="#line_5997" id="line_5997"> 5997.</a></span><span class="count                ">     22</span><span>            prefix_function_parameter(the_function, mode_infix_fart);</span></pre>
 <pre><span class="lineno"><a href="#line_5998" id="line_5998"> 5998.</a></span><span class="count                ">     22</span><span>            if (!mode_infix_fart) {</span></pre>
 <pre><span class="lineno"><a href="#line_5999" id="line_5999"> 5999.</a></span><span class="count                ">     22</span><span>                advance("=&gt;");</span></pre>

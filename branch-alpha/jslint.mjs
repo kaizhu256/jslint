@@ -5941,6 +5941,20 @@ function jslint_phase3_parse(state) {
                 }
             }
         }
+
+// Give the function properties for storing its names and for observing the
+// depth of loops and switches.
+
+        Object.assign(the_function, {
+            async: the_function.async || 0,
+            context: empty(),
+            finally: 0,
+            level: functionage.level + 1,
+            loop: 0,
+            statement_prv: undefined,
+            switch: 0,
+            try: 0
+        });
         if (mode_fart) {
             the_function.arity = "binary";
             the_function.name = anon;
@@ -5960,20 +5974,6 @@ function jslint_phase3_parse(state) {
             name.init = true;
             name.used = 1;
         }
-
-// Give the function properties for storing its names and for observing the
-// depth of loops and switches.
-
-        Object.assign(the_function, {
-            async: the_function.async || 0,
-            context: empty(),
-            finally: 0,
-            level: functionage.level + 1,
-            loop: 0,
-            statement_prv: undefined,
-            switch: 0,
-            try: 0
-        });
 
 // PR-384 - Relax warning "function_in_loop".
 //
