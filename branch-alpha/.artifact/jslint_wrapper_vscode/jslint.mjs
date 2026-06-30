@@ -7939,50 +7939,50 @@ function jslint_phase4_walk(state) {
     function name_lookup(thing, init) {
 
 // This function will:
-// 1. Lookup and return variable or function-parameter <name> in current context
-//    from given <thing>.id.
-// 2. Set <name>.init = true, if lookup was from an assignment.
+// 1. Lookup and return variable or function-parameter <the_variable> in current
+//    context from given <thing>.id.
+// 2. Set <the_variable>.init = true, if lookup was from an assignment.
 
         let id = thing.id;
-        let name;
+        let the_variable;
         if (thing.arity !== "variable") {
             return;
         }
 
 // Look up the variable in the current context.
 
-        name = functionage.context[id] || catchage.context[id];
+        the_variable = functionage.context[id] || catchage.context[id];
 
 // Set variable as initialized, if lookup was from an assignment.
 
-        if (init && name && !name.readonly) {
-            name.init = true;
+        if (init && the_variable && !the_variable.readonly) {
+            the_variable.init = true;
         }
 
 // If it isn't local, search all the other contexts. If there are name
 // collisions, take the most recent.
 
-        if (name && name.role === "label") {
+        if (the_variable && the_variable.role === "label") {
 
 // test_cause:
 // ["aa:while(0){aa;}", "name_lookup", "label_a", "aa", 13]
 
             warn("label_a", thing);
-            return name;
+            return the_variable;
         }
-        if (!name) {
+        if (!the_variable) {
             function_stack.forEach(function ({
                 context
             }) {
                 if (context[id] && context[id].role !== "label") {
-                    name = context[id];
+                    the_variable = context[id];
                 }
             });
 
 // If it isn't in any of those either, perhaps it is a predefined global.
 // If so, add it to the global context.
 
-            if (!name && global_dict[id] === undefined) {
+            if (!the_variable && global_dict[id] === undefined) {
 
 // test_cause:
 // ["aa", "name_lookup", "undeclared_a", "aa", 1]
@@ -7997,8 +7997,8 @@ function jslint_phase4_walk(state) {
                 warn("undeclared_a", thing);
                 return;
             }
-            if (!name) {
-                name = {
+            if (!the_variable) {
+                the_variable = {
                     dead: false,
                     id,
                     init: true,
@@ -8007,18 +8007,18 @@ function jslint_phase4_walk(state) {
                     role: "variable",
                     used: 0
                 };
-                token_global.context[id] = name;
+                token_global.context[id] = the_variable;
             }
-            name.closure = true;
-            functionage.context[id] = name;
+            the_variable.closure = true;
+            functionage.context[id] = the_variable;
         }
         if (
             (
-                name.calls === undefined
+                the_variable.calls === undefined
                 || functionage.name === undefined
-                || name.calls[functionage.name.id] === undefined
+                || the_variable.calls[functionage.name.id] === undefined
             )
-            && name.dead
+            && the_variable.dead
         ) {
 
 // test_cause:
@@ -8028,7 +8028,10 @@ function jslint_phase4_walk(state) {
 
             warn("out_of_scope_a", thing);
         }
-        return name;
+        if (init && !the_variable.init) {
+            debugInline(the_variable);
+        }
+        return the_variable;
     }
 
     function post_a(thing) {
@@ -8090,6 +8093,9 @@ function jslint_phase4_walk(state) {
                     warn("bad_assignment_a", name);
                     return;
                 }
+                //!! if (the_variable?.init !== true) {
+                    //!! debugInline(the_variable);
+                //!! }
                 the_variable.init = true;
             });
             return;

@@ -455,7 +455,22 @@ jstestIt((
     __consoleError("\n");
     return argList[0];
 }</pre></li>
-<li>Example usage:<pre class="apidocCodePre">N/A</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+// ["const aa=0;aa=0", "post_a", "bad_assignment_a", "aa", 12]
+
+            test_cause("=", name.id);
+            warn("bad_assignment_a", name);
+            return;
+        }
+        //!! if (the_variable?.init !== true) {
+            //!! <span class="apidocCodeKeywordSpan">debugInline</span>(the_variable);
+        //!! }
+        the_variable.init = true;
+    });
+    return;
+}
+if (lvalue.id === "." &amp;&amp; thing.expression[1].id === "undefined") {
+...</pre></li>
 
 <li>
     <h2>
