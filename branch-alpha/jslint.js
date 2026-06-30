@@ -4906,7 +4906,7 @@ function jslint_phase3_parse(state) {
 // ["aa=>0", "infix_fart_unwrapped", "wrap_fart_parameter", "=>", 3]
 
         warn("wrap_fart_parameter", token_now);
-        return parse_fart(token_now, true);
+        return parse_fart(token_now, true, true);
     }
 
     function infix_grave(left) {
@@ -5267,18 +5267,22 @@ function jslint_phase3_parse(state) {
         return left;
     }
 
-    function parse_fart(the_fart, mode_infix_fart) {
+    function parse_fart(the_function, mode_fart, mode_infix_fart) {
 
 // Give the function properties storing its names and for observing the depth
 // of loops and switches.
 
-        Object.assign(the_fart, {
-            arity: "binary",
+        if (mode_fart) {
+            the_function.arity = "binary";
+            the_function.name = anon;
+        }
+        Object.assign(the_function, {
+            async: the_function.async || 0,
             context: empty(),
             finally: 0,
             level: functionage.level + 1,
             loop: 0,
-            name: anon,
+            statement_prv: undefined,
             switch: 0,
             try: 0
         });
@@ -5290,18 +5294,18 @@ function jslint_phase3_parse(state) {
 // // test_cause:
 // // ["while(0){aa.map(()=>0);}", "parse_fart", "function_in_loop", "=>", 19]
 //
-//             warn("function_in_loop", the_fart);
+//             warn("function_in_loop", the_function);
 //         }
 
 // Push the current function context and establish a new one.
 
-        function_list.push(the_fart);
+        function_list.push(the_function);
         function_stack.push(functionage);
-        functionage = the_fart;
+        functionage = the_function;
 
 // Parse the parameter list.
 
-        prefix_function_parameter(the_fart, mode_infix_fart);
+        prefix_function_parameter(the_function, mode_infix_fart);
         if (!mode_infix_fart) {
             advance("=>");
         }
@@ -5314,9 +5318,9 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["()=>{}", "parse_fart", "use_function_not_fart", "=>", 3]
 
-                warn("use_function_not_fart", the_fart);
+                warn("use_function_not_fart", the_function);
             }
-            the_fart.block = block("body");
+            the_function.block = block("body");
 
 // The function's body is an expression.
 
@@ -5339,13 +5343,13 @@ function jslint_phase3_parse(state) {
                     "=>"
                 );
             }
-            the_fart.expression = parse_expression(0);
+            the_function.expression = parse_expression(0);
         }
 
 // Restore the previous context.
 
         functionage = function_stack.pop();
-        return the_fart;
+        return the_function;
     }
 
     function parse_json() {
@@ -5983,9 +5987,9 @@ function jslint_phase3_parse(state) {
         return stop("expected_a_before_b", token_now, "()", "=>");
     }
 
-    function prefix_function(the_function) {
-        let name = the_function && the_function.name;
-        if (the_function === undefined) {
+    function prefix_function(the_function, mode_fart) {
+        let name = the_function?.name;
+        if (the_function === undefined && !mode_fart) {
             the_function = token_now;
 
 // A function statement must have a name that will be in the parent's scope.
@@ -6414,7 +6418,7 @@ function jslint_phase3_parse(state) {
 // PR-385 - Bugfix - Fixes issue #382 - failure to detect destructured fart.
 
         if (token_now.fart) {
-            return parse_fart(token_now.fart);
+            return parse_fart(token_now.fart, true, false);
         }
 
 // test_cause:
