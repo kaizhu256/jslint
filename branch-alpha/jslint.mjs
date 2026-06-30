@@ -8899,7 +8899,7 @@ function jslint_phase4_walk(state) {
     }
 
     function pre_v(thing) {
-        const the_variable = name_lookup(thing);
+        const the_variable = name_lookup(thing, false);
         if (the_variable !== undefined) {
             thing.variable = the_variable;
             the_variable.used += 1;
