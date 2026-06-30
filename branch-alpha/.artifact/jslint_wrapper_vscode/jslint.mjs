@@ -5305,9 +5305,15 @@ function jslint_phase3_parse(state) {
 
 // Parse the parameter list.
 
-        prefix_function_parameter(the_function, mode_infix_fart);
-        if (!mode_infix_fart) {
-            advance("=>");
+        if (mode_fart) {
+            prefix_function_parameter(the_function, mode_infix_fart);
+            if (!mode_infix_fart) {
+                advance("=>");
+            }
+        } else {
+            advance("(");
+            token_now.arity = "function";
+            prefix_function_parameter(the_function);
         }
 
 // The function's body is a block.
@@ -5987,7 +5993,7 @@ function jslint_phase3_parse(state) {
         return stop("expected_a_before_b", token_now, "()", "=>");
     }
 
-    function prefix_function(the_function, mode_fart) {
+    function prefix_function(the_function, mode_fart, mode_infix_fart) {
         let name = the_function?.name;
         if (the_function === undefined && !mode_fart) {
             the_function = token_now;
@@ -6082,9 +6088,16 @@ function jslint_phase3_parse(state) {
 
 // Parse the parameter list.
 
-        advance("(");
-        token_now.arity = "function";
-        prefix_function_parameter(the_function);
+        if (mode_fart) {
+            prefix_function_parameter(the_function, mode_infix_fart);
+            if (!mode_infix_fart) {
+                advance("=>");
+            }
+        } else {
+            advance("(");
+            token_now.arity = "function";
+            prefix_function_parameter(the_function);
+        }
 
 // The function's body is a block.
 
