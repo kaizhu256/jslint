@@ -5318,19 +5318,9 @@ function jslint_phase3_parse(state) {
 
 // The function's body is a block.
 
-        if (token_nxt.id === "{") {
-            if (!option_dict.fart) {
-
-// test_cause:
-// ["()=>{}", "parse_fart", "use_function_not_fart", "=>", 3]
-
-                warn("use_function_not_fart", the_function);
-            }
-            the_function.block = block("body");
+        if (mode_fart && token_nxt.id !== "{") {
 
 // The function's body is an expression.
-
-        } else {
 
 // PR-384 - Bugfix - Fixes issue #379 - warn against naked-statement in fart.
 
@@ -5350,6 +5340,58 @@ function jslint_phase3_parse(state) {
                 );
             }
             the_function.expression = parse_expression(0);
+        } else if (mode_fart) {
+            if (!option_dict.fart) {
+
+// test_cause:
+// ["()=>{}", "parse_fart", "use_function_not_fart", "=>", 3]
+
+                warn("use_function_not_fart", the_function);
+            }
+            the_function.block = block("body");
+        } else {
+            the_function.block = block("body");
+            if (
+                the_function.arity === "statement"
+                && token_nxt.line === token_now.line
+            ) {
+
+// test_cause:
+// ["function aa(){}0", "prefix_function", "unexpected_a", "0", 16]
+
+                return stop("unexpected_a");
+            }
+            if (
+                token_nxt.id === "."
+                || token_nxt.id === "?."
+
+// PR-459 - Allow destructuring-assignment after function-definition.
+
+                // || token_nxt.id === "["
+            ) {
+
+// test_cause:
+// ["function aa(){}\n.aa", "prefix_function", "unexpected_a", ".", 1]
+// ["function aa(){}\n?.aa", "prefix_function", "unexpected_a", "?.", 1]
+
+                warn("unexpected_a");
+            }
+
+// Check functions are ordered.
+
+            check_ordered(
+                "function",
+                function_list.slice(
+                    function_list.indexOf(the_function) + 1
+                ).map(function ({
+                    level,
+                    name
+                }) {
+                    return (level === the_function.level + 1) && name;
+                }).filter(function (name) {
+                    return option_dict.beta && name && name.id;
+                })
+            );
         }
 
 // Restore the previous context.
