@@ -6098,7 +6098,7 @@ function jslint_phase3_parse(state) {
         if (mode_fart) {
             the_function.arity = "binary";
             the_function.name = anon;
-        } else if (the_function === undefined) {
+        } else if (!the_function) {
             the_function = token_now;
 
 // A function statement must have a name that will be in the parent's scope.
@@ -6123,7 +6123,7 @@ function jslint_phase3_parse(state) {
                     init: true
                 });
                 advance();
-            } else if (name === undefined) {
+            } else if (!name) {
 
 // A function expression may have an optional name.
 
@@ -6134,6 +6134,21 @@ function jslint_phase3_parse(state) {
                     advance();
                 }
             }
+        }
+        if (
+            !mode_fart
+            && the_function.arity !== "statement"
+            && typeof name === "object"
+        ) {
+
+// test_cause:
+// ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]
+
+            test_cause("expression", name.id);
+            name_enroll(name, "function", true);
+            name.dead = false;
+            name.init = true;
+            name.used = 1;
         }
 
 //  Probably deadcode.
@@ -6170,17 +6185,6 @@ function jslint_phase3_parse(state) {
             switch: 0,
             try: 0
         });
-        if (the_function.arity !== "statement" && typeof name === "object") {
-
-// test_cause:
-// ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]
-
-            test_cause("expression", name.id);
-            name_enroll(name, "function", true);
-            name.dead = false;
-            name.init = true;
-            name.used = 1;
-        }
 
 // PR-384 - Relax warning "function_in_loop".
 //
@@ -6220,8 +6224,8 @@ function jslint_phase3_parse(state) {
 // PR-384 - Bugfix - Fixes issue #379 - warn against naked-statement in fart.
 
             if (
-                syntax_dict[token_nxt.id] !== undefined
-                && syntax_dict[token_nxt.id].fud_stmt !== undefined
+                syntax_dict[token_nxt.id]
+                && syntax_dict[token_nxt.id].fud_stmt
             ) {
 
 // test_cause:
