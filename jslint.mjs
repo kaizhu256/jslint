@@ -4521,13 +4521,20 @@ function jslint_phase3_parse(state) {
 
 // This function will warn if <token_list> is unordered.
 
-        token_list.reduce(function (aa, token) {
-            const bb = artifact(token);
-            if (!option_dict.unordered && aa > bb) {
-                warn("expected_a_b_before_c_d", token, type, bb, type, aa);
-            }
-            return bb;
-        }, "");
+        token_list
+            .filter(function (token) {
+
+// Issue #401 - Regression - Ignore tokens prefixed by ellipsis for sorting.
+
+                return token && !token.ellipsis;
+            })
+            .reduce(function (aa, token) {
+                const bb = artifact(token);
+                if (!option_dict.unordered && aa > bb) {
+                    warn("expected_a_b_before_c_d", token, type, bb, type, aa);
+                }
+                return bb;
+            }, "");
     }
 
     function check_ordered_case(case_list) {
@@ -4980,7 +4987,6 @@ function jslint_phase3_parse(state) {
 
                     test_cause("aa(...aa)");
                     the_argument = prefix_ellipsis();
-                    the_argument.ellipsis = true;
                 } else {
                     the_argument = parse_expression(10);
                 }
@@ -5286,8 +5292,10 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["[-.0]", "parse_json", "unexpected_a", ".", 3]
 // ["[-0x0]", "parse_json", "unexpected_a", "0x0", 3]
+// ["[...]", "parse_json", "unexpected_a", "...", 2]
 // ["[.0]", "parse_json", "unexpected_a", ".", 2]
 // ["[0x0]", "parse_json", "unexpected_a", "0x0", 2]
+// ["{...}", "parse_json", "unexpected_a", "...", 2]
 
                 warn("unexpected_a");
             }
@@ -5719,6 +5727,7 @@ function jslint_phase3_parse(state) {
             case "...":
                 advance_and_signature_push("...");
                 name = token_nxt;
+                name.ellipsis = true;
                 if (name.id === "...") {
 
 // test_cause:
@@ -5904,6 +5913,7 @@ function jslint_phase3_parse(state) {
         let after_ellipsis;
         advance("...");
         after_ellipsis = parse_expression(0);
+        after_ellipsis.ellipsis = true;
         return after_ellipsis;
     }
 
@@ -6154,7 +6164,6 @@ function jslint_phase3_parse(state) {
 
                 test_cause("ellipsis");
                 value = prefix_ellipsis();
-                value.ellipsis = true;
                 return value;
             }
             advance();
@@ -6290,11 +6299,7 @@ function jslint_phase3_parse(state) {
 
         check_ordered(
             "property",
-            the_brace.expression.filter(function ({
-                ellipsis
-            }) {
-                return !ellipsis;
-            }).map(function ({
+            the_brace.expression.map(function ({
                 label
             }) {
                 return label;
@@ -6334,16 +6339,16 @@ function jslint_phase3_parse(state) {
                 if (!state.mode_json && token_nxt.id === "...") {
 
 // test_cause:
-// [";[...aa,aa]", "advance", "expected_a_b", ",", 8]
-// [";[...aa,aa]", "prefix_lbracket", "ellipsis", "...", 0]
+// ["aa=[...aa]", "prefix_lbracket", "ellipsis", "...", 0]
 
                     test_cause("ellipsis", token_nxt.id);
-                    element = prefix_ellipsis();
-                    the_token.expression.push(element);
-                    break;
+                    the_token.expression.push(prefix_ellipsis());
+
+// Issue #401 - Regression - Allow multiple-ellipsis in array-literal.
+
+                } else {
+                    the_token.expression.push(parse_expression(10));
                 }
-                element = parse_expression(10);
-                the_token.expression.push(element);
                 if (token_nxt.id !== ",") {
                     break;
                 }
@@ -6351,7 +6356,7 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id === "]") {
 
 // test_cause:
-// ["let aa=[0,]", "prefix_lbracket", "unexpected_a", ",", 10]
+// ["aa=[0,]", "prefix_lbracket", "unexpected_a", ",", 6]
 
                     warn("unexpected_a", token_now);
                     break;
