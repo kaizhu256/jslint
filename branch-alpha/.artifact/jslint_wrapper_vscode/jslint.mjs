@@ -6972,7 +6972,7 @@ function jslint_phase3_parse(state) {
                         name_push(
                             the_import.name_list,       // name_list
                             name,       // name
-                            true,        // enroll
+                            true,       // enroll
                             "variable", // role
                             true,       // readonly
                             true        // init
