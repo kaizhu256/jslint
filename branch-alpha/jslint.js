@@ -7955,7 +7955,7 @@ function jslint_phase4_walk(state) {
 
 // Set variable as initialized, if lookup was from an assignment.
 
-        if (init) {
+        if (init && name && !name.readonly && noop()) {
             name.init = true;
         }
 
