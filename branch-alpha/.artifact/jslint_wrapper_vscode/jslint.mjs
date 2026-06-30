@@ -8077,7 +8077,7 @@ function jslint_phase4_walk(state) {
         }
         if (thing.name_list) {
             thing.name_list.forEach(function (name) {
-                const the_variable = name_lookup(name);
+                const the_variable = name_lookup(name, true);
                 if (!the_variable || the_variable.readonly) {
 
 // test_cause:
