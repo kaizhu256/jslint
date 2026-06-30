@@ -5928,9 +5928,6 @@ function jslint_phase3_parse(state) {
                     the_function.name = name;
                     name.calls = empty();
                     role = "variable";
-                    name_enroll(name, role, true);
-                    name.dead = false;
-                    name.init = true;
                     advance();
                 } else if (!name) {
 
@@ -5944,10 +5941,7 @@ function jslint_phase3_parse(state) {
                     }
                 }
             }
-            if (
-                the_function.arity !== "statement"
-                && typeof name === "object"
-            ) {
+            if (typeof name === "object") {
 
 // test_cause:
 // ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]
