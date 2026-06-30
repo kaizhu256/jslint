@@ -5268,14 +5268,16 @@ function jslint_phase3_parse(state) {
     }
 
     function parse_fart(the_function, mode_fart, mode_infix_fart) {
-
-// Give the function properties storing its names and for observing the depth
-// of loops and switches.
-
+        let name = the_function?.name;
+        noop(name);
         if (mode_fart) {
             the_function.arity = "binary";
             the_function.name = anon;
         }
+
+// Give the function properties storing its names and for observing the depth
+// of loops and switches.
+
         Object.assign(the_function, {
             async: the_function.async || 0,
             context: empty(),
@@ -6037,7 +6039,10 @@ function jslint_phase3_parse(state) {
 
     function prefix_function(the_function, mode_fart, mode_infix_fart) {
         let name = the_function?.name;
-        if (the_function === undefined && !mode_fart) {
+        if (mode_fart) {
+            the_function.arity = "binary";
+            the_function.name = anon;
+        } else if (the_function === undefined) {
             the_function = token_now;
 
 // A function statement must have a name that will be in the parent's scope.
