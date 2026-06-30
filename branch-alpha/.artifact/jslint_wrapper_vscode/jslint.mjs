@@ -5904,10 +5904,7 @@ function jslint_phase3_parse(state) {
 
     function prefix_function(the_function, mode_fart, mode_infix_fart) {
         let name = the_function?.name;
-        if (mode_fart) {
-            the_function.arity = "binary";
-            the_function.name = anon;
-        } else if (!the_function) {
+        if (!the_function) {
             the_function = token_now;
 
 // A function statement must have a name that will be in the parent's scope.
@@ -5944,6 +5941,24 @@ function jslint_phase3_parse(state) {
                 }
             }
         }
+
+// Give the function properties for storing its names and for observing the
+// depth of loops and switches.
+
+        Object.assign(the_function, {
+            async: the_function.async || 0,
+            context: empty(),
+            finally: 0,
+            level: functionage.level + 1,
+            loop: 0,
+            statement_prv: undefined,
+            switch: 0,
+            try: 0
+        });
+        if (mode_fart) {
+            the_function.arity = "binary";
+            the_function.name = anon;
+        }
         if (
             !mode_fart
             && the_function.arity !== "statement"
@@ -5959,41 +5974,6 @@ function jslint_phase3_parse(state) {
             name.init = true;
             name.used = 1;
         }
-
-//  Probably deadcode.
-//  if (mode_mega) {
-//      warn("unexpected_a", the_function);
-//  }
-//  jslint_assert(!mode_mega, `Expected !mode_mega.`);
-
-// PR-378 - Relax warning "function_in_loop".
-//
-// // Don't create functions in loops. It is inefficient, and it can lead to
-// // scoping errors.
-//
-//         if (functionage.loop > 0) {
-//
-// // test_cause:
-// // ["
-// // while(0){aa.map(function(){});}
-// // ", "prefix_function", "function_in_loop", "function", 17]
-//
-//             warn("function_in_loop", the_function);
-//         }
-
-// Give the function properties for storing its names and for observing the
-// depth of loops and switches.
-
-        Object.assign(the_function, {
-            async: the_function.async || 0,
-            context: empty(),
-            finally: 0,
-            level: functionage.level + 1,
-            loop: 0,
-            statement_prv: undefined,
-            switch: 0,
-            try: 0
-        });
 
 // PR-384 - Relax warning "function_in_loop".
 //
