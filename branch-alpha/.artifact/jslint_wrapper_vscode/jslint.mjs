@@ -6182,6 +6182,16 @@ function jslint_phase3_parse(state) {
             name.used = 1;
         }
 
+// PR-384 - Relax warning "function_in_loop".
+//
+//         if (functionage.loop > 0) {
+
+// // test_cause:
+// // ["while(0){aa.map(()=>0);}", "parse_fart", "function_in_loop", "=>", 19]
+//
+//             warn("function_in_loop", the_function);
+//         }
+
 // Push the current function context and establish a new one.
 
         function_list.push(the_function);
