@@ -1085,10 +1085,10 @@ if (false) {
         # re-run until version propagates
         sh jslint_ci.sh shGithubPrCreate alpha master # 20xx.xx.xx
 
-        # squash re-run commits
+        # optional squash
         sh jslint_ci.sh shGitSquashPop <commit-hash> "- ci - shGithubPrUpdatePrxxx."
 
-        # squash re-run commits
+        # optional squash
         sh jslint_ci.sh shGithubPrCreate alpha master # 20xx.xx.xx
 
         git push upstream alpha -f

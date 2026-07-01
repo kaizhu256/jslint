@@ -983,6 +983,7 @@ shGitSquashPop() {(set -e
     git add .
     # commit HEAD immediately after previous $COMMIT
     git commit --allow-empty -am "$MESSAGE" || true
+    git log -n 4
 )}
 
 shGithubCheckoutRemote() {(set -e
@@ -1226,6 +1227,7 @@ import moduleFs from "fs";
     git push origin alpha -f
     shDirHttplinkValidate
     git push . HEAD:__pr_${branchMerge} -f
+    git log -n 4
 )
             `)
         ],
