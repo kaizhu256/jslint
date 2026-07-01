@@ -10,7 +10,7 @@
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
-# v2026.6.30
+# v2026.6.1-beta
 - jslint-ecma - Update README.md, documenting supported ES2015+ features.
 - jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure().
 - jslint-ci - Add shell-function shGithubPrUpdatePrxxx() to auto-update 'PR-xxx' placeholder to next sequential github issue/pull number.
