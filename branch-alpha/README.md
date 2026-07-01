@@ -1031,6 +1031,9 @@ if (false) {
         # squash intermediary commits
         sh jslint_ci.sh shGithubPrCreate alpha beta # v20xx.xx.xx
 
+        # squash intermediary commits
+        git push . __pr_beta_pre~:__pr_beta_pre -f
+
         git push upstream alpha -f
         ```
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
@@ -1093,6 +1096,9 @@ if (false) {
 
         # squash intermediary commits
         sh jslint_ci.sh shGithubPrCreate alpha master # v20xx.xx.xx
+
+        # squash intermediary commits
+        git push . __pr_master_pre~:__pr_master_pre -f
 
         git push upstream alpha -f
         ```
