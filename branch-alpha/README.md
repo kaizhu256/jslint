@@ -1016,13 +1016,6 @@ if (false) {
     - verify `<CHANGELOG.md entry #1>` is most-relevant to pull-request.
     - run
         ```shell
-        # re-run until version propagates
-        npm run test2
-
-        sh jslint_ci.sh shGitSquashPop <commit-hash> "<CHANGELOG.md entry #1>"
-        ```
-    - run
-        ```shell
         sh jslint_ci.sh shGithubPrUpdatePrxxx
 
         git push . HEAD:beta -f
@@ -1030,8 +1023,14 @@ if (false) {
         # re-run until version propagates
         sh jslint_ci.sh shGithubPrCreate beta beta # 20xx.xx.xx
 
-        # optional rebase
-        sh jslint_ci.sh shGitSquashPop <commit-hash> "<CHANGELOG.md entries>"
+        # squash re-run commits
+        sh jslint_ci.sh shGitSquashPop <commit-hash> "<CHANGELOG.md entry #1>"
+
+        # squash re-run commits
+        git push . HEAD:beta -f
+
+        # squash re-run commits
+        sh jslint_ci.sh shGithubPrCreate master beta # 20xx.xx.xx
 
         git push upstream alpha -f
         ```
@@ -1089,7 +1088,7 @@ if (false) {
         sh jslint_ci.sh shGithubPrCreate master beta # 20xx.xx.xx
 
         # squash re-run commits
-        sh jslint_ci.sh shGitSquashPop <commit-hash> "<CHANGELOG.md entries>"
+        sh jslint_ci.sh shGitSquashPop <commit-hash> "- ci - Update version."
 
         # squash re-run commits
         git push . HEAD:beta -f

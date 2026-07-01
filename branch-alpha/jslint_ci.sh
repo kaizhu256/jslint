@@ -982,7 +982,7 @@ shGitSquashPop() {(set -e
     git reset "$COMMIT"
     git add .
     # commit HEAD immediately after previous $COMMIT
-    git commit -am "$MESSAGE" || true
+    git commit --allow-empty -am "$MESSAGE" || true
 )}
 
 shGithubCheckoutRemote() {(set -e
