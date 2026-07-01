@@ -1082,19 +1082,14 @@ if (false) {
         ```shell
         sh jslint_ci.sh shGithubPrUpdatePrxxx
 
-        git push . HEAD:beta -f
-
         # re-run until version propagates
-        sh jslint_ci.sh shGithubPrCreate master beta # 20xx.xx.xx
+        sh jslint_ci.sh shGithubPrCreate alpha master # 20xx.xx.xx
 
         # squash re-run commits
-        sh jslint_ci.sh shGitSquashPop <commit-hash> "- ci - Update version."
+        sh jslint_ci.sh shGitSquashPop <commit-hash> "- ci - shGithubPrUpdatePrxxx."
 
         # squash re-run commits
-        git push . HEAD:beta -f
-
-        # squash re-run commits
-        sh jslint_ci.sh shGithubPrCreate master beta # 20xx.xx.xx
+        sh jslint_ci.sh shGithubPrCreate alpha master # 20xx.xx.xx
 
         git push upstream alpha -f
         ```
