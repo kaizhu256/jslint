@@ -1016,21 +1016,23 @@ if (false) {
     - verify `<CHANGELOG.md entry #1>` is most-relevant to pull-request.
     - run
         ```shell
+        # re-run until version propagates
+        npm run test2
+
+        git commit -am "<CHANGELOG.md entries>"
+        ```
+    - run
+        ```shell
         sh jslint_ci.sh shGithubPrUpdatePrxxx
 
-        git push . HEAD:beta -f
-
         # re-run until version propagates
-        sh jslint_ci.sh shGithubPrCreate beta beta # 20xx.xx.xx
+        sh jslint_ci.sh shGithubPrCreate alpha beta # v20xx.xx.xx
 
-        # squash re-run commits
-        sh jslint_ci.sh shGitSquashPop <commit-hash> "<CHANGELOG.md entry #1>"
+        # optional squash
+        sh jslint_ci.sh shGitSquashPop "__pr_beta_pre~1" "- ci - shGithubPrUpdatePrxxx."
 
-        # squash re-run commits
-        git push . HEAD:beta -f
-
-        # squash re-run commits
-        sh jslint_ci.sh shGithubPrCreate master beta # 20xx.xx.xx
+        # optional squash
+        sh jslint_ci.sh shGithubPrCreate alpha beta # v20xx.xx.xx
 
         git push upstream alpha -f
         ```
@@ -1083,13 +1085,13 @@ if (false) {
         sh jslint_ci.sh shGithubPrUpdatePrxxx
 
         # re-run until version propagates
-        sh jslint_ci.sh shGithubPrCreate alpha master # 20xx.xx.xx
+        sh jslint_ci.sh shGithubPrCreate alpha master # v20xx.xx.xx
 
         # optional squash
-        sh jslint_ci.sh shGitSquashPop <commit-hash> "- ci - shGithubPrUpdatePrxxx."
+        sh jslint_ci.sh shGitSquashPop "__pr_master_pre~1" "- ci - shGithubPrUpdatePrxxx."
 
         # optional squash
-        sh jslint_ci.sh shGithubPrCreate alpha master # 20xx.xx.xx
+        sh jslint_ci.sh shGithubPrCreate alpha master # v20xx.xx.xx
 
         git push upstream alpha -f
         ```

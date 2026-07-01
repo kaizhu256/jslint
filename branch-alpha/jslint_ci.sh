@@ -1164,7 +1164,7 @@ import moduleFs from "fs";
     let commitMessage;
     let data;
     let version = process.argv[3] || new Date().toISOString().slice(0, 10);
-    version = version.replace((/-0?/g), ".");
+    version = version.replace((/-0?/g), ".").replace((/^v/), "");
     // security - sanitize branchXxx
     [
         branchCheckpoint, branchMerge, version
