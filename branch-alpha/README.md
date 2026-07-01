@@ -1054,6 +1054,7 @@ if (false) {
 
         <screenshot>
         ```
+    - click `Preview` and review
     - verify:
         - base respository: `kaizhu256/jslint`
         - base: `beta`
