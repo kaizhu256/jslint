@@ -1019,7 +1019,7 @@ if (false) {
         # re-run until version propagates
         npm run test2
 
-        git commit -am "<CHANGELOG.md entries>"
+        sh jslint_ci.sh shGitSquashPop <commit> "<CHANGELOG.md entries>"
         ```
     - run
         ```shell
@@ -1039,7 +1039,7 @@ if (false) {
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
 
-1. goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-p2026.6.28
+1. goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-p2026.7.1
     - click `Create pull request`
     - input `Add a title *` with: `<CHANGELOG.md entry #1>`
     - input `Add a description` with:
