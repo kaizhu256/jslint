@@ -1029,7 +1029,7 @@ if (false) {
         sh jslint_ci.sh shGithubPrCreate alpha beta # v20xx.xx.xx
 
         # optional squash
-        sh jslint_ci.sh shGitSquashPop "__pr_beta_pre~1" "- ci - shGithubPrUpdatePrxxx."
+        sh jslint_ci.sh shGitSquashPop __pr_beta_pre~1 "- ci - shGithubPrUpdatePrxxx."
 
         # optional squash
         sh jslint_ci.sh shGithubPrCreate alpha beta # v20xx.xx.xx
@@ -1088,7 +1088,7 @@ if (false) {
         sh jslint_ci.sh shGithubPrCreate alpha master # v20xx.xx.xx
 
         # optional squash
-        sh jslint_ci.sh shGitSquashPop "__pr_master_pre~1" "- ci - shGithubPrUpdatePrxxx."
+        sh jslint_ci.sh shGitSquashPop __pr_master_pre~1 "- ci - shGithubPrUpdatePrxxx."
 
         # optional squash
         sh jslint_ci.sh shGithubPrCreate alpha master # v20xx.xx.xx
