@@ -1078,15 +1078,7 @@ if (false) {
 1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
     - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
 1. update `CHANGELOG.md`
-    - remove `-beta` tag from `v20xx.xx.xx-beta`
     - verify `<CHANGELOG.md entry #1>` is most-relevant to pull-request.
-    - run
-        ```shell
-        # re-run until version propagates
-        npm run test2
-
-        sh jslint_ci.sh shGitSquashPop <commit-hash> "<CHANGELOG.md entry #1>"
-        ```
     - run
         ```shell
         sh jslint_ci.sh shGithubPrUpdatePrxxx
@@ -1098,6 +1090,12 @@ if (false) {
 
         # squash re-run commits
         sh jslint_ci.sh shGitSquashPop <commit-hash> "<CHANGELOG.md entries>"
+
+        # squash re-run commits
+        git push . HEAD:beta -f
+
+        # squash re-run commits
+        sh jslint_ci.sh shGithubPrCreate master beta # 20xx.xx.xx
 
         git push upstream alpha -f
         ```
