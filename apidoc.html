@@ -853,21 +853,21 @@ ${String(message).slice(0, 2000)}`
     throw error;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-// ["let aa={};", "whitage_case", "opener", "", 0]
+//     }
+// } else {
+//     if (right.from !== margin + 8) {
+//         expected_at(margin + 8);
+//     }
+// }
 
-test_cause("opener");
+        <span class="apidocCodeKeywordSpan">jslint_assert</span>(open, `Expected open.`);
+        jslint_assert(free, `Expected free.`);
+        if (right.from &lt; margin) {
 
-// Probably deadcode.
-// case "${}":
+// test_cause:
+// ["String(\nString\n()\n);", "no_space", "expected_at(margin)", "(", 0]
 
-<span class="apidocCodeKeywordSpan">jslint_assert</span>(
-    !(left.id + right.id === "${}"),
-    "Expected !(left.id + right.id === \"${}\")."
-);
-switch (left.id + right.id) {
-case "()":
-case "[]":
-case "{}":
+test_cause("expected_at(margin)", right.id);
 ...</pre></li>
 
 <li>
@@ -1388,7 +1388,7 @@ jslint_assert(
                 if (!name.used) {
 
 // test_cause:
-// ["/*jslint node*/\nlet aa;",...
+// ["function aa(bb){return;}",...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

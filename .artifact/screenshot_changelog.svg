@@ -113,13 +113,13 @@
     textLength="768"
     x="10"
     y="406"
->- jslint-regression - Fix long-running regression where 'let x = x;' doesn't warn about uninitia\</tspan>
+>- jslint-regression - Fix long-running regression where 'let x = x;' doesn't warn about temporal\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="428"
->  lized variables.                                                                               </tspan>
+>  -dead-zone.                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
