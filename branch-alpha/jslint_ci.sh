@@ -1158,12 +1158,15 @@ import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 (async function () {
-    let branchCheckpoint = process.argv[1] || "HEAD";
-    let branchMerge = process.argv[2] || "beta";
+    let [
+        ,
+        branchCheckpoint = "HEAD",
+        branchMerge = "beta",
+        version = new Date().toISOString().slice(0, 10)
+    ] = process.argv;
     let branchPull;
     let commitMessage;
     let data;
-    let version = process.argv[3] || new Date().toISOString().slice(0, 10);
     version = version.replace((/-0?/g), ".").replace((/^v/), "");
     // security - sanitize branchXxx
     [
