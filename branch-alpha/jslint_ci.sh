@@ -1225,13 +1225,13 @@ import moduleFs from "fs";
     . ./jslint_ci.sh
     npm run test2
     git reset "${branchSquash}"
-    git push . HEAD:__pr_${branchMerge}_pre -f
-    shGitSquashPop ${branchCheckpoint} \u0027${commitMessage}\u0027
-    git diff origin/${branchPull} || true
-    git push origin alpha:${branchPull} -f
+    git push . HEAD:__pr_"${branchMerge}"_pre -f
+    shGitSquashPop "${branchCheckpoint}" \u0027${commitMessage}\u0027
+    git diff origin/"${branchPull}" || true
+    git push origin alpha:"${branchPull}" -f
     git push origin alpha -f
     shDirHttplinkValidate
-    git push . HEAD:__pr_${branchMerge} -f
+    git push . HEAD:__pr_"${branchMerge}" -f
     git log -n 4
 )
             `)
@@ -1240,7 +1240,7 @@ import moduleFs from "fs";
     ).on("exit", function (exitCode) {
         moduleAssert.ok(
             exitCode === 0,
-            `shGithubPrCreate - exitCode=${exitCode}`
+            `shGithubPrCreate - exitCode="${exitCode}"`
         );
     });
 }());
