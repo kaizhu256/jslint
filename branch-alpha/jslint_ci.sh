@@ -1232,6 +1232,7 @@ import moduleFs from "fs";
     git push origin alpha -f
     shDirHttplinkValidate
     git push . HEAD:__pr_"${branchMerge}" -f
+    git diff __pr_"${branchMerge}"_pre
     git log -n 4
 )
             `)
