@@ -1,8 +1,6 @@
 # Changelog
 
 # Todo
-- jslint-regression - Fix multiline-method-chaining whitespace-check not working when function-call's parameter-list spans more than one line.
-- jslint-warning - Relax warnings for console.log() and friends.
 - jslint-ci - Automate linting of shell-scripts with shellcheck.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
@@ -11,14 +9,6 @@
 - jslint - Add html and css linting back into jslint.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
-
-# v2026.7.1-beta
-- jslint-regression - Fix long-running regression where 'let x = x;' doesn't warn about temporal-dead-zone.
-- jslint-warning - Tighten warning of unused variables to be always on, regardless of module / nodejs mode.
-- jslint-warning - Relax fat-arrow-warning "use_function_not_fart".
-- jslint - Wrap all property-updates 'name.init = true/false' with calls to:
-    name_lookup() - 'aa=0'
-    name_push()   - 'let aa=0'
 
 # v2026.6.30
 - jslint-ecma - Update README.md, documenting supported ES2015+ features.
