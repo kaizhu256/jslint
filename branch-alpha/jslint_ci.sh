@@ -1162,7 +1162,8 @@ import moduleFs from "fs";
         ,
         branchCheckpoint = "HEAD",
         branchMerge = "beta",
-        version = new Date().toISOString().slice(0, 10)
+        version = new Date().toISOString().slice(0, 10),
+        branchSquash = "HEAD"
     ] = process.argv;
     let branchPull;
     let commitMessage;
@@ -1214,7 +1215,7 @@ import moduleFs from "fs";
     );
     await moduleFs.promises.writeFile("README.md", data);
     // security - sanitize commitMessage
-    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
+    commitMessage = commitMessage.trim().replace((/\u0027/g), "$&\"$&\"$&");
     moduleChildProcess.spawn(
         "sh",
         [
@@ -1223,6 +1224,7 @@ import moduleFs from "fs";
 (set -e
     . ./jslint_ci.sh
     npm run test2
+    git reset "${branchSquash}"
     git push . HEAD:__pr_${branchMerge}_pre -f
     shGitSquashPop ${branchCheckpoint} \u0027${commitMessage}\u0027
     git diff origin/${branchPull} || true
