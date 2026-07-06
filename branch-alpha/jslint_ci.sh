@@ -1166,7 +1166,7 @@ import moduleFs from "fs";
         branchSquash = "HEAD"
     ] = process.argv;
     let branchPull;
-    let commitMessage;
+    let commitMessage = "";
     let data;
     version = version.replace((/-0?/g), ".").replace((/^v/), "");
     // security - sanitize branchXxx
@@ -1188,13 +1188,14 @@ import moduleFs from "fs";
             `\n\n# ${version}\n`
         );
         await moduleFs.promises.writeFile("CHANGELOG.md", data);
-        commitMessage = new RegExp(
+        commitMessage += new RegExp(
             `\n\n# ${version}\n[\\S\\s]+?\n\n`
         ).exec(data)[0];
         break;
     default:
         version = `p${version}`;
-        commitMessage = (
+        commitMessage += "- shGithubPrCreate - ";
+        commitMessage += (
             /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)(?:\n- |\n\n)/
         ).exec(data)[1];
     }
