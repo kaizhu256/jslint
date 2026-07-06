@@ -1194,7 +1194,7 @@ import moduleFs from "fs";
         break;
     default:
         version = `p${version}`;
-        commitMessage += "- shGithubPrCreate - ";
+        commitMessage += "- shGithubPrCreate ";
         commitMessage += (
             /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)(?:\n- |\n\n)/
         ).exec(data)[1];
@@ -1233,7 +1233,6 @@ import moduleFs from "fs";
     git push origin alpha -f
     shDirHttplinkValidate
     git push . HEAD:__pr_"${branchMerge}" -f
-    git diff __pr_"${branchMerge}"_pre
     git log -n 4
 )
             `)
