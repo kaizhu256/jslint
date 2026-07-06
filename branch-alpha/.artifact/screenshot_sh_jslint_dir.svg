@@ -53,37 +53,37 @@
     textLength="768"
     x="10"
     y="186"
->jslint - 53ms - ./.ci.sh                                                                         </tspan>
+>jslint - 50ms - ./.ci.sh                                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="208"
->jslint - 61ms - ./CHANGELOG.md                                                                   </tspan>
+>jslint - 55ms - ./CHANGELOG.md                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="230"
->jslint ./hello.js                                                                                </tspan>
+>jslint - 67ms - ./README.md                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="252"
-> 1. Undeclared 'console'. // line 1, column 17                                                   </tspan>
+>jslint - 65ms - ./asset_image_logo_256.html                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="274"
->    function foo() {console.log('hello world');}                                                 </tspan>
+>jslint ./hello.js                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="296"
-> 2. Use double quotes, not single quotes. // line 1, column 29                                   </tspan>
+> 1. Undeclared 'console'. // line 1, column 17                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -95,85 +95,85 @@
     textLength="768"
     x="10"
     y="340"
->jslint - 65ms - ./hello.js                                                                       </tspan>
+> 2. Use double quotes, not single quotes. // line 1, column 29                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="362"
->jslint - 79ms - ./README.md                                                                      </tspan>
+>    function foo() {console.log('hello world');}                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="384"
->jslint - 275ms - ./jslint.js                                                                     </tspan>
+>jslint - 67ms - ./hello.js                                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="406"
->jslint - 410ms - ./jslint.mjs                                                                    </tspan>
+>jslint - 83ms - ./index.html                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="428"
->jslint - 411ms - ./asset_image_logo_256.html                                                     </tspan>
+>jslint - 228ms - ./jslint.js                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="450"
->jslint - 420ms - ./index.html                                                                    </tspan>
+>jslint - 334ms - ./jslint.mjs                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="472"
->jslint - 420ms - ./jslint_wrapper_cjs.cjs                                                        </tspan>
+>jslint - 379ms - ./jslint_ci.sh                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="494"
->jslint - 419ms - ./jslint_wrapper_codemirror.html                                                </tspan>
+>jslint - 380ms - ./jslint_wrapper_cjs.cjs                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="516"
->jslint - 421ms - ./jslint_wrapper_codemirror.js                                                  </tspan>
+>jslint - 381ms - ./jslint_wrapper_codemirror.html                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="538"
->jslint - 424ms - ./jslint_wrapper_vscode.js                                                      </tspan>
+>jslint - 382ms - ./jslint_wrapper_codemirror.js                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="560"
->jslint - 425ms - ./package.json                                                                  </tspan>
+>jslint - 385ms - ./jslint_wrapper_vscode.js                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="582"
->jslint - 437ms - ./test.mjs                                                                      </tspan>
+>jslint - 386ms - ./package.json                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="604"
->jslint - 498ms - ./test_coverage_merge_data.json                                                 </tspan>
+>jslint - 402ms - ./test.mjs                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="626"
->jslint - 537ms - ./jslint_ci.sh                                                                  </tspan>
+>jslint - 461ms - ./test_coverage_merge_data.json                                                 </tspan>
 
 </text>
 </svg>
