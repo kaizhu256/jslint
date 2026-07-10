@@ -4188,6 +4188,14 @@ import moduleHttps from "https";
                 return stop("unexpected_a", the_token);
             }
             break;
+
+// PR-xxx - Warn-and-continue parsing instead of stopping for 'async aa => 0'.
+
+        case "=>":
+            if (token_prv_expr.identifier) {
+                token_prv_expr.fart = the_token;
+            }
+            break;
         }
         switch (token_prv_expr.id + " " + id) {
         case ") =>":
@@ -5628,34 +5636,26 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_async() {
-        let the_async = token_now;
-        let the_function;
+        const the_async = token_now;
+        const the_fart = token_nxt.fart;
+        const the_function = token_nxt.fart || token_nxt;
+        the_function.async = 1;
         token_nxt.arity = the_async.arity;
 
 // PR-414 - Parse async fart.
 
-        if (token_nxt.fart) {
+        if (the_fart && token_nxt.identifier) {
+            advance();
+            prefix_function(the_fart, true, true);
+        } else if (the_fart) {
             advance("(");
-            the_function = Object.assign(token_now.fart, {
-                async: 1
-            });
-            if (!option_dict.fart) {
-
-// test_cause:
-// ["async()=>0", "prefix_async", "use_function_not_fart", "=>", 8]
-
-                warn("use_function_not_fart", the_function);
-            }
-            prefix_lparen();
+            prefix_function(the_fart, true, false);
 
 // Parse async function.
 
         } else {
             advance("function");
-            the_function = Object.assign(token_now, {
-                async: 1
-            });
-            prefix_function();
+            prefix_function(undefined, false, false);
         }
         if (the_function.async === 1) {
 
@@ -5924,7 +5924,7 @@ function jslint_phase3_parse(state) {
         return stop("expected_a_before_b", token_now, "()", "=>");
     }
 
-    function prefix_function(the_function, mode_fart, mode_fart_infix) {
+    function prefix_function(the_function, mode_fart, mode_fart_unwrapped) {
         let name;
         let role = "function";
         the_function = the_function || token_now;
@@ -5988,14 +5988,14 @@ function jslint_phase3_parse(state) {
             loop: 0,
             name: (
                 name || (
-                    mode_fart_infix
+                    mode_fart_unwrapped
                     ? "anonymous"
                     : anon
                 )
             ),
-            parameter_count: Number(Boolean(mode_fart_infix)),
+            parameter_count: Number(Boolean(mode_fart_unwrapped)),
             signature: (
-                mode_fart_infix
+                mode_fart_unwrapped
                 ? token_prv.id
                 : ["("]
             ),
@@ -6027,7 +6027,7 @@ function jslint_phase3_parse(state) {
             token_now.arity = "function";
         }
         the_function.name_list = [];    // 2. name_list for "function (aa)"
-        if (mode_fart_infix) {
+        if (mode_fart_unwrapped) {
             name_push(
                 the_function.name_list, // name_list
                 true,                   // enroll
@@ -6054,7 +6054,7 @@ function jslint_phase3_parse(state) {
             advance(")");
             the_function.signature = the_function.signature.join("") + ")";
         }
-        if (mode_fart && !mode_fart_infix) {
+        if (mode_fart && !mode_fart_unwrapped) {
             advance("=>");
         }
         if (mode_fart && token_nxt.id !== "{") {
