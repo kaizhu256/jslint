@@ -4923,10 +4923,6 @@ function jslint_phase3_parse(state) {
 // PR-499 - Update ES2015-feature arrow, to continue parsing unwrapped-form
 // with warning, instead of stopping.
 
-// test_cause:
-// ["aa=>0", "infix_fart_unwrapped", "wrap_fart_parameter", "=>", 3]
-
-        warn("wrap_fart_parameter", token_now);
         return prefix_function(token_now, true, true);
     }
 
@@ -5646,6 +5642,7 @@ function jslint_phase3_parse(state) {
 
         if (the_fart && token_nxt.identifier) {
             advance();
+            advance();
             prefix_function(the_fart, true, true);
         } else if (the_fart) {
             advance("(");
@@ -5930,10 +5927,10 @@ function jslint_phase3_parse(state) {
         the_function = the_function || token_now;
         if (mode_fart) {
             the_function.arity = "binary";
+        } else if (the_function.arity === "statement") {
 
 // A function statement must have a name that will be in the parent's scope.
 
-        } else if (the_function.arity === "statement") {
             if (!token_nxt.identifier) {
 
 // test_cause:
@@ -6028,6 +6025,11 @@ function jslint_phase3_parse(state) {
         }
         the_function.name_list = [];    // 2. name_list for "function (aa)"
         if (mode_fart_unwrapped) {
+
+// test_cause:
+// ["aa=>0", "prefix_function", "wrap_fart_parameter", "aa", 1]
+
+            warn("wrap_fart_parameter", token_prv);
             name_push(
                 the_function.name_list, // name_list
                 true,                   // enroll
