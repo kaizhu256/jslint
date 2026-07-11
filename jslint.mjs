@@ -250,8 +250,6 @@
     lines,
     linesCovered,
     linesTotal,
-    live,
-    live_list,
     log,
     long,
     loop,
@@ -283,6 +281,7 @@
     node,
     nomen,
     noop,
+    not_tdz,
     now,
     nr,
     nud_prefix,
@@ -356,6 +355,7 @@
     subscript,
     switch,
     syntax_dict,
+    tdz_list,
     tenure,
     test,
     test_cause,
@@ -893,9 +893,9 @@ function jslint(
         id: "(global)",
         level: 0,
         line: jslint_fudge,
-        live_list: [],
         loop: 0,
         switch: 0,
+        tdz_list: [],
         thru: 0,
         try: 0
     };
@@ -5475,14 +5475,14 @@ function jslint_phase3_parse(state) {
                     true                // init
                 );
 
-// 2a. Mark not-tdz, the label-statement, before control-flow-block.
+// 2a. Mark outside 'tdz', the label-statement, before control-flow-block.
 
-                the_label.live = true;
+                the_label.not_tdz = true;
                 the_statement = parse_statement();
 
-// 2z. Mark tdz, the label-statement, after control-flow-block.
+// 2z. Mark within 'tdz', the label-statement, after control-flow-block.
 
-                the_label.live = false;
+                the_label.not_tdz = false;
                 functionage.statement_prv = the_statement;
                 the_statement.label = the_label;
                 the_statement.statement = true;
@@ -5969,9 +5969,9 @@ function jslint_phase3_parse(state) {
             );
             if (the_function.arity === "statement") {
 
-// 3a. Mark not-tdz, the function-name, in function-statement.
+// 3a. Mark outside 'tdz', the function-name, in function-statement.
 
-                name.live = true;
+                name.not_tdz = true;
             } else {
                 name.used += 1;
             }
@@ -6514,9 +6514,9 @@ function jslint_phase3_parse(state) {
             if (
                 the_label === undefined
                 || the_label.role !== "label"
-                || !the_label.live
+                || !the_label.not_tdz
             ) {
-                if (the_label !== undefined && !the_label.live) {
+                if (the_label !== undefined && !the_label.not_tdz) {
 
 // test_cause:
 // ["aa:{function aa(aa){break aa}}", "stmt_break", "out_of_scope_a", "aa", 27]
@@ -7970,9 +7970,9 @@ function jslint_phase4_walk(state) {
                     id,
                     init: true,
 
-// 4a. Mark not tdz, the global-variable, anywhere.
+// 4a. Mark outside 'tdz', the global-variable, anywhere.
 
-                    live: true,
+                    not_tdz: true,
                     parent: token_global,
                     readonly: true,
                     role: "variable",
@@ -7989,7 +7989,7 @@ function jslint_phase4_walk(state) {
                 || functionage.name === undefined
                 || the_variable.calls[functionage.name.id] === undefined
             )
-            && !the_variable.live
+            && !the_variable.not_tdz
         ) {
 
 // test_cause:
@@ -8428,25 +8428,25 @@ function jslint_phase4_walk(state) {
     function post_s_import(the_thing) {
         the_thing.name_list.forEach(function (name) {
 
-// 5a. Mark not-tdz, the import-name, after import-statement.
+// 5a. Mark outside 'tdz', the import-name, after import-statement.
 
-            name.live = true;
+            name.not_tdz = true;
 
-// 5z. Mark tdz, the import-name, after module-scope.
+// 5z. Mark within 'tdz', the import-name, after module-scope.
 
-            blockage.live_list.push(name);
+            blockage.tdz_list.push(name);
         });
         return post_s_export_toplevel(the_thing);
     }
 
     function post_s_lbrace_pop_block() {
-        blockage.live_list.forEach(function (name) {
+        blockage.tdz_list.forEach(function (name) {
 
-// 1z. Mark tdz, the variable, after block-scope.
+// 1z. Mark within 'tdz', the variable, after block-scope.
 
-            name.live = false;
+            name.not_tdz = false;
         });
-        delete blockage.live_list;
+        delete blockage.tdz_list;
         blockage = block_stack.pop();
     }
 
@@ -8456,9 +8456,9 @@ function jslint_phase4_walk(state) {
         }
         if (thing.catch.name) {
 
-// 6a. Mark not-tdz, the exception-variable, before catch-block.
+// 6a. Mark outside 'tdz', the exception-variable, before catch-block.
 
-            catchage.context[thing.catch.name.id].live = true;
+            catchage.context[thing.catch.name.id].not_tdz = true;
         }
 
 // Recurse walk_statement().
@@ -8490,16 +8490,16 @@ function jslint_phase4_walk(state) {
 // PR-502 - Fix long-running regression where 'let x = x;'
 // doesn't warn about temporal-dead-zone.
 
-// 1a. Mark not-tdz, the variable, after variable-initialization.
+// 1a. Mark outside 'tdz', the variable, after variable-initialization.
 
-            name.live = true;
+            name.not_tdz = true;
             switch (thing.id) {
             case "const":
             case "let":
 
-// 1z. Mark tdz, the variable, after block-scope.
+// 1z. Mark within 'tdz', the variable, after block-scope.
 
-                blockage.live_list.push(name);
+                blockage.tdz_list.push(name);
                 break;
             }
         });
@@ -8834,7 +8834,7 @@ function jslint_phase4_walk(state) {
 // // false so JSLint won't raise an error for
 // // calling it before its line is executed.
 //
-//                     left_variable.live = true;
+//                     left_variable.not_tdz = true;
 //                 }
 //             }
 //         }
@@ -8864,9 +8864,9 @@ function jslint_phase4_walk(state) {
         let the_variable;
         if (thing.name !== undefined) {
 
-// 7a. Mark not-tdz, the iterator variable, during for-loop-initialization.
+// 7a. Mark outside 'tdz', the iterator variable, during for-loop-init.
 
-            thing.name.live = true;
+            thing.name.not_tdz = true;
             the_variable = name_lookup(thing.name, true);
             if (the_variable !== undefined) {
                 if (the_variable.init && the_variable.readonly) {
@@ -8903,12 +8903,12 @@ function jslint_phase4_walk(state) {
         block_stack.push(blockage);
         functionage = thing;
         blockage = thing;
-        thing.live_list = [];
+        thing.tdz_list = [];
         if (typeof thing.name === "object") {
 
-// 3a. Mark not-tdz, the function-name, in function-expression.
+// 3a. Mark outside 'tdz', the function-name, in function-expression.
 
-            thing.name.live = true;
+            thing.name.not_tdz = true;
         }
         if (thing.extra === "get") {
             if (thing.parameter_count !== 0) {
@@ -8950,16 +8950,16 @@ function jslint_phase4_walk(state) {
             }
             walk_expression(name.expression);
 
-// 8a. Mark not-tdz, the function-parameter, after destructuring.
+// 8a. Mark outside 'tdz', the function-parameter, after destructuring.
 
-            name.live = true;
+            name.not_tdz = true;
         });
     }
 
     function pre_s_lbrace(thing) {
         block_stack.push(blockage);
         blockage = thing;
-        thing.live_list = [];
+        thing.tdz_list = [];
     }
 
     function pre_try(thing) {
@@ -9819,7 +9819,7 @@ function jslint_phase5_whitage(state) {
         delete left.calls;
         delete left.free;
         delete left.init;
-        delete left.live;
+        delete left.not_tdz;
         delete left.open;
         delete left.used;
         left = right;
