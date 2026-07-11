@@ -2010,9 +2010,7 @@ body {
 </body>
 </html>
     `);
-    html = html.trim().replace((
-        / +?$/gm
-    ), "") + "\n";
+    html = html.replace((/ +$/gm), "").trim() + "\n";
     await fsWriteFileWithParents(pathname, html);
 }
 
