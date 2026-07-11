@@ -5633,33 +5633,33 @@ function jslint_phase3_parse(state) {
 
     function prefix_async() {
         const the_async = token_now;
-        const the_fart = token_nxt.fart;
         const the_function = token_nxt.fart || token_nxt;
         the_function.async = 1;
         token_nxt.arity = the_async.arity;
+        if (token_nxt.fart && token_nxt.identifier) {
 
-// PR-414 - Parse async fart.
+// PR-xxx - Parse async fart (unwrapped).
 
-        if (the_fart && token_nxt.identifier) {
             advance();
             advance("=>");
-
-// PR-xxx - Warn-and-continue parsing instead of stopping for 'async aa => 0'.
 
 // test_cause:
 // ["async aa=>0", "prefix_async", "fart_unwrapped", "aa", 0]
 
             test_cause("fart_unwrapped", token_prv.id);
-            prefix_function(the_fart, true, true);
-        } else if (the_fart) {
+            prefix_function(the_function, true, true);
+        } else if (token_nxt.fart) {
+
+// PR-414 - Parse async fart.
+
             advance("(");
-            prefix_function(the_fart, true, false);
+            prefix_function(the_function, true, false);
+        } else {
 
 // Parse async function.
 
-        } else {
             advance("function");
-            prefix_function(undefined, false, false);
+            prefix_function(the_function, false, false);
         }
         if (the_function.async === 1) {
 
