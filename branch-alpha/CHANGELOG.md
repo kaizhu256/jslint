@@ -7,7 +7,7 @@
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add ability to auto-fix whitespace.
-- jslint - bugfix - Fix false-positive Unused-variable when variable is used in function argument-default.
+- jslint - bugfix - Fix false-positive unused-variable when variable is used in function argument-default.
 - jslint - Add html and css linting back into jslint.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
