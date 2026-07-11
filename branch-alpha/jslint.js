@@ -4189,7 +4189,7 @@ import moduleHttps from "https";
             }
             break;
 
-// PR-xxx - Fix jslint unable to continue parsing 'async aa => 0'.
+// PR-503 - Fix jslint unable to continue parsing 'async aa => 0'.
 
         case "=>":
             if (token_prv_expr.identifier) {
@@ -5638,7 +5638,7 @@ function jslint_phase3_parse(state) {
         token_nxt.arity = the_async.arity;
         if (token_nxt.fart && token_nxt.identifier) {
 
-// PR-xxx - Parse async fart (unwrapped).
+// PR-503 - Parse async fart (unwrapped).
 
             advance();
             advance("=>");

@@ -1026,7 +1026,7 @@ if (false) {
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
 
-1. goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-p2026.7.1
+1. goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-p2026.7.2
     - click `Create pull request`
     - input `Add a title *` with: `<CHANGELOG.md entry #1>`
     - input `Add a description` with:
