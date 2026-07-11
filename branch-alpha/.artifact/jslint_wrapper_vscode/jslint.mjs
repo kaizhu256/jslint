@@ -5642,7 +5642,14 @@ function jslint_phase3_parse(state) {
 
         if (the_fart && token_nxt.identifier) {
             advance();
-            advance();
+            advance("=>");
+
+// PR-xxx - Warn-and-continue parsing instead of stopping for 'async aa => 0'.
+
+// test_cause:
+// ["async aa=>0", "prefix_async", "fart_unwrapped", "aa", 0]
+
+            test_cause("fart_unwrapped", token_prv.id);
             prefix_function(the_fart, true, true);
         } else if (the_fart) {
             advance("(");
