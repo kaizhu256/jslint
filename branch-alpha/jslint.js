@@ -5685,17 +5685,16 @@ function jslint_phase3_parse(state) {
 // ["function aa(){await 0}", "prefix_await", "unexpected_a", "await", 15]
 
             warn("unexpected_a", the_await);
-        } else {
-            functionage.async += 1;
         }
+        if (functionage.async === 1) {
+            functionage.async = 2;
+        }
+        the_await.expression = parse_expression(150);
         if (the_await.arity === "statement") {
 
 // PR-405 - Bugfix - fix expression after "await" mis-identified as statement.
 
-            the_await.expression = parse_expression(150);
             semicolon();
-        } else {
-            the_await.expression = parse_expression(150);
         }
         return the_await;
     }
