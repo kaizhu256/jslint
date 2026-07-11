@@ -113,19 +113,19 @@
     textLength="768"
     x="10"
     y="406"
->- jslint-regression - Fix jslint unable to parse 'async aa =&gt; 0'.                                </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="428"
 >- jslint-regression - Fix long-running regression where 'let x = x;' doesn't warn about temporal\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="450"
+    y="428"
 >  -dead-zone.                                                                                    </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="450"
+>- jslint - Fix jslint unable to continue parsing 'async aa =&gt; 0'.                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

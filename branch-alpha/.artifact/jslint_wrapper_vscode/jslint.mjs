@@ -4189,7 +4189,7 @@ import moduleHttps from "https";
             }
             break;
 
-// PR-xxx - Fix jslint unable to parse 'async aa => 0'.
+// PR-xxx - Fix jslint unable to continue parsing 'async aa => 0'.
 
         case "=>":
             if (token_prv_expr.identifier) {
