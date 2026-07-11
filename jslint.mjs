@@ -6304,7 +6304,7 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id === "}") {
 
 // test_cause:
-// ["let aa={aa:0,}", "prefix_lbrace", "unexpected_a", ",", 13]
+// ["aa={aa:0,}", "prefix_lbrace", "unexpected_a", ",", 9]
 
                     warn("unexpected_a", token_now);
                     break;
