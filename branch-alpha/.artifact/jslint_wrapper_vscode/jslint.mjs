@@ -6238,18 +6238,22 @@ function jslint_phase3_parse(state) {
 // ["aa={get aa(){}}", "property_parse", "paren", "", 0]
 
                 test_cause("paren");
-                value = prefix_function({
-                    arity: "unary",
-                    from: name.from,
-                    id: "function",
-                    line: name.line,
-                    name: (
-                        typeof extra === "string"
-                        ? extra
-                        : id
-                    ),
-                    thru: name.from
-                });
+                value = prefix_function(
+                    {
+                        arity: "unary",
+                        from: name.from,
+                        id: "function",
+                        line: name.line,
+                        name: (
+                            typeof extra === "string"
+                            ? extra
+                            : id
+                        ),
+                        thru: name.from
+                    },
+                    false,
+                    false
+                );
             } else {
                 if (typeof extra === "string") {
 
