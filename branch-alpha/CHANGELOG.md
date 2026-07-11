@@ -13,6 +13,7 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.7.1-beta
+- jslint-regression - Fix jslint unable to parse 'async aa => 0'.
 - jslint-regression - Fix long-running regression where 'let x = x;' doesn't warn about temporal-dead-zone.
 - jslint-warning - Tighten warning of unused variables to be always on, regardless of module / nodejs mode.
 - jslint - Wrap all property-updates 'name.init = true/false' with calls to:
