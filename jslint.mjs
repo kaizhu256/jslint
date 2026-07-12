@@ -210,6 +210,7 @@
     includeList,
     indent2,
     indent_method,
+    indent_method_dict,
     index,
     indexOf,
     init,
@@ -856,35 +857,37 @@ function jslint(
 
 // The jslint function itself.
 
-    let catch_list = [];        // The array containing all catch-blocks.
-    let catch_stack = [         // The stack of catch-blocks.
+    const catch_list = [];      // The array containing all catch-blocks.
+    const catch_stack = [       // The stack of catch-blocks.
         {
             context: empty()
         }
     ];
-    let cause_dict = empty();   // The object of test-causes.
-    let directive_list = [];    // The directive comments.
-    let export_dict = empty();  // The exported names and values.
-    let function_list = [];     // The array containing all functions.
-    let function_stack = [];    // The stack of functions.
-    let global_dict = empty();  // The object containing the global
-                                // ... declarations.
-    let import_list = [];       // The array collecting all import-from strings.
-    let line_list = String(     // The array containing source lines.
+    const cause_dict = empty(); // The object of test-causes.
+    const directive_list = [];  // The directive comments.
+    const export_dict = empty();// The exported names and values.
+    const function_list = [];   // The array containing all functions.
+    const function_stack = [];  // The stack of functions.
+    const global_dict = empty();        // The object containing the global
+                                        // ... declarations.
+    const import_list = [];     // The array collecting all import-from strings.
+    const indent_method_dict = empty();
+    const line_list = String(   // The array containing source lines.
         "\n" + source
-    ).split(jslint_rgx_crlf).map(function (line_source) {
-        return {
-            line_source
-        };
-    });
-    let mode_stop = false;      // true if JSLint cannot finish.
-    let property_dict = empty();        // The object containing the tallied
+    )
+        .split(jslint_rgx_crlf)
+        .map(function (line_source) {
+            return {
+                line_source
+            };
+        });
+    const property_dict = empty();      // The object containing the tallied
                                         // ... property names.
-    let state = empty();        // jslint state-object to be passed between
+    const state = empty();      // jslint state-object to be passed between
                                 // jslint functions.
-    let syntax_dict = empty();  // The object containing the parser.
-    let tenure = empty();       // The predefined property registry.
-    let token_global = {        // The global object; the outermost context.
+    const syntax_dict = empty();        // The object containing the parser.
+    const tenure = empty();     // The predefined property registry.
+    const token_global = {      // The global object; the outermost context.
         async: 0,
         body: true,
         context: empty(),
@@ -899,8 +902,9 @@ function jslint(
         thru: 0,
         try: 0
     };
-    let token_list = [];        // The array of tokens.
-    let warning_list = [];      // The array collecting all generated warnings.
+    const token_list = [];      // The array of tokens.
+    const warning_list = [];    // The array collecting all generated warnings.
+    let mode_stop = false;      // true if JSLint cannot finish.
 
 // Error reportage functions:
 
@@ -1526,6 +1530,7 @@ function jslint(
             global_dict,
             global_list,
             import_list,
+            indent_method_dict,
             is_equal,
             is_weird,
             line_list,
@@ -9152,12 +9157,12 @@ function jslint_phase5_whitage(state) {
 
 // PHASE 5. Check whitespace between tokens in <token_list>.
 
-    const indent_method_dict = empty();
     let {
         artifact,
         catch_list,
         function_list,
         function_stack,
+        indent_method_dict,
         option_dict,
         test_cause,
         token_global,
@@ -9443,6 +9448,7 @@ function jslint_phase5_whitage(state) {
                 opening
             };
             function_stack.push(indentage);
+            //!! debugInline(indentage);
             switch (left.id) {
             case "${":
                 closer = "}";
@@ -9514,7 +9520,6 @@ function jslint_phase5_whitage(state) {
             test_cause("(0)", right.value);
             no_space_only();
         }
-        //!! debugInline(indentage);
     }
 
     function whitage_default() {
@@ -9544,6 +9549,7 @@ function jslint_phase5_whitage(state) {
 
         if (right.id === closer) {
             indentage = function_stack.pop();
+            //!! debugInline("pop");
             closer = indentage.closer;
             free = indentage.free;
             margin = indentage.margin;
