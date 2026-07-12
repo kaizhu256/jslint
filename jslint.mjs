@@ -9152,11 +9152,12 @@ function jslint_phase5_whitage(state) {
 
 // PHASE 5. Check whitespace between tokens in <token_list>.
 
+    const indent_method_dict = empty();
+    const indent_stack = [];
     let {
         artifact,
         catch_list,
         function_list,
-        function_stack,
         option_dict,
         test_cause,
         token_global,
@@ -9186,7 +9187,6 @@ function jslint_phase5_whitage(state) {
 // "switch(){}"
 // "while(){}"
 
-    let indent_method_dict = empty();
     let indentage;
     let left = token_global;
     let margin = 0;
@@ -9442,7 +9442,7 @@ function jslint_phase5_whitage(state) {
                 open,
                 opening
             };
-            function_stack.push(indentage);
+            indent_stack.push(indentage);
             switch (left.id) {
             case "${":
                 closer = "}";
@@ -9514,6 +9514,7 @@ function jslint_phase5_whitage(state) {
             test_cause("(0)", right.value);
             no_space_only();
         }
+        //!! debugInline(indentage);
     }
 
     function whitage_default() {
@@ -9542,7 +9543,7 @@ function jslint_phase5_whitage(state) {
 // If right is a closer, then pop the previous state.
 
         if (right.id === closer) {
-            indentage = function_stack.pop();
+            indentage = indent_stack.pop();
             closer = indentage.closer;
             free = indentage.free;
             margin = indentage.margin;
