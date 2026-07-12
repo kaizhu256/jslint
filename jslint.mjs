@@ -2423,7 +2423,7 @@ function jslint_phase2_lex(state) {
 
 // PHASE 2. Lex <line_list> into <token_list>.
 
-    let {
+    const {
         artifact,
         directive_list,
         global_dict,
@@ -4271,8 +4271,7 @@ function jslint_phase3_parse(state) {
 
 // Specialized tokens may have additional properties.
 
-    let anon = "anonymous";     // The guessed name for anonymous functions.
-    let {
+    const {
         artifact,
         catch_list,
         catch_stack,
@@ -4293,6 +4292,7 @@ function jslint_phase3_parse(state) {
         warn,
         warn_at
     } = state;
+    let anon = "anonymous";     // The guessed name for anonymous functions.
     let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -7823,7 +7823,7 @@ function jslint_phase4_walk(state) {
 //          recursive traversal. Each node may be processed on the way down
 //          (preaction) and on the way up (postaction).
 
-    let {
+    const {
         artifact,
         catch_stack,
         function_stack,
@@ -9157,7 +9157,7 @@ function jslint_phase5_whitage(state) {
 
 // PHASE 5. Check whitespace between tokens in <token_list>.
 
-    let {
+    const {
         artifact,
         catch_list,
         function_list,
