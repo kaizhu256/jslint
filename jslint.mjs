@@ -210,7 +210,6 @@
     includeList,
     indent2,
     indent_method,
-    indent_method_dict,
     index,
     indexOf,
     init,
@@ -857,37 +856,35 @@ function jslint(
 
 // The jslint function itself.
 
-    const catch_list = [];      // The array containing all catch-blocks.
-    const catch_stack = [       // The stack of catch-blocks.
+    let catch_list = [];        // The array containing all catch-blocks.
+    let catch_stack = [         // The stack of catch-blocks.
         {
             context: empty()
         }
     ];
-    const cause_dict = empty(); // The object of test-causes.
-    const directive_list = [];  // The directive comments.
-    const export_dict = empty();// The exported names and values.
-    const function_list = [];   // The array containing all functions.
-    const function_stack = [];  // The stack of functions.
-    const global_dict = empty();        // The object containing the global
-                                        // ... declarations.
-    const import_list = [];     // The array collecting all import-from strings.
-    const indent_method_dict = empty();
-    const line_list = String(   // The array containing source lines.
+    let cause_dict = empty();   // The object of test-causes.
+    let directive_list = [];    // The directive comments.
+    let export_dict = empty();  // The exported names and values.
+    let function_list = [];     // The array containing all functions.
+    let function_stack = [];    // The stack of functions.
+    let global_dict = empty();  // The object containing the global
+                                // ... declarations.
+    let import_list = [];       // The array collecting all import-from strings.
+    let line_list = String(     // The array containing source lines.
         "\n" + source
-    )
-        .split(jslint_rgx_crlf)
-        .map(function (line_source) {
-            return {
-                line_source
-            };
-        });
-    const property_dict = empty();      // The object containing the tallied
+    ).split(jslint_rgx_crlf).map(function (line_source) {
+        return {
+            line_source
+        };
+    });
+    let mode_stop = false;      // true if JSLint cannot finish.
+    let property_dict = empty();        // The object containing the tallied
                                         // ... property names.
-    const state = empty();      // jslint state-object to be passed between
+    let state = empty();        // jslint state-object to be passed between
                                 // jslint functions.
-    const syntax_dict = empty();        // The object containing the parser.
-    const tenure = empty();     // The predefined property registry.
-    const token_global = {      // The global object; the outermost context.
+    let syntax_dict = empty();  // The object containing the parser.
+    let tenure = empty();       // The predefined property registry.
+    let token_global = {        // The global object; the outermost context.
         async: 0,
         body: true,
         context: empty(),
@@ -902,9 +899,8 @@ function jslint(
         thru: 0,
         try: 0
     };
-    const token_list = [];      // The array of tokens.
-    const warning_list = [];    // The array collecting all generated warnings.
-    let mode_stop = false;      // true if JSLint cannot finish.
+    let token_list = [];        // The array of tokens.
+    let warning_list = [];      // The array collecting all generated warnings.
 
 // Error reportage functions:
 
@@ -1530,7 +1526,6 @@ function jslint(
             global_dict,
             global_list,
             import_list,
-            indent_method_dict,
             is_equal,
             is_weird,
             line_list,
@@ -2423,7 +2418,7 @@ function jslint_phase2_lex(state) {
 
 // PHASE 2. Lex <line_list> into <token_list>.
 
-    const {
+    let {
         artifact,
         directive_list,
         global_dict,
@@ -4271,7 +4266,8 @@ function jslint_phase3_parse(state) {
 
 // Specialized tokens may have additional properties.
 
-    const {
+    let anon = "anonymous";     // The guessed name for anonymous functions.
+    let {
         artifact,
         catch_list,
         catch_stack,
@@ -4280,7 +4276,6 @@ function jslint_phase3_parse(state) {
         function_stack,
         global_dict,
         import_list,
-        indent_method_dict,
         is_equal,
         option_dict,
         property_dict,
@@ -4293,7 +4288,6 @@ function jslint_phase3_parse(state) {
         warn,
         warn_at
     } = state;
-    let anon = "anonymous";     // The guessed name for anonymous functions.
     let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -4829,14 +4823,8 @@ function jslint_phase3_parse(state) {
     }
 
     function infix_dot(left) {
-        const name = token_nxt;
         const the_token = token_now;
-        if (token_prv.line !== the_token.line) {
-
-// PR-498 - Relax warning on multiline-method-chaining.
-
-            indent_method_dict[the_token.line] = true;
-        }
+        let name = token_nxt;
         if (
             (
                 left.id !== "(string)"
@@ -7830,7 +7818,7 @@ function jslint_phase4_walk(state) {
 //          recursive traversal. Each node may be processed on the way down
 //          (preaction) and on the way up (postaction).
 
-    const {
+    let {
         artifact,
         catch_stack,
         function_stack,
@@ -7843,23 +7831,22 @@ function jslint_phase4_walk(state) {
         token_global,
         warn
     } = state;
-    const block_stack = [];             // The stack of blocks.
-    const post_list = empty();
-    const pre_list = empty();
-    const relationop = object_assign_from_list( // The relational operators.
-        empty(),
-        [
-            "!=", "!==", "<", "<=", "==", "===", ">", ">="
-        ],
-        true
-    );
+    let block_stack = [];               // The stack of blocks.
     let blockage = token_global;        // The current block.
     let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let postaction;
     let postamble;
+    let posts = empty();
     let preaction;
     let preamble;
+    let pres = empty();
+
+// The relational operators.
+
+    let relationop = object_assign_from_list(empty(), [
+        "!=", "!==", "<", "<=", "==", "===", ">", ">="
+    ], true);
 
 // Ambulation of the parse tree.
 
@@ -9111,10 +9098,10 @@ function jslint_phase4_walk(state) {
         postamble(thing);
     }
 
-    postaction = action(post_list);
-    postamble = amble(post_list);
-    preaction = action(pre_list);
-    preamble = amble(pre_list);
+    postaction = action(posts);
+    postamble = amble(posts);
+    preaction = action(pres);
+    preamble = amble(pres);
     postaction("assignment", "+=", post_a_pluseq);
     postaction("assignment", post_a);
     postaction("binary", "&&", post_b_and);
@@ -9165,12 +9152,11 @@ function jslint_phase5_whitage(state) {
 
 // PHASE 5. Check whitespace between tokens in <token_list>.
 
-    const {
+    let {
         artifact,
         catch_list,
         function_list,
         function_stack,
-        indent_method_dict,
         option_dict,
         test_cause,
         token_global,
@@ -9200,6 +9186,7 @@ function jslint_phase5_whitage(state) {
 // "switch(){}"
 // "while(){}"
 
+    let indent_method_dict = empty();
     let indentage;
     let left = token_global;
     let margin = 0;
@@ -9451,8 +9438,6 @@ function jslint_phase5_whitage(state) {
             indentage = {
                 closer,
                 free,
-                id: left.id,
-                line: left.line,
                 margin,
                 open,
                 opening
@@ -9505,10 +9490,8 @@ function jslint_phase5_whitage(state) {
                 } else {
                     at_margin(0);
                 }
-                //!! debugInline(opening, function_stack);
                 break;
             }
-            //!! debugInline(opening, function_stack);
             if (right.statement || right.role === "label") {
 
 // test_cause:
@@ -9700,6 +9683,10 @@ function jslint_phase5_whitage(state) {
                 no_space_only();
                 return;
             }
+
+// PR-498 - Relax warning on multiline-method-chaining.
+
+            indent_method_dict[right.line] = true;
             at_margin(mode_indent);
             return;
         }
