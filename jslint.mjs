@@ -7839,6 +7839,13 @@ function jslint_phase4_walk(state) {
     const block_stack = [];             // The stack of blocks.
     const post_list = empty();
     const pre_list = empty();
+    const relationop = object_assign_from_list( // The relational operators.
+        empty(),
+        [
+            "!=", "!==", "<", "<=", "==", "===", ">", ">="
+        ],
+        true
+    );
     let blockage = token_global;        // The current block.
     let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
@@ -7846,12 +7853,6 @@ function jslint_phase4_walk(state) {
     let postamble;
     let preaction;
     let preamble;
-
-// The relational operators.
-
-    let relationop = object_assign_from_list(empty(), [
-        "!=", "!==", "<", "<=", "==", "===", ">", ">="
-    ], true);
 
 // Ambulation of the parse tree.
 
