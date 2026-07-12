@@ -4280,6 +4280,7 @@ function jslint_phase3_parse(state) {
         function_stack,
         global_dict,
         import_list,
+        indent_method_dict,
         is_equal,
         option_dict,
         property_dict,
@@ -4828,8 +4829,14 @@ function jslint_phase3_parse(state) {
     }
 
     function infix_dot(left) {
+        const name = token_nxt;
         const the_token = token_now;
-        let name = token_nxt;
+        if (token_prv.line !== the_token.line) {
+
+// PR-498 - Relax warning on multiline-method-chaining.
+
+            indent_method_dict[the_token.line] = true;
+        }
         if (
             (
                 left.id !== "(string)"
@@ -9444,6 +9451,8 @@ function jslint_phase5_whitage(state) {
             indentage = {
                 closer,
                 free,
+                id: left.id,
+                line: left.line,
                 margin,
                 open,
                 opening
@@ -9496,8 +9505,10 @@ function jslint_phase5_whitage(state) {
                 } else {
                     at_margin(0);
                 }
+                //!! debugInline(opening, function_stack);
                 break;
             }
+            //!! debugInline(opening, function_stack);
             if (right.statement || right.role === "label") {
 
 // test_cause:
@@ -9689,10 +9700,6 @@ function jslint_phase5_whitage(state) {
                 no_space_only();
                 return;
             }
-
-// PR-498 - Relax warning on multiline-method-chaining.
-
-            indent_method_dict[right.line] = true;
             at_margin(mode_indent);
             return;
         }
