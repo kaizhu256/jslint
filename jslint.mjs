@@ -7836,16 +7836,16 @@ function jslint_phase4_walk(state) {
         token_global,
         warn
     } = state;
-    let block_stack = [];               // The stack of blocks.
+    const block_stack = [];             // The stack of blocks.
+    const post_list = empty();
+    const pre_list = empty();
     let blockage = token_global;        // The current block.
     let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let postaction;
     let postamble;
-    let posts = empty();
     let preaction;
     let preamble;
-    let pres = empty();
 
 // The relational operators.
 
@@ -9103,10 +9103,10 @@ function jslint_phase4_walk(state) {
         postamble(thing);
     }
 
-    postaction = action(posts);
-    postamble = amble(posts);
-    preaction = action(pres);
-    preamble = amble(pres);
+    postaction = action(post_list);
+    postamble = amble(post_list);
+    preaction = action(pre_list);
+    preamble = amble(pre_list);
     postaction("assignment", "+=", post_a_pluseq);
     postaction("assignment", post_a);
     postaction("binary", "&&", post_b_and);
