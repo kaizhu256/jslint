@@ -9448,7 +9448,6 @@ function jslint_phase5_whitage(state) {
                 opening
             };
             function_stack.push(indentage);
-            //!! debugInline(indentage);
             switch (left.id) {
             case "${":
                 closer = "}";
@@ -9549,7 +9548,6 @@ function jslint_phase5_whitage(state) {
 
         if (right.id === closer) {
             indentage = function_stack.pop();
-            //!! debugInline("pop");
             closer = indentage.closer;
             free = indentage.free;
             margin = indentage.margin;
