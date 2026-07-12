@@ -5824,6 +5824,14 @@ function jslint_phase3_parse(state) {
                     name_parse();
                     return;
                 }
+
+// PR-xxx - Bugfix - Fix false-positive-warning 'Unused aa' in code:
+// /*jslint white*/
+// let aa = 0;
+// function bb({cc:aa}) {return aa;}
+// bb();
+
+                token_nxt.default = true;
                 token_nxt.label = name;
                 name = token_nxt;
                 name_push(sub_list, enroll, name, role, readonly, true);
@@ -6106,7 +6114,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["function aa(){}0", "prefix_function", "unexpected_a", "0", 16]
 
-                return stop("unexpected_a");
+                warn("unexpected_a");
             }
             if (
                 token_nxt.id === "."
@@ -8934,6 +8942,7 @@ function jslint_phase4_walk(state) {
             }
         }
         thing.name_list.forEach(function (name) {
+            let the_variable;
             if (name.expression) {
 
 // test_cause:
@@ -8947,6 +8956,20 @@ function jslint_phase4_walk(state) {
 // ["aa=>0", "pre_s_function", "(aa)=>0", "", 0]
 
                 test_cause("(aa)=>0");
+            }
+            if (name.default) {
+
+// PR-xxx - Bugfix - Fix false-positive-warning 'Unused aa' in code:
+// /*jslint white*/
+// let aa = 0;
+// function bb({cc:aa}) {return aa;}
+// bb();
+
+                the_variable = name_lookup(thing.name, true);
+                if (the_variable) {
+                    the_variable.used += 1;
+                }
+                debugInline(the_variable);
             }
             walk_expression(name.expression);
 
