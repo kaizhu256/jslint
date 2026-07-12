@@ -884,7 +884,7 @@ function jslint(
     const property_dict = empty();      // The object containing the tallied
                                         // ... property names.
     const state = empty();      // jslint state-object to be passed between
-                                // jslint functions.
+                                // ... jslint functions.
     const syntax_dict = empty();        // The object containing the parser.
     const tenure = empty();     // The predefined property registry.
     const token_global = {      // The global object; the outermost context.
@@ -9505,10 +9505,8 @@ function jslint_phase5_whitage(state) {
                 } else {
                     at_margin(0);
                 }
-                //!! debugInline(opening, function_stack);
                 break;
             }
-            //!! debugInline(opening, function_stack);
             if (right.statement || right.role === "label") {
 
 // test_cause:
