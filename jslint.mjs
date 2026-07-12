@@ -6109,6 +6109,7 @@ function jslint_phase3_parse(state) {
             if (
                 the_function.arity === "statement"
                 && token_nxt.line === token_now.line
+                && !option_dict.white
             ) {
 
 // test_cause:
