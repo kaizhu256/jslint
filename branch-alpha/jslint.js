@@ -209,7 +209,6 @@
     inc,
     includeList,
     indent2,
-    indent_method,
     index,
     indexOf,
     init,
