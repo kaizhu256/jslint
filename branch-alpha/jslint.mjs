@@ -6524,11 +6524,13 @@ function jslint_phase3_parse(state) {
         if (token_nxt.identifier && token_now.line === token_nxt.line) {
             the_label = functionage.context[token_nxt.id];
             if (
-                the_label === undefined
+                !the_label
                 || the_label.role !== "label"
                 || !the_label.live
             ) {
-                if (the_label !== undefined && !the_label.live) {
+                if (the_label && !the_label.live) {
+
+// Warn label-statement is inside 'tdz', while being accessed.
 
 // test_cause:
 // ["aa:{function aa(aa){break aa}}", "stmt_break", "out_of_scope_a", "aa", 27]
@@ -7997,12 +7999,14 @@ function jslint_phase4_walk(state) {
         }
         if (
             (
-                the_variable.calls === undefined
-                || functionage.name === undefined
-                || the_variable.calls[functionage.name.id] === undefined
+                !the_variable.calls
+                || !functionage.name
+                || !the_variable.calls[functionage.name.id]
             )
             && !the_variable.live
         ) {
+
+// Warn variable / parameter is inside 'tdz', while being accessed.
 
 // test_cause:
 // ["(aa=aa)=>0", "name_lookup", "out_of_scope_a", "aa", 5]
