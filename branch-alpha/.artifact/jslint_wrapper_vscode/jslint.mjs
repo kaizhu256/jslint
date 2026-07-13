@@ -136,7 +136,6 @@
     create,
     cwd,
     d,
-    dead,
     debugInline,
     default,
     delta,
@@ -252,7 +251,6 @@
     lines,
     linesCovered,
     linesTotal,
-    live_list,
     log,
     long,
     loop,
@@ -357,6 +355,8 @@
     subscript,
     switch,
     syntax_dict,
+    tdz,
+    tdz_list,
     tenure,
     test,
     test_cause,
@@ -894,9 +894,9 @@ function jslint(
         id: "(global)",
         level: 0,
         line: jslint_fudge,
-        live_list: [],
         loop: 0,
         switch: 0,
+        tdz_list: [],
         thru: 0,
         try: 0
     };
@@ -5137,10 +5137,6 @@ function jslint_phase3_parse(state) {
 // Enroll it.
 
         Object.assign(name, {
-
-// 1z. Mark as dead, the variable, during variable-initialization.
-
-            dead: true,
             parent: (
                 role === "exception"
                 ? catchage
@@ -5148,6 +5144,10 @@ function jslint_phase3_parse(state) {
             ),
             readonly,
             role,
+
+// 1z. Mark inside 'tdz', the variable, during variable-initialization.
+
+            tdz: true,
             used: 0
         });
         name.parent.context[id] = name;
@@ -5484,14 +5484,14 @@ function jslint_phase3_parse(state) {
                     true                // init
                 );
 
-// 2a. Mark not dead, the label-statement, before control-flow-block.
+// 2a. Mark outside 'tdz', the label-statement, before control-flow-block.
 
-                the_label.dead = false;
+                the_label.tdz = false;
                 the_statement = parse_statement();
 
-// 2z. Mark as dead, the label-statement, after control-flow-block.
+// 2z. Mark inside 'tdz', the label-statement, after control-flow-block.
 
-                the_label.dead = true;
+                the_label.tdz = true;
                 functionage.statement_prv = the_statement;
                 the_statement.label = the_label;
                 the_statement.statement = true;
@@ -5978,9 +5978,9 @@ function jslint_phase3_parse(state) {
             );
             if (the_function.arity === "statement") {
 
-// 3a. Mark not dead, the function-name, in function-statement.
+// 3a. Mark outside 'tdz', the function-name, in function-statement.
 
-                name.dead = false;
+                name.tdz = false;
             } else {
                 name.used += 1;
             }
@@ -6531,9 +6531,9 @@ function jslint_phase3_parse(state) {
             if (
                 the_label === undefined
                 || the_label.role !== "label"
-                || the_label.dead
+                || the_label.tdz
             ) {
-                if (the_label !== undefined && the_label.dead) {
+                if (the_label !== undefined && the_label.tdz) {
 
 // test_cause:
 // ["aa:{function aa(aa){break aa}}", "stmt_break", "out_of_scope_a", "aa", 27]
@@ -7984,15 +7984,15 @@ function jslint_phase4_walk(state) {
 
             if (!the_variable) {
                 the_variable = {
-
-// 4a. Mark not dead, the global-variable, anywhere.
-
-                    dead: false,
                     id,
                     init: true,
                     parent: token_global,
                     readonly: true,
                     role: "variable",
+
+// 4a. Mark outside 'tdz', the global-variable, anywhere.
+
+                    tdz: false,
                     used: 0
                 };
                 token_global.context[id] = the_variable;
@@ -8006,7 +8006,7 @@ function jslint_phase4_walk(state) {
                 || functionage.name === undefined
                 || the_variable.calls[functionage.name.id] === undefined
             )
-            && the_variable.dead
+            && the_variable.tdz
         ) {
 
 // test_cause:
@@ -8445,25 +8445,25 @@ function jslint_phase4_walk(state) {
     function post_s_import(the_thing) {
         the_thing.name_list.forEach(function (name) {
 
-// 5a. Mark not dead, the import-name, after import-statement.
+// 5a. Mark outside 'tdz', the import-name, after import-statement.
 
-            name.dead = false;
+            name.tdz = false;
 
-// 5z. Mark as dead, the import-name, after module-scope.
+// 5z. Mark inside 'tdz', the import-name, after module-scope.
 
-            blockage.live_list.push(name);
+            blockage.tdz_list.push(name);
         });
         return post_s_export_toplevel(the_thing);
     }
 
     function post_s_lbrace_pop_block() {
-        blockage.live_list.forEach(function (name) {
+        blockage.tdz_list.forEach(function (name) {
 
-// 1z. Mark as dead, the variable, after block-scope.
+// 1z. Mark inside 'tdz', the variable, after block-scope.
 
-            name.dead = true;
+            name.tdz = true;
         });
-        delete blockage.live_list;
+        delete blockage.tdz_list;
         blockage = block_stack.pop();
     }
 
@@ -8473,9 +8473,9 @@ function jslint_phase4_walk(state) {
         }
         if (thing.catch.name) {
 
-// 6a. Mark not dead, the exception-variable, before catch-block.
+// 6a. Mark outside 'tdz', the exception-variable, before catch-block.
 
-            catchage.context[thing.catch.name.id].dead = false;
+            catchage.context[thing.catch.name.id].tdz = false;
         }
 
 // Recurse walk_statement().
@@ -8507,16 +8507,16 @@ function jslint_phase4_walk(state) {
 // PR-502 - Fix long-running regression where 'let x = x;'
 // doesn't warn about temporal-dead-zone.
 
-// 1a. Mark not dead, the variable, after variable-initialization.
+// 1a. Mark outside 'tdz', the variable, after variable-initialization.
 
-            name.dead = false;
+            name.tdz = false;
             switch (thing.id) {
             case "const":
             case "let":
 
-// 1z. Mark as dead, the variable, after block-scope.
+// 1z. Mark inside 'tdz', the variable, after block-scope.
 
-                blockage.live_list.push(name);
+                blockage.tdz_list.push(name);
                 break;
             }
         });
@@ -8841,7 +8841,7 @@ function jslint_phase4_walk(state) {
 //                 if (
 //                     left_variable !== undefined
 // // Probably deadcode.
-// // && left_variable.dead
+// // && left_variable.tdz
 //                     && left_variable.parent === parent
 //                     && left_variable.calls !== undefined
 //                     && left_variable.calls[functionage.name.id] !== undefined
@@ -8851,7 +8851,7 @@ function jslint_phase4_walk(state) {
 // // false so JSLint won't raise an error for
 // // calling it before its line is executed.
 //
-//                     left_variable.dead = false;
+//                     left_variable.tdz = false;
 //                 }
 //             }
 //         }
@@ -8881,9 +8881,9 @@ function jslint_phase4_walk(state) {
         let the_variable;
         if (thing.name !== undefined) {
 
-// 7a. Mark not dead, the iterator variable, during for-loop-initialization.
+// 7a. Mark outside 'tdz', the iterator variable, during for-loop-init.
 
-            thing.name.dead = false;
+            thing.name.tdz = false;
             the_variable = name_lookup(thing.name, true);
             if (the_variable !== undefined) {
                 if (the_variable.init && the_variable.readonly) {
@@ -8920,12 +8920,12 @@ function jslint_phase4_walk(state) {
         block_stack.push(blockage);
         functionage = thing;
         blockage = thing;
-        thing.live_list = [];
+        thing.tdz_list = [];
         if (typeof thing.name === "object") {
 
-// 3a. Mark not dead, the function-name, in function-expression.
+// 3a. Mark outside 'tdz', the function-name, in function-expression.
 
-            thing.name.dead = false;
+            thing.name.tdz = false;
         }
         if (thing.extra === "get") {
             if (thing.parameter_count !== 0) {
@@ -8967,16 +8967,16 @@ function jslint_phase4_walk(state) {
             }
             walk_expression(name.expression);
 
-// 8a. Mark not dead, the function-parameter, after destructuring.
+// 8a. Mark outside 'tdz', the function-parameter, after destructuring.
 
-            name.dead = false;
+            name.tdz = false;
         });
     }
 
     function pre_s_lbrace(thing) {
         block_stack.push(blockage);
         blockage = thing;
-        thing.live_list = [];
+        thing.tdz_list = [];
     }
 
     function pre_try(thing) {
@@ -9788,10 +9788,10 @@ function jslint_phase5_whitage(state) {
         }
         nr_comments_skipped = 0;
         delete left.calls;
-        delete left.dead;
         delete left.free;
         delete left.init;
         delete left.open;
+        delete left.tdz;
         delete left.used;
         left = right;
     });
