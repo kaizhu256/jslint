@@ -5479,12 +5479,12 @@ function jslint_phase3_parse(state) {
                     true                // init
                 );
 
-// 5.lbl.1 - Mark 'initialized', the label-statement, before control-flow-block.
+// 5.lab.1 - Mark 'initialized', the label-statement, before control-flow-block.
 
                 the_label.live = true;
                 the_statement = parse_statement();
 
-// 5.lbl.2 - Mark 'out-of-scope', the label-statement, after control-flow-block.
+// 5.lab.2 - Mark 'out-of-scope', the label-statement, after control-flow-block.
 
                 the_label.live = false;
                 functionage.statement_prv = the_statement;
