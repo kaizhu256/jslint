@@ -1834,7 +1834,7 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
         result = (
             "\n\n\n\n\n\n\n\n"
 
-// bug-workaround - truncate example to manageable size
+// bug-workaround - Truncate example to manageable size.
 
             + result.slice(0, 524288)
             + "\n\n\n\n\n\n\n\n"
