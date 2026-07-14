@@ -1833,7 +1833,9 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
         let result = await moduleFs.promises.readFile(file, "utf8");
         result = (
             "\n\n\n\n\n\n\n\n"
-            // bug-workaround - truncate example to manageable size
+
+// bug-workaround - truncate example to manageable size
+
             + result.slice(0, 524288)
             + "\n\n\n\n\n\n\n\n"
         );
@@ -7985,7 +7987,6 @@ function jslint_phase4_walk(state) {
 
 // 3.glo.1 - Mark 'initialized', the global-variable, immediately.
 // 3.glo.2 - Mark 'out-of-scope', the global-variable, never.
-
 
                     live: true,
                     parent: token_global,
