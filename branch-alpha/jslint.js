@@ -7983,7 +7983,9 @@ function jslint_phase4_walk(state) {
                     id,
                     init: true,
 
-// 3.var.1 - Mark 'initialized', the global-variable, immediately.
+// 3.glo.1 - Mark 'initialized', the global-variable, immediately.
+// 3.glo.2 - Mark 'out-of-scope', the global-variable, never.
+
 
                     live: true,
                     parent: token_global,
@@ -8469,7 +8471,7 @@ function jslint_phase4_walk(state) {
         }
         if (thing.catch.name) {
 
-// 3.var.1 - Mark 'initialized', the exception-variable, before catch-block.
+// 3.exc.1 - Mark 'initialized', the exception-variable, before catch-block.
 
             catchage.context[thing.catch.name.id].live = true;
         }
@@ -8479,7 +8481,7 @@ function jslint_phase4_walk(state) {
         walk_statement(thing.catch.block);
         if (thing.catch.name) {
 
-// 3.var.2 - Mark 'out-of-scope', the exception-variable, after catch-block.
+// 3.exc.2 - Mark 'out-of-scope', the exception-variable, after catch-block.
 
             catchage.context[thing.catch.name.id].live = false;
         }
@@ -8520,12 +8522,12 @@ function jslint_phase4_walk(state) {
 
                 blockage.live_list.push(name);
                 break;
-            case "var":
+            // case "var":
+            default:
 
 // 3.var.2 - Mark 'out-of-scope', the variable, after function-scope.
 
                 functionage.live_list.push(name);
-                break;
             }
         });
     }
@@ -8889,7 +8891,8 @@ function jslint_phase4_walk(state) {
         let the_variable;
         if (thing.name !== undefined) {
 
-// 3.var.1 - Mark 'initialized', the iterator-variable, in for-statement.
+// 3.for.1 - Mark 'initialized', the iterator-variable, in for-statement.
+// 3.for.2 - Mark 'out-of-scope', the iterator-variable, ???.
 
             thing.name.live = true;
             the_variable = name_lookup(thing.name, true);
@@ -8968,11 +8971,11 @@ function jslint_phase4_walk(state) {
             }
             walk_expression(name.expression);
 
-// 4.prm.1 - Mark 'initialized', the function-parameter, after destructuring.
+// 4.par.1 - Mark 'initialized', the function-parameter, after destructuring.
 
             name.live = true;
 
-// 4.prm.2 - Mark 'out-of-scope', the function-parameter, after function-scope.
+// 4.par.2 - Mark 'out-of-scope', the function-parameter, after function-scope.
 
             functionage.live_list.push(name);
         });
