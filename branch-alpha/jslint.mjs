@@ -5479,12 +5479,12 @@ function jslint_phase3_parse(state) {
                     true                // init
                 );
 
-// 2a. Mark outside 'tdz', the label-statement, before control-flow-block.
+// 5.lbl.1 - Mark 'initialized', the label-statement, before control-flow-block.
 
                 the_label.live = true;
                 the_statement = parse_statement();
 
-// 2z. Mark inside 'tdz', the label-statement, after control-flow-block.
+// 5.lbl.2 - Mark 'out-of-scope', the label-statement, after control-flow-block.
 
                 the_label.live = false;
                 functionage.statement_prv = the_statement;
@@ -5929,12 +5929,13 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_function(the_function, mode_fart, mode_fart_unwrapped) {
-        let name;
-        let role = "function";
+        const name = !mode_fart && token_nxt.identifier && token_nxt;
         the_function = the_function || token_now;
+        the_function.live_list = [];
         if (mode_fart) {
             the_function.arity = "binary";
-        } else if (the_function.arity === "statement") {
+        }
+        if (the_function.arity === "statement") {
 
 // A function statement must have a name that will be in the parent's scope.
 
@@ -5942,41 +5943,39 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["function(){}", "prefix_function", "expected_identifier_a", "(", 9]
-// ["function*aa(){}", "prefix_function", "expected_identifier_a", "*", 9]
 
                 return stop("expected_identifier_a", token_nxt);
             }
-            name = token_nxt;
             name.calls = empty();
-            role = "variable";
-            advance();
-        } else if (token_nxt.identifier) {
-
-// A function expression may have an optional name.
-
-// test_cause:
-// ["(function bb(){}())", "prefix_function", "expression", "bb", 0]
-// ["aa=function bb(){}", "prefix_function", "expression", "bb", 0]
-
-            test_cause("expression", token_nxt.id);
-            name = token_nxt;
-            advance();
         }
         if (name) {
+            advance();
             name_push(
                 [],                     // name_list
                 true,                   // enroll
                 name,                   // name
-                role,                   // role
+                (                       // role
+                    the_function.arity === "statement"
+                    ? "variable"
+                    : "function"
+                ),
                 false,                  // readonly
                 true                    // init
             );
+
+// 2.fun.1 - Mark 'initialized', the function-name, immediately.
+
+            name.live = true;
             if (the_function.arity === "statement") {
 
-// 3a. Mark outside 'tdz', the function-name, in function-statement.
+// 2.fun.2 - Mark 'out-of-scope', the function-name, after function-scope.
 
-                name.live = true;
+                functionage.live_list.push(name);
             } else {
+
+// 2.fun.2 - Mark 'out-of-scope', the function-name, after expression-scope.
+
+                the_function.live_list.push(name);
                 name.used += 1;
             }
         }
@@ -6530,7 +6529,7 @@ function jslint_phase3_parse(state) {
             ) {
                 if (the_label && !the_label.live) {
 
-// Warn label-statement is inside 'tdz', while being accessed.
+// Warn label-statement is illegally accessed while inside 'tdz'.
 
 // test_cause:
 // ["aa:{function aa(aa){break aa}}", "stmt_break", "out_of_scope_a", "aa", 27]
@@ -7984,7 +7983,7 @@ function jslint_phase4_walk(state) {
                     id,
                     init: true,
 
-// 4a. Mark outside 'tdz', the global-variable, anywhere.
+// 3.var.1 - Mark 'initialized', the global-variable, immediately.
 
                     live: true,
                     parent: token_global,
@@ -8006,10 +8005,11 @@ function jslint_phase4_walk(state) {
             && !the_variable.live
         ) {
 
-// Warn variable / parameter is inside 'tdz', while being accessed.
+// Warn variable / parameter is illegally accessed while inside 'tdz'.
 
 // test_cause:
 // ["(aa=aa)=>0", "name_lookup", "out_of_scope_a", "aa", 5]
+// ["(function aa(){})aa", "name_lookup", "out_of_scope_a", "aa", 18]
 // ["if(0){let aa}aa", "name_lookup", "out_of_scope_a", "aa", 14]
 // ["let [aa]=aa", "name_lookup", "out_of_scope_a", "aa", 10]
 // ["let aa=()=>aa", "name_lookup", "out_of_scope_a", "aa", 12]
@@ -8438,28 +8438,25 @@ function jslint_phase4_walk(state) {
 
             warn("unexpected_parens", thing);
         }
-        return post_s_lbrace_pop_block();
+        post_s_lbrace_pop_block();
     }
 
     function post_s_import(the_thing) {
         the_thing.name_list.forEach(function (name) {
 
-// 5a. Mark outside 'tdz', the import-name, after import-statement.
+// 1.imp.1 - Mark 'initialized', the import-name, after import-statement.
 
             name.live = true;
 
-// 5z. Mark inside 'tdz', the import-name, after module-scope.
+// 1.imp.2 - Mark 'out-of-scope', the import-name, after module-scope.
 
             blockage.live_list.push(name);
         });
-        return post_s_export_toplevel(the_thing);
+        post_s_export_toplevel(the_thing);
     }
 
     function post_s_lbrace_pop_block() {
         blockage.live_list.forEach(function (name) {
-
-// 1z. Mark inside 'tdz', the variable, after block-scope.
-
             name.live = false;
         });
         delete blockage.live_list;
@@ -8472,7 +8469,7 @@ function jslint_phase4_walk(state) {
         }
         if (thing.catch.name) {
 
-// 6a. Mark outside 'tdz', the exception-variable, before catch-block.
+// 3.var.1 - Mark 'initialized', the exception-variable, before catch-block.
 
             catchage.context[thing.catch.name.id].live = true;
         }
@@ -8480,6 +8477,12 @@ function jslint_phase4_walk(state) {
 // Recurse walk_statement().
 
         walk_statement(thing.catch.block);
+        if (thing.catch.name) {
+
+// 3.var.2 - Mark 'out-of-scope', the exception-variable, after catch-block.
+
+            catchage.context[thing.catch.name.id].live = false;
+        }
 
 // Restore previous catch-scope after catch-block.
 
@@ -8506,16 +8509,22 @@ function jslint_phase4_walk(state) {
 // PR-502 - Fix long-running regression where 'let x = x;'
 // doesn't warn about temporal-dead-zone.
 
-// 1a. Mark outside 'tdz', the variable, after variable-initialization.
+// 3.var.1 - Mark 'initialized', the variable, after variable-initialization.
 
             name.live = true;
             switch (thing.id) {
             case "const":
             case "let":
 
-// 1z. Mark inside 'tdz', the variable, after block-scope.
+// 3.var.2 - Mark 'out-of-scope', the variable, after block-scope.
 
                 blockage.live_list.push(name);
+                break;
+            case "var":
+
+// 3.var.2 - Mark 'out-of-scope', the variable, after function-scope.
+
+                functionage.live_list.push(name);
                 break;
             }
         });
@@ -8840,7 +8849,7 @@ function jslint_phase4_walk(state) {
 //                 if (
 //                     left_variable !== undefined
 // // Probably deadcode.
-// // && left_variable.tdz
+// // && !left_variable.live
 //                     && left_variable.parent === parent
 //                     && left_variable.calls !== undefined
 //                     && left_variable.calls[functionage.name.id] !== undefined
@@ -8880,7 +8889,7 @@ function jslint_phase4_walk(state) {
         let the_variable;
         if (thing.name !== undefined) {
 
-// 7a. Mark outside 'tdz', the iterator variable, during for-loop-init.
+// 3.var.1 - Mark 'initialized', the iterator-variable, in for-statement.
 
             thing.name.live = true;
             the_variable = name_lookup(thing.name, true);
@@ -8919,13 +8928,6 @@ function jslint_phase4_walk(state) {
         block_stack.push(blockage);
         functionage = thing;
         blockage = thing;
-        thing.live_list = [];
-        if (typeof thing.name === "object") {
-
-// 3a. Mark outside 'tdz', the function-name, in function-expression.
-
-            thing.name.live = true;
-        }
         if (thing.extra === "get") {
             if (thing.parameter_count !== 0) {
 
@@ -8966,9 +8968,13 @@ function jslint_phase4_walk(state) {
             }
             walk_expression(name.expression);
 
-// 8a. Mark outside 'tdz', the function-parameter, after destructuring.
+// 4.prm.1 - Mark 'initialized', the function-parameter, after destructuring.
 
             name.live = true;
+
+// 4.prm.2 - Mark 'out-of-scope', the function-parameter, after function-scope.
+
+            functionage.live_list.push(name);
         });
     }
 
