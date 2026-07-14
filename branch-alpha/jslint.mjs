@@ -6529,7 +6529,7 @@ function jslint_phase3_parse(state) {
             ) {
                 if (the_label && !the_label.live) {
 
-// Warn label-statement is illegally accessed while inside 'tdz'.
+// Warn label-statement is 'out-of-scope'.
 
 // test_cause:
 // ["aa:{function aa(aa){break aa}}", "stmt_break", "out_of_scope_a", "aa", 27]
@@ -8005,7 +8005,7 @@ function jslint_phase4_walk(state) {
             && !the_variable.live
         ) {
 
-// Warn variable / parameter is illegally accessed while inside 'tdz'.
+// Warn variable is 'out-of-scope'.
 
 // test_cause:
 // ["(aa=aa)=>0", "name_lookup", "out_of_scope_a", "aa", 5]

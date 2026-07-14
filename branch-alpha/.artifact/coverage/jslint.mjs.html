@@ -6694,7 +6694,7 @@ body {
 <pre><span class="lineno"><a href="#line_6529" id="line_6529"> 6529.</a></span><span class="count                ">      3</span><span>            ) {</span></pre>
 <pre><span class="lineno"><a href="#line_6530" id="line_6530"> 6530.</a></span><span class="count                ">      3</span><span>                if (the_label &amp;&amp; !the_label.live) {</span></pre>
 <pre><span class="lineno"><a href="#line_6531" id="line_6531"> 6531.</a></span><span class="count                ">      3</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6532" id="line_6532"> 6532.</a></span><span class="count                ">      3</span><span>// Warn label-statement is illegally accessed while inside 'tdz'.</span></pre>
+<pre><span class="lineno"><a href="#line_6532" id="line_6532"> 6532.</a></span><span class="count                ">      3</span><span>// Warn label-statement is 'out-of-scope'.</span></pre>
 <pre><span class="lineno"><a href="#line_6533" id="line_6533"> 6533.</a></span><span class="count                ">      3</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6534" id="line_6534"> 6534.</a></span><span class="count                ">      3</span><span>// test_cause:</span></pre>
 <pre><span class="lineno"><a href="#line_6535" id="line_6535"> 6535.</a></span><span class="count                ">      3</span><span>// ["aa:{function aa(aa){break aa}}", "stmt_break", "out_of_scope_a", "aa", 27]</span></pre>
@@ -8170,7 +8170,7 @@ body {
 <pre><span class="lineno"><a href="#line_8005" id="line_8005"> 8005.</a></span><span class="count                ">  31311</span><span>            &amp;&amp; !the_variable.live</span></pre>
 <pre><span class="lineno"><a href="#line_8006" id="line_8006"> 8006.</a></span><span class="count                ">     21</span><span>        ) {</span></pre>
 <pre><span class="lineno"><a href="#line_8007" id="line_8007"> 8007.</a></span><span class="count                ">     21</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8008" id="line_8008"> 8008.</a></span><span class="count                ">     21</span><span>// Warn variable / parameter is illegally accessed while inside 'tdz'.</span></pre>
+<pre><span class="lineno"><a href="#line_8008" id="line_8008"> 8008.</a></span><span class="count                ">     21</span><span>// Warn variable is 'out-of-scope'.</span></pre>
 <pre><span class="lineno"><a href="#line_8009" id="line_8009"> 8009.</a></span><span class="count                ">     21</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8010" id="line_8010"> 8010.</a></span><span class="count                ">     21</span><span>// test_cause:</span></pre>
 <pre><span class="lineno"><a href="#line_8011" id="line_8011"> 8011.</a></span><span class="count                ">     21</span><span>// ["(aa=aa)=&gt;0", "name_lookup", "out_of_scope_a", "aa", 5]</span></pre>
