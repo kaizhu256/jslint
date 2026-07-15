@@ -4020,13 +4020,13 @@ function jslint_phase2_lex(state) {
                     Object.entries(dict).forEach(function ([name, is_global]) {
                         if (is_global) {
                             global_dict[name] = (
-                                key === "browser"
+                                key2.startsWith("browser")
                                 ? "browser"
-                                : key === "couch"
+                                : key2.startsWith("couch")
                                 ? "CouchDb"
-                                : key === "devel"
+                                : key2.startsWith("devel")
                                 ? "development"
-                                : key === "ecma"
+                                : key2.startsWith("ecma")
                                 ? "ECMAScript"
                                 : "Node.js"
                             );
