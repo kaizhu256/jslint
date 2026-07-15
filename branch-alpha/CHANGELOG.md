@@ -1,7 +1,6 @@
 # Changelog
 
 # Todo
-- jslint-warning - Relax warnings for console.log() and friends.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add ability to auto-fix whitespace.
