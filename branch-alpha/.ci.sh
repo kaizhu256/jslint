@@ -413,9 +413,9 @@ function objectDeepCopyWithKeysSorted(obj) {
         );
         response = await response.text();
         Object.keys(dict).forEach(function (key) {
-            dictBrowserNode[key] = response.includes(
-                `"path":"files/en-us/web/api/${key.toLowerCase()}"`
-            );
+            dictBrowserNode[key] = new RegExp(
+                `"path":"files/en-us/web/api/(?:window/)?${key.toLowerCase()}"`
+            ).test(response);
         });
     }());
     await Promise.all(promiseList);
