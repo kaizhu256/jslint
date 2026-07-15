@@ -4017,9 +4017,19 @@ function jslint_phase2_lex(state) {
                 key2, dict
             ]) {
                 if (key2.startsWith(key)) {
-                    Object.entries(dict).forEach(function ([key, val]) {
-                        if (val) {
-                            global_dict[key] = true;
+                    Object.entries(dict).forEach(function ([name, is_global]) {
+                        if (is_global) {
+                            global_dict[name] = (
+                                key === "browser"
+                                ? "browser"
+                                : key === "couch"
+                                ? "CouchDb"
+                                : key === "devel"
+                                ? "development"
+                                : key === "ecma"
+                                ? "ECMAScript"
+                                : "Node.js"
+                            );
                         }
                     });
                 }
