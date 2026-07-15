@@ -306,7 +306,6 @@ shCiJslintGlobalDictAllFetch() {(set -e
 # this function will fetch list of common, javascript global-objects
 # from online-resources.
     node --input-type=module --eval '
-/*global fetch*/
 import moduleFs from "fs";
 function isDeprecated(text) {
     return (/(?:deprecated|experimental|non-standard)_inline/i).test(text);
