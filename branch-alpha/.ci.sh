@@ -416,6 +416,7 @@ function objectDeepCopyWithKeysSorted(obj) {
         response = JSON.stringify(response);
         await Promise.all(Object.keys(dict).map(async function (key) {
             let response2;
+            dictBrowserNode[key] = false;
             response2 = new RegExp(
                 `"files/en-us/web/api/(?:window/)?`
                 + key.toLowerCase()
