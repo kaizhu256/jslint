@@ -490,6 +490,8 @@ const jslint_global_dict_all = {
     "node": {
     },
 
+// sh jslint_ci.sh shCiJslintGlobalDictAllFetch
+
 // jslint_global_dict_all - auto-generated - start.
 
     "browser_auto_node": {
