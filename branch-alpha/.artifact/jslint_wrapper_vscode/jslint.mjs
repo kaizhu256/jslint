@@ -434,11 +434,7 @@ const jslint_global_dict_all = {
 // Assign global browser variables to global_dict.
 
     "browser": {
-        "CharacterData": false,
-        "DocumentType": false,
-        "Element": false,
         "FileReader": true,
-        "FontFace": false,
         "IntersectionObserver": true,
         "MutationObserver": true,
         "WebAssembly": true,
@@ -482,7 +478,6 @@ const jslint_global_dict_all = {
 // Assign global Node.js variables to global_dict.
 
     "node": {
-        "fetch": true
     },
 
 // sh jslint_ci.sh shCiJslintGlobalDictAllFetch
