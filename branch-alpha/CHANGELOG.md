@@ -10,6 +10,9 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.7.1-beta
+- jslint - Expand built-in-globals for browser, ecma, and node - auto-generated from online-sources:
+    https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/
+    https://raw.githubusercontent.com/nodejs/node/v24.x/doc/api/globals.md
 - jslint-ci - Add automated ci for shellcheck to lint shell-scripts.
 - jslint-regression - Cleanup indent for multiline-method-chaining.
 - jslint-regression - Fix jslint crashing before warning about dangling ')' or ']'.
