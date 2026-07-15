@@ -307,12 +307,12 @@ shCiJslintGlobalDictAllFetch() {(set -e
 # from online-resources.
     node --input-type=module --eval '
 import moduleFs from "fs";
-function isDeprecated(text) {
+function nameDeprecated(text) {
     return (
         (/(?:deprecated|experimental|non-standard)_inline/i).test(text)
     );
 }
-function isTooShort(name) {
+function nameTooShort(name) {
     return (/^[a-z].{0,5}$/).test(name);
 }
 function objectDeepCopyWithKeysSorted(obj) {
@@ -353,7 +353,7 @@ function objectDeepCopyWithKeysSorted(obj) {
         response.replace((
             /^- \{\{domxref\("Window\.(\w+?)(\W.*?)$/gm
         ), function (ignore, name, deprecated) {
-            if (!isDeprecated(deprecated) && !isTooShort(name)) {
+            if (!nameDeprecated(deprecated) && !nameTooShort(name)) {
                 dict[name] = true;
             }
             return "";
@@ -370,7 +370,7 @@ function objectDeepCopyWithKeysSorted(obj) {
         response.replace((
             /^- \{\{jsxref\("(\w+?)(\W.*?)$/gm
         ), function (ignore, name, deprecated) {
-            if (!isDeprecated(deprecated)) {
+            if (!nameDeprecated(deprecated)) {
                 dict[name] = true;
             }
             return "";
