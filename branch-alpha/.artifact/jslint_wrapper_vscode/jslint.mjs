@@ -448,9 +448,9 @@ const jslint_global_dict_all = {
         "TextDecoder": false,
         "TextEncoder": false,
         "URL": false,
+        "WebAssembly": true,
         "Worker": true,
-        "XMLHttpRequest": true,
-        "WebAssembly": true
+        "XMLHttpRequest": true
     },
 
 // https://docs.couchdb.org/en/stable/query-server/javascript.html#javascript
