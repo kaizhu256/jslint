@@ -358,7 +358,7 @@ function objectDeepCopyWithKeysSorted(obj) {
         response.replace((
             /^- \{\{domxref\("Window\.(\w+?)["(](.*?)$/gm
         ), function (ignore, name, deprecated) {
-            if (nameOk(name, deprecated, 6)) {
+            if (nameOk(name, deprecated, 8)) {
                 dict[name] = true;
             }
             return "";
