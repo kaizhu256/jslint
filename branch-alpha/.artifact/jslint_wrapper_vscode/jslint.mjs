@@ -475,7 +475,6 @@ const jslint_global_dict_all = {
 
     "ecma": {
         "ShadowRealm": true,
-        "Temporal": true,
         "eval": true,
         "import": true
     },
