@@ -438,15 +438,11 @@ const jslint_global_dict_all = {
         "CharacterData": false,
         "DocumentType": false,
         "Element": false,
-        "Event": false,
         "FileReader": true,
         "FontFace": false,
-        "FormData": true,
         "IntersectionObserver": true,
         "MutationObserver": true,
         "Storage": false,
-        "TextDecoder": false,
-        "TextEncoder": false,
         "URL": false,
         "WebAssembly": true,
         "Worker": true,
@@ -456,6 +452,7 @@ const jslint_global_dict_all = {
 // https://docs.couchdb.org/en/stable/query-server/javascript.html#javascript
 
     "couch": {
+        "JSON": true,
         "emit": true,
         "getRow": true,
         "isArray": true,
