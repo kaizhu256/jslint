@@ -368,7 +368,7 @@ function objectDeepCopyWithKeysSorted(obj) {
         );
         response = await response.text();
         response.replace((
-            /^- \{\{jsxref\("(\w+?)(\W.*?)$/gm
+            /^- \{\{jsxref\("(\w+?)["(](.*?)$/gm
         ), function (ignore, name, deprecated) {
             if (!nameDeprecated(deprecated)) {
                 dict[name] = true;

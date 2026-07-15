@@ -647,7 +647,6 @@ const jslint_global_dict_all = {
         "Function": true,
         "Generator": true,
         "GeneratorFunction": true,
-        "Global_Objects": true,
         "Infinity": true,
         "Int16Array": true,
         "Int32Array": true,
