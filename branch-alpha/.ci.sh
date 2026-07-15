@@ -397,9 +397,7 @@ function objectDeepCopyWithKeysSorted(obj) {
         response.replace((
             /^## (?:Class: )?`(\w+?)\W/gm //`
         ), function (ignore, key) {
-            if (Object.hasOwn(globalThis, key)) {
-                dict[key] = true;
-            }
+            dict[key] = Object.hasOwn(globalThis, key);
             return "";
         });
         response.replace((
