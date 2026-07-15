@@ -674,32 +674,7 @@ const jslint_global_dict_all = {
         "window": true
     },
     "browser_auto_worker": {
-        "atob": true,
-        "btoa": true,
-        "caches": true,
-        "clearInterval": true,
-        "clearTimeout": true,
-        "createImageBitmap": true,
-        "crossOriginIsolated": true,
-        "crypto": true,
-        "dump": false,
-        "fetch": true,
-        "fonts": true,
-        "importScripts": true,
-        "indexedDB": true,
-        "isSecureContext": true,
-        "location": true,
-        "navigator": true,
-        "origin": true,
-        "performance": true,
-        "queueMicrotask": true,
-        "reportError": true,
-        "scheduler": true,
-        "self": true,
-        "setInterval": true,
-        "setTimeout": true,
-        "structuredClone": true,
-        "trustedTypes": true
+        "importScripts": true
     },
     "ecma_auto": {
         "AggregateError": true,
