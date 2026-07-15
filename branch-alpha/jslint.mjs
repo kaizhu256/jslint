@@ -449,13 +449,13 @@ const jslint_global_dict_all = {
         "send": true,
         "start": true,
         "sum": true,
-        "toJSON": true,
+        "toJSON": true
     },
     "devel": {
         "alert": true,
         "confirm": true,
         "console": true,
-        "prompt": true,
+        "prompt": true
     },
 
 // These are the globals that are provided by the language standard.
@@ -549,6 +549,9 @@ const jslint_global_dict_all = {
         "setTimeout": false,
         "structuredClone": true,
         "window": true
+    },
+    "browser_auto_worker": {
+        "importScripts": true
     },
     "ecma_auto": {
         "AggregateError": true,
