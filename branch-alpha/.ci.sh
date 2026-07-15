@@ -394,7 +394,7 @@ function objectDeepCopyWithKeysSorted(obj) {
         response.replace((
             /^## (?:Class: )?`(\w+?)\W/gm //`
         ), function (ignore, name) {
-            dict[name] = nameOk(name, "", 0) && Object.hasOwn(globalThis, name);
+            dict[name] = nameOk(name, "", 4) && Object.hasOwn(globalThis, name);
             return "";
         });
         response.replace((
@@ -425,7 +425,7 @@ function objectDeepCopyWithKeysSorted(obj) {
                 );
                 response2 = await response2.text();
                 if (
-                    nameOk(name, "", 0)
+                    nameOk(name, "", 4)
                     && !(/\{\{deprecated_header\}\}/).test(response2)
                 ) {
                     dictBrowserNode[name] = true;
