@@ -422,16 +422,15 @@ function objectDeepCopyWithKeysSorted(obj) {
                 + key.toLowerCase()
                 + `/index.md"`
             ).exec(response);
-            if (!response2) {
-                return;
-            }
-            response2 = await fetch(
-                "https://raw.githubusercontent.com/mdn/content/main/"
-                + response2[0].slice(1, -1)
-            );
-            response2 = await response2.text();
-            if (!(/\{\{deprecated_header\}\}/).test(response2)) {
-                dictBrowserNode[key] = true;
+            if (response2) {
+                response2 = await fetch(
+                    "https://raw.githubusercontent.com/mdn/content/main/"
+                    + response2[0].slice(1, -1)
+                );
+                response2 = await response2.text();
+                if (!(/\{\{deprecated_header\}\}/).test(response2)) {
+                    dictBrowserNode[key] = true;
+                }
             }
         }));
     }());
