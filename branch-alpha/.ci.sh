@@ -419,10 +419,7 @@ function objectDeepCopyWithKeysSorted(obj) {
                     + response2[0].slice(1, -1)
                 );
                 response2 = await response2.text();
-                if (
-                    !(/\{\{deprecated_header\}\}/).test(response2)
-                    && !isTooShort(name)
-                ) {
+                if (!(/\{\{deprecated_header\}\}/).test(response2)) {
                     dictBrowserNode[name] = true;
                 }
             }
