@@ -434,7 +434,6 @@ const jslint_global_dict_all = {
 // Assign global browser variables to global_dict.
 
     "browser": {
-        "Blob": true,
         "CharacterData": false,
         "DocumentType": false,
         "Element": false,
@@ -443,7 +442,6 @@ const jslint_global_dict_all = {
         "IntersectionObserver": true,
         "MutationObserver": true,
         "Storage": false,
-        "URL": false,
         "WebAssembly": true,
         "Worker": true,
         "XMLHttpRequest": true
