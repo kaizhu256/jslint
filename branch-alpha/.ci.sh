@@ -400,7 +400,7 @@ function objectDeepCopyWithKeysSorted(obj) {
         response.replace((
             /^\* \[`(\w+?)\W/gm //`
         ), function (ignore, name) {
-            dict[name] = true;
+            dict[name] = nameOk(name, "", 0);
             return "";
         });
         response = await fetch(
