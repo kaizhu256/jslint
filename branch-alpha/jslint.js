@@ -441,7 +441,6 @@ const jslint_global_dict_all = {
         "FontFace": false,
         "IntersectionObserver": true,
         "MutationObserver": true,
-        "Storage": false,
         "WebAssembly": true,
         "Worker": true,
         "XMLHttpRequest": true
