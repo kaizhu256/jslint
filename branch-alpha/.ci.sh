@@ -409,12 +409,33 @@ function objectDeepCopyWithKeysSorted(obj) {
         response = await fetch(
 "https://api.github.com/repos/mdn/content/git/trees/main?recursive=1" //jslint-ignore-line
         );
-        response = await response.text();
-        Object.keys(dict).forEach(function (key) {
-            dictBrowserNode[key] = new RegExp(
-                `"path":"files/en-us/web/api/(?:window/)?${key.toLowerCase()}"`
-            ).test(response);
+        response = await response.json();
+        response = response.tree.map(function ({path}) {
+            return path;
         });
+        response = JSON.stringify(response);
+        await Promise.all(Object.keys(dict).map(async function (key) {
+            let response2;
+            dictBrowserNode[key] = false;
+            response2 = new RegExp(
+                `"files/en-us/web/api/(?:window/)?`
+                + key.toLowerCase()
+                + `/index.md"`
+            ).exec(response);
+            if (response2) {
+                response2 = await fetch(
+                    "https://raw.githubusercontent.com/mdn/content/main/"
+                    + response2[0].slice(1, -1)
+                );
+                response2 = await response2.text();
+                if (!(
+                    /\{\{(?:deprecated)_header\}\}/
+                ).test(response2)) {
+                    dictBrowserNode[key] = true;
+                }
+            }
+            await 0;
+        }));
     }());
     await Promise.all(promiseList);
     result = await moduleFs.promises.readFile("jslint.mjs", "utf8");

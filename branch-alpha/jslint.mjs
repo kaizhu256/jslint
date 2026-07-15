@@ -547,7 +547,7 @@ const jslint_global_dict_all = {
         "__filename": false,
         "atob": true,
         "btoa": true,
-        "clearImmediate": true,
+        "clearImmediate": false,
         "clearInterval": true,
         "clearTimeout": true,
         "console": true,
@@ -563,7 +563,7 @@ const jslint_global_dict_all = {
         "queueMicrotask": true,
         "require": false,
         "sessionStorage": true,
-        "setImmediate": true,
+        "setImmediate": false,
         "setInterval": true,
         "setTimeout": true,
         "structuredClone": true
