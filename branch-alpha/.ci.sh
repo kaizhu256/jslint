@@ -308,7 +308,12 @@ shCiJslintGlobalDictAllFetch() {(set -e
     node --input-type=module --eval '
 import moduleFs from "fs";
 function isDeprecated(text) {
-    return (/(?:deprecated|experimental|non-standard)_inline/i).test(text);
+    return (
+        (/(?:deprecated|experimental|non-standard)_inline/i).test(text)
+    );
+}
+function isTooShort(name) {
+    return (/^[a-z].{0,5}$/).test(name);
 }
 function objectDeepCopyWithKeysSorted(obj) {
 
@@ -347,8 +352,8 @@ function objectDeepCopyWithKeysSorted(obj) {
         response = await response.text();
         response.replace((
             /^- \{\{domxref\("Window\.(\w+?)(\W.*?)$/gm
-        ), function (ignore, key, deprecated) {
-            dict[key] = !isDeprecated(deprecated);
+        ), function (ignore, name, deprecated) {
+            dict[name] = !isDeprecated(deprecated) && !isTooShort(name);
             return "";
         });
     }());
@@ -362,8 +367,8 @@ function objectDeepCopyWithKeysSorted(obj) {
         response = await response.text();
         response.replace((
             /^- \{\{domxref\("WorkerGlobalScope\.(\w+?)(\W.*?)$/gm
-        ), function (ignore, key, deprecated) {
-            dict[key] = !isDeprecated(deprecated);
+        ), function (ignore, name, deprecated) {
+            dict[name] = !isDeprecated(deprecated) && !isTooShort(name);
             return "";
         });
     }());
@@ -377,9 +382,9 @@ function objectDeepCopyWithKeysSorted(obj) {
         response = await response.text();
         response.replace((
             /^- \{\{jsxref\("(\w+?)(\W.*?)$/gm
-        ), function (ignore, key, deprecated) {
-            dict[key] = (
-                Object.hasOwn(globalThis, key) && !isDeprecated(deprecated)
+        ), function (ignore, name, deprecated) {
+            dict[name] = (
+                Object.hasOwn(globalThis, name) && !isDeprecated(deprecated)
             );
             return "";
         });
@@ -396,14 +401,14 @@ function objectDeepCopyWithKeysSorted(obj) {
         response = await response.text();
         response.replace((
             /^## (?:Class: )?`(\w+?)\W/gm //`
-        ), function (ignore, key) {
-            dict[key] = Object.hasOwn(globalThis, key);
+        ), function (ignore, name) {
+            dict[name] = Object.hasOwn(globalThis, name);
             return "";
         });
         response.replace((
             /^\* \[`(\w+?)\W/gm //`
-        ), function (ignore, key) {
-            dict[key] = true;
+        ), function (ignore, name) {
+            dict[name] = true;
             return "";
         });
         response = await fetch(
@@ -414,12 +419,12 @@ function objectDeepCopyWithKeysSorted(obj) {
             return path;
         });
         response = JSON.stringify(response);
-        await Promise.all(Object.keys(dict).map(async function (key) {
+        await Promise.all(Object.keys(dict).map(async function (name) {
             let response2;
-            dictBrowserNode[key] = false;
+            dictBrowserNode[name] = false;
             response2 = new RegExp(
                 `"files/en-us/web/api/(?:window/)?`
-                + key.toLowerCase()
+                + name.toLowerCase()
                 + `/index.md"`
             ).exec(response);
             if (response2) {
@@ -429,7 +434,7 @@ function objectDeepCopyWithKeysSorted(obj) {
                 );
                 response2 = await response2.text();
                 if (!(/\{\{deprecated_header\}\}/).test(response2)) {
-                    dictBrowserNode[key] = true;
+                    dictBrowserNode[name] = true;
                 }
             }
         }));
