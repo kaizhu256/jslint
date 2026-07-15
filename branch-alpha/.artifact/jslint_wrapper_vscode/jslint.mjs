@@ -450,25 +450,7 @@ const jslint_global_dict_all = {
         "URL": false,
         "Worker": true,
         "XMLHttpRequest": true,
-        "caches": false,
-        "clearInterval": false,
-        "clearTimeout": false,
-        "document": true,
-        "event": false,
-        "fetch": true,
-        "history": false,
-        "indexedDb": true,
-        "localStorage": true,
-        "location": true,
-        "name": false,
-        "navigator": true,
-        "postMessage": true,
-        "screen": false,
-        "sessionStorage": true,
-        "setInterval": false,
-        "setTimeout": false,
-        "structuredClone": true,
-        "window": true
+        "WebAssembly": true
     },
 
 // https://docs.couchdb.org/en/stable/query-server/javascript.html#javascript
