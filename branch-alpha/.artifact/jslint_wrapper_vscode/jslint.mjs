@@ -448,7 +448,6 @@ const jslint_global_dict_all = {
         "caches": false,
         "document": true,
         "event": false,
-        "fetch": true,
         "history": false,
         "indexedDB": true,
         "location": true,
