@@ -436,7 +436,6 @@ const jslint_global_dict_all = {
 
     "browser": {
         "CharacterData": true,
-        "DOMException": true,
         "DocumentType": true,
         "Element": true,
         "FileReader": true,
