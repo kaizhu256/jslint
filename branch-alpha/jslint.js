@@ -447,7 +447,6 @@ const jslint_global_dict_all = {
         "XMLHttpRequest": true,
         "caches": false,
         "document": true,
-        "event": false,
         "history": false,
         "indexedDB": true,
         "location": true,
