@@ -6128,6 +6128,7 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
 
 // PR-500 - Unify ES2015-destructure-logic. - function ([aa]) {...}
+
                 prefix_destructure(
 
 // 4.par.1 - Mark 'enrolled', the function-parameter, during destructuring.
