@@ -5068,38 +5068,38 @@ function jslint_phase3_parse(state) {
 //
 // 1.imp.1 - Mark 'enrolled', the import-name, during import-statement.
 // 1.imp.2 - Mark 'alive', the import-name, after import-statement.
-// 1.imp.3 - Mark 'out-of-scope', the import-name, after module-scope.
+// 1.imp.4 - Mark 'out-of-scope', the import-name, after module-scope.
 //
 // 2.fun.1 - Mark 'enrolled', the function-name, immediately.
 // 2.fun.2 - Mark 'alive', the function-name, immediately.
-// 2.fun.3 - Mark 'out-of-scope', the function-name, after expression-scope.
-// 2.fun.3 - Mark 'out-of-scope', the function-name, after function-scope.
+// 2.fun.4 - Mark 'out-of-scope', the function-name, after expression-scope.
+// 2.fun.4 - Mark 'out-of-scope', the function-name, after function-scope.
 //
 // 3.exc.1 - Mark 'enrolled', the exception-variable, before catch-block.
 // 3.exc.2 - Mark 'alive', the exception-variable, before catch-block.
-// 3.exc.3 - Mark 'out-of-scope', the exception-variable, after catch-block.
+// 3.exc.4 - Mark 'out-of-scope', the exception-variable, after catch-block.
 //
 // 3.for.1 - Mark 'enrolled', the for-variable, ???.
 // 3.for.2 - Mark 'alive', the for-variable, before for-block.
-// 3.for.3 - Mark 'out-of-scope', the for-variable, ???.
+// 3.for.4 - Mark 'out-of-scope', the for-variable, ???.
 //
 // 3.glo.1 - Mark 'enrolled', the global-variable, never.
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
-// 3.glo.3 - Mark 'out-of-scope', the global-variable, never.
+// 3.glo.4 - Mark 'out-of-scope', the global-variable, never.
 //
 // 3.var.1 - Mark 'enrolled', the variable, during variable-initialization.
 // 3.var.2 - Mark 'alive', the variable, after variable-initialization.
-// 3.var.3 - Mark 'out-of-scope', the variable, after block-scope.
-// 3.var.3 - Mark 'out-of-scope', the variable, after function-scope.
+// 3.var.4 - Mark 'out-of-scope', the variable, after block-scope.
+// 3.var.4 - Mark 'out-of-scope', the variable, after function-scope.
 //
 // 4.par.1 - Mark 'enrolled', the function-parameter, during destructuring.
 // 4.par.1 - Mark 'enrolled', the function-parameter, if unwrapped.
 // 4.par.2 - Mark 'alive', the function-parameter, after destructuring.
-// 4.par.3 - Mark 'out-of-scope', the function-parameter, after function-scope.
+// 4.par.4 - Mark 'out-of-scope', the function-parameter, after function-scope.
 //
 // 5.lab.1 - Mark 'enrolled', the label-statement, before control-flow-block.
 // 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.
-// 5.lab.3 - Mark 'out-of-scope', the label-statement, after control-flow-block.
+// 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
 
         let earlier;
         let id = name.id;
@@ -5515,7 +5515,7 @@ function jslint_phase3_parse(state) {
                 the_label.alive = true;
                 the_statement = parse_statement();
 
-// 5.lab.3 - Mark 'out-of-scope', the label-statement, after control-flow-block.
+// 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
 
                 the_label.alive = false;
                 functionage.statement_prv = the_statement;
@@ -6002,12 +6002,12 @@ function jslint_phase3_parse(state) {
             name.alive = true;
             if (the_function.arity === "statement") {
 
-// 2.fun.3 - Mark 'out-of-scope', the function-name, after function-scope.
+// 2.fun.4 - Mark 'out-of-scope', the function-name, after function-scope.
 
                 functionage.alive_list.push(name);
             } else {
 
-// 2.fun.3 - Mark 'out-of-scope', the function-name, after expression-scope.
+// 2.fun.4 - Mark 'out-of-scope', the function-name, after expression-scope.
 
                 the_function.alive_list.push(name);
                 name.used += 1;
@@ -8046,7 +8046,7 @@ function jslint_phase4_walk(state) {
 
 // 3.glo.1 - Mark 'enrolled', the global-variable, never.
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
-// 3.glo.3 - Mark 'out-of-scope', the global-variable, never.
+// 3.glo.4 - Mark 'out-of-scope', the global-variable, never.
 
                     alive: true,
                     id,
@@ -8513,7 +8513,7 @@ function jslint_phase4_walk(state) {
 
             name.alive = true;
 
-// 1.imp.3 - Mark 'out-of-scope', the import-name, after module-scope.
+// 1.imp.4 - Mark 'out-of-scope', the import-name, after module-scope.
 
             blockage.alive_list.push(name);
         });
@@ -8544,7 +8544,7 @@ function jslint_phase4_walk(state) {
         walk_statement(thing.catch.block);
         if (thing.catch.name) {
 
-// 3.exc.3 - Mark 'out-of-scope', the exception-variable, after catch-block.
+// 3.exc.4 - Mark 'out-of-scope', the exception-variable, after catch-block.
 
             catchage.context[thing.catch.name.id].alive = false;
         }
@@ -8581,14 +8581,14 @@ function jslint_phase4_walk(state) {
             case "const":
             case "let":
 
-// 3.var.3 - Mark 'out-of-scope', the variable, after block-scope.
+// 3.var.4 - Mark 'out-of-scope', the variable, after block-scope.
 
                 blockage.alive_list.push(name);
                 break;
             // case "var":
             default:
 
-// 3.var.3 - Mark 'out-of-scope', the variable, after function-scope.
+// 3.var.4 - Mark 'out-of-scope', the variable, after function-scope.
 
                 functionage.alive_list.push(name);
             }
@@ -8956,7 +8956,7 @@ function jslint_phase4_walk(state) {
 
 // 3.for.1 - Mark 'enrolled', the for-variable, ???.
 // 3.for.2 - Mark 'alive', the for-variable, before for-block.
-// 3.for.3 - Mark 'out-of-scope', the for-variable, ???.
+// 3.for.4 - Mark 'out-of-scope', the for-variable, ???.
 
             thing.name.alive = true;
             the_variable = name_lookup(thing.name, true);
@@ -9039,7 +9039,7 @@ function jslint_phase4_walk(state) {
 
             name.alive = true;
 
-// 4.par.3 - Mark 'out-of-scope', the function-parameter, after function-scope.
+// 4.par.4 - Mark 'out-of-scope', the function-parameter, after function-scope.
 
             functionage.alive_list.push(name);
         });
