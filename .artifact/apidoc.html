@@ -687,15 +687,17 @@ await jslint.jslint_cli({
         };
     });
     const opener_stack = [];    // Stack of opener tokens: (, [.
-    let mode_stop = false;      // true if JSLint cannot finish.
-    let property_dict = empty();        // The object containing the tallied
+    const property_dict = empty();      // The object containing the tallied
                                         // ... property names.
-    let state = empty();        // jslint state-object to be passed between
                                 // jslint functions.
-    let syntax_dict = empty();  // The object containing the parser.
-    let tenure = empty();       // The predefined property registry.
-    let token_global = {        // The global object; the outermost context.
-        aliv...
+    const state = empty();      // jslint state-object to be passed between
+    const syntax_dict = empty();        // The object containing the parser.
+    const tenure = empty();     // The predefined property registry.
+    const token_global = {      // The global object; the outermost context.
+        alive_list: [],
+        async: 0,
+        body: true,
+       ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -803,21 +805,20 @@ ${name}
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-command[1] = command.slice(1).join("=");
+    command[1] = command.slice(1).join("=");
 
-switch (command[0]) {
+    switch (command[0]) {
 
 // PR-362 - Add API Doc.
 
-case "jslint_apidoc":
-    await <span class="apidocCodeKeywordSpan">jslint_apidoc</span>(Object.assign(JSON.parse(process_argv[3]), {
-        pathname: command[1]
-    }));
-    return;
+    case "jslint_apidoc":
+        await <span class="apidocCodeKeywordSpan">jslint_apidoc</span>({
+            ...JSON.parse(process_argv[3]),
+            pathname: command[1]
+        });
+        return;
 
 // PR-363 - Add command jslint_report.
-
-case "jslint_report":
 ...</pre></li>
 
 <li>
@@ -924,9 +925,10 @@ warn(
         ) {
             return;
         }
-        option = Object.assign(empty(), option, {
+        option = {
+            ...option,
             file
-        });
+        };
         switch ((
             /\.\w+?$|$/m
         ).exec(file)[0]) {
@@ -941,9 +943,10 @@ warn(
                     code: match1,
                     file: file + ".&lt;script&gt;.js",
                     line_offset: string_line_count(code.slice(0, ii)) + 1,
-                    option: Object.assign(empty(), {
-                        browser: true
-                    }, option)
+                    option: {
+                        browser: true,
+                        ...option
+                    }
                 });
                 return "";
             });
@@ -969,7 +972,7 @@ warn(
                 option
             });
             return;
-       ...
+        defau...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1004,10 +1007,10 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 </span>    return;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-            warn,
-            warn_at,
-            warning_list
-        });
+                warn_at,
+                warning_list
+            }
+        );
 
 // PHASE 1. Split &lt;source&gt; by newlines into &lt;line_list&gt;.
 
