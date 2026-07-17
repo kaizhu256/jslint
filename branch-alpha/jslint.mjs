@@ -4383,7 +4383,7 @@ function jslint_phase3_parse(state) {
                     false,              // readonly
                     the_token.name_list,        // name_list
                     left,               // name
-                    true                // init
+                    false               // init
                 );
             } else {
                 the_token.expression = [left, right];
@@ -7991,7 +7991,7 @@ function jslint_phase4_walk(state) {
         };
     }
 
-    function name_lookup(thing, init) {
+    function name_lookup(thing) {
 
 // This function will:
 // 1. Lookup and return variable or function-parameter <the_variable> in current
@@ -8086,12 +8086,6 @@ function jslint_phase4_walk(state) {
 
             warn("out_of_scope_a", thing);
         }
-
-// Set variable as initialized, if lookup was from an assignment.
-
-        if (init && the_variable && !the_variable.readonly) {
-            the_variable.init = true;
-        }
         return the_variable;
     }
 
@@ -8141,8 +8135,14 @@ function jslint_phase4_walk(state) {
         }
         if (thing.name_list) {
             thing.name_list.forEach(function (name) {
-                const the_variable = name_lookup(name, true);
-                if (!the_variable || the_variable.readonly) {
+                const the_variable = name_lookup(name);
+                if (the_variable && !the_variable.readonly) {
+
+// 3.for.2 - Mark 'init', the for-variable, after assignment.
+
+                    the_variable.init = true;
+                    return;
+                }
 
 // test_cause:
 // ["aa=0", "post_a", "=", "aa", 0]
@@ -8150,10 +8150,9 @@ function jslint_phase4_walk(state) {
 // ["const aa=0;aa=0", "post_a", "=", "aa", 0]
 // ["const aa=0;aa=0", "post_a", "bad_assignment_a", "aa", 12]
 
-                    test_cause("=", name.id);
-                    warn("bad_assignment_a", name);
-                    return;
-                }
+                test_cause("=", name.id);
+                warn("bad_assignment_a", name);
+                return;
             });
             return;
         }
@@ -8962,7 +8961,13 @@ function jslint_phase4_walk(state) {
 // 3.for.4 - Mark 'out-of-scope', the for-variable, ???.
 
             thing.name.alive = true;
-            the_variable = name_lookup(thing.name, true);
+            the_variable = name_lookup(thing.name);
+            if (the_variable && !the_variable.readonly) {
+
+// 3.for.2 - Mark 'init', the for-variable, before for-block.
+
+                the_variable.init = true;
+            }
             if (the_variable !== undefined) {
                 if (the_variable.init && the_variable.readonly) {
 
@@ -9065,7 +9070,7 @@ function jslint_phase4_walk(state) {
     }
 
     function pre_s_var(thing) {
-        const the_variable = name_lookup(thing, false);
+        const the_variable = name_lookup(thing);
         if (the_variable !== undefined) {
             thing.variable = the_variable;
             the_variable.used += 1;
