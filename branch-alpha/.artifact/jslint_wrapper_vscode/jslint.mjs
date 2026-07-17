@@ -7526,7 +7526,7 @@ function jslint_phase3_parse(state) {
 
 // 3.var.3 - Mark 'init', the variable, during variable-initialization.
 
-                    name.expression     // init
+                    Boolean(name.expression)    // init
                 );
             } else {
 
