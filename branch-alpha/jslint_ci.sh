@@ -2028,10 +2028,11 @@ function replaceListReplace(replaceList, data) {
         /^\/\*jslint-disable\*\/\n\/\*\nshRollupFetch\n(\{\n[\S\s]*?\n\})([\S\s]*?)\n\*\/\n/m
     ).exec(await moduleFs.promises.readFile(process.argv[1], "utf8"));
     // JSON.parse match1 with comment
-    matchObj[1] = Object.assign({
+    matchObj[1] = {
         fetchList: [],
-        replaceList: []
-    }, JSON.parse(matchObj[1]));
+        replaceList: [],
+        ...JSON.parse(matchObj[1])
+    };
     fetchList = JSON.parse(JSON.stringify(matchObj[1].fetchList));
     // init repoDict, fetchList
     repoDict = {};
