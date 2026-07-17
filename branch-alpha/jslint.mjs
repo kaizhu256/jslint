@@ -8136,7 +8136,13 @@ function jslint_phase4_walk(state) {
         if (thing.name_list) {
             thing.name_list.forEach(function (name) {
                 const the_variable = name_lookup(name);
-                if (!the_variable || the_variable.readonly) {
+                if (the_variable && !the_variable.readonly) {
+
+// 3.for.2 - Mark 'init', the for-variable, after assignment.
+
+                    the_variable.init = true;
+                    return;
+                }
 
 // test_cause:
 // ["aa=0", "post_a", "=", "aa", 0]
@@ -8144,15 +8150,8 @@ function jslint_phase4_walk(state) {
 // ["const aa=0;aa=0", "post_a", "=", "aa", 0]
 // ["const aa=0;aa=0", "post_a", "bad_assignment_a", "aa", 12]
 
-                    test_cause("=", name.id);
-                    warn("bad_assignment_a", name);
-                    return;
-                }
-
-// 3.for.2 - Mark 'init', the for-variable, after assignment.
-
-                the_variable.init = true;
-                return;
+                test_cause("=", name.id);
+                warn("bad_assignment_a", name);
             });
             return;
         }
