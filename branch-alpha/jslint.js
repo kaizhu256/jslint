@@ -9051,7 +9051,7 @@ function jslint_phase4_walk(state) {
         thing.live_list = [];
     }
 
-    function pre_try(thing) {
+    function pre_s_try(thing) {
         if (thing.catch !== undefined) {
 
 // Create new catch-scope for catch-parameter.
@@ -9061,7 +9061,7 @@ function jslint_phase4_walk(state) {
         }
     }
 
-    function pre_v(thing) {
+    function pre_s_var(thing) {
         const the_variable = name_lookup(thing, false);
         if (the_variable !== undefined) {
             thing.variable = the_variable;
@@ -9216,11 +9216,11 @@ function jslint_phase4_walk(state) {
     preaction("binary", pre_a_bitwise);
     preaction("statement", "for", pre_s_for);
     preaction("statement", "function", pre_s_function);
-    preaction("statement", "try", pre_try);
+    preaction("statement", "try", pre_s_try);
     preaction("statement", "{", pre_s_lbrace);
     preaction("unary", "function", pre_s_function);
     preaction("unary", "~", pre_a_bitwise);
-    preaction("variable", pre_v);
+    preaction("variable", pre_s_var);
 
     walk_statement(state.token_tree);
 }

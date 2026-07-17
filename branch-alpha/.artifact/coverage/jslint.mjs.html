@@ -9216,7 +9216,7 @@ body {
 <pre><span class="lineno"><a href="#line_9051" id="line_9051"> 9051.</a></span><span class="count                ">   5630</span><span>        thing.live_list = [];</span></pre>
 <pre><span class="lineno"><a href="#line_9052" id="line_9052"> 9052.</a></span><span class="count                ">   5630</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_9053" id="line_9053"> 9053.</a></span><span class="count                ">    548</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9054" id="line_9054"> 9054.</a></span><span class="count                ">     54</span><span>    function pre_try(thing) {</span></pre>
+<pre><span class="lineno"><a href="#line_9054" id="line_9054"> 9054.</a></span><span class="count                ">     54</span><span>    function pre_s_try(thing) {</span></pre>
 <pre><span class="lineno"><a href="#line_9055" id="line_9055"> 9055.</a></span><span class="count                ">     52</span><span>        if (thing.catch !== undefined) {</span></pre>
 <pre><span class="lineno"><a href="#line_9056" id="line_9056"> 9056.</a></span><span class="count                ">     52</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9057" id="line_9057"> 9057.</a></span><span class="count                ">     52</span><span>// Create new catch-scope for catch-parameter.</span></pre>
@@ -9226,7 +9226,7 @@ body {
 <pre><span class="lineno"><a href="#line_9061" id="line_9061"> 9061.</a></span><span class="count                ">     52</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_9062" id="line_9062"> 9062.</a></span><span class="count                ">     54</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_9063" id="line_9063"> 9063.</a></span><span class="count                ">    548</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9064" id="line_9064"> 9064.</a></span><span class="count                ">  29017</span><span>    function pre_v(thing) {</span></pre>
+<pre><span class="lineno"><a href="#line_9064" id="line_9064"> 9064.</a></span><span class="count                ">  29017</span><span>    function pre_s_var(thing) {</span></pre>
 <pre><span class="lineno"><a href="#line_9065" id="line_9065"> 9065.</a></span><span class="count                ">  29017</span><span>        const the_variable = name_lookup(thing, false);</span></pre>
 <pre><span class="lineno"><a href="#line_9066" id="line_9066"> 9066.</a></span><span class="count                ">  28936</span><span>        if (the_variable !== undefined) {</span></pre>
 <pre><span class="lineno"><a href="#line_9067" id="line_9067"> 9067.</a></span><span class="count                ">  28936</span><span>            thing.variable = the_variable;</span></pre>
@@ -9381,11 +9381,11 @@ body {
 <pre><span class="lineno"><a href="#line_9216" id="line_9216"> 9216.</a></span><span class="count                ">    548</span><span>    preaction("binary", pre_a_bitwise);</span></pre>
 <pre><span class="lineno"><a href="#line_9217" id="line_9217"> 9217.</a></span><span class="count                ">    548</span><span>    preaction("statement", "for", pre_s_for);</span></pre>
 <pre><span class="lineno"><a href="#line_9218" id="line_9218"> 9218.</a></span><span class="count                ">    548</span><span>    preaction("statement", "function", pre_s_function);</span></pre>
-<pre><span class="lineno"><a href="#line_9219" id="line_9219"> 9219.</a></span><span class="count                ">    548</span><span>    preaction("statement", "try", pre_try);</span></pre>
+<pre><span class="lineno"><a href="#line_9219" id="line_9219"> 9219.</a></span><span class="count                ">    548</span><span>    preaction("statement", "try", pre_s_try);</span></pre>
 <pre><span class="lineno"><a href="#line_9220" id="line_9220"> 9220.</a></span><span class="count                ">    548</span><span>    preaction("statement", "{", pre_s_lbrace);</span></pre>
 <pre><span class="lineno"><a href="#line_9221" id="line_9221"> 9221.</a></span><span class="count                ">    548</span><span>    preaction("unary", "function", pre_s_function);</span></pre>
 <pre><span class="lineno"><a href="#line_9222" id="line_9222"> 9222.</a></span><span class="count                ">    548</span><span>    preaction("unary", "~", pre_a_bitwise);</span></pre>
-<pre><span class="lineno"><a href="#line_9223" id="line_9223"> 9223.</a></span><span class="count                ">    548</span><span>    preaction("variable", pre_v);</span></pre>
+<pre><span class="lineno"><a href="#line_9223" id="line_9223"> 9223.</a></span><span class="count                ">    548</span><span>    preaction("variable", pre_s_var);</span></pre>
 <pre><span class="lineno"><a href="#line_9224" id="line_9224"> 9224.</a></span><span class="count                ">    548</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9225" id="line_9225"> 9225.</a></span><span class="count                ">    548</span><span>    walk_statement(state.token_tree);</span></pre>
 <pre><span class="lineno"><a href="#line_9226" id="line_9226"> 9226.</a></span><span class="count                ">    548</span><span>}</span></pre>
