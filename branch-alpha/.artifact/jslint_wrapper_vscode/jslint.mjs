@@ -7523,7 +7523,10 @@ function jslint_phase3_parse(state) {
                     readonly,           // readonly
                     the_variable.name_list,     // name_list
                     name,               // name
-                    Boolean(name.expression)    // init
+
+// 3.var.3 - Mark 'init', the variable, during variable-initialization.
+
+                    name.expression     // init
                 );
             } else {
 
@@ -8064,6 +8067,9 @@ function jslint_phase4_walk(state) {
 
                     alive: true,
                     id,
+
+// 3.glo.3 - Mark 'init', the global-variable, immediately.
+
                     init: true,
                     parent: token_global,
                     readonly: true,
@@ -8154,7 +8160,7 @@ function jslint_phase4_walk(state) {
                 const the_variable = name_lookup(name);
                 if (the_variable && !the_variable.readonly) {
 
-// 3.for.2 - Mark 'init', the for-variable, after assignment.
+// 3.var.3 - Mark 'init', the variable, after assignment.
 
                     the_variable.init = true;
                     return;
@@ -8979,7 +8985,7 @@ function jslint_phase4_walk(state) {
             the_variable = name_lookup(thing.name);
             if (the_variable && !the_variable.readonly) {
 
-// 3.for.2 - Mark 'init', the for-variable, before for-block.
+// 3.for.3 - Mark 'init', the for-variable, before for-block.
 
                 the_variable.init = true;
             }
