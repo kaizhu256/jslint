@@ -5083,7 +5083,7 @@ function jslint_phase3_parse(state) {
 // 3.for.2 - Mark 'alive', the for-variable, before for-block.
 // 3.for.4 - Mark 'out-of-scope', the for-variable, ???.
 //
-// 3.glo.1 - Mark 'enrolled', the global-variable, never.
+// 3.glo.1 - Mark 'enrolled', the global-variable, immediately.
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
 // 3.glo.4 - Mark 'out-of-scope', the global-variable, never.
 //
@@ -5498,10 +5498,10 @@ function jslint_phase3_parse(state) {
 // ["aa:while{}", "parse_statement", "the_statement_label", "while", 0]
 
                 test_cause("the_statement_label", token_nxt.id);
+                name_enroll(
 
 // 5.lab.1 - Mark 'enrolled', the label-statement, before control-flow-block.
 
-                name_enroll(
                     true,               // enroll
                     "label",            // role
                     true,               // readonly
@@ -5981,10 +5981,10 @@ function jslint_phase3_parse(state) {
         }
         if (name) {
             advance();
+            name_enroll(
 
 // 2.fun.1 - Mark 'enrolled', the function-name, immediately.
 
-            name_enroll(
                 true,                   // enroll
                 (                       // role
                     the_function.arity === "statement"
@@ -6070,10 +6070,10 @@ function jslint_phase3_parse(state) {
 // ["aa=>0", "prefix_function", "wrap_fart_parameter", "aa", 1]
 
             warn("wrap_fart_parameter", token_prv);
+            name_enroll(
 
 // 4.par.1 - Mark 'enrolled', the function-parameter, if unwrapped.
 
-            name_enroll(
                 true,                   // enroll
                 "parameter",            // role
                 false,                  // readonly
@@ -6086,10 +6086,10 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
 
 // PR-500 - Unify ES2015-destructure-logic. - function ([aa]) {...}
+                prefix_destructure(
 
 // 4.par.1 - Mark 'enrolled', the function-parameter, during destructuring.
 
-                prefix_destructure(
                     true,               // enroll
                     "parameter",        // role
                     false,              // readonly
@@ -6970,10 +6970,10 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", name);
                 }
+                name_enroll(
 
 // 1.imp.1 - Mark 'enrolled', the import-name, during import-statement.
 
-                name_enroll(
                     true,               // enroll
                     "variable",         // role
                     true,               // readonly
@@ -7006,10 +7006,10 @@ function jslint_phase3_parse(state) {
 
                             warn("unexpected_a", name);
                         }
+                        name_enroll(
 
 // 1.imp.1 - Mark 'enrolled', the import-name, during import-statement.
 
-                        name_enroll(
                             true,       // enroll
                             "variable", // role
                             true,       // readonly
@@ -7340,10 +7340,10 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id !== "ignore") {
                     ignored = undefined;
                     the_catch.name = token_nxt;
+                    name_enroll(
 
 // 3.exc.1 - Mark 'enrolled', the exception-variable, before catch-block.
 
-                    name_enroll(
                         true,           // enroll
                         "exception",    // role
                         true,           // readonly
@@ -7496,10 +7496,10 @@ function jslint_phase3_parse(state) {
                     advance("=");
                     name.expression = parse_expression(0);
                 }
+                name_enroll(
 
 // 3.var.1 - Mark 'enrolled', the variable, during variable-initialization.
 
-                name_enroll(
                     true,               // enroll
                     "variable",         // role
                     readonly,           // readonly
@@ -8044,9 +8044,7 @@ function jslint_phase4_walk(state) {
             if (!the_variable) {
                 the_variable = {
 
-// 3.glo.1 - Mark 'enrolled', the global-variable, never.
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
-// 3.glo.4 - Mark 'out-of-scope', the global-variable, never.
 
                     alive: true,
                     id,
@@ -8059,7 +8057,12 @@ function jslint_phase4_walk(state) {
                 token_global.context[id] = the_variable;
             }
             the_variable.closure = true;
+
+// 3.glo.1 - Mark 'enrolled', the global-variable, immediately.
+
             functionage.context[id] = the_variable;
+
+// 3.glo.4 - Mark 'out-of-scope', the global-variable, never.
         }
         if (
             (
