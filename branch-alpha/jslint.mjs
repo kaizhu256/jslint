@@ -95,6 +95,8 @@
     JSLINT_BETA,
     NODE_V8_COVERAGE,
     a,
+    alive,
+    alive_list,
     all,
     argv,
     arity,
@@ -251,8 +253,6 @@
     lines,
     linesCovered,
     linesTotal,
-    live,
-    live_list,
     log,
     long,
     loop,
@@ -1117,6 +1117,7 @@ function jslint(
     let syntax_dict = empty();  // The object containing the parser.
     let tenure = empty();       // The predefined property registry.
     let token_global = {        // The global object; the outermost context.
+        alive_list: [],
         async: 0,
         body: true,
         context: empty(),
@@ -1125,7 +1126,6 @@ function jslint(
         id: "(global)",
         level: 0,
         line: jslint_fudge,
-        live_list: [],
         loop: 0,
         switch: 0,
         thru: 0,
@@ -4375,6 +4375,7 @@ function jslint_phase3_parse(state) {
             the_token.arity = "assignment";
             right = parse_expression(20 - 1);
             if (id === "=" && left.arity === "variable") {
+                the_token.expression = right;
                 the_token.name_list = [];       // 1. name_list for "aa = ..."
                 name_enroll(
                     false,              // enroll
@@ -4382,9 +4383,11 @@ function jslint_phase3_parse(state) {
                     false,              // readonly
                     the_token.name_list,        // name_list
                     left,               // name
+
+// 3.var.3 - Mark 'init', the variable, after assignment.
+
                     true                // init
                 );
-                the_token.expression = right;
             } else {
                 the_token.expression = [left, right];
             }
@@ -5067,39 +5070,47 @@ function jslint_phase3_parse(state) {
 // and its lifecycle.  Here is a list of all lifecycle comments.
 //
 // 1.imp.1 - Mark 'enrolled', the import-name, during import-statement.
-// 1.imp.2 - Mark 'live', the import-name, after import-statement.
-// 1.imp.3 - Mark 'out-of-scope', the import-name, after module-scope.
+// 1.imp.2 - Mark 'alive', the import-name, after import-statement.
+// 1.imp.3 - Mark 'init', the import-name, during import-statement.
+// 1.imp.4 - Mark 'out-of-scope', the import-name, after module-scope.
 //
 // 2.fun.1 - Mark 'enrolled', the function-name, immediately.
-// 2.fun.2 - Mark 'live', the function-name, immediately.
-// 2.fun.3 - Mark 'out-of-scope', the function-name, after expression-scope.
-// 2.fun.3 - Mark 'out-of-scope', the function-name, after function-scope.
+// 2.fun.2 - Mark 'alive', the function-name, immediately.
+// 2.fun.3 - Mark 'init', the function-name, immediately.
+// 2.fun.4 - Mark 'out-of-scope', the function-name, after expression-scope.
+// 2.fun.4 - Mark 'out-of-scope', the function-name, after function-scope.
 //
 // 3.exc.1 - Mark 'enrolled', the exception-variable, before catch-block.
-// 3.exc.2 - Mark 'live', the exception-variable, before catch-block.
-// 3.exc.3 - Mark 'out-of-scope', the exception-variable, after catch-block.
+// 3.exc.2 - Mark 'alive', the exception-variable, before catch-block.
+// 3.exc.3 - Mark 'init', the exception-variable, before catch-block.
+// 3.exc.4 - Mark 'out-of-scope', the exception-variable, after catch-block.
 //
 // 3.for.1 - Mark 'enrolled', the iterator-variable, ???.
-// 3.for.2 - Mark 'live', the iterator-variable, before for-block.
-// 3.for.3 - Mark 'out-of-scope', the iterator-variable, ???.
+// 3.for.2 - Mark 'alive', the iterator-variable, before for-block.
+// 3.for.4 - Mark 'out-of-scope', the iterator-variable, ???.
 //
 // 3.glo.1 - Mark 'enrolled', the global-variable, never.
-// 3.glo.2 - Mark 'live', the global-variable, immediately.
-// 3.glo.3 - Mark 'out-of-scope', the global-variable, never.
+// 3.glo.2 - Mark 'alive', the global-variable, immediately.
+// 3.glo.3 - Mark 'init', the global-variable, immediately.
+// 3.glo.4 - Mark 'out-of-scope', the global-variable, never.
 //
 // 3.var.1 - Mark 'enrolled', the variable, during variable-initialization.
-// 3.var.2 - Mark 'live', the variable, after variable-initialization.
-// 3.var.3 - Mark 'out-of-scope', the variable, after block-scope.
-// 3.var.3 - Mark 'out-of-scope', the variable, after function-scope.
+// 3.var.2 - Mark 'alive', the variable, after variable-initialization.
+// 3.var.3 - Mark 'init', the variable, after assignment.
+// 3.var.3 - Mark 'init', the variable, during variable-initialization.
+// 3.var.4 - Mark 'out-of-scope', the variable, after block-scope.
+// 3.var.4 - Mark 'out-of-scope', the variable, after function-scope.
 //
 // 4.par.1 - Mark 'enrolled', the function-parameter, during destructuring.
 // 4.par.1 - Mark 'enrolled', the function-parameter, if unwrapped.
-// 4.par.2 - Mark 'live', the function-parameter, after destructuring.
-// 4.par.3 - Mark 'out-of-scope', the function-parameter, after function-scope.
+// 4.par.2 - Mark 'alive', the function-parameter, after destructuring.
+// 4.par.3 - Mark 'init', the function-parameter, if unwrapped.
+// 4.par.4 - Mark 'out-of-scope', the function-parameter, after function-scope.
 //
 // 5.lab.1 - Mark 'enrolled', the label-statement, before control-flow-block.
-// 5.lab.2 - Mark 'live', the label-statement, before control-flow-block.
-// 5.lab.3 - Mark 'out-of-scope', the label-statement, after control-flow-block.
+// 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.
+// 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.
+// 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
 
         let earlier;
         let id = name.id;
@@ -5498,26 +5509,29 @@ function jslint_phase3_parse(state) {
 // ["aa:while{}", "parse_statement", "the_statement_label", "while", 0]
 
                 test_cause("the_statement_label", token_nxt.id);
+                name_enroll(
 
 // 5.lab.1 - Mark 'enrolled', the label-statement, before control-flow-block.
 
-                name_enroll(
                     true,               // enroll
                     "label",            // role
                     true,               // readonly
                     [],                 // name_list
                     the_label,          // name
+
+// 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.
+
                     true                // init
                 );
 
-// 5.lab.2 - Mark 'live', the label-statement, before control-flow-block.
+// 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.
 
-                the_label.live = true;
+                the_label.alive = true;
                 the_statement = parse_statement();
 
-// 5.lab.3 - Mark 'out-of-scope', the label-statement, after control-flow-block.
+// 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
 
-                the_label.live = false;
+                the_label.alive = false;
                 functionage.statement_prv = the_statement;
                 the_statement.label = the_label;
                 the_statement.statement = true;
@@ -5962,7 +5976,7 @@ function jslint_phase3_parse(state) {
     function prefix_function(the_function, mode_fart, mode_fart_unwrapped) {
         const name = !mode_fart && token_nxt.identifier && token_nxt;
         the_function = the_function || token_now;
-        the_function.live_list = [];
+        the_function.alive_list = [];
         if (mode_fart) {
             the_function.arity = "binary";
         }
@@ -5981,10 +5995,10 @@ function jslint_phase3_parse(state) {
         }
         if (name) {
             advance();
+            name_enroll(
 
 // 2.fun.1 - Mark 'enrolled', the function-name, immediately.
 
-            name_enroll(
                 true,                   // enroll
                 (                       // role
                     the_function.arity === "statement"
@@ -5994,22 +6008,25 @@ function jslint_phase3_parse(state) {
                 false,                  // readonly
                 [],                     // name_list
                 name,                   // name
+
+// 2.fun.3 - Mark 'init', the function-name, immediately.
+
                 true                    // init
             );
 
-// 2.fun.2 - Mark 'live', the function-name, immediately.
+// 2.fun.2 - Mark 'alive', the function-name, immediately.
 
-            name.live = true;
+            name.alive = true;
             if (the_function.arity === "statement") {
 
-// 2.fun.3 - Mark 'out-of-scope', the function-name, after function-scope.
+// 2.fun.4 - Mark 'out-of-scope', the function-name, after function-scope.
 
-                functionage.live_list.push(name);
+                functionage.alive_list.push(name);
             } else {
 
-// 2.fun.3 - Mark 'out-of-scope', the function-name, after expression-scope.
+// 2.fun.4 - Mark 'out-of-scope', the function-name, after expression-scope.
 
-                the_function.live_list.push(name);
+                the_function.alive_list.push(name);
                 name.used += 1;
             }
         }
@@ -6070,15 +6087,18 @@ function jslint_phase3_parse(state) {
 // ["aa=>0", "prefix_function", "wrap_fart_parameter", "aa", 1]
 
             warn("wrap_fart_parameter", token_prv);
+            name_enroll(
 
 // 4.par.1 - Mark 'enrolled', the function-parameter, if unwrapped.
 
-            name_enroll(
                 true,                   // enroll
                 "parameter",            // role
                 false,                  // readonly
                 the_function.name_list, // name_list
                 token_prv,              // name
+
+// 4.par.3 - Mark 'init', the function-parameter, if unwrapped.
+
                 true                    // init
             );
         } else {
@@ -6564,9 +6584,9 @@ function jslint_phase3_parse(state) {
             if (
                 !the_label
                 || the_label.role !== "label"
-                || !the_label.live
+                || !the_label.alive
             ) {
-                if (the_label && !the_label.live) {
+                if (the_label && !the_label.alive) {
 
 // Warn label-statement is 'out-of-scope'.
 
@@ -6970,15 +6990,18 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", name);
                 }
+                name_enroll(
 
 // 1.imp.1 - Mark 'enrolled', the import-name, during import-statement.
 
-                name_enroll(
                     true,               // enroll
                     "variable",         // role
                     true,               // readonly
                     the_import.name_list,       // name_list
                     name,               // name
+
+// 1.imp.3 - Mark 'init', the import-name, during import-statement.
+
                     true                // init
                 );
             } else {
@@ -7006,15 +7029,18 @@ function jslint_phase3_parse(state) {
 
                             warn("unexpected_a", name);
                         }
+                        name_enroll(
 
 // 1.imp.1 - Mark 'enrolled', the import-name, during import-statement.
 
-                        name_enroll(
                             true,       // enroll
                             "variable", // role
                             true,       // readonly
                             the_import.name_list,       // name_list
                             name,       // name
+
+// 1.imp.3 - Mark 'init', the import-name, during import-statement.
+
                             true        // init
                         );
                         if (token_nxt.id !== ",") {
@@ -7340,15 +7366,18 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id !== "ignore") {
                     ignored = undefined;
                     the_catch.name = token_nxt;
+                    name_enroll(
 
 // 3.exc.1 - Mark 'enrolled', the exception-variable, before catch-block.
 
-                    name_enroll(
                         true,           // enroll
                         "exception",    // role
                         true,           // readonly
                         [],             // name_list
                         token_nxt,      // name
+
+// 3.exc.3 - Mark 'init', the exception-variable, before catch-block.
+
                         true            // init
                     );
                 }
@@ -7496,15 +7525,18 @@ function jslint_phase3_parse(state) {
                     advance("=");
                     name.expression = parse_expression(0);
                 }
+                name_enroll(
 
 // 3.var.1 - Mark 'enrolled', the variable, during variable-initialization.
 
-                name_enroll(
                     true,               // enroll
                     "variable",         // role
                     readonly,           // readonly
                     the_variable.name_list,     // name_list
                     name,               // name
+
+// 3.var.3 - Mark 'init', the variable, during variable-initialization.
+
                     Boolean(name.expression)    // init
                 );
             } else {
@@ -8042,20 +8074,27 @@ function jslint_phase4_walk(state) {
 // If so, add it to the global context.
 
             if (!the_variable) {
-                the_variable = {
-                    id,
-                    init: true,
 
 // 3.glo.1 - Mark 'enrolled', the global-variable, never.
-// 3.glo.2 - Mark 'live', the global-variable, immediately.
-// 3.glo.3 - Mark 'out-of-scope', the global-variable, never.
 
-                    live: true,
+                the_variable = {
+
+// 3.glo.2 - Mark 'alive', the global-variable, immediately.
+
+                    alive: true,
+                    id,
+
+// 3.glo.3 - Mark 'init', the global-variable, immediately.
+
+                    init: true,
                     parent: token_global,
                     readonly: true,
                     role: "variable",
                     used: 0
                 };
+
+// 3.glo.4 - Mark 'out-of-scope', the global-variable, never.
+
                 token_global.context[id] = the_variable;
             }
             the_variable.closure = true;
@@ -8067,7 +8106,7 @@ function jslint_phase4_walk(state) {
                 || !functionage.name
                 || !the_variable.calls[functionage.name.id]
             )
-            && !the_variable.live
+            && !the_variable.alive
         ) {
 
 // Warn variable is 'out-of-scope'.
@@ -8509,22 +8548,22 @@ function jslint_phase4_walk(state) {
     function post_s_import(the_thing) {
         the_thing.name_list.forEach(function (name) {
 
-// 1.imp.2 - Mark 'live', the import-name, after import-statement.
+// 1.imp.2 - Mark 'alive', the import-name, after import-statement.
 
-            name.live = true;
+            name.alive = true;
 
-// 1.imp.3 - Mark 'out-of-scope', the import-name, after module-scope.
+// 1.imp.4 - Mark 'out-of-scope', the import-name, after module-scope.
 
-            blockage.live_list.push(name);
+            blockage.alive_list.push(name);
         });
         post_s_export_toplevel(the_thing);
     }
 
     function post_s_lbrace_pop_block() {
-        blockage.live_list.forEach(function (name) {
-            name.live = false;
+        blockage.alive_list.forEach(function (name) {
+            name.alive = false;
         });
-        delete blockage.live_list;
+        delete blockage.alive_list;
         blockage = block_stack.pop();
     }
 
@@ -8534,9 +8573,9 @@ function jslint_phase4_walk(state) {
         }
         if (thing.catch.name) {
 
-// 3.exc.2 - Mark 'live', the exception-variable, before catch-block.
+// 3.exc.2 - Mark 'alive', the exception-variable, before catch-block.
 
-            catchage.context[thing.catch.name.id].live = true;
+            catchage.context[thing.catch.name.id].alive = true;
         }
 
 // Recurse walk_statement().
@@ -8544,9 +8583,9 @@ function jslint_phase4_walk(state) {
         walk_statement(thing.catch.block);
         if (thing.catch.name) {
 
-// 3.exc.3 - Mark 'out-of-scope', the exception-variable, after catch-block.
+// 3.exc.4 - Mark 'out-of-scope', the exception-variable, after catch-block.
 
-            catchage.context[thing.catch.name.id].live = false;
+            catchage.context[thing.catch.name.id].alive = false;
         }
 
 // Restore previous catch-scope after catch-block.
@@ -8574,23 +8613,23 @@ function jslint_phase4_walk(state) {
 // PR-502 - Fix long-running regression where 'let x = x;'
 // doesn't warn about temporal-dead-zone.
 
-// 3.var.2 - Mark 'live', the variable, after variable-initialization.
+// 3.var.2 - Mark 'alive', the variable, after variable-initialization.
 
-            name.live = true;
+            name.alive = true;
             switch (thing.id) {
             case "const":
             case "let":
 
-// 3.var.3 - Mark 'out-of-scope', the variable, after block-scope.
+// 3.var.4 - Mark 'out-of-scope', the variable, after block-scope.
 
-                blockage.live_list.push(name);
+                blockage.alive_list.push(name);
                 break;
             // case "var":
             default:
 
-// 3.var.3 - Mark 'out-of-scope', the variable, after function-scope.
+// 3.var.4 - Mark 'out-of-scope', the variable, after function-scope.
 
-                functionage.live_list.push(name);
+                functionage.alive_list.push(name);
             }
         });
     }
@@ -8914,7 +8953,7 @@ function jslint_phase4_walk(state) {
 //                 if (
 //                     left_variable !== undefined
 // // Probably deadcode.
-// // && !left_variable.live
+// // && !left_variable.alive
 //                     && left_variable.parent === parent
 //                     && left_variable.calls !== undefined
 //                     && left_variable.calls[functionage.name.id] !== undefined
@@ -8924,7 +8963,7 @@ function jslint_phase4_walk(state) {
 // // false so JSLint won't raise an error for
 // // calling it before its line is executed.
 //
-//                     left_variable.live = true;
+//                     left_variable.alive = true;
 //                 }
 //             }
 //         }
@@ -8955,10 +8994,10 @@ function jslint_phase4_walk(state) {
         if (thing.name !== undefined) {
 
 // 3.for.1 - Mark 'enrolled', the iterator-variable, ???.
-// 3.for.2 - Mark 'live', the iterator-variable, before for-block.
-// 3.for.3 - Mark 'out-of-scope', the iterator-variable, ???.
+// 3.for.2 - Mark 'alive', the iterator-variable, before for-block.
+// 3.for.4 - Mark 'out-of-scope', the iterator-variable, ???.
 
-            thing.name.live = true;
+            thing.name.alive = true;
             the_variable = name_lookup(thing.name, true);
             if (the_variable !== undefined) {
                 if (the_variable.init && the_variable.readonly) {
@@ -9035,20 +9074,20 @@ function jslint_phase4_walk(state) {
             }
             walk_expression(name.expression);
 
-// 4.par.2 - Mark 'live', the function-parameter, after destructuring.
+// 4.par.2 - Mark 'alive', the function-parameter, after destructuring.
 
-            name.live = true;
+            name.alive = true;
 
-// 4.par.3 - Mark 'out-of-scope', the function-parameter, after function-scope.
+// 4.par.4 - Mark 'out-of-scope', the function-parameter, after function-scope.
 
-            functionage.live_list.push(name);
+            functionage.alive_list.push(name);
         });
     }
 
     function pre_s_lbrace(thing) {
         block_stack.push(blockage);
         blockage = thing;
-        thing.live_list = [];
+        thing.alive_list = [];
     }
 
     function pre_s_try(thing) {
@@ -9859,10 +9898,10 @@ function jslint_phase5_whitage(state) {
             }
         }
         nr_comments_skipped = 0;
+        delete left.alive;
         delete left.calls;
         delete left.free;
         delete left.init;
-        delete left.live;
         delete left.open;
         delete left.used;
         left = right;
@@ -10392,7 +10431,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
             level,
             line,
             name,
-            name_list = [],
+            name_list,
             signature
         } = the_function;
         let list = Object.keys(context);
