@@ -4380,7 +4380,7 @@ function jslint_phase3_parse(state) {
                     false,              // enroll
                     "variable",         // role
                     false,              // readonly
-                    the_token.name_list,        // name_list
+                    the_token,          // name_list_parent
                     left,               // name
                     true                // init
                 );
@@ -5054,10 +5054,11 @@ function jslint_phase3_parse(state) {
 
 // PR-502 - Unify name_list.push() logic with helper-function name_enroll().
 
-    function name_enroll(enroll, role, readonly, name_list, name, init) {
+    function name_enroll(enroll, role, readonly, name_list_parent, name, init) {
 
 // This function will:
-// 1. Push variable or function-parameter <name> to <name_list>.
+// 1. Push variable or function-parameter <name>
+//    to <name_list_parent>.name_list.
 // 2. Set <name>.init = true, if its an assigned-variable,
 //    a function-parameter, or existing variable assigned new value.
 // 3. Enroll <name> in <name>.parent.context, if its a declared-variable,
@@ -5103,7 +5104,10 @@ function jslint_phase3_parse(state) {
 
         let earlier;
         let id = name.id;
-        name_list.push(name);
+        if (!name_list_parent.name_list) {
+            name_list_parent.name_list = [];
+        }
+        name_list_parent.name_list.push(name);
         if (init) {
             name.init = init;
         }
@@ -5505,7 +5509,7 @@ function jslint_phase3_parse(state) {
                     true,               // enroll
                     "label",            // role
                     true,               // readonly
-                    [],                 // name_list
+                    {},                 // name_list_parent
                     the_label,          // name
                     true                // init
                 );
@@ -5735,7 +5739,7 @@ function jslint_phase3_parse(state) {
         enroll,
         role,
         readonly,
-        name_list,
+        name_list_parent,
         the_function,
         the_function_toplevel
     ) {
@@ -5813,7 +5817,7 @@ function jslint_phase3_parse(state) {
                     enroll,             // enroll
                     role,               // role
                     readonly,           // readonly
-                    name_list,          // name_list
+                    name_list_parent,   // name_list_parent
                     the_function,       // the_function
                     false               // the_function_toplevel
                 );
@@ -5921,7 +5925,10 @@ function jslint_phase3_parse(state) {
             }
             advance_and_signature_push(",");
         }
-        name_list.push(...sub_list);
+        if (!name_list_parent.name_list) {
+            name_list_parent.name_list = [];
+        }
+        name_list_parent.name_list.push(...sub_list);
         if (the_function_toplevel) {
             return the_destructure;
         }
@@ -5992,7 +5999,7 @@ function jslint_phase3_parse(state) {
                     : "function"
                 ),
                 false,                  // readonly
-                [],                     // name_list
+                {},                     // name_list_parent
                 name,                   // name
                 true                    // init
             );
@@ -6077,7 +6084,7 @@ function jslint_phase3_parse(state) {
                 true,                   // enroll
                 "parameter",            // role
                 false,                  // readonly
-                the_function.name_list, // name_list
+                the_function,           // name_list_parent
                 token_prv,              // name
                 true                    // init
             );
@@ -6093,7 +6100,7 @@ function jslint_phase3_parse(state) {
                     true,               // enroll
                     "parameter",        // role
                     false,              // readonly
-                    the_function.name_list,     // name_list
+                    the_function,       // name_list_parent
                     the_function,       // the_function
                     true                // the_function_toplevel
                 );
@@ -6387,7 +6394,7 @@ function jslint_phase3_parse(state) {
                 false,                  // enroll
                 "variable",             // role
                 false,                  // readonly
-                the_token.name_list,    // name_list
+                the_token,              // name_list_parent
                 undefined,              // the_function
                 false                   // the_function_toplevel
             );
@@ -6977,7 +6984,7 @@ function jslint_phase3_parse(state) {
                     true,               // enroll
                     "variable",         // role
                     true,               // readonly
-                    the_import.name_list,       // name_list
+                    the_import,         // name_list_parent
                     name,               // name
                     true                // init
                 );
@@ -7013,7 +7020,7 @@ function jslint_phase3_parse(state) {
                             true,       // enroll
                             "variable", // role
                             true,       // readonly
-                            the_import.name_list,       // name_list
+                            the_import, // name_list_parent
                             name,       // name
                             true        // init
                         );
@@ -7347,7 +7354,7 @@ function jslint_phase3_parse(state) {
                         true,           // enroll
                         "exception",    // role
                         true,           // readonly
-                        [],             // name_list
+                        {},             // name_list_parent
                         token_nxt,      // name
                         true            // init
                     );
@@ -7474,7 +7481,7 @@ function jslint_phase3_parse(state) {
                     true,               // enroll
                     "variable",         // role
                     readonly,           // readonly
-                    the_variable.name_list,     // name_list
+                    the_variable,       // name_list_parent
                     undefined,          // the_function
                     false               // the_function_toplevel
                 );
@@ -7503,7 +7510,7 @@ function jslint_phase3_parse(state) {
                     true,               // enroll
                     "variable",         // role
                     readonly,           // readonly
-                    the_variable.name_list,     // name_list
+                    the_variable,       // name_list_parent
                     name,               // name
                     Boolean(name.expression)    // init
                 );
