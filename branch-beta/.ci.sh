@@ -113,9 +113,9 @@ echo "\
                 ],
                 {
                     env: {
-                        ...process.env,
                         // limit stdout to xxx lines
-                        SH_RUN_WITH_SCREENSHOT_TXT_MAX_LINES: 64
+                        SH_RUN_WITH_SCREENSHOT_TXT_MAX_LINES: 64,
+                        ...process.env
                     },
                     stdio: ["ignore", 1, 2]
                 }
