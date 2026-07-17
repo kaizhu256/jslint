@@ -5068,37 +5068,46 @@ function jslint_phase3_parse(state) {
 //
 // 1.imp.1 - Mark 'enrolled', the import-name, during import-statement.
 // 1.imp.2 - Mark 'alive', the import-name, after import-statement.
+// 1.imp.3 - Mark 'init', the import-name, during import-statement.
 // 1.imp.4 - Mark 'out-of-scope', the import-name, after module-scope.
 //
 // 2.fun.1 - Mark 'enrolled', the function-name, immediately.
 // 2.fun.2 - Mark 'alive', the function-name, immediately.
+// 2.fun.3 - Mark 'init', the function-name, immediately.
 // 2.fun.4 - Mark 'out-of-scope', the function-name, after expression-scope.
 // 2.fun.4 - Mark 'out-of-scope', the function-name, after function-scope.
 //
 // 3.exc.1 - Mark 'enrolled', the exception-variable, before catch-block.
 // 3.exc.2 - Mark 'alive', the exception-variable, before catch-block.
+// 3.exc.3 - Mark 'init', the exception-variable, before catch-block.
 // 3.exc.4 - Mark 'out-of-scope', the exception-variable, after catch-block.
 //
 // 3.for.1 - Mark 'enrolled', the for-variable, ???.
 // 3.for.2 - Mark 'alive', the for-variable, before for-block.
+// 3.for.3 - Mark 'init', the for-variable, before for-block.
 // 3.for.4 - Mark 'out-of-scope', the for-variable, ???.
 //
 // 3.glo.1 - Mark 'enrolled', the global-variable, immediately.
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
+// 3.glo.3 - Mark 'init', the global-variable, immediately.
 // 3.glo.4 - Mark 'out-of-scope', the global-variable, never.
 //
 // 3.var.1 - Mark 'enrolled', the variable, during variable-initialization.
 // 3.var.2 - Mark 'alive', the variable, after variable-initialization.
+// 3.var.3 - Mark 'init', the variable, after assignment.
+// 3.var.3 - Mark 'init', the variable, during variable-initialization.
 // 3.var.4 - Mark 'out-of-scope', the variable, after block-scope.
 // 3.var.4 - Mark 'out-of-scope', the variable, after function-scope.
 //
 // 4.par.1 - Mark 'enrolled', the function-parameter, during destructuring.
 // 4.par.1 - Mark 'enrolled', the function-parameter, if unwrapped.
 // 4.par.2 - Mark 'alive', the function-parameter, after destructuring.
+// 4.par.3 - Mark 'init', the function-parameter, if unwrapped.
 // 4.par.4 - Mark 'out-of-scope', the function-parameter, after function-scope.
 //
 // 5.lab.1 - Mark 'enrolled', the label-statement, before control-flow-block.
 // 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.
+// 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.
 // 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
 
         let earlier;
