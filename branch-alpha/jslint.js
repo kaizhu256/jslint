@@ -5105,7 +5105,7 @@ function jslint_phase3_parse(state) {
         let id = name.id;
         name_list.push(name);
         if (init) {
-            name.init = init;
+            name.init = true;
         }
         if (role === "variable") {
             name.arity = "variable";
@@ -5507,6 +5507,9 @@ function jslint_phase3_parse(state) {
                     true,               // readonly
                     [],                 // name_list
                     the_label,          // name
+
+// 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.
+
                     true                // init
                 );
 
@@ -5994,6 +5997,9 @@ function jslint_phase3_parse(state) {
                 false,                  // readonly
                 [],                     // name_list
                 name,                   // name
+
+// 2.fun.3 - Mark 'init', the function-name, immediately.
+
                 true                    // init
             );
 
@@ -6079,6 +6085,9 @@ function jslint_phase3_parse(state) {
                 false,                  // readonly
                 the_function.name_list, // name_list
                 token_prv,              // name
+
+// 4.par.3 - Mark 'init', the function-parameter, if unwrapped.
+
                 true                    // init
             );
         } else {
@@ -6979,6 +6988,9 @@ function jslint_phase3_parse(state) {
                     true,               // readonly
                     the_import.name_list,       // name_list
                     name,               // name
+
+// 1.imp.3 - Mark 'init', the import-name, during import-statement.
+
                     true                // init
                 );
             } else {
@@ -7015,6 +7027,9 @@ function jslint_phase3_parse(state) {
                             true,       // readonly
                             the_import.name_list,       // name_list
                             name,       // name
+
+// 1.imp.3 - Mark 'init', the import-name, during import-statement.
+
                             true        // init
                         );
                         if (token_nxt.id !== ",") {
@@ -7349,6 +7364,9 @@ function jslint_phase3_parse(state) {
                         true,           // readonly
                         [],             // name_list
                         token_nxt,      // name
+
+// 3.exc.3 - Mark 'init', the exception-variable, before catch-block.
+
                         true            // init
                     );
                 }
@@ -7993,10 +8011,8 @@ function jslint_phase4_walk(state) {
 
     function name_lookup(thing) {
 
-// This function will:
-// 1. Lookup and return variable or function-parameter <the_variable> in current
-//    context from given <thing>.id.
-// 2. Set <the_variable>.init = true, if lookup was from an assignment.
+// This function will lookup and return variable or function-parameter
+// <the_variable> in current context from given <thing>.id.
 
         let id = thing.id;
         let the_variable;
