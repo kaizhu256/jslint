@@ -8120,7 +8120,7 @@ function jslint_phase4_walk(state) {
         return the_variable;
     }
 
-    function post_a(thing) {
+    function post_a_assignment(thing) {
 
 // Assignment using = sets the init property of a variable. No other assignment
 // operator can do this. A = token keeps that variable (or array of variables
@@ -8135,10 +8135,10 @@ function jslint_phase4_walk(state) {
             ) {
 
 // test_cause:
-// ["aa+=0", "post_a", "+=", "aa", 0]
-// ["aa+=0", "post_a", "bad_assignment_a", "aa", 1]
-// ["const aa=0;aa+=0", "post_a", "+=", "aa", 0]
-// ["const aa=0;aa+=0", "post_a", "bad_assignment_a", "aa", 12]
+// ["aa+=0", "post_a_assignment", "+=", "aa", 0]
+// ["aa+=0", "post_a_assignment", "bad_assignment_a", "aa", 1]
+// ["const aa=0;aa+=0", "post_a_assignment", "+=", "aa", 0]
+// ["const aa=0;aa+=0", "post_a_assignment", "bad_assignment_a", "aa", 12]
 
                 test_cause("+=", lvalue.id);
                 warn("bad_assignment_a", lvalue);
@@ -8158,7 +8158,7 @@ function jslint_phase4_walk(state) {
             ) {
 
 // test_cause:
-// ["aa+=undefined", "post_a", "unexpected_a", "undefined", 5]
+// ["aa+=undefined", "post_a_assignment", "unexpected_a", "undefined", 5]
 
                 warn("unexpected_a", thing.expression[1]);
             }
@@ -8176,10 +8176,10 @@ function jslint_phase4_walk(state) {
                 }
 
 // test_cause:
-// ["aa=0", "post_a", "=", "aa", 0]
-// ["aa=0", "post_a", "bad_assignment_a", "aa", 1]
-// ["const aa=0;aa=0", "post_a", "=", "aa", 0]
-// ["const aa=0;aa=0", "post_a", "bad_assignment_a", "aa", 12]
+// ["aa=0", "post_a_assignment", "=", "aa", 0]
+// ["aa=0", "post_a_assignment", "bad_assignment_a", "aa", 1]
+// ["const aa=0;aa=0", "post_a_assignment", "=", "aa", 0]
+// ["const aa=0;aa=0", "post_a_assignment", "bad_assignment_a", "aa", 12]
 
                 test_cause("=", name.id);
                 warn("bad_assignment_a", name);
@@ -8189,7 +8189,7 @@ function jslint_phase4_walk(state) {
         if (lvalue.id === "." && thing.expression[1].id === "undefined") {
 
 // test_cause:
-// ["aa.aa=undefined", "post_a", "expected_a_b", "undefined", 1]
+// ["aa.aa=undefined", "post_a_assignment", "expected_a_b", "undefined", 1]
 
             warn("expected_a_b", lvalue.expression, "delete", "undefined");
             return;
@@ -8208,92 +8208,6 @@ function jslint_phase4_walk(state) {
                 || Number.isNaN(right.value)
             ) {
                 warn("unexpected_a", right);
-            }
-        }
-    }
-
-    function post_b(thing) {
-        let right;
-        if (relationop[thing.id]) {
-            if (
-                is_weird(thing.expression[0])
-                || is_weird(thing.expression[1])
-                || is_equal(thing.expression[0], thing.expression[1])
-                || (
-                    thing.expression[0].constant === true
-                    && thing.expression[1].constant === true
-                )
-            ) {
-
-// test_cause:
-// ["if(0===0){0}", "post_b", "weird_relation_a", "===", 5]
-
-                warn("weird_relation_a", thing);
-            }
-        }
-        if (thing.id === "+") {
-            if (!option_dict.convert) {
-                if (thing.expression[0].value === "") {
-
-// test_cause:
-// ["\"\"+0", "post_b", "expected_a_b", "\"\" +", 3]
-
-                    warn("expected_a_b", thing, "String(...)", "\"\" +");
-                } else if (thing.expression[1].value === "") {
-
-// test_cause:
-// ["0+\"\"", "post_b", "expected_a_b", "+ \"\"", 2]
-
-                    warn("expected_a_b", thing, "String(...)", "+ \"\"");
-                }
-            }
-        } else if (thing.id === "[") {
-            if (thing.expression[0].id === "window") {
-
-// test_cause:
-// ["aa=window[0]", "post_b", "weird_expression_a", "window[...]", 10]
-
-                warn("weird_expression_a", thing, "window[...]");
-            }
-            if (thing.expression[0].id === "self") {
-
-// test_cause:
-// ["aa=self[0]", "post_b", "weird_expression_a", "self[...]", 8]
-
-                warn("weird_expression_a", thing, "self[...]");
-            }
-        } else if (thing.id === "." || thing.id === "?.") {
-            if (thing.expression.id === "RegExp") {
-
-// PR-499 - Relax warning for ES2025-feature RegExp.escape().
-
-                if (!thing.name || thing.name.id !== "escape") {
-
-// test_cause:
-// ["aa=RegExp.aa", "post_b", "weird_expression_a", ".", 10]
-
-                    warn("weird_expression_a", thing);
-                }
-            }
-        } else if (thing.id !== "=>" && thing.id !== "(") {
-            right = thing.expression[1];
-            if (
-                (thing.id === "+" || thing.id === "-")
-                && right.id === thing.id
-                && right.arity === "unary"
-                && !right.wrapped
-            ) {
-
-// test_cause:
-// ["0- -0", "post_b", "wrap_unary", "-", 4]
-
-                warn("wrap_unary", right);
-            }
-            if (
-                thing.expression[0].constant === true
-                && right.constant === true
-            ) {
-                thing.constant = true;
             }
         }
     }
@@ -8319,6 +8233,92 @@ function jslint_phase4_walk(state) {
 // ["aa={}&&{}", "post_b_and", "weird_condition_a", "&&", 6]
 
             warn("weird_condition_a", thing);
+        }
+    }
+
+    function post_b_binary(thing) {
+        let right;
+        if (relationop[thing.id]) {
+            if (
+                is_weird(thing.expression[0])
+                || is_weird(thing.expression[1])
+                || is_equal(thing.expression[0], thing.expression[1])
+                || (
+                    thing.expression[0].constant === true
+                    && thing.expression[1].constant === true
+                )
+            ) {
+
+// test_cause:
+// ["if(0===0){0}", "post_b_binary", "weird_relation_a", "===", 5]
+
+                warn("weird_relation_a", thing);
+            }
+        }
+        if (thing.id === "+") {
+            if (!option_dict.convert) {
+                if (thing.expression[0].value === "") {
+
+// test_cause:
+// ["\"\"+0", "post_b_binary", "expected_a_b", "\"\" +", 3]
+
+                    warn("expected_a_b", thing, "String(...)", "\"\" +");
+                } else if (thing.expression[1].value === "") {
+
+// test_cause:
+// ["0+\"\"", "post_b_binary", "expected_a_b", "+ \"\"", 2]
+
+                    warn("expected_a_b", thing, "String(...)", "+ \"\"");
+                }
+            }
+        } else if (thing.id === "[") {
+            if (thing.expression[0].id === "window") {
+
+// test_cause:
+// ["aa=window[0]", "post_b_binary", "weird_expression_a", "window[...]", 10]
+
+                warn("weird_expression_a", thing, "window[...]");
+            }
+            if (thing.expression[0].id === "self") {
+
+// test_cause:
+// ["aa=self[0]", "post_b_binary", "weird_expression_a", "self[...]", 8]
+
+                warn("weird_expression_a", thing, "self[...]");
+            }
+        } else if (thing.id === "." || thing.id === "?.") {
+            if (thing.expression.id === "RegExp") {
+
+// PR-499 - Relax warning for ES2025-feature RegExp.escape().
+
+                if (!thing.name || thing.name.id !== "escape") {
+
+// test_cause:
+// ["aa=RegExp.aa", "post_b_binary", "weird_expression_a", ".", 10]
+
+                    warn("weird_expression_a", thing);
+                }
+            }
+        } else if (thing.id !== "=>" && thing.id !== "(") {
+            right = thing.expression[1];
+            if (
+                (thing.id === "+" || thing.id === "-")
+                && right.id === thing.id
+                && right.arity === "unary"
+                && !right.wrapped
+            ) {
+
+// test_cause:
+// ["0- -0", "post_b_binary", "wrap_unary", "-", 4]
+
+                warn("wrap_unary", right);
+            }
+            if (
+                thing.expression[0].constant === true
+                && right.constant === true
+            ) {
+                thing.constant = true;
+            }
         }
     }
 
@@ -8792,7 +8792,7 @@ function jslint_phase4_walk(state) {
         }
     }
 
-    function pre_b(thing) {
+    function pre_b_binary(thing) {
         let left;
         let right;
         let value;
@@ -8802,7 +8802,7 @@ function jslint_phase4_walk(state) {
             if (left.id === "NaN" || right.id === "NaN") {
 
 // test_cause:
-// ["NaN===NaN", "pre_b", "number_isNaN", "===", 4]
+// ["NaN===NaN", "pre_b_binary", "number_isNaN", "===", 4]
 
                 warn("number_isNaN", thing);
             } else if (left.id === "typeof") {
@@ -8810,7 +8810,7 @@ function jslint_phase4_walk(state) {
                     if (right.id !== "typeof") {
 
 // test_cause:
-// ["typeof 0===0", "pre_b", "expected_string_a", "0", 12]
+// ["typeof 0===0", "pre_b_binary", "expected_string_a", "0", 12]
 
                         warn("expected_string_a", right);
                     }
@@ -8821,7 +8821,7 @@ function jslint_phase4_walk(state) {
 // test_cause:
 // ["
 // typeof aa==="undefined"
-// ", "pre_b", "unexpected_typeof_a", "undefined", 13]
+// ", "pre_b_binary", "unexpected_typeof_a", "undefined", 13]
 
                         warn("unexpected_typeof_a", right, value);
                     } else if (
@@ -8835,7 +8835,7 @@ function jslint_phase4_walk(state) {
                     ) {
 
 // test_cause:
-// ["typeof 0===\"aa\"", "pre_b", "expected_type_string_a", "aa", 12]
+// ["typeof 0===\"aa\"", "pre_b_binary", "expected_type_string_a", "aa", 12]
 
                         warn("expected_type_string_a", right, value);
                     }
@@ -9099,7 +9099,7 @@ function jslint_phase4_walk(state) {
         }
     }
 
-    function pre_s_var(thing) {
+    function pre_v_var(thing) {
         const the_variable = name_lookup(thing);
         if (the_variable !== undefined) {
             thing.variable = the_variable;
@@ -9218,13 +9218,13 @@ function jslint_phase4_walk(state) {
     preaction = action(pres);
     preamble = amble(pres);
     postaction("assignment", "+=", post_a_pluseq);
-    postaction("assignment", post_a);
+    postaction("assignment", post_a_assignment);
     postaction("binary", "&&", post_b_and);
     postaction("binary", "(", post_b_lparen);
     postaction("binary", "=>", post_s_function);
     postaction("binary", "[", post_b_lbracket);
     postaction("binary", "||", post_b_or);
-    postaction("binary", post_b);
+    postaction("binary", post_b_binary);
     postaction("statement", "const", post_s_var);
     postaction("statement", "export", post_s_export_toplevel);
     postaction("statement", "for", post_s_for);
@@ -9250,7 +9250,7 @@ function jslint_phase4_walk(state) {
     preaction("binary", "in", pre_b_in);
     preaction("binary", "instanceof", pre_b_instanceof);
     preaction("binary", "||", pre_b_or);
-    preaction("binary", pre_b);
+    preaction("binary", pre_b_binary);
     preaction("binary", pre_a_bitwise);
     preaction("statement", "for", pre_s_for);
     preaction("statement", "function", pre_s_function);
@@ -9258,7 +9258,7 @@ function jslint_phase4_walk(state) {
     preaction("statement", "{", pre_s_lbrace);
     preaction("unary", "function", pre_s_function);
     preaction("unary", "~", pre_a_bitwise);
-    preaction("variable", pre_s_var);
+    preaction("variable", pre_v_var);
 
     walk_statement(state.token_tree);
 }
