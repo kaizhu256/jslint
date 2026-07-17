@@ -3426,9 +3426,10 @@ function sentinel() {}
     processArgv0,
     processArgv.slice(1),
     {
-     env: Object.assign({}, process.env, {
+     env: {
+      ...process.env,
       NODE_V8_COVERAGE: coverageDir
-     }),
+     },
      shell: (
       processArgv0.endsWith(".bat")
       || processArgv0.endsWith(".cmd")
