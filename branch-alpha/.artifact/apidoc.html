@@ -1310,7 +1310,6 @@ jslint_assert(
         artifact,
         block_list,
         block_stack,
-        function_list,
         option_dict,
         test_cause,
         token_global,
@@ -1394,7 +1393,7 @@ jslint_assert(
                 if (!name.used) {
 
 // test_cause:
-// ["function aa(bb){return;}", "delve"...
+// ["function aa(bb){return;}", "delve", "unused_a", "bb", 13]...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
