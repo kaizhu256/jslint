@@ -10493,8 +10493,8 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         }));
         html += detail("outer", list.filter(function (id) {
             return (
-                context[id].declared_scope !== the_function
-                && context[id].declared_scope.id !== "(global)"
+                context[id].declared_scope.id !== "(global)"
+                && context[id].declared_scope !== the_function
             );
         }));
         html += detail(module, list.filter(function (id) {
