@@ -1378,7 +1378,7 @@ jslint_assert(
     function delve(the_function) {
         Object.keys(the_function.context).forEach(function (id) {
             const name = the_function.context[id];
-            if (id !== "ignore" &amp;&amp; name.parent === the_function) {
+            if (id !== "ignore" &amp;&amp; name.declared_scope === the_function) {
 
 // test_cause:
 // ["function aa(aa) {return aa;}", "delve", "id", "", 0]
@@ -1387,7 +1387,7 @@ jslint_assert(
                 if (!name.used) {
 
 // test_cause:
-// ["function aa(bb){return;}", "delve", "unus...
+// ["function aa(bb){return;}", "delve...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
