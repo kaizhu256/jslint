@@ -7458,8 +7458,9 @@ function jslint_phase3_parse(state) {
 
     function stmt_var() {
         const readonly = token_now.id === "const";
+        const the_variable = token_now;
+        let declared_scope = functionage;
         let name;
-        let the_variable = token_now;
         let variable_prv;
         the_variable.name_list = [];    // 5. name_list for "let [aa] = ..."
 
@@ -7501,6 +7502,11 @@ function jslint_phase3_parse(state) {
 
             test_cause("var_prv", functionage.statement_prv.id);
             variable_prv = functionage.statement_prv;
+            //!! declared_scope = (
+                //!! variable_prv === "var"
+                //!! ? functionage
+                //!! : blockage
+            //!! );
             break;
         case "import":
 
@@ -7541,7 +7547,7 @@ function jslint_phase3_parse(state) {
 // PR-500 - Unify ES2015-destructure-logic. - let [aa] = ...;
 
                 prefix_destructure(
-                    functionage,        // declared_scope
+                    declared_scope,     // declared_scope
                     "variable",         // role
                     readonly,           // readonly
                     the_variable.name_list,     // name_list
@@ -8089,11 +8095,10 @@ function jslint_phase4_walk(state) {
             return the_variable;
         }
         if (!the_variable) {
-            function_stack.forEach(function ({
-                context
-            }) {
-                if (context[id] && context[id].role !== "label") {
-                    the_variable = context[id];
+            block_stack.forEach(function (blockage) {
+                the_variable = blockage?.context?.[id] || the_variable;
+                if (the_variable?.role === "label") {
+                    the_variable = undefined;
                 }
             });
             if (!the_variable && global_dict[id] === undefined) {
