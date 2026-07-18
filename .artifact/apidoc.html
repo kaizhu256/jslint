@@ -665,7 +665,8 @@ await jslint.jslint_cli({
 <span class="apidocCodeCommentSpan">
 // The jslint function itself.
 
-</span>    const catch_list = [];      // The array containing all catch-blocks.
+</span>    const block_stack = [];     // The stack of blocks.
+    const catch_list = [];      // The array containing all catch-blocks.
     const catch_stack = [       // The stack of catch-blocks.
         {
             context: empty()
@@ -686,7 +687,6 @@ await jslint.jslint_cli({
             line_source
         };
     });
-    const opener_stack = [];    // Stack of opener tokens: (, [.
     const property_dict = empty();      // The object containing the tallied
                                         // ... property names.
                                 // jslint functions.
@@ -697,7 +697,7 @@ await jslint.jslint_cli({
         alive_list: [],
         async: 0,
         body: true,
-       ...
+        context:...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1019,6 +1019,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 // PHASE 2. Lex &lt;line_list&gt; into &lt;token_list&gt;.
 
         jslint_phase2_lex(state);
+        block_stack.length = 0;
 
 // PHASE 3. Parse &lt;token_list&gt; into &lt;token_tree&gt; using the Pratt-parser.
 ...</pre></li>
@@ -1036,11 +1037,11 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 
 </span>    const {
         artifact,
+        block_stack,
         directive_list,
         global_dict,
         global_list,
         line_list,
-        opener_stack,
         option_dict,
         stop,
         stop_at,
@@ -1067,7 +1068,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
                                 // ... literal.
     let mode_regexp;            // true if regular expression literal seen on
                                 // ... this line.
-    let opener_popped = empty();        // Last token popped from opener_stack.
+    let opener_popped = empty();        // Last token popped from block_stack.
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.
     let token_prv = token_global;       // The previous token including
@@ -1076,7 +1077,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
                                         // ... comments.
 
 // Most tokens, including the identifiers, operators, and punctuators, can be
-// found with a regular...
+// found with a regular e...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1088,13 +1089,13 @@ jslint_phase1_split(state);
 // PHASE 2. Lex &lt;line_list&gt; into &lt;token_list&gt;.
 
 <span class="apidocCodeKeywordSpan">jslint_phase2_lex</span>(state);
+block_stack.length = 0;
 
 // PHASE 3. Parse &lt;token_list&gt; into &lt;token_tree&gt; using the Pratt-parser.
 
 jslint_phase3_parse(state);
 jslint_assert(
-    catch_stack.length === 1,
-    `catch_stack.length=${catch_stack.length}.`
+    block_stack.length === 0,
 ...</pre></li>
 
 <li>
@@ -1124,6 +1125,7 @@ jslint_assert(
 
     const {
         artifact,
+        block_stack,
         catch_list,
         catch_stack,
         export_dict,
@@ -1144,6 +1146,7 @@ jslint_assert(
         warn_at
     } = state;
     let anon = "anonymous";     // The guessed name for anonymous functions.
+    let blockage = token_global;        // The current block.
     let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -1165,28 +1168,25 @@ jslint_assert(
             &amp;&amp; token_now.id !== "function"
             &amp;&amp; token_now.id !== "async"
         ) {
-            anon = token_now.id;
-        } else if (
-            token_now.id === "(string)"
-...
+          ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-
 // PHASE 2. Lex &lt;line_list&gt; into &lt;token_list&gt;.
 
 jslint_phase2_lex(state);
+block_stack.length = 0;
 
 // PHASE 3. Parse &lt;token_list&gt; into &lt;token_tree&gt; using the Pratt-parser.
 
 <span class="apidocCodeKeywordSpan">jslint_phase3_parse</span>(state);
 jslint_assert(
-    catch_stack.length === 1,
-    `catch_stack.length=${catch_stack.length}.`
+    block_stack.length === 0,
+    `block_stack.length=${block_stack.length}.`
 );
 jslint_assert(
-    function_stack.length === 0,
-    `function_stack.length=${function_stack.length}.`
+    catch_stack.length === 1,
+    `catch_stack.length=${catch_stack.length}.`
 ...</pre></li>
 
 <li>
@@ -1204,6 +1204,7 @@ jslint_assert(
 
 </span>    const {
         artifact,
+        block_stack,
         catch_stack,
         function_stack,
         global_dict,
@@ -1215,7 +1216,6 @@ jslint_assert(
         token_global,
         warn
     } = state;
-    let block_stack = [];               // The stack of blocks.
     let blockage = token_global;        // The current block.
     let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
@@ -1267,7 +1267,10 @@ jslint_assert(
                 a_set[id] = i_set;
             }
 
-// Register the task with the arity and the id...
+// Register the task with the arity and the id.
+
+            i_set.push(task);
+        };...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1281,11 +1284,11 @@ if (!state.mode_json) {
     <span class="apidocCodeKeywordSpan">jslint_phase4_walk</span>(state);
 }
 jslint_assert(
-    catch_stack.length === 1,
-    `catch_stack.length=${catch_stack.length}.`
+    block_stack.length === 0,
+    `block_stack.length=${block_stack.length}.`
 );
 jslint_assert(
-    function_stack.length === 0,
+    catch_stack.length === 1,
 ...</pre></li>
 
 <li>
@@ -1301,9 +1304,9 @@ jslint_assert(
 
 </span>    const {
         artifact,
+        block_stack,
         catch_list,
         function_list,
-        opener_stack,
         option_dict,
         test_cause,
         token_global,
@@ -1387,7 +1390,7 @@ jslint_assert(
                 if (!name.used) {
 
 // test_cause:
-// ["function aa(bb){return;}", "delve...
+// ["function aa(bb){return;}", "delve"...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1401,8 +1404,8 @@ jslint_assert(
             <span class="apidocCodeKeywordSpan">jslint_phase5_whitage</span>(state);
         }
         jslint_assert(
-            opener_stack.length === 0,
-            `opener_stack.length=${opener_stack.length}.`
+            block_stack.length === 0,
+            `block_stack.length=${block_stack.length}.`
         );
 
 // PR-347 - Disable warning "missing_browser".
