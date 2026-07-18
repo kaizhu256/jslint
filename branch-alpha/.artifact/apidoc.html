@@ -665,13 +665,8 @@ await jslint.jslint_cli({
 <span class="apidocCodeCommentSpan">
 // The jslint function itself.
 
-</span>    const block_stack = [];     // The stack of blocks.
-    const catch_list = [];      // The array containing all catch-blocks.
-    const catch_stack = [       // The stack of catch-blocks.
-        {
-            context: empty()
-        }
-    ];
+</span>    const block_list = [];      // The array containing all lexical-blocks.
+    const block_stack = [];     // The stack of lexical-blocks.
     const cause_dict = empty(); // The object of test-causes.
     const directive_list = [];  // The directive comments.
     const export_dict = empty();        // The exported names and values.
@@ -697,7 +692,12 @@ await jslint.jslint_cli({
         alive_list: [],
         async: 0,
         body: true,
-        context:...
+        context: empty(),
+        finally: 0,
+        from: 0,
+        id: "(global)",
+        level: 0,
+        line: jslin...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1125,9 +1125,8 @@ jslint_assert(
 
     const {
         artifact,
+        block_list,
         block_stack,
-        catch_list,
-        catch_stack,
         export_dict,
         function_list,
         function_stack,
@@ -1147,7 +1146,6 @@ jslint_assert(
     } = state;
     let anon = "anonymous";     // The guessed name for anonymous functions.
     let blockage = token_global;        // The current block.
-    let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
     let token_ii = 0;           // The number of the next token.
@@ -1168,7 +1166,10 @@ jslint_assert(
             &amp;&amp; token_now.id !== "function"
             &amp;&amp; token_now.id !== "async"
         ) {
-          ...
+            anon = token_now.id;
+        } else if (
+            token_now.id === "(string)"
+      ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1185,8 +1186,8 @@ jslint_assert(
     `block_stack.length=${block_stack.length}.`
 );
 jslint_assert(
-    catch_stack.length === 1,
-    `catch_stack.length=${catch_stack.length}.`
+    function_stack.length === 0,
+    `function_stack.length=${function_stack.length}.`
 ...</pre></li>
 
 <li>
@@ -1205,7 +1206,6 @@ jslint_assert(
 </span>    const {
         artifact,
         block_stack,
-        catch_stack,
         function_stack,
         global_dict,
         is_equal,
@@ -1217,7 +1217,6 @@ jslint_assert(
         warn
     } = state;
     let blockage = token_global;        // The current block.
-    let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let postaction;
     let postamble;
@@ -1270,7 +1269,12 @@ jslint_assert(
 // Register the task with the arity and the id.
 
             i_set.push(task);
-        };...
+        };
+    }
+
+    function amble(when) {
+
+// Produce a function that will act on the tasks regi...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1288,7 +1292,7 @@ jslint_assert(
     `block_stack.length=${block_stack.length}.`
 );
 jslint_assert(
-    catch_stack.length === 1,
+    function_stack.length === 0,
 ...</pre></li>
 
 <li>
@@ -1304,8 +1308,8 @@ jslint_assert(
 
 </span>    const {
         artifact,
+        block_list,
         block_stack,
-        catch_list,
         function_list,
         option_dict,
         test_cause,
