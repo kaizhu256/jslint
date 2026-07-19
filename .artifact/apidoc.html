@@ -689,7 +689,6 @@ await jslint.jslint_cli({
     const syntax_dict = empty();        // The object containing the parser.
     const tenure = empty();     // The predefined property registry.
     const token_global = {      // The global object; the outermost context.
-        alive_list: [],
         async: 0,
         body: true,
         context: empty(),
@@ -697,7 +696,8 @@ await jslint.jslint_cli({
         from: 0,
         id: "(global)",
         level: 0,
-        line: jslin...
+        line: jslint_fudge,
+        loop: 0...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
