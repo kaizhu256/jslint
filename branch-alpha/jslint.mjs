@@ -4400,7 +4400,7 @@ function jslint_phase3_parse(state) {
 //          "naked"     No advance.
 //          undefined   An ordinary block.
 
-        let stmts;
+        let parsed_block;
         let the_block;
         if (special !== "naked") {
             advance("{");
@@ -4424,9 +4424,9 @@ function jslint_phase3_parse(state) {
             advance("(string)");
             semicolon();
         }
-        stmts = parse_statement_block();
-        the_block.block = stmts;
-        if (stmts.length === 0) {
+        parsed_block = parse_statement_block();
+        the_block.block = parsed_block;
+        if (parsed_block.length === 0) {
             if (!option_dict.devel && special !== "ignore") {
 
 // test_cause:
@@ -4436,7 +4436,7 @@ function jslint_phase3_parse(state) {
             }
             the_block.disrupt = false;
         } else {
-            the_block.disrupt = stmts[stmts.length - 1].disrupt;
+            the_block.disrupt = parsed_block[parsed_block.length - 1].disrupt;
         }
         blockage = block_stack_pop(block_stack);
         advance("}");
@@ -7151,7 +7151,7 @@ function jslint_phase3_parse(state) {
         let dups = [];
         let exp;
         let last;
-        let stmts;
+        let parsed_block;
         let the_case;
         let the_default;
         let the_disrupt = true;
@@ -7225,8 +7225,8 @@ function jslint_phase3_parse(state) {
 // ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 24]
 
             check_ordered_case(the_case.expression);
-            stmts = parse_statement_block();
-            if (stmts.length < 1) {
+            parsed_block = parse_statement_block();
+            if (parsed_block.length < 1) {
 
 // test_cause:
 // ["
@@ -7240,9 +7240,9 @@ function jslint_phase3_parse(state) {
 
                 break;
             }
-            the_case.block = stmts;
+            the_case.block = parsed_block;
             the_cases.push(the_case);
-            last = stmts[stmts.length - 1];
+            last = parsed_block[parsed_block.length - 1];
             if (last.disrupt) {
                 if (last.id === "break" && last.label === undefined) {
                     the_disrupt = false;

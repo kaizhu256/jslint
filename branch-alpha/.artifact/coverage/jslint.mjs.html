@@ -4565,7 +4565,7 @@ body {
 <pre><span class="lineno"><a href="#line_4400" id="line_4400"> 4400.</a></span><span class="count                ">   5628</span><span>//          "naked"     No advance.</span></pre>
 <pre><span class="lineno"><a href="#line_4401" id="line_4401"> 4401.</a></span><span class="count                ">   5628</span><span>//          undefined   An ordinary block.</span></pre>
 <pre><span class="lineno"><a href="#line_4402" id="line_4402"> 4402.</a></span><span class="count                ">   5628</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_4403" id="line_4403"> 4403.</a></span><span class="count                ">   5628</span><span>        let stmts;</span></pre>
+<pre><span class="lineno"><a href="#line_4403" id="line_4403"> 4403.</a></span><span class="count                ">   5628</span><span>        let parsed_block;</span></pre>
 <pre><span class="lineno"><a href="#line_4404" id="line_4404"> 4404.</a></span><span class="count                ">   5628</span><span>        let the_block;</span></pre>
 <pre><span class="lineno"><a href="#line_4405" id="line_4405"> 4405.</a></span><span class="count                ">   5622</span><span>        if (special !== "naked") {</span></pre>
 <pre><span class="lineno"><a href="#line_4406" id="line_4406"> 4406.</a></span><span class="count                ">   5622</span><span>            advance("{");</span></pre>
@@ -4589,9 +4589,9 @@ body {
 <pre><span class="lineno"><a href="#line_4424" id="line_4424"> 4424.</a></span><span class="count                ">      4</span><span>            advance("(string)");</span></pre>
 <pre><span class="lineno"><a href="#line_4425" id="line_4425"> 4425.</a></span><span class="count                ">      4</span><span>            semicolon();</span></pre>
 <pre><span class="lineno"><a href="#line_4426" id="line_4426"> 4426.</a></span><span class="count                ">   5626</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_4427" id="line_4427"> 4427.</a></span><span class="count                ">   5626</span><span>        stmts = parse_statement_block();</span></pre>
-<pre><span class="lineno"><a href="#line_4428" id="line_4428"> 4428.</a></span><span class="count                ">   5626</span><span>        the_block.block = stmts;</span></pre>
-<pre><span class="lineno"><a href="#line_4429" id="line_4429"> 4429.</a></span><span class="count                ">   5626</span><span>        if (stmts.length === 0) {</span></pre>
+<pre><span class="lineno"><a href="#line_4427" id="line_4427"> 4427.</a></span><span class="count                ">   5626</span><span>        parsed_block = parse_statement_block();</span></pre>
+<pre><span class="lineno"><a href="#line_4428" id="line_4428"> 4428.</a></span><span class="count                ">   5626</span><span>        the_block.block = parsed_block;</span></pre>
+<pre><span class="lineno"><a href="#line_4429" id="line_4429"> 4429.</a></span><span class="count                ">   5626</span><span>        if (parsed_block.length === 0) {</span></pre>
 <pre><span class="lineno"><a href="#line_4430" id="line_4430"> 4430.</a></span><span class="count                ">     80</span><span>            if (!option_dict.devel &amp;&amp; special !== "ignore") {</span></pre>
 <pre><span class="lineno"><a href="#line_4431" id="line_4431"> 4431.</a></span><span class="count                ">     80</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_4432" id="line_4432"> 4432.</a></span><span class="count                ">     80</span><span>// test_cause:</span></pre>
@@ -4601,7 +4601,7 @@ body {
 <pre><span class="lineno"><a href="#line_4436" id="line_4436"> 4436.</a></span><span class="count                ">     80</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_4437" id="line_4437"> 4437.</a></span><span class="count                ">     80</span><span>            the_block.disrupt = false;</span></pre>
 <pre><span class="lineno"><a href="#line_4438" id="line_4438"> 4438.</a></span><span class="count                ">   5543</span><span>        } else {</span></pre>
-<pre><span class="lineno"><a href="#line_4439" id="line_4439"> 4439.</a></span><span class="count                ">   5543</span><span>            the_block.disrupt = stmts[stmts.length - 1].disrupt;</span></pre>
+<pre><span class="lineno"><a href="#line_4439" id="line_4439"> 4439.</a></span><span class="count                ">   5543</span><span>            the_block.disrupt = parsed_block[parsed_block.length - 1].disrupt;</span></pre>
 <pre><span class="lineno"><a href="#line_4440" id="line_4440"> 4440.</a></span><span class="count                ">   5623</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_4441" id="line_4441"> 4441.</a></span><span class="count                ">   5623</span><span>        blockage = block_stack_pop(block_stack);</span></pre>
 <pre><span class="lineno"><a href="#line_4442" id="line_4442"> 4442.</a></span><span class="count                ">   5623</span><span>        advance("}");</span></pre>
@@ -7316,7 +7316,7 @@ body {
 <pre><span class="lineno"><a href="#line_7151" id="line_7151"> 7151.</a></span><span class="count                ">    256</span><span>        let dups = [];</span></pre>
 <pre><span class="lineno"><a href="#line_7152" id="line_7152"> 7152.</a></span><span class="count                ">    256</span><span>        let exp;</span></pre>
 <pre><span class="lineno"><a href="#line_7153" id="line_7153"> 7153.</a></span><span class="count                ">    256</span><span>        let last;</span></pre>
-<pre><span class="lineno"><a href="#line_7154" id="line_7154"> 7154.</a></span><span class="count                ">    256</span><span>        let stmts;</span></pre>
+<pre><span class="lineno"><a href="#line_7154" id="line_7154"> 7154.</a></span><span class="count                ">    256</span><span>        let parsed_block;</span></pre>
 <pre><span class="lineno"><a href="#line_7155" id="line_7155"> 7155.</a></span><span class="count                ">    256</span><span>        let the_case;</span></pre>
 <pre><span class="lineno"><a href="#line_7156" id="line_7156"> 7156.</a></span><span class="count                ">    256</span><span>        let the_default;</span></pre>
 <pre><span class="lineno"><a href="#line_7157" id="line_7157"> 7157.</a></span><span class="count                ">    256</span><span>        let the_disrupt = true;</span></pre>
@@ -7390,8 +7390,8 @@ body {
 <pre><span class="lineno"><a href="#line_7225" id="line_7225"> 7225.</a></span><span class="count                ">   1142</span><span>// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 24]</span></pre>
 <pre><span class="lineno"><a href="#line_7226" id="line_7226"> 7226.</a></span><span class="count                ">   1142</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7227" id="line_7227"> 7227.</a></span><span class="count                ">   1142</span><span>            check_ordered_case(the_case.expression);</span></pre>
-<pre><span class="lineno"><a href="#line_7228" id="line_7228"> 7228.</a></span><span class="count                ">   1142</span><span>            stmts = parse_statement_block();</span></pre>
-<pre><span class="lineno"><a href="#line_7229" id="line_7229"> 7229.</a></span><span class="count                ">   1142</span><span>            if (stmts.length &lt; 1) {</span></pre>
+<pre><span class="lineno"><a href="#line_7228" id="line_7228"> 7228.</a></span><span class="count                ">   1142</span><span>            parsed_block = parse_statement_block();</span></pre>
+<pre><span class="lineno"><a href="#line_7229" id="line_7229"> 7229.</a></span><span class="count                ">   1142</span><span>            if (parsed_block.length &lt; 1) {</span></pre>
 <pre><span class="lineno"><a href="#line_7230" id="line_7230"> 7230.</a></span><span class="count                ">   1142</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7231" id="line_7231"> 7231.</a></span><span class="count                ">   1142</span><span>// test_cause:</span></pre>
 <pre><span class="lineno"><a href="#line_7232" id="line_7232"> 7232.</a></span><span class="count                ">   1142</span><span>// ["</span></pre>
@@ -7405,9 +7405,9 @@ body {
 <pre><span class="lineno"><a href="#line_7240" id="line_7240"> 7240.</a></span><span class="count                ">   1142</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7241" id="line_7241"> 7241.</a></span><span class="count                ">   1142</span><span>                break;</span></pre>
 <pre><span class="lineno"><a href="#line_7242" id="line_7242"> 7242.</a></span><span class="count                ">   1142</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_7243" id="line_7243"> 7243.</a></span><span class="count                ">   1142</span><span>            the_case.block = stmts;</span></pre>
+<pre><span class="lineno"><a href="#line_7243" id="line_7243"> 7243.</a></span><span class="count                ">   1142</span><span>            the_case.block = parsed_block;</span></pre>
 <pre><span class="lineno"><a href="#line_7244" id="line_7244"> 7244.</a></span><span class="count                ">   1142</span><span>            the_cases.push(the_case);</span></pre>
-<pre><span class="lineno"><a href="#line_7245" id="line_7245"> 7245.</a></span><span class="count                ">   1142</span><span>            last = stmts[stmts.length - 1];</span></pre>
+<pre><span class="lineno"><a href="#line_7245" id="line_7245"> 7245.</a></span><span class="count                ">   1142</span><span>            last = parsed_block[parsed_block.length - 1];</span></pre>
 <pre><span class="lineno"><a href="#line_7246" id="line_7246"> 7246.</a></span><span class="count                ">   1142</span><span>            if (last.disrupt) {</span></pre>
 <pre><span class="lineno"><a href="#line_7247" id="line_7247"> 7247.</a></span><span class="count                ">   1142</span><span>                if (last.id === "break" &amp;&amp; last.label === undefined) {</span></pre>
 <pre><span class="lineno"><a href="#line_7248" id="line_7248"> 7248.</a></span><span class="count                ">   1142</span><span>                    the_disrupt = false;</span></pre>
