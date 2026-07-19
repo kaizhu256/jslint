@@ -1128,8 +1128,6 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     const {
         artifact,
         block_stack,
-        block_stack_pop,
-        block_stack_push,
         export_dict,
         function_list,
         function_stack,
@@ -1138,6 +1136,8 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         is_equal,
         option_dict,
         property_dict,
+        scope_stack_pop,
+        scope_stack_push,
         stop,
         syntax_dict,
         tenure,
@@ -1148,9 +1148,9 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         warn_at
     } = state;
     let anon = "anonymous";     // The guessed name for anonymous functions.
-    let blockage = token_global;        // The current block.
-    let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
+    let scope_block;            // The current block-scope.
+    let scope_function;         // The current function-scope.
     let token_ii = 0;           // The index of the next token in &lt;token_list&gt;.
     let token_now = token_global;       // The current token being examined in
                                         // ... the parse.
@@ -1170,7 +1170,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
             &amp;&amp; token_now.id !== "async"
         ) {
             anon = token_now.id;
-        } else...
+        } else if ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1207,20 +1207,18 @@ if (!state.mode_json) {
 </span>    const {
         artifact,
         block_stack,
-        block_stack_pop,
-        block_stack_push,
         function_stack,
         global_dict,
         is_equal,
         is_weird,
         option_dict,
+        scope_stack_pop,
+        scope_stack_push,
         syntax_dict,
         test_cause,
         token_global,
         warn
     } = state;
-    let blockage = token_global;        // The current block.
-    let functionage = token_global;     // The current function.
     let postaction;
     let postamble;
     let posts = empty();
@@ -1233,6 +1231,8 @@ if (!state.mode_json) {
     let relationop = object_assign_from_list(empty(), [
         "!=", "!==", "&lt;", "&lt;=", "==", "===", "&gt;", "&gt;="
     ], true);
+    let scope_block;            // The current block-scope.
+    let scope_function;         // The current function-scope.
 
 // Ambulation of the parse tree.
 
@@ -1274,7 +1274,7 @@ if (!state.mode_json) {
 
         return function (the_token) {
 
-// Given a task set that was built by an action functi...
+// Given a task set that was built by an action function, ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1384,7 +1384,7 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
     function delve(the_function) {
         Object.keys(the_function.context).forEach(function (id) {
             const name = the_function.context[id];
-            if (id !== "ignore" &amp;&amp; name.declared_scope === the_function) {
+            if (id !== "ignore" &amp;&amp; name.scope_declared === the_function) {
 
 // test_cause:
 // ["function aa(aa) {return aa;}", "delve", "id", "", 0]
