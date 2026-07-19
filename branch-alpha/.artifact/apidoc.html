@@ -850,21 +850,21 @@ ${String(message).slice(0, 2000)}`
     throw error;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-    function expected_at(at) {
+        delete left.open;
+        delete left.used;
+        left = right;
+    });
 
-// Probably deadcode.
-// if (right === undefined) {
-//     right = token_nxt;
-// }
+// Cleanup block_stack.
 
-<span class="apidocCodeKeywordSpan">jslint_assert</span>(
-    !(right === undefined),
-    `Expected !(right === undefined).`
-);
-warn(
-    "expected_a_at_b_c",
-    right,
-    artifact(right),
+    <span class="apidocCodeKeywordSpan">jslint_assert</span>(
+        block_stack.length === 0,
+        `block_stack.length=${block_stack.length}.`
+    );
+    block_stack.length = 0;
+}
+
+function jslint_report({
 ...</pre></li>
 
 <li>
@@ -1019,7 +1019,6 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 // PHASE 2. Lex &lt;line_list&gt; into &lt;token_list&gt;.
 
         jslint_phase2_lex(state);
-        block_stack.length = 0;
 
 // PHASE 3. Parse &lt;token_list&gt; into &lt;token_tree&gt; using the Pratt-parser.
 ...</pre></li>
@@ -1084,18 +1083,18 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 
 // PHASE 1. Split &lt;source&gt; by newlines into &lt;line_list&gt;.
 
-jslint_phase1_split(state);
+        jslint_phase1_split(state);
 
 // PHASE 2. Lex &lt;line_list&gt; into &lt;token_list&gt;.
 
-<span class="apidocCodeKeywordSpan">jslint_phase2_lex</span>(state);
-block_stack.length = 0;
+        <span class="apidocCodeKeywordSpan">jslint_phase2_lex</span>(state);
 
 // PHASE 3. Parse &lt;token_list&gt; into &lt;token_tree&gt; using the Pratt-parser.
 
-jslint_phase3_parse(state);
-jslint_assert(
-    block_stack.length === 0,
+        jslint_phase3_parse(state);
+
+// PHASE 4. Walk &lt;token_tree&gt;, traversing all nodes of the tree. It is a
+//          recursive traversal. Each node may be processed on the way down
 ...</pre></li>
 
 <li>
@@ -1125,8 +1124,9 @@ jslint_assert(
 
     const {
         artifact,
-        block_list,
         block_stack,
+        block_stack_pop,
+        block_stack_push,
         export_dict,
         function_list,
         function_stack,
@@ -1148,7 +1148,7 @@ jslint_assert(
     let blockage = token_global;        // The current block.
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
-    let token_ii = 0;           // The number of the next token.
+    let token_ii = 0;           // The index of the next token in &lt;token_list&gt;.
     let token_now = token_global;       // The current token being examined in
                                         // ... the parse.
     let token_nxt = token_global;       // The next token to be examined in
@@ -1167,27 +1167,25 @@ jslint_assert(
             &amp;&amp; token_now.id !== "async"
         ) {
             anon = token_now.id;
-        } else if (
-            token_now.id === "(string)"
-      ...
+        } else...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
+
 // PHASE 2. Lex &lt;line_list&gt; into &lt;token_list&gt;.
 
 jslint_phase2_lex(state);
-block_stack.length = 0;
 
 // PHASE 3. Parse &lt;token_list&gt; into &lt;token_tree&gt; using the Pratt-parser.
 
 <span class="apidocCodeKeywordSpan">jslint_phase3_parse</span>(state);
-jslint_assert(
-    block_stack.length === 0,
-    `block_stack.length=${block_stack.length}.`
-);
-jslint_assert(
-    function_stack.length === 0,
-    `function_stack.length=${function_stack.length}.`
+
+// PHASE 4. Walk &lt;token_tree&gt;, traversing all nodes of the tree. It is a
+//          recursive traversal. Each node may be processed on the way down
+//          (preaction) and on the way up (postaction).
+
+if (!state.mode_json) {
+    jslint_phase4_walk(state);
 ...</pre></li>
 
 <li>
@@ -1206,6 +1204,8 @@ jslint_assert(
 </span>    const {
         artifact,
         block_stack,
+        block_stack_pop,
+        block_stack_push,
         function_stack,
         global_dict,
         is_equal,
@@ -1274,11 +1274,11 @@ jslint_assert(
 
     function amble(when) {
 
-// Produce a function that will act on the tasks regi...
+//...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-);
+jslint_phase3_parse(state);
 
 // PHASE 4. Walk &lt;token_tree&gt;, traversing all nodes of the tree. It is a
 //          recursive traversal. Each node may be processed on the way down
@@ -1287,12 +1287,12 @@ jslint_assert(
 if (!state.mode_json) {
     <span class="apidocCodeKeywordSpan">jslint_phase4_walk</span>(state);
 }
-jslint_assert(
-    block_stack.length === 0,
-    `block_stack.length=${block_stack.length}.`
-);
-jslint_assert(
-    function_stack.length === 0,
+
+// PHASE 5. Check whitespace between tokens in &lt;token_list&gt;.
+
+if (!state.mode_json &amp;&amp; warning_list.length === 0) {
+    jslint_phase5_whitage(state);
+}
 ...</pre></li>
 
 <li>
@@ -1397,21 +1397,21 @@ jslint_assert(
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-            function_stack.length === 0,
-            `function_stack.length=${function_stack.length}.`
-        );
+    if (!state.mode_json) {
+        jslint_phase4_walk(state);
+    }
 
 // PHASE 5. Check whitespace between tokens in &lt;token_list&gt;.
 
-        if (!state.mode_json &amp;&amp; warning_list.length === 0) {
-            <span class="apidocCodeKeywordSpan">jslint_phase5_whitage</span>(state);
-        }
-        jslint_assert(
-            block_stack.length === 0,
-            `block_stack.length=${block_stack.length}.`
-        );
-
-// PR-347 - Disable warning "missing_browser".
+    if (!state.mode_json &amp;&amp; warning_list.length === 0) {
+        <span class="apidocCodeKeywordSpan">jslint_phase5_whitage</span>(state);
+    }
+    if (option_dict.test_internal_error) {
+        jslint_assert(undefined, "test_internal_error");
+    }
+} catch (err) {
+    mode_stop = true;
+    err.message = "[JSLint was unable to finish] " + err.message;
 ...</pre></li>
 
 <li>
