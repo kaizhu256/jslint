@@ -1245,14 +1245,6 @@ if (!state.mode_json) {
             let a_set = when[arity];
             let i_set;
 
-// The id parameter is optional. If excluded, the task will be applied to all
-// ids.
-
-            if (typeof id !== "string") {
-                task = id;
-                id = "(all)";
-            }
-
 // If this arity has no registrations yet, then create a set object to hold
 // them.
 
@@ -1277,7 +1269,12 @@ if (!state.mode_json) {
 
     function amble(when) {
 
-//...
+// Produce a function that will act on the tasks registered by an action
+// function while walking the tree.
+
+        return function (the_token) {
+
+// Given a task set that was built by an action functi...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
