@@ -8793,7 +8793,7 @@ body {
 <pre><span class="lineno"><a href="#line_8628" id="line_8628"> 8628.</a></span><span class="count                ">   2605</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_8629" id="line_8629"> 8629.</a></span><span class="count                ">   2251</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_8630" id="line_8630"> 8630.</a></span><span class="count                ">    561</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8631" id="line_8631"> 8631.</a></span><span class="count                ">    259</span><span>    function post_ternary(thing) {</span></pre>
+<pre><span class="lineno"><a href="#line_8631" id="line_8631"> 8631.</a></span><span class="count                ">    259</span><span>    function post_t_ternary(thing) {</span></pre>
 <pre><span class="lineno"><a href="#line_8632" id="line_8632"> 8632.</a></span><span class="count                ">    259</span><span>        if (</span></pre>
 <pre><span class="lineno"><a href="#line_8633" id="line_8633"> 8633.</a></span><span class="count                ">    259</span><span>            is_weird(thing.expression[0])</span></pre>
 <pre><span class="lineno"><a href="#line_8634" id="line_8634"> 8634.</a></span><span class="count                ">    259</span><span>            || thing.expression[0].constant === true</span></pre>
@@ -8801,20 +8801,20 @@ body {
 <pre><span class="lineno"><a href="#line_8636" id="line_8636"> 8636.</a></span><span class="count                ">     10</span><span>        ) {</span></pre>
 <pre><span class="lineno"><a href="#line_8637" id="line_8637"> 8637.</a></span><span class="count                ">     10</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8638" id="line_8638"> 8638.</a></span><span class="count                ">     10</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_8639" id="line_8639"> 8639.</a></span><span class="count                ">     10</span><span>// ["let aa=(aa?`${0}`:`${0}`)", "post_ternary", "unexpected_a", "?", 11]</span></pre>
-<pre><span class="lineno"><a href="#line_8640" id="line_8640"> 8640.</a></span><span class="count                ">     10</span><span>// ["let aa=(aa?`0`:`0`)", "post_ternary", "unexpected_a", "?", 11]</span></pre>
+<pre><span class="lineno"><a href="#line_8639" id="line_8639"> 8639.</a></span><span class="count                ">     10</span><span>// ["let aa=(aa?`${0}`:`${0}`)", "post_t_ternary", "unexpected_a", "?", 11]</span></pre>
+<pre><span class="lineno"><a href="#line_8640" id="line_8640"> 8640.</a></span><span class="count                ">     10</span><span>// ["let aa=(aa?`0`:`0`)", "post_t_ternary", "unexpected_a", "?", 11]</span></pre>
 <pre><span class="lineno"><a href="#line_8641" id="line_8641"> 8641.</a></span><span class="count                ">     10</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8642" id="line_8642"> 8642.</a></span><span class="count                ">     10</span><span>            warn("unexpected_a", thing);</span></pre>
 <pre><span class="lineno"><a href="#line_8643" id="line_8643"> 8643.</a></span><span class="count                ">    249</span><span>        } else if (is_equal(thing.expression[0], thing.expression[1])) {</span></pre>
 <pre><span class="lineno"><a href="#line_8644" id="line_8644"> 8644.</a></span><span class="count                ">    249</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8645" id="line_8645"> 8645.</a></span><span class="count                ">    249</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_8646" id="line_8646"> 8646.</a></span><span class="count                ">    249</span><span>// ["aa?aa:0", "post_ternary", "expected_a_b", "?", 3]</span></pre>
+<pre><span class="lineno"><a href="#line_8646" id="line_8646"> 8646.</a></span><span class="count                ">    249</span><span>// ["aa?aa:0", "post_t_ternary", "expected_a_b", "?", 3]</span></pre>
 <pre><span class="lineno"><a href="#line_8647" id="line_8647"> 8647.</a></span><span class="count                ">    249</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8648" id="line_8648"> 8648.</a></span><span class="count                ">    249</span><span>            warn("expected_a_b", thing, "||", "?");</span></pre>
 <pre><span class="lineno"><a href="#line_8649" id="line_8649"> 8649.</a></span><span class="count                ">    249</span><span>        } else if (is_equal(thing.expression[0], thing.expression[2])) {</span></pre>
 <pre><span class="lineno"><a href="#line_8650" id="line_8650"> 8650.</a></span><span class="count                ">    249</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8651" id="line_8651"> 8651.</a></span><span class="count                ">    249</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_8652" id="line_8652"> 8652.</a></span><span class="count                ">    249</span><span>// ["aa?0:aa", "post_ternary", "expected_a_b", "?", 3]</span></pre>
+<pre><span class="lineno"><a href="#line_8652" id="line_8652"> 8652.</a></span><span class="count                ">    249</span><span>// ["aa?0:aa", "post_t_ternary", "expected_a_b", "?", 3]</span></pre>
 <pre><span class="lineno"><a href="#line_8653" id="line_8653"> 8653.</a></span><span class="count                ">    249</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8654" id="line_8654"> 8654.</a></span><span class="count                ">    249</span><span>            warn("expected_a_b", thing, "&amp;&amp;", "?");</span></pre>
 <pre><span class="lineno"><a href="#line_8655" id="line_8655"> 8655.</a></span><span class="count                ">    249</span><span>        } else if (</span></pre>
@@ -8823,7 +8823,7 @@ body {
 <pre><span class="lineno"><a href="#line_8658" id="line_8658"> 8658.</a></span><span class="count                ">    249</span><span>        ) {</span></pre>
 <pre><span class="lineno"><a href="#line_8659" id="line_8659"> 8659.</a></span><span class="count                ">    249</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8660" id="line_8660"> 8660.</a></span><span class="count                ">    249</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_8661" id="line_8661"> 8661.</a></span><span class="count                ">    249</span><span>// ["aa?true:false", "post_ternary", "expected_a_b", "?", 3]</span></pre>
+<pre><span class="lineno"><a href="#line_8661" id="line_8661"> 8661.</a></span><span class="count                ">    249</span><span>// ["aa?true:false", "post_t_ternary", "expected_a_b", "?", 3]</span></pre>
 <pre><span class="lineno"><a href="#line_8662" id="line_8662"> 8662.</a></span><span class="count                ">    249</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8663" id="line_8663"> 8663.</a></span><span class="count                ">    249</span><span>            warn("expected_a_b", thing, "Boolean(...)", "?");</span></pre>
 <pre><span class="lineno"><a href="#line_8664" id="line_8664"> 8664.</a></span><span class="count                ">    249</span><span>        } else if (</span></pre>
@@ -8832,7 +8832,7 @@ body {
 <pre><span class="lineno"><a href="#line_8667" id="line_8667"> 8667.</a></span><span class="count                ">    249</span><span>        ) {</span></pre>
 <pre><span class="lineno"><a href="#line_8668" id="line_8668"> 8668.</a></span><span class="count                ">    249</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8669" id="line_8669"> 8669.</a></span><span class="count                ">    249</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_8670" id="line_8670"> 8670.</a></span><span class="count                ">    249</span><span>// ["aa?false:true", "post_ternary", "expected_a_b", "?", 3]</span></pre>
+<pre><span class="lineno"><a href="#line_8670" id="line_8670"> 8670.</a></span><span class="count                ">    249</span><span>// ["aa?false:true", "post_t_ternary", "expected_a_b", "?", 3]</span></pre>
 <pre><span class="lineno"><a href="#line_8671" id="line_8671"> 8671.</a></span><span class="count                ">    249</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8672" id="line_8672"> 8672.</a></span><span class="count                ">    249</span><span>            warn("expected_a_b", thing, "!", "?");</span></pre>
 <pre><span class="lineno"><a href="#line_8673" id="line_8673"> 8673.</a></span><span class="count                ">    249</span><span>        } else if (</span></pre>
@@ -8844,62 +8844,62 @@ body {
 <pre><span class="lineno"><a href="#line_8679" id="line_8679"> 8679.</a></span><span class="count                ">    249</span><span>        ) {</span></pre>
 <pre><span class="lineno"><a href="#line_8680" id="line_8680"> 8680.</a></span><span class="count                ">    249</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8681" id="line_8681"> 8681.</a></span><span class="count                ">    249</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_8682" id="line_8682"> 8682.</a></span><span class="count                ">    249</span><span>// ["(aa&amp;&amp;!aa?0:1)", "post_ternary", "wrap_condition", "&amp;&amp;", 4]</span></pre>
+<pre><span class="lineno"><a href="#line_8682" id="line_8682"> 8682.</a></span><span class="count                ">    249</span><span>// ["(aa&amp;&amp;!aa?0:1)", "post_t_ternary", "wrap_condition", "&amp;&amp;", 4]</span></pre>
 <pre><span class="lineno"><a href="#line_8683" id="line_8683"> 8683.</a></span><span class="count                ">    249</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8684" id="line_8684"> 8684.</a></span><span class="count                ">    249</span><span>            warn("wrap_condition", thing.expression[0]);</span></pre>
 <pre><span class="lineno"><a href="#line_8685" id="line_8685"> 8685.</a></span><span class="count                ">    249</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_8686" id="line_8686"> 8686.</a></span><span class="count                ">    259</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_8687" id="line_8687"> 8687.</a></span><span class="count                ">    561</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8688" id="line_8688"> 8688.</a></span><span class="count                ">   4184</span><span>    function post_u(thing) {</span></pre>
-<pre><span class="lineno"><a href="#line_8689" id="line_8689"> 8689.</a></span><span class="count                ">    802</span><span>        if (thing.id === "`") {</span></pre>
-<pre><span class="lineno"><a href="#line_8690" id="line_8690"> 8690.</a></span><span class="count                ">    802</span><span>            if (thing.expression.every(function (thing) {</span></pre>
-<pre><span class="lineno"><a href="#line_8691" id="line_8691"> 8691.</a></span><span class="count                ">    802</span><span>                return thing.constant;</span></pre>
-<pre><span class="lineno"><a href="#line_8692" id="line_8692"> 8692.</a></span><span class="count                ">    802</span><span>            })) {</span></pre>
-<pre><span class="lineno"><a href="#line_8693" id="line_8693"> 8693.</a></span><span class="count                ">    802</span><span>                thing.constant = true;</span></pre>
-<pre><span class="lineno"><a href="#line_8694" id="line_8694"> 8694.</a></span><span class="count                ">    802</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_8695" id="line_8695"> 8695.</a></span><span class="count                ">   3382</span><span>        } else if (thing.id === "!") {</span></pre>
-<pre><span class="lineno"><a href="#line_8696" id="line_8696"> 8696.</a></span><span class="count                ">   3382</span><span>            if (thing.expression.constant === true) {</span></pre>
-<pre><span class="lineno"><a href="#line_8697" id="line_8697"> 8697.</a></span><span class="count                ">   3382</span><span>                warn("unexpected_a", thing);</span></pre>
-<pre><span class="lineno"><a href="#line_8698" id="line_8698"> 8698.</a></span><span class="count                ">   3382</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_8699" id="line_8699"> 8699.</a></span><span class="count                ">   3382</span><span>        } else if (thing.id === "!!") {</span></pre>
-<pre><span class="lineno"><a href="#line_8700" id="line_8700"> 8700.</a></span><span class="count                ">   3382</span><span>            if (!option_dict.convert) {</span></pre>
-<pre><span class="lineno"><a href="#line_8701" id="line_8701"> 8701.</a></span><span class="count                ">   3382</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8702" id="line_8702"> 8702.</a></span><span class="count                ">   3382</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_8703" id="line_8703"> 8703.</a></span><span class="count                ">   3382</span><span>// ["!!0", "post_u", "expected_a_b", "!!", 1]</span></pre>
-<pre><span class="lineno"><a href="#line_8704" id="line_8704"> 8704.</a></span><span class="count                ">   3382</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8705" id="line_8705"> 8705.</a></span><span class="count                ">   3382</span><span>                warn("expected_a_b", thing, "Boolean(...)", "!!");</span></pre>
-<pre><span class="lineno"><a href="#line_8706" id="line_8706"> 8706.</a></span><span class="count                ">   3382</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_8707" id="line_8707"> 8707.</a></span><span class="count                ">   3382</span><span>        } else if (</span></pre>
-<pre><span class="lineno"><a href="#line_8708" id="line_8708"> 8708.</a></span><span class="count                ">   3382</span><span>            thing.id !== "["</span></pre>
-<pre><span class="lineno"><a href="#line_8709" id="line_8709"> 8709.</a></span><span class="count                ">   3382</span><span>            &amp;&amp; thing.id !== "{"</span></pre>
-<pre><span class="lineno"><a href="#line_8710" id="line_8710"> 8710.</a></span><span class="count                ">   3382</span><span>            &amp;&amp; thing.id !== "function"</span></pre>
-<pre><span class="lineno"><a href="#line_8711" id="line_8711"> 8711.</a></span><span class="count                ">   3382</span><span>            &amp;&amp; thing.id !== "new"</span></pre>
-<pre><span class="lineno"><a href="#line_8712" id="line_8712"> 8712.</a></span><span class="count                ">   3382</span><span>        ) {</span></pre>
-<pre><span class="lineno"><a href="#line_8713" id="line_8713"> 8713.</a></span><span class="count                ">   3382</span><span>            if (thing.expression.constant === true) {</span></pre>
-<pre><span class="lineno"><a href="#line_8714" id="line_8714"> 8714.</a></span><span class="count                ">   3382</span><span>                thing.constant = true;</span></pre>
-<pre><span class="lineno"><a href="#line_8715" id="line_8715"> 8715.</a></span><span class="count                ">   3382</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_8716" id="line_8716"> 8716.</a></span><span class="count                ">   3382</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_8717" id="line_8717"> 8717.</a></span><span class="count                ">   4184</span><span>    }</span></pre>
-<pre><span class="lineno"><a href="#line_8718" id="line_8718"> 8718.</a></span><span class="count                ">    561</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8719" id="line_8719"> 8719.</a></span><span class="count                ">      7</span><span>    function post_u_plus(thing) {</span></pre>
-<pre><span class="lineno"><a href="#line_8720" id="line_8720"> 8720.</a></span><span class="count                ">      7</span><span>        const right = thing.expression;</span></pre>
-<pre><span class="lineno"><a href="#line_8721" id="line_8721"> 8721.</a></span><span class="count                ">      7</span><span>        if (!option_dict.convert) {</span></pre>
-<pre><span class="lineno"><a href="#line_8722" id="line_8722"> 8722.</a></span><span class="count                ">      7</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8723" id="line_8723"> 8723.</a></span><span class="count                ">      7</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_8724" id="line_8724"> 8724.</a></span><span class="count                ">      7</span><span>// ["aa=+0", "post_u_plus", "expected_a_b", "+", 4]</span></pre>
-<pre><span class="lineno"><a href="#line_8725" id="line_8725"> 8725.</a></span><span class="count                ">      7</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8726" id="line_8726"> 8726.</a></span><span class="count                ">      7</span><span>            warn("expected_a_b", thing, "Number(...)", "+");</span></pre>
-<pre><span class="lineno"><a href="#line_8727" id="line_8727"> 8727.</a></span><span class="count                ">      7</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_8728" id="line_8728"> 8728.</a></span><span class="count                ">      1</span><span>        if (right.id === "(" &amp;&amp; right.expression[0].id === "new") {</span></pre>
-<pre><span class="lineno"><a href="#line_8729" id="line_8729"> 8729.</a></span><span class="count                ">      1</span><span>            warn("unexpected_a_before_b", thing, "+", "new");</span></pre>
-<pre><span class="lineno"><a href="#line_8730" id="line_8730"> 8730.</a></span><span class="count                ">      6</span><span>        } else if (</span></pre>
-<pre><span class="lineno"><a href="#line_8731" id="line_8731"> 8731.</a></span><span class="count                ">      6</span><span>            right.constant</span></pre>
-<pre><span class="lineno"><a href="#line_8732" id="line_8732"> 8732.</a></span><span class="count                ">      6</span><span>            || right.id === "{"</span></pre>
-<pre><span class="lineno"><a href="#line_8733" id="line_8733"> 8733.</a></span><span class="count                ">      6</span><span>            || (right.id === "[" &amp;&amp; right.arity !== "binary")</span></pre>
-<pre><span class="lineno"><a href="#line_8734" id="line_8734"> 8734.</a></span><span class="count                ">      6</span><span>        ) {</span></pre>
-<pre><span class="lineno"><a href="#line_8735" id="line_8735"> 8735.</a></span><span class="count                ">      6</span><span>            warn("unexpected_a", thing, "+");</span></pre>
-<pre><span class="lineno"><a href="#line_8736" id="line_8736"> 8736.</a></span><span class="count                ">      6</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_8737" id="line_8737"> 8737.</a></span><span class="count                ">      7</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_8688" id="line_8688"> 8688.</a></span><span class="count                ">      7</span><span>    function post_u_plus(thing) {</span></pre>
+<pre><span class="lineno"><a href="#line_8689" id="line_8689"> 8689.</a></span><span class="count                ">      7</span><span>        const right = thing.expression;</span></pre>
+<pre><span class="lineno"><a href="#line_8690" id="line_8690"> 8690.</a></span><span class="count                ">      7</span><span>        if (!option_dict.convert) {</span></pre>
+<pre><span class="lineno"><a href="#line_8691" id="line_8691"> 8691.</a></span><span class="count                ">      7</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_8692" id="line_8692"> 8692.</a></span><span class="count                ">      7</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_8693" id="line_8693"> 8693.</a></span><span class="count                ">      7</span><span>// ["aa=+0", "post_u_plus", "expected_a_b", "+", 4]</span></pre>
+<pre><span class="lineno"><a href="#line_8694" id="line_8694"> 8694.</a></span><span class="count                ">      7</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_8695" id="line_8695"> 8695.</a></span><span class="count                ">      7</span><span>            warn("expected_a_b", thing, "Number(...)", "+");</span></pre>
+<pre><span class="lineno"><a href="#line_8696" id="line_8696"> 8696.</a></span><span class="count                ">      7</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_8697" id="line_8697"> 8697.</a></span><span class="count                ">      1</span><span>        if (right.id === "(" &amp;&amp; right.expression[0].id === "new") {</span></pre>
+<pre><span class="lineno"><a href="#line_8698" id="line_8698"> 8698.</a></span><span class="count                ">      1</span><span>            warn("unexpected_a_before_b", thing, "+", "new");</span></pre>
+<pre><span class="lineno"><a href="#line_8699" id="line_8699"> 8699.</a></span><span class="count                ">      6</span><span>        } else if (</span></pre>
+<pre><span class="lineno"><a href="#line_8700" id="line_8700"> 8700.</a></span><span class="count                ">      6</span><span>            right.constant</span></pre>
+<pre><span class="lineno"><a href="#line_8701" id="line_8701"> 8701.</a></span><span class="count                ">      6</span><span>            || right.id === "{"</span></pre>
+<pre><span class="lineno"><a href="#line_8702" id="line_8702"> 8702.</a></span><span class="count                ">      6</span><span>            || (right.id === "[" &amp;&amp; right.arity !== "binary")</span></pre>
+<pre><span class="lineno"><a href="#line_8703" id="line_8703"> 8703.</a></span><span class="count                ">      6</span><span>        ) {</span></pre>
+<pre><span class="lineno"><a href="#line_8704" id="line_8704"> 8704.</a></span><span class="count                ">      6</span><span>            warn("unexpected_a", thing, "+");</span></pre>
+<pre><span class="lineno"><a href="#line_8705" id="line_8705"> 8705.</a></span><span class="count                ">      6</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_8706" id="line_8706"> 8706.</a></span><span class="count                ">      7</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_8707" id="line_8707"> 8707.</a></span><span class="count                ">    561</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_8708" id="line_8708"> 8708.</a></span><span class="count                ">   4184</span><span>    function post_u_unary(thing) {</span></pre>
+<pre><span class="lineno"><a href="#line_8709" id="line_8709"> 8709.</a></span><span class="count                ">    802</span><span>        if (thing.id === "`") {</span></pre>
+<pre><span class="lineno"><a href="#line_8710" id="line_8710"> 8710.</a></span><span class="count                ">    802</span><span>            if (thing.expression.every(function (thing) {</span></pre>
+<pre><span class="lineno"><a href="#line_8711" id="line_8711"> 8711.</a></span><span class="count                ">    802</span><span>                return thing.constant;</span></pre>
+<pre><span class="lineno"><a href="#line_8712" id="line_8712"> 8712.</a></span><span class="count                ">    802</span><span>            })) {</span></pre>
+<pre><span class="lineno"><a href="#line_8713" id="line_8713"> 8713.</a></span><span class="count                ">    802</span><span>                thing.constant = true;</span></pre>
+<pre><span class="lineno"><a href="#line_8714" id="line_8714"> 8714.</a></span><span class="count                ">    802</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_8715" id="line_8715"> 8715.</a></span><span class="count                ">   3382</span><span>        } else if (thing.id === "!") {</span></pre>
+<pre><span class="lineno"><a href="#line_8716" id="line_8716"> 8716.</a></span><span class="count                ">   3382</span><span>            if (thing.expression.constant === true) {</span></pre>
+<pre><span class="lineno"><a href="#line_8717" id="line_8717"> 8717.</a></span><span class="count                ">   3382</span><span>                warn("unexpected_a", thing);</span></pre>
+<pre><span class="lineno"><a href="#line_8718" id="line_8718"> 8718.</a></span><span class="count                ">   3382</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_8719" id="line_8719"> 8719.</a></span><span class="count                ">   3382</span><span>        } else if (thing.id === "!!") {</span></pre>
+<pre><span class="lineno"><a href="#line_8720" id="line_8720"> 8720.</a></span><span class="count                ">   3382</span><span>            if (!option_dict.convert) {</span></pre>
+<pre><span class="lineno"><a href="#line_8721" id="line_8721"> 8721.</a></span><span class="count                ">   3382</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_8722" id="line_8722"> 8722.</a></span><span class="count                ">   3382</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_8723" id="line_8723"> 8723.</a></span><span class="count                ">   3382</span><span>// ["!!0", "post_u_unary", "expected_a_b", "!!", 1]</span></pre>
+<pre><span class="lineno"><a href="#line_8724" id="line_8724"> 8724.</a></span><span class="count                ">   3382</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_8725" id="line_8725"> 8725.</a></span><span class="count                ">   3382</span><span>                warn("expected_a_b", thing, "Boolean(...)", "!!");</span></pre>
+<pre><span class="lineno"><a href="#line_8726" id="line_8726"> 8726.</a></span><span class="count                ">   3382</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_8727" id="line_8727"> 8727.</a></span><span class="count                ">   3382</span><span>        } else if (</span></pre>
+<pre><span class="lineno"><a href="#line_8728" id="line_8728"> 8728.</a></span><span class="count                ">   3382</span><span>            thing.id !== "["</span></pre>
+<pre><span class="lineno"><a href="#line_8729" id="line_8729"> 8729.</a></span><span class="count                ">   3382</span><span>            &amp;&amp; thing.id !== "{"</span></pre>
+<pre><span class="lineno"><a href="#line_8730" id="line_8730"> 8730.</a></span><span class="count                ">   3382</span><span>            &amp;&amp; thing.id !== "function"</span></pre>
+<pre><span class="lineno"><a href="#line_8731" id="line_8731"> 8731.</a></span><span class="count                ">   3382</span><span>            &amp;&amp; thing.id !== "new"</span></pre>
+<pre><span class="lineno"><a href="#line_8732" id="line_8732"> 8732.</a></span><span class="count                ">   3382</span><span>        ) {</span></pre>
+<pre><span class="lineno"><a href="#line_8733" id="line_8733"> 8733.</a></span><span class="count                ">   3382</span><span>            if (thing.expression.constant === true) {</span></pre>
+<pre><span class="lineno"><a href="#line_8734" id="line_8734"> 8734.</a></span><span class="count                ">   3382</span><span>                thing.constant = true;</span></pre>
+<pre><span class="lineno"><a href="#line_8735" id="line_8735"> 8735.</a></span><span class="count                ">   3382</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_8736" id="line_8736"> 8736.</a></span><span class="count                ">   3382</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_8737" id="line_8737"> 8737.</a></span><span class="count                ">   4184</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_8738" id="line_8738"> 8738.</a></span><span class="count                ">    561</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8739" id="line_8739"> 8739.</a></span><span class="count                ">  36688</span><span>    function pre_a_bitwise(thing) {</span></pre>
 <pre><span class="lineno"><a href="#line_8740" id="line_8740"> 8740.</a></span><span class="count                ">  36688</span><span></span></pre>
@@ -9296,8 +9296,8 @@ body {
 <pre><span class="lineno"><a href="#line_9131" id="line_9131"> 9131.</a></span><span class="count                ">    561</span><span>    postaction("statement", "try", post_s_try);</span></pre>
 <pre><span class="lineno"><a href="#line_9132" id="line_9132"> 9132.</a></span><span class="count                ">    561</span><span>    postaction("statement", "var", post_s_var);</span></pre>
 <pre><span class="lineno"><a href="#line_9133" id="line_9133"> 9133.</a></span><span class="count                ">    561</span><span>    postaction("statement", "{", post_s_lbrace_pop_block);</span></pre>
-<pre><span class="lineno"><a href="#line_9134" id="line_9134"> 9134.</a></span><span class="count                ">    561</span><span>    postaction("ternary", "(all)", post_ternary);</span></pre>
-<pre><span class="lineno"><a href="#line_9135" id="line_9135"> 9135.</a></span><span class="count                ">    561</span><span>    postaction("unary", "(all)", post_u);</span></pre>
+<pre><span class="lineno"><a href="#line_9134" id="line_9134"> 9134.</a></span><span class="count                ">    561</span><span>    postaction("ternary", "(all)", post_t_ternary);</span></pre>
+<pre><span class="lineno"><a href="#line_9135" id="line_9135"> 9135.</a></span><span class="count                ">    561</span><span>    postaction("unary", "(all)", post_u_unary);</span></pre>
 <pre><span class="lineno"><a href="#line_9136" id="line_9136"> 9136.</a></span><span class="count                ">    561</span><span>    postaction("unary", "+", post_u_plus);</span></pre>
 <pre><span class="lineno"><a href="#line_9137" id="line_9137"> 9137.</a></span><span class="count                ">    561</span><span>    postaction("unary", "function", post_s_function);</span></pre>
 <pre><span class="lineno"><a href="#line_9138" id="line_9138"> 9138.</a></span><span class="count                ">    561</span><span>    preaction("assignment", "(all)", pre_a_bitwise);</span></pre>
