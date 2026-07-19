@@ -8054,50 +8054,55 @@ function jslint_phase4_walk(state) {
             return;
         }
 
-// Look up the variable, starting from current scope-context, moving out.
+// Look up the variable in the current context.
 
-        block_stack.some(function (blockage, ii) {
-            the_variable = blockage.context[id];
-            if (the_variable && ii > 0) {
-                the_variable.closure = true;
-            }
-            return the_variable;
-        });
-        if (!the_variable && !global_dict[id]) {
+        the_variable = blockage.context[id];
+
+// If it isn't local, search all the other contexts. If there are name
+// collisions, take the most recent.
+
+        if (!the_variable) {
+            block_stack.some(function (blockage) {
+                the_variable = blockage.context[id];
+                return the_variable;
+            });
+            if (!the_variable && !global_dict[id]) {
 
 // test_cause:
 // ["aa", "name_lookup", "undeclared_a", "aa", 1]
 // ["class aa{}", "name_lookup", "undeclared_a", "aa", 7]
 // ["try{}catch(aa){}aa", "name_lookup", "undeclared_a", "aa", 17]
 
-            warn("undeclared_a", thing);
-            return;
-        }
+                warn("undeclared_a", thing);
+                return;
+            }
 
 // If it isn't in any of those either, perhaps it is a predefined global.
 // If so, add it to the global context.
 
-        if (!the_variable) {
-            the_variable = {
+            if (!the_variable) {
+                the_variable = {
 
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
 
-                alive: true,
-                declared_scope: token_global,
-                id,
+                    alive: true,
+                    declared_scope: token_global,
+                    id,
 
 // 3.glo.3 - Mark 'init', the global-variable, immediately.
 
-                init: true,
-                readonly: true,
-                role: "variable"
-            };
-            token_global.context[id] = the_variable;
-        }
+                    init: true,
+                    readonly: true,
+                    role: "variable"
+                };
+                token_global.context[id] = the_variable;
+            }
+            the_variable.closure = true;
 
 // 3.glo.1 - Mark 'declared', the global-variable, immediately.
 
-        token_global.context[id] = the_variable;
+            token_global.context[id] = the_variable;
+        }
         if (the_variable?.role === "label") {
 
 // test_cause:
