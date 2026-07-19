@@ -843,8 +843,11 @@ https://github.com/jslint-org/jslint/issues.
 edition = "${jslint_edition}";
 ${String(message).slice(0, 2000)}`
     );
-    if (message === "test_internal_error") {
+    switch (message) {
+    case "test_internal_error":
+    case "unknown_warning_code=test_unknown_warning_code":
         error = {};
+        break;
     }
     console.error(error);
     throw error;
@@ -1397,21 +1400,21 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-    if (!state.mode_json) {
-        jslint_phase4_walk(state);
-    }
+if (!state.mode_json) {
+    jslint_phase4_walk(state);
+}
 
 // PHASE 5. Check whitespace between tokens in &lt;token_list&gt;.
 
-    if (!state.mode_json &amp;&amp; warning_list.length === 0) {
-        <span class="apidocCodeKeywordSpan">jslint_phase5_whitage</span>(state);
-    }
-    if (option_dict.test_internal_error) {
-        jslint_assert(undefined, "test_internal_error");
-    }
-} catch (err) {
-    mode_stop = true;
-    err.message = "[JSLint was unable to finish] " + err.message;
+if (!state.mode_json &amp;&amp; warning_list.length === 0) {
+    <span class="apidocCodeKeywordSpan">jslint_phase5_whitage</span>(state);
+}
+if (option_dict.test_internal_error) {
+    jslint_assert(undefined, "test_internal_error");
+}
+if (option_dict.test_unknown_warning_code) {
+    warn_at("test_unknown_warning_code");
+}
 ...</pre></li>
 
 <li>
