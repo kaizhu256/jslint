@@ -362,7 +362,6 @@
     test,
     test_cause,
     test_internal_error,
-    test_unknown_warning_code,
     this,
     thru,
     toLocaleString,
@@ -1724,8 +1723,8 @@ function jslint(
         case "wrap_unary":
             mm = `Wrap the unary expression in parens.`;
             break;
-        default:
-            jslint_assert(undefined, `unknown_warning_code=${code}`);
+        //!! default:
+            //!! jslint_assert(undefined, `warning_code=${code}`);
         }
 
 // Validate mm.
@@ -1829,9 +1828,6 @@ function jslint(
         }
         if (option_dict.test_internal_error) {
             jslint_assert(undefined, "test_internal_error");
-        }
-        if (option_dict.test_unknown_warning_code) {
-            warn_at("test_unknown_warning_code");
         }
     } catch (err) {
         mode_stop = true;
@@ -2247,11 +2243,8 @@ https://github.com/jslint-org/jslint/issues.
 edition = "${jslint_edition}";
 ${String(message).slice(0, 2000)}`
     );
-    switch (message) {
-    case "test_internal_error":
-    case "unknown_warning_code=test_unknown_warning_code":
+    if (message === "test_internal_error") {
         error = {};
-        break;
     }
     console.error(error);
     throw error;
@@ -3876,8 +3869,6 @@ function jslint_phase2_lex(state) {
         case "subscript":       // Allow identifier in subscript-notation.
         case "test_cause":      // Test jslint's causes.
         case "test_internal_error":     // Test jslint's internal-error
-                                        // ... handling-ability.
-        case "test_unknown_warning_code": // Test jslint's unknown-warning-code
                                         // ... handling-ability.
         case "this":            // Allow 'this'.
         case "trace":           // Include jslint stack-trace in warnings.

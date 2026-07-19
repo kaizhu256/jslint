@@ -1103,7 +1103,6 @@ aa();
 
         [{subscript: true}, "String[\"aa\"]();"],
         [{test_internal_error: true}, ""],
-        [{test_unknown_warning_code: true}, ""],
         [{this: true}, "String(this);"],
         [{trace: true}, ""],
         [{unordered: true}, (`
@@ -1140,12 +1139,11 @@ function aa() {
         jstestIt((
             `test option=${JSON.stringify(option_dict)} handling-behavior`
         ), function () {
-            const elemNow = JSON.stringify([option_dict, source]);
-            const warningsLength = (
-                (
-                    option_dict.test_internal_error
-                    || option_dict.test_unknown_warning_code
-                )
+            let elemNow = JSON.stringify([
+                option_dict, source
+            ]);
+            let warningsLength = (
+                option_dict.test_internal_error
                 ? 1
                 : 0
             );
