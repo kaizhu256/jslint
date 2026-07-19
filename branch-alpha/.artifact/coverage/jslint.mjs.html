@@ -4589,7 +4589,7 @@ body {
 <pre><span class="lineno"><a href="#line_4424" id="line_4424"> 4424.</a></span><span class="count                ">      4</span><span>            advance("(string)");</span></pre>
 <pre><span class="lineno"><a href="#line_4425" id="line_4425"> 4425.</a></span><span class="count                ">      4</span><span>            semicolon();</span></pre>
 <pre><span class="lineno"><a href="#line_4426" id="line_4426"> 4426.</a></span><span class="count                ">   5626</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_4427" id="line_4427"> 4427.</a></span><span class="count                ">   5626</span><span>        stmts = parse_statements();</span></pre>
+<pre><span class="lineno"><a href="#line_4427" id="line_4427"> 4427.</a></span><span class="count                ">   5626</span><span>        stmts = parse_statement_block();</span></pre>
 <pre><span class="lineno"><a href="#line_4428" id="line_4428"> 4428.</a></span><span class="count                ">   5626</span><span>        the_block.block = stmts;</span></pre>
 <pre><span class="lineno"><a href="#line_4429" id="line_4429"> 4429.</a></span><span class="count                ">   5626</span><span>        if (stmts.length === 0) {</span></pre>
 <pre><span class="lineno"><a href="#line_4430" id="line_4430"> 4430.</a></span><span class="count                ">     80</span><span>            if (!option_dict.devel &amp;&amp; special !== "ignore") {</span></pre>
@@ -5629,158 +5629,158 @@ body {
 <pre><span class="lineno"><a href="#line_5464" id="line_5464"> 5464.</a></span><span class="count                ">  12961</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_5465" id="line_5465"> 5465.</a></span><span class="count                ">  12961</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_5466" id="line_5466"> 5466.</a></span><span class="count                ">    668</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5467" id="line_5467"> 5467.</a></span><span class="count                ">  21086</span><span>    function parse_statement() {</span></pre>
-<pre><span class="lineno"><a href="#line_5468" id="line_5468"> 5468.</a></span><span class="count                ">  21086</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5469" id="line_5469"> 5469.</a></span><span class="count                ">  21086</span><span>// Parse a statement. Any statement may have a label, but only four statements</span></pre>
-<pre><span class="lineno"><a href="#line_5470" id="line_5470"> 5470.</a></span><span class="count                ">  21086</span><span>// have use for one. A statement can be one of the standard statements, or</span></pre>
-<pre><span class="lineno"><a href="#line_5471" id="line_5471"> 5471.</a></span><span class="count                ">  21086</span><span>// an assignment expression, or an invocation expression.</span></pre>
-<pre><span class="lineno"><a href="#line_5472" id="line_5472"> 5472.</a></span><span class="count                ">  21086</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5473" id="line_5473"> 5473.</a></span><span class="count                ">  21086</span><span>        let first;</span></pre>
-<pre><span class="lineno"><a href="#line_5474" id="line_5474"> 5474.</a></span><span class="count                ">  21086</span><span>        let the_label;</span></pre>
-<pre><span class="lineno"><a href="#line_5475" id="line_5475"> 5475.</a></span><span class="count                ">  21086</span><span>        let the_statement;</span></pre>
-<pre><span class="lineno"><a href="#line_5476" id="line_5476"> 5476.</a></span><span class="count                ">  21086</span><span>        let the_symbol;</span></pre>
-<pre><span class="lineno"><a href="#line_5477" id="line_5477"> 5477.</a></span><span class="count                ">  21086</span><span>        advance();</span></pre>
-<pre><span class="lineno"><a href="#line_5478" id="line_5478"> 5478.</a></span><span class="count                ">  20886</span><span>        if (token_now.identifier &amp;&amp; token_nxt.id === ":") {</span></pre>
-<pre><span class="lineno"><a href="#line_5479" id="line_5479"> 5479.</a></span><span class="count                ">     18</span><span>            the_label = token_now;</span></pre>
-<pre><span class="lineno"><a href="#line_5480" id="line_5480"> 5480.</a></span><span class="count                ">     18</span><span>            if (the_label.id === "ignore") {</span></pre>
-<pre><span class="lineno"><a href="#line_5481" id="line_5481"> 5481.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5482" id="line_5482"> 5482.</a></span><span class="count                ">     18</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_5483" id="line_5483"> 5483.</a></span><span class="count                ">     18</span><span>// ["ignore:", "parse_statement", "unexpected_a", "ignore", 1]</span></pre>
-<pre><span class="lineno"><a href="#line_5484" id="line_5484"> 5484.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5485" id="line_5485"> 5485.</a></span><span class="count                ">     18</span><span>                warn("unexpected_a", the_label);</span></pre>
-<pre><span class="lineno"><a href="#line_5486" id="line_5486"> 5486.</a></span><span class="count                ">     18</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_5487" id="line_5487"> 5487.</a></span><span class="count                ">     18</span><span>            advance(":");</span></pre>
-<pre><span class="lineno"><a href="#line_5488" id="line_5488"> 5488.</a></span><span class="count                ">     18</span><span>            switch (token_nxt.id) {</span></pre>
-<pre><span class="lineno"><a href="#line_5489" id="line_5489"> 5489.</a></span><span class="count                ">     18</span><span>            case "do":</span></pre>
-<pre><span class="lineno"><a href="#line_5490" id="line_5490"> 5490.</a></span><span class="count                ">     18</span><span>            case "for":</span></pre>
-<pre><span class="lineno"><a href="#line_5491" id="line_5491"> 5491.</a></span><span class="count                ">     18</span><span>            case "switch":</span></pre>
-<pre><span class="lineno"><a href="#line_5492" id="line_5492"> 5492.</a></span><span class="count                ">     18</span><span>            case "while":</span></pre>
-<pre><span class="lineno"><a href="#line_5493" id="line_5493"> 5493.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5494" id="line_5494"> 5494.</a></span><span class="count                ">     18</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_5495" id="line_5495"> 5495.</a></span><span class="count                ">     18</span><span>// ["aa:do", "parse_statement", "label", "do", 0]</span></pre>
-<pre><span class="lineno"><a href="#line_5496" id="line_5496"> 5496.</a></span><span class="count                ">     18</span><span>// ["aa:for", "parse_statement", "label", "for", 0]</span></pre>
-<pre><span class="lineno"><a href="#line_5497" id="line_5497"> 5497.</a></span><span class="count                ">     18</span><span>// ["aa:switch", "parse_statement", "label", "switch", 0]</span></pre>
-<pre><span class="lineno"><a href="#line_5498" id="line_5498"> 5498.</a></span><span class="count                ">     18</span><span>// ["aa:while", "parse_statement", "label", "while", 0]</span></pre>
-<pre><span class="lineno"><a href="#line_5499" id="line_5499"> 5499.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5500" id="line_5500"> 5500.</a></span><span class="count                ">     18</span><span>                test_cause("label", token_nxt.id);</span></pre>
-<pre><span class="lineno"><a href="#line_5501" id="line_5501"> 5501.</a></span><span class="count                ">     18</span><span>                name_declare(</span></pre>
-<pre><span class="lineno"><a href="#line_5502" id="line_5502"> 5502.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5503" id="line_5503"> 5503.</a></span><span class="count                ">     18</span><span>// 5.lab.1 - Mark 'declared', the label-statement, before control-flow-block.</span></pre>
-<pre><span class="lineno"><a href="#line_5504" id="line_5504"> 5504.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5505" id="line_5505"> 5505.</a></span><span class="count                ">     18</span><span>                    functionage,        // declared_scope</span></pre>
-<pre><span class="lineno"><a href="#line_5506" id="line_5506"> 5506.</a></span><span class="count                ">     18</span><span>                    "label",            // role</span></pre>
-<pre><span class="lineno"><a href="#line_5507" id="line_5507"> 5507.</a></span><span class="count                ">     18</span><span>                    true,               // readonly</span></pre>
-<pre><span class="lineno"><a href="#line_5508" id="line_5508"> 5508.</a></span><span class="count                ">     18</span><span>                    [],                 // name_list</span></pre>
-<pre><span class="lineno"><a href="#line_5509" id="line_5509"> 5509.</a></span><span class="count                ">     18</span><span>                    the_label,          // name</span></pre>
-<pre><span class="lineno"><a href="#line_5510" id="line_5510"> 5510.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5511" id="line_5511"> 5511.</a></span><span class="count                ">     18</span><span>// 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.</span></pre>
-<pre><span class="lineno"><a href="#line_5512" id="line_5512"> 5512.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5513" id="line_5513"> 5513.</a></span><span class="count                ">     18</span><span>                    true                // init</span></pre>
-<pre><span class="lineno"><a href="#line_5514" id="line_5514"> 5514.</a></span><span class="count                ">     18</span><span>                );</span></pre>
-<pre><span class="lineno"><a href="#line_5515" id="line_5515"> 5515.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5516" id="line_5516"> 5516.</a></span><span class="count                ">     18</span><span>// 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.</span></pre>
-<pre><span class="lineno"><a href="#line_5517" id="line_5517"> 5517.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5518" id="line_5518"> 5518.</a></span><span class="count                ">     18</span><span>                the_label.alive = true;</span></pre>
-<pre><span class="lineno"><a href="#line_5519" id="line_5519"> 5519.</a></span><span class="count                ">     18</span><span>                the_statement = parse_statement();</span></pre>
-<pre><span class="lineno"><a href="#line_5520" id="line_5520"> 5520.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5521" id="line_5521"> 5521.</a></span><span class="count                ">     18</span><span>// 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.</span></pre>
-<pre><span class="lineno"><a href="#line_5522" id="line_5522"> 5522.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5523" id="line_5523"> 5523.</a></span><span class="count                ">     18</span><span>                the_label.alive = false;</span></pre>
-<pre><span class="lineno"><a href="#line_5524" id="line_5524"> 5524.</a></span><span class="count                ">     18</span><span>                the_statement.label = the_label;</span></pre>
-<pre><span class="lineno"><a href="#line_5525" id="line_5525"> 5525.</a></span><span class="count                ">     18</span><span>                the_statement.statement = true;</span></pre>
-<pre><span class="lineno"><a href="#line_5526" id="line_5526"> 5526.</a></span><span class="count                ">     18</span><span>                functionage.statement_prv = the_statement;</span></pre>
-<pre><span class="lineno"><a href="#line_5527" id="line_5527"> 5527.</a></span><span class="count                ">     18</span><span>                return the_statement;</span></pre>
-<pre><span class="lineno"><a href="#line_5528" id="line_5528"> 5528.</a></span><span class="count                ">     18</span><span>            default:</span></pre>
-<pre><span class="lineno"><a href="#line_5529" id="line_5529"> 5529.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5530" id="line_5530"> 5530.</a></span><span class="count                ">     18</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_5531" id="line_5531"> 5531.</a></span><span class="count                ">     18</span><span>// ["()=&gt;{aa:0}", "parse_statement", "unexpected_label_a", "aa", 6]</span></pre>
-<pre><span class="lineno"><a href="#line_5532" id="line_5532"> 5532.</a></span><span class="count                ">     18</span><span>// [";{aa:0}", "parse_statement", "unexpected_label_a", "aa", 3]</span></pre>
-<pre><span class="lineno"><a href="#line_5533" id="line_5533"> 5533.</a></span><span class="count                ">     18</span><span>// ["aa:", "parse_statement", "unexpected_label_a", "aa", 1]</span></pre>
-<pre><span class="lineno"><a href="#line_5534" id="line_5534"> 5534.</a></span><span class="count                ">     18</span><span>// ["aa:0", "parse_statement", "unexpected_label_a", "aa", 1]</span></pre>
-<pre><span class="lineno"><a href="#line_5535" id="line_5535"> 5535.</a></span><span class="count                ">     18</span><span>// ["aa:0?0:0", "parse_statement", "unexpected_label_a", "aa", 1]</span></pre>
-<pre><span class="lineno"><a href="#line_5536" id="line_5536"> 5536.</a></span><span class="count                ">     18</span><span>// ["aa:bb:0", "parse_statement", "unexpected_label_a", "aa", 1]</span></pre>
-<pre><span class="lineno"><a href="#line_5537" id="line_5537"> 5537.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5538" id="line_5538"> 5538.</a></span><span class="count                ">     18</span><span>                warn("unexpected_label_a", the_label);</span></pre>
-<pre><span class="lineno"><a href="#line_5539" id="line_5539"> 5539.</a></span><span class="count                ">     18</span><span>                advance();</span></pre>
-<pre><span class="lineno"><a href="#line_5540" id="line_5540"> 5540.</a></span><span class="count                ">     18</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_5541" id="line_5541"> 5541.</a></span><span class="count                ">  21077</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_5542" id="line_5542"> 5542.</a></span><span class="count                ">  21077</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5543" id="line_5543"> 5543.</a></span><span class="count                ">  21077</span><span>// Parse the statement.</span></pre>
-<pre><span class="lineno"><a href="#line_5544" id="line_5544"> 5544.</a></span><span class="count                ">  21077</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5545" id="line_5545"> 5545.</a></span><span class="count                ">  21077</span><span>        first = token_now;</span></pre>
-<pre><span class="lineno"><a href="#line_5546" id="line_5546"> 5546.</a></span><span class="count                ">  21077</span><span>        first.statement = true;</span></pre>
-<pre><span class="lineno"><a href="#line_5547" id="line_5547"> 5547.</a></span><span class="count                ">  21077</span><span>        the_symbol = syntax_dict[first.id];</span></pre>
-<pre><span class="lineno"><a href="#line_5548" id="line_5548"> 5548.</a></span><span class="count                ">  21077</span><span>        if (</span></pre>
-<pre><span class="lineno"><a href="#line_5549" id="line_5549"> 5549.</a></span><span class="count                ">  21077</span><span>            the_symbol !== undefined</span></pre>
-<pre><span class="lineno"><a href="#line_5550" id="line_5550"> 5550.</a></span><span class="count                ">  21077</span><span>            &amp;&amp; the_symbol.fud_stmt !== undefined</span></pre>
-<pre><span class="lineno"><a href="#line_5551" id="line_5551"> 5551.</a></span><span class="count                ">  21086</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5552" id="line_5552"> 5552.</a></span><span class="count                ">  21086</span><span>// PR-318 - Bugfix - Fixes issues #316, #317 - dynamic-import().</span></pre>
-<pre><span class="lineno"><a href="#line_5553" id="line_5553"> 5553.</a></span><span class="count                ">  21086</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5554" id="line_5554"> 5554.</a></span><span class="count                ">  10401</span><span>            &amp;&amp; !(the_symbol.id === "import" &amp;&amp; token_nxt.id === "(")</span></pre>
-<pre><span class="lineno"><a href="#line_5555" id="line_5555"> 5555.</a></span><span class="count                ">  10400</span><span>        ) {</span></pre>
-<pre><span class="lineno"><a href="#line_5556" id="line_5556"> 5556.</a></span><span class="count                ">  10400</span><span>            the_symbol.disrupt = false;</span></pre>
-<pre><span class="lineno"><a href="#line_5557" id="line_5557"> 5557.</a></span><span class="count                ">  10400</span><span>            the_symbol.statement = true;</span></pre>
-<pre><span class="lineno"><a href="#line_5558" id="line_5558"> 5558.</a></span><span class="count                ">  10400</span><span>            token_now.arity = "statement";</span></pre>
-<pre><span class="lineno"><a href="#line_5559" id="line_5559"> 5559.</a></span><span class="count                ">  10400</span><span>            the_statement = the_symbol.fud_stmt();</span></pre>
-<pre><span class="lineno"><a href="#line_5560" id="line_5560"> 5560.</a></span><span class="count                ">  10677</span><span>        } else {</span></pre>
-<pre><span class="lineno"><a href="#line_5561" id="line_5561"> 5561.</a></span><span class="count                ">  10677</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5562" id="line_5562"> 5562.</a></span><span class="count                ">  10677</span><span>// It is an expression statement.</span></pre>
-<pre><span class="lineno"><a href="#line_5563" id="line_5563"> 5563.</a></span><span class="count                ">  10677</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5564" id="line_5564"> 5564.</a></span><span class="count                ">  10677</span><span>            the_statement = parse_expression(0, true);</span></pre>
-<pre><span class="lineno"><a href="#line_5565" id="line_5565"> 5565.</a></span><span class="count                ">  10677</span><span>            if (the_statement.wrapped &amp;&amp; the_statement.id !== "(") {</span></pre>
-<pre><span class="lineno"><a href="#line_5566" id="line_5566"> 5566.</a></span><span class="count                ">  10677</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5567" id="line_5567"> 5567.</a></span><span class="count                ">  10677</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_5568" id="line_5568"> 5568.</a></span><span class="count                ">  10677</span><span>// ["(0)", "parse_statement", "unexpected_a", "(", 1]</span></pre>
-<pre><span class="lineno"><a href="#line_5569" id="line_5569"> 5569.</a></span><span class="count                ">  10677</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5570" id="line_5570"> 5570.</a></span><span class="count                ">  10677</span><span>                warn("unexpected_a", first);</span></pre>
-<pre><span class="lineno"><a href="#line_5571" id="line_5571"> 5571.</a></span><span class="count                ">  10677</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_5572" id="line_5572"> 5572.</a></span><span class="count                ">  10677</span><span>            semicolon();</span></pre>
-<pre><span class="lineno"><a href="#line_5573" id="line_5573"> 5573.</a></span><span class="count                ">  20995</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_5574" id="line_5574"> 5574.</a></span><span class="count                ">  20995</span><span>        functionage.statement_prv = the_statement;</span></pre>
-<pre><span class="lineno"><a href="#line_5575" id="line_5575"> 5575.</a></span><span class="count                ">  20995</span><span>        return the_statement;</span></pre>
-<pre><span class="lineno"><a href="#line_5576" id="line_5576"> 5576.</a></span><span class="count                ">  20995</span><span>    }</span></pre>
-<pre><span class="lineno"><a href="#line_5577" id="line_5577"> 5577.</a></span><span class="count                ">    668</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5578" id="line_5578"> 5578.</a></span><span class="count                ">   7513</span><span>    function parse_statements() {</span></pre>
-<pre><span class="lineno"><a href="#line_5579" id="line_5579"> 5579.</a></span><span class="count                ">   7513</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5580" id="line_5580"> 5580.</a></span><span class="count                ">   7513</span><span>// Parse a list of statements. Give a warning if an unreachable statement</span></pre>
-<pre><span class="lineno"><a href="#line_5581" id="line_5581"> 5581.</a></span><span class="count                ">   7513</span><span>// follows a disruptive statement.</span></pre>
-<pre><span class="lineno"><a href="#line_5582" id="line_5582"> 5582.</a></span><span class="count                ">   7513</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5583" id="line_5583"> 5583.</a></span><span class="count                ">   7513</span><span>        const statement_list = [];</span></pre>
-<pre><span class="lineno"><a href="#line_5584" id="line_5584"> 5584.</a></span><span class="count                ">   7513</span><span>        let a_statement;</span></pre>
-<pre><span class="lineno"><a href="#line_5585" id="line_5585"> 5585.</a></span><span class="count                ">   7513</span><span>        let disrupt = false;</span></pre>
-<pre><span class="lineno"><a href="#line_5586" id="line_5586"> 5586.</a></span><span class="count                ">   7513</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5587" id="line_5587"> 5587.</a></span><span class="count                ">   7513</span><span>// Parse/loop each statement until a statement-terminator is reached.</span></pre>
-<pre><span class="lineno"><a href="#line_5588" id="line_5588"> 5588.</a></span><span class="count                ">   7513</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5589" id="line_5589"> 5589.</a></span><span class="count                ">  28259</span><span>        while (true) {</span></pre>
-<pre><span class="lineno"><a href="#line_5590" id="line_5590"> 5590.</a></span><span class="count                ">  28259</span><span>            switch (token_nxt.id) {</span></pre>
-<pre><span class="lineno"><a href="#line_5591" id="line_5591"> 5591.</a></span><span class="count                ">  28259</span><span>            case "(end)":</span></pre>
-<pre><span class="lineno"><a href="#line_5592" id="line_5592"> 5592.</a></span><span class="count                ">  28259</span><span>            case "case":</span></pre>
-<pre><span class="lineno"><a href="#line_5593" id="line_5593"> 5593.</a></span><span class="count                ">  28259</span><span>            case "default":</span></pre>
-<pre><span class="lineno"><a href="#line_5594" id="line_5594"> 5594.</a></span><span class="count                ">  28259</span><span>            case "else":</span></pre>
-<pre><span class="lineno"><a href="#line_5595" id="line_5595"> 5595.</a></span><span class="count                ">  28259</span><span>            case "}":</span></pre>
-<pre><span class="lineno"><a href="#line_5596" id="line_5596"> 5596.</a></span><span class="count                ">  28259</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5597" id="line_5597"> 5597.</a></span><span class="count                ">  28259</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_5598" id="line_5598"> 5598.</a></span><span class="count                ">  28259</span><span>// [";", "parse_statements", "closer", "", 0]</span></pre>
-<pre><span class="lineno"><a href="#line_5599" id="line_5599"> 5599.</a></span><span class="count                ">  28259</span><span>// ["case", "parse_statements", "closer", "", 0]</span></pre>
-<pre><span class="lineno"><a href="#line_5600" id="line_5600"> 5600.</a></span><span class="count                ">  28259</span><span>// ["default", "parse_statements", "closer", "", 0]</span></pre>
-<pre><span class="lineno"><a href="#line_5601" id="line_5601"> 5601.</a></span><span class="count                ">  28259</span><span>// ["else", "parse_statements", "closer", "", 0]</span></pre>
-<pre><span class="lineno"><a href="#line_5602" id="line_5602"> 5602.</a></span><span class="count                ">  28259</span><span>// ["}", "parse_statements", "closer", "", 0]</span></pre>
-<pre><span class="lineno"><a href="#line_5603" id="line_5603"> 5603.</a></span><span class="count                ">  28259</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5604" id="line_5604"> 5604.</a></span><span class="count                ">  28259</span><span>                test_cause("closer");</span></pre>
-<pre><span class="lineno"><a href="#line_5605" id="line_5605"> 5605.</a></span><span class="count                ">  28259</span><span>                return statement_list;</span></pre>
-<pre><span class="lineno"><a href="#line_5606" id="line_5606"> 5606.</a></span><span class="count                ">  28259</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_5607" id="line_5607"> 5607.</a></span><span class="count                ">  28259</span><span>            a_statement = parse_statement();</span></pre>
-<pre><span class="lineno"><a href="#line_5608" id="line_5608"> 5608.</a></span><span class="count                ">  28259</span><span>            statement_list.push(a_statement);</span></pre>
-<pre><span class="lineno"><a href="#line_5609" id="line_5609"> 5609.</a></span><span class="count                ">  28259</span><span>            if (disrupt) {</span></pre>
-<pre><span class="lineno"><a href="#line_5610" id="line_5610"> 5610.</a></span><span class="count                ">  28259</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5611" id="line_5611"> 5611.</a></span><span class="count                ">  28259</span><span>// test_cause:</span></pre>
-<pre><span class="lineno"><a href="#line_5612" id="line_5612"> 5612.</a></span><span class="count                ">  28259</span><span>// ["while(0){break;0}", "parse_statements", "unreachable_a", "0", 16]</span></pre>
-<pre><span class="lineno"><a href="#line_5613" id="line_5613"> 5613.</a></span><span class="count                ">  28259</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5614" id="line_5614"> 5614.</a></span><span class="count                ">  28259</span><span>                warn("unreachable_a", a_statement);</span></pre>
-<pre><span class="lineno"><a href="#line_5615" id="line_5615"> 5615.</a></span><span class="count                ">  28259</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_5616" id="line_5616"> 5616.</a></span><span class="count                ">  28259</span><span>            disrupt = a_statement.disrupt;</span></pre>
-<pre><span class="lineno"><a href="#line_5617" id="line_5617"> 5617.</a></span><span class="count                ">  28259</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_5618" id="line_5618"> 5618.</a></span><span class="count                ">   7513</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_5467" id="line_5467"> 5467.</a></span><span class="count                ">   7513</span><span>    function parse_statement_block() {</span></pre>
+<pre><span class="lineno"><a href="#line_5468" id="line_5468"> 5468.</a></span><span class="count                ">   7513</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5469" id="line_5469"> 5469.</a></span><span class="count                ">   7513</span><span>// Parse a list of statements. Give a warning if an unreachable statement</span></pre>
+<pre><span class="lineno"><a href="#line_5470" id="line_5470"> 5470.</a></span><span class="count                ">   7513</span><span>// follows a disruptive statement.</span></pre>
+<pre><span class="lineno"><a href="#line_5471" id="line_5471"> 5471.</a></span><span class="count                ">   7513</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5472" id="line_5472"> 5472.</a></span><span class="count                ">   7513</span><span>        const statement_list = [];</span></pre>
+<pre><span class="lineno"><a href="#line_5473" id="line_5473"> 5473.</a></span><span class="count                ">   7513</span><span>        let a_statement;</span></pre>
+<pre><span class="lineno"><a href="#line_5474" id="line_5474"> 5474.</a></span><span class="count                ">   7513</span><span>        let disrupt = false;</span></pre>
+<pre><span class="lineno"><a href="#line_5475" id="line_5475"> 5475.</a></span><span class="count                ">   7513</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5476" id="line_5476"> 5476.</a></span><span class="count                ">   7513</span><span>// Parse/loop each statement until a statement-terminator is reached.</span></pre>
+<pre><span class="lineno"><a href="#line_5477" id="line_5477"> 5477.</a></span><span class="count                ">   7513</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5478" id="line_5478"> 5478.</a></span><span class="count                ">  28259</span><span>        while (true) {</span></pre>
+<pre><span class="lineno"><a href="#line_5479" id="line_5479"> 5479.</a></span><span class="count                ">  28259</span><span>            switch (token_nxt.id) {</span></pre>
+<pre><span class="lineno"><a href="#line_5480" id="line_5480"> 5480.</a></span><span class="count                ">  28259</span><span>            case "(end)":</span></pre>
+<pre><span class="lineno"><a href="#line_5481" id="line_5481"> 5481.</a></span><span class="count                ">  28259</span><span>            case "case":</span></pre>
+<pre><span class="lineno"><a href="#line_5482" id="line_5482"> 5482.</a></span><span class="count                ">  28259</span><span>            case "default":</span></pre>
+<pre><span class="lineno"><a href="#line_5483" id="line_5483"> 5483.</a></span><span class="count                ">  28259</span><span>            case "else":</span></pre>
+<pre><span class="lineno"><a href="#line_5484" id="line_5484"> 5484.</a></span><span class="count                ">  28259</span><span>            case "}":</span></pre>
+<pre><span class="lineno"><a href="#line_5485" id="line_5485"> 5485.</a></span><span class="count                ">  28259</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5486" id="line_5486"> 5486.</a></span><span class="count                ">  28259</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_5487" id="line_5487"> 5487.</a></span><span class="count                ">  28259</span><span>// [";", "parse_statement_block", "closer", "", 0]</span></pre>
+<pre><span class="lineno"><a href="#line_5488" id="line_5488"> 5488.</a></span><span class="count                ">  28259</span><span>// ["case", "parse_statement_block", "closer", "", 0]</span></pre>
+<pre><span class="lineno"><a href="#line_5489" id="line_5489"> 5489.</a></span><span class="count                ">  28259</span><span>// ["default", "parse_statement_block", "closer", "", 0]</span></pre>
+<pre><span class="lineno"><a href="#line_5490" id="line_5490"> 5490.</a></span><span class="count                ">  28259</span><span>// ["else", "parse_statement_block", "closer", "", 0]</span></pre>
+<pre><span class="lineno"><a href="#line_5491" id="line_5491"> 5491.</a></span><span class="count                ">  28259</span><span>// ["}", "parse_statement_block", "closer", "", 0]</span></pre>
+<pre><span class="lineno"><a href="#line_5492" id="line_5492"> 5492.</a></span><span class="count                ">  28259</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5493" id="line_5493"> 5493.</a></span><span class="count                ">  28259</span><span>                test_cause("closer");</span></pre>
+<pre><span class="lineno"><a href="#line_5494" id="line_5494"> 5494.</a></span><span class="count                ">  28259</span><span>                return statement_list;</span></pre>
+<pre><span class="lineno"><a href="#line_5495" id="line_5495"> 5495.</a></span><span class="count                ">  28259</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_5496" id="line_5496"> 5496.</a></span><span class="count                ">  28259</span><span>            a_statement = parse_statement_single();</span></pre>
+<pre><span class="lineno"><a href="#line_5497" id="line_5497"> 5497.</a></span><span class="count                ">  28259</span><span>            statement_list.push(a_statement);</span></pre>
+<pre><span class="lineno"><a href="#line_5498" id="line_5498"> 5498.</a></span><span class="count                ">  28259</span><span>            if (disrupt) {</span></pre>
+<pre><span class="lineno"><a href="#line_5499" id="line_5499"> 5499.</a></span><span class="count                ">  28259</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5500" id="line_5500"> 5500.</a></span><span class="count                ">  28259</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_5501" id="line_5501"> 5501.</a></span><span class="count                ">  28259</span><span>// ["while(0){break;0}", "parse_statement_block", "unreachable_a", "0", 16]</span></pre>
+<pre><span class="lineno"><a href="#line_5502" id="line_5502"> 5502.</a></span><span class="count                ">  28259</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5503" id="line_5503"> 5503.</a></span><span class="count                ">  28259</span><span>                warn("unreachable_a", a_statement);</span></pre>
+<pre><span class="lineno"><a href="#line_5504" id="line_5504"> 5504.</a></span><span class="count                ">  28259</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_5505" id="line_5505"> 5505.</a></span><span class="count                ">  28259</span><span>            disrupt = a_statement.disrupt;</span></pre>
+<pre><span class="lineno"><a href="#line_5506" id="line_5506"> 5506.</a></span><span class="count                ">  28259</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_5507" id="line_5507"> 5507.</a></span><span class="count                ">   7513</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_5508" id="line_5508"> 5508.</a></span><span class="count                ">    668</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5509" id="line_5509"> 5509.</a></span><span class="count                ">  21086</span><span>    function parse_statement_single() {</span></pre>
+<pre><span class="lineno"><a href="#line_5510" id="line_5510"> 5510.</a></span><span class="count                ">  21086</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5511" id="line_5511"> 5511.</a></span><span class="count                ">  21086</span><span>// Parse a statement. Any statement may have a label, but only four statements</span></pre>
+<pre><span class="lineno"><a href="#line_5512" id="line_5512"> 5512.</a></span><span class="count                ">  21086</span><span>// have use for one. A statement can be one of the standard statements, or</span></pre>
+<pre><span class="lineno"><a href="#line_5513" id="line_5513"> 5513.</a></span><span class="count                ">  21086</span><span>// an assignment expression, or an invocation expression.</span></pre>
+<pre><span class="lineno"><a href="#line_5514" id="line_5514"> 5514.</a></span><span class="count                ">  21086</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5515" id="line_5515"> 5515.</a></span><span class="count                ">  21086</span><span>        let first;</span></pre>
+<pre><span class="lineno"><a href="#line_5516" id="line_5516"> 5516.</a></span><span class="count                ">  21086</span><span>        let the_label;</span></pre>
+<pre><span class="lineno"><a href="#line_5517" id="line_5517"> 5517.</a></span><span class="count                ">  21086</span><span>        let the_statement;</span></pre>
+<pre><span class="lineno"><a href="#line_5518" id="line_5518"> 5518.</a></span><span class="count                ">  21086</span><span>        let the_symbol;</span></pre>
+<pre><span class="lineno"><a href="#line_5519" id="line_5519"> 5519.</a></span><span class="count                ">  21086</span><span>        advance();</span></pre>
+<pre><span class="lineno"><a href="#line_5520" id="line_5520"> 5520.</a></span><span class="count                ">  20886</span><span>        if (token_now.identifier &amp;&amp; token_nxt.id === ":") {</span></pre>
+<pre><span class="lineno"><a href="#line_5521" id="line_5521"> 5521.</a></span><span class="count                ">     18</span><span>            the_label = token_now;</span></pre>
+<pre><span class="lineno"><a href="#line_5522" id="line_5522"> 5522.</a></span><span class="count                ">     18</span><span>            if (the_label.id === "ignore") {</span></pre>
+<pre><span class="lineno"><a href="#line_5523" id="line_5523"> 5523.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5524" id="line_5524"> 5524.</a></span><span class="count                ">     18</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_5525" id="line_5525"> 5525.</a></span><span class="count                ">     18</span><span>// ["ignore:", "parse_statement_single", "unexpected_a", "ignore", 1]</span></pre>
+<pre><span class="lineno"><a href="#line_5526" id="line_5526"> 5526.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5527" id="line_5527"> 5527.</a></span><span class="count                ">     18</span><span>                warn("unexpected_a", the_label);</span></pre>
+<pre><span class="lineno"><a href="#line_5528" id="line_5528"> 5528.</a></span><span class="count                ">     18</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_5529" id="line_5529"> 5529.</a></span><span class="count                ">     18</span><span>            advance(":");</span></pre>
+<pre><span class="lineno"><a href="#line_5530" id="line_5530"> 5530.</a></span><span class="count                ">     18</span><span>            switch (token_nxt.id) {</span></pre>
+<pre><span class="lineno"><a href="#line_5531" id="line_5531"> 5531.</a></span><span class="count                ">     18</span><span>            case "do":</span></pre>
+<pre><span class="lineno"><a href="#line_5532" id="line_5532"> 5532.</a></span><span class="count                ">     18</span><span>            case "for":</span></pre>
+<pre><span class="lineno"><a href="#line_5533" id="line_5533"> 5533.</a></span><span class="count                ">     18</span><span>            case "switch":</span></pre>
+<pre><span class="lineno"><a href="#line_5534" id="line_5534"> 5534.</a></span><span class="count                ">     18</span><span>            case "while":</span></pre>
+<pre><span class="lineno"><a href="#line_5535" id="line_5535"> 5535.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5536" id="line_5536"> 5536.</a></span><span class="count                ">     18</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_5537" id="line_5537"> 5537.</a></span><span class="count                ">     18</span><span>// ["aa:do", "parse_statement_single", "label", "do", 0]</span></pre>
+<pre><span class="lineno"><a href="#line_5538" id="line_5538"> 5538.</a></span><span class="count                ">     18</span><span>// ["aa:for", "parse_statement_single", "label", "for", 0]</span></pre>
+<pre><span class="lineno"><a href="#line_5539" id="line_5539"> 5539.</a></span><span class="count                ">     18</span><span>// ["aa:switch", "parse_statement_single", "label", "switch", 0]</span></pre>
+<pre><span class="lineno"><a href="#line_5540" id="line_5540"> 5540.</a></span><span class="count                ">     18</span><span>// ["aa:while", "parse_statement_single", "label", "while", 0]</span></pre>
+<pre><span class="lineno"><a href="#line_5541" id="line_5541"> 5541.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5542" id="line_5542"> 5542.</a></span><span class="count                ">     18</span><span>                test_cause("label", token_nxt.id);</span></pre>
+<pre><span class="lineno"><a href="#line_5543" id="line_5543"> 5543.</a></span><span class="count                ">     18</span><span>                name_declare(</span></pre>
+<pre><span class="lineno"><a href="#line_5544" id="line_5544"> 5544.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5545" id="line_5545"> 5545.</a></span><span class="count                ">     18</span><span>// 5.lab.1 - Mark 'declared', the label-statement, before control-flow-block.</span></pre>
+<pre><span class="lineno"><a href="#line_5546" id="line_5546"> 5546.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5547" id="line_5547"> 5547.</a></span><span class="count                ">     18</span><span>                    functionage,        // declared_scope</span></pre>
+<pre><span class="lineno"><a href="#line_5548" id="line_5548"> 5548.</a></span><span class="count                ">     18</span><span>                    "label",            // role</span></pre>
+<pre><span class="lineno"><a href="#line_5549" id="line_5549"> 5549.</a></span><span class="count                ">     18</span><span>                    true,               // readonly</span></pre>
+<pre><span class="lineno"><a href="#line_5550" id="line_5550"> 5550.</a></span><span class="count                ">     18</span><span>                    [],                 // name_list</span></pre>
+<pre><span class="lineno"><a href="#line_5551" id="line_5551"> 5551.</a></span><span class="count                ">     18</span><span>                    the_label,          // name</span></pre>
+<pre><span class="lineno"><a href="#line_5552" id="line_5552"> 5552.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5553" id="line_5553"> 5553.</a></span><span class="count                ">     18</span><span>// 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.</span></pre>
+<pre><span class="lineno"><a href="#line_5554" id="line_5554"> 5554.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5555" id="line_5555"> 5555.</a></span><span class="count                ">     18</span><span>                    true                // init</span></pre>
+<pre><span class="lineno"><a href="#line_5556" id="line_5556"> 5556.</a></span><span class="count                ">     18</span><span>                );</span></pre>
+<pre><span class="lineno"><a href="#line_5557" id="line_5557"> 5557.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5558" id="line_5558"> 5558.</a></span><span class="count                ">     18</span><span>// 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.</span></pre>
+<pre><span class="lineno"><a href="#line_5559" id="line_5559"> 5559.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5560" id="line_5560"> 5560.</a></span><span class="count                ">     18</span><span>                the_label.alive = true;</span></pre>
+<pre><span class="lineno"><a href="#line_5561" id="line_5561"> 5561.</a></span><span class="count                ">     18</span><span>                the_statement = parse_statement_single();</span></pre>
+<pre><span class="lineno"><a href="#line_5562" id="line_5562"> 5562.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5563" id="line_5563"> 5563.</a></span><span class="count                ">     18</span><span>// 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.</span></pre>
+<pre><span class="lineno"><a href="#line_5564" id="line_5564"> 5564.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5565" id="line_5565"> 5565.</a></span><span class="count                ">     18</span><span>                the_label.alive = false;</span></pre>
+<pre><span class="lineno"><a href="#line_5566" id="line_5566"> 5566.</a></span><span class="count                ">     18</span><span>                the_statement.label = the_label;</span></pre>
+<pre><span class="lineno"><a href="#line_5567" id="line_5567"> 5567.</a></span><span class="count                ">     18</span><span>                the_statement.statement = true;</span></pre>
+<pre><span class="lineno"><a href="#line_5568" id="line_5568"> 5568.</a></span><span class="count                ">     18</span><span>                functionage.statement_prv = the_statement;</span></pre>
+<pre><span class="lineno"><a href="#line_5569" id="line_5569"> 5569.</a></span><span class="count                ">     18</span><span>                return the_statement;</span></pre>
+<pre><span class="lineno"><a href="#line_5570" id="line_5570"> 5570.</a></span><span class="count                ">     18</span><span>            default:</span></pre>
+<pre><span class="lineno"><a href="#line_5571" id="line_5571"> 5571.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5572" id="line_5572"> 5572.</a></span><span class="count                ">     18</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_5573" id="line_5573"> 5573.</a></span><span class="count                ">     18</span><span>// ["()=&gt;{aa:0}", "parse_statement_single", "unexpected_label_a", "aa", 6]</span></pre>
+<pre><span class="lineno"><a href="#line_5574" id="line_5574"> 5574.</a></span><span class="count                ">     18</span><span>// [";{aa:0}", "parse_statement_single", "unexpected_label_a", "aa", 3]</span></pre>
+<pre><span class="lineno"><a href="#line_5575" id="line_5575"> 5575.</a></span><span class="count                ">     18</span><span>// ["aa:", "parse_statement_single", "unexpected_label_a", "aa", 1]</span></pre>
+<pre><span class="lineno"><a href="#line_5576" id="line_5576"> 5576.</a></span><span class="count                ">     18</span><span>// ["aa:0", "parse_statement_single", "unexpected_label_a", "aa", 1]</span></pre>
+<pre><span class="lineno"><a href="#line_5577" id="line_5577"> 5577.</a></span><span class="count                ">     18</span><span>// ["aa:0?0:0", "parse_statement_single", "unexpected_label_a", "aa", 1]</span></pre>
+<pre><span class="lineno"><a href="#line_5578" id="line_5578"> 5578.</a></span><span class="count                ">     18</span><span>// ["aa:bb:0", "parse_statement_single", "unexpected_label_a", "aa", 1]</span></pre>
+<pre><span class="lineno"><a href="#line_5579" id="line_5579"> 5579.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5580" id="line_5580"> 5580.</a></span><span class="count                ">     18</span><span>                warn("unexpected_label_a", the_label);</span></pre>
+<pre><span class="lineno"><a href="#line_5581" id="line_5581"> 5581.</a></span><span class="count                ">     18</span><span>                advance();</span></pre>
+<pre><span class="lineno"><a href="#line_5582" id="line_5582"> 5582.</a></span><span class="count                ">     18</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_5583" id="line_5583"> 5583.</a></span><span class="count                ">  21077</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_5584" id="line_5584"> 5584.</a></span><span class="count                ">  21077</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5585" id="line_5585"> 5585.</a></span><span class="count                ">  21077</span><span>// Parse the statement.</span></pre>
+<pre><span class="lineno"><a href="#line_5586" id="line_5586"> 5586.</a></span><span class="count                ">  21077</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5587" id="line_5587"> 5587.</a></span><span class="count                ">  21077</span><span>        first = token_now;</span></pre>
+<pre><span class="lineno"><a href="#line_5588" id="line_5588"> 5588.</a></span><span class="count                ">  21077</span><span>        first.statement = true;</span></pre>
+<pre><span class="lineno"><a href="#line_5589" id="line_5589"> 5589.</a></span><span class="count                ">  21077</span><span>        the_symbol = syntax_dict[first.id];</span></pre>
+<pre><span class="lineno"><a href="#line_5590" id="line_5590"> 5590.</a></span><span class="count                ">  21077</span><span>        if (</span></pre>
+<pre><span class="lineno"><a href="#line_5591" id="line_5591"> 5591.</a></span><span class="count                ">  21077</span><span>            the_symbol !== undefined</span></pre>
+<pre><span class="lineno"><a href="#line_5592" id="line_5592"> 5592.</a></span><span class="count                ">  21077</span><span>            &amp;&amp; the_symbol.fud_stmt !== undefined</span></pre>
+<pre><span class="lineno"><a href="#line_5593" id="line_5593"> 5593.</a></span><span class="count                ">  21086</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5594" id="line_5594"> 5594.</a></span><span class="count                ">  21086</span><span>// PR-318 - Bugfix - Fixes issues #316, #317 - dynamic-import().</span></pre>
+<pre><span class="lineno"><a href="#line_5595" id="line_5595"> 5595.</a></span><span class="count                ">  21086</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5596" id="line_5596"> 5596.</a></span><span class="count                ">  10401</span><span>            &amp;&amp; !(the_symbol.id === "import" &amp;&amp; token_nxt.id === "(")</span></pre>
+<pre><span class="lineno"><a href="#line_5597" id="line_5597"> 5597.</a></span><span class="count                ">  10400</span><span>        ) {</span></pre>
+<pre><span class="lineno"><a href="#line_5598" id="line_5598"> 5598.</a></span><span class="count                ">  10400</span><span>            the_symbol.disrupt = false;</span></pre>
+<pre><span class="lineno"><a href="#line_5599" id="line_5599"> 5599.</a></span><span class="count                ">  10400</span><span>            the_symbol.statement = true;</span></pre>
+<pre><span class="lineno"><a href="#line_5600" id="line_5600"> 5600.</a></span><span class="count                ">  10400</span><span>            token_now.arity = "statement";</span></pre>
+<pre><span class="lineno"><a href="#line_5601" id="line_5601"> 5601.</a></span><span class="count                ">  10400</span><span>            the_statement = the_symbol.fud_stmt();</span></pre>
+<pre><span class="lineno"><a href="#line_5602" id="line_5602"> 5602.</a></span><span class="count                ">  10677</span><span>        } else {</span></pre>
+<pre><span class="lineno"><a href="#line_5603" id="line_5603"> 5603.</a></span><span class="count                ">  10677</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5604" id="line_5604"> 5604.</a></span><span class="count                ">  10677</span><span>// It is an expression statement.</span></pre>
+<pre><span class="lineno"><a href="#line_5605" id="line_5605"> 5605.</a></span><span class="count                ">  10677</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5606" id="line_5606"> 5606.</a></span><span class="count                ">  10677</span><span>            the_statement = parse_expression(0, true);</span></pre>
+<pre><span class="lineno"><a href="#line_5607" id="line_5607"> 5607.</a></span><span class="count                ">  10677</span><span>            if (the_statement.wrapped &amp;&amp; the_statement.id !== "(") {</span></pre>
+<pre><span class="lineno"><a href="#line_5608" id="line_5608"> 5608.</a></span><span class="count                ">  10677</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5609" id="line_5609"> 5609.</a></span><span class="count                ">  10677</span><span>// test_cause:</span></pre>
+<pre><span class="lineno"><a href="#line_5610" id="line_5610"> 5610.</a></span><span class="count                ">  10677</span><span>// ["(0)", "parse_statement_single", "unexpected_a", "(", 1]</span></pre>
+<pre><span class="lineno"><a href="#line_5611" id="line_5611"> 5611.</a></span><span class="count                ">  10677</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5612" id="line_5612"> 5612.</a></span><span class="count                ">  10677</span><span>                warn("unexpected_a", first);</span></pre>
+<pre><span class="lineno"><a href="#line_5613" id="line_5613"> 5613.</a></span><span class="count                ">  10677</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_5614" id="line_5614"> 5614.</a></span><span class="count                ">  10677</span><span>            semicolon();</span></pre>
+<pre><span class="lineno"><a href="#line_5615" id="line_5615"> 5615.</a></span><span class="count                ">  20995</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_5616" id="line_5616"> 5616.</a></span><span class="count                ">  20995</span><span>        functionage.statement_prv = the_statement;</span></pre>
+<pre><span class="lineno"><a href="#line_5617" id="line_5617"> 5617.</a></span><span class="count                ">  20995</span><span>        return the_statement;</span></pre>
+<pre><span class="lineno"><a href="#line_5618" id="line_5618"> 5618.</a></span><span class="count                ">  20995</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_5619" id="line_5619"> 5619.</a></span><span class="count                ">    668</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5620" id="line_5620"> 5620.</a></span><span class="count                ">   1336</span><span>    function postassign(id) {</span></pre>
 <pre><span class="lineno"><a href="#line_5621" id="line_5621"> 5621.</a></span><span class="count                ">   1336</span><span></span></pre>
@@ -6910,7 +6910,7 @@ body {
 <pre><span class="lineno"><a href="#line_6745" id="line_6745"> 6745.</a></span><span class="count                ">     13</span><span>// ["export function aa(){}", "stmt_export", "freeze_exports", "function", 8]</span></pre>
 <pre><span class="lineno"><a href="#line_6746" id="line_6746"> 6746.</a></span><span class="count                ">     13</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6747" id="line_6747"> 6747.</a></span><span class="count                ">     13</span><span>                warn("freeze_exports");</span></pre>
-<pre><span class="lineno"><a href="#line_6748" id="line_6748"> 6748.</a></span><span class="count                ">     13</span><span>                the_thing = parse_statement();</span></pre>
+<pre><span class="lineno"><a href="#line_6748" id="line_6748"> 6748.</a></span><span class="count                ">     13</span><span>                the_thing = parse_statement_single();</span></pre>
 <pre><span class="lineno"><a href="#line_6749" id="line_6749"> 6749.</a></span><span class="count                ">     13</span><span>                the_name = the_thing.name;</span></pre>
 <pre><span class="lineno"><a href="#line_6750" id="line_6750"> 6750.</a></span><span class="count                ">     13</span><span>                the_id = the_name.id;</span></pre>
 <pre><span class="lineno"><a href="#line_6751" id="line_6751"> 6751.</a></span><span class="count                ">     13</span><span>                the_name.used = true;</span></pre>
@@ -6939,7 +6939,7 @@ body {
 <pre><span class="lineno"><a href="#line_6774" id="line_6774"> 6774.</a></span><span class="count                ">     13</span><span>// ["export var", "stmt_export", "unexpected_a", "var", 8]</span></pre>
 <pre><span class="lineno"><a href="#line_6775" id="line_6775"> 6775.</a></span><span class="count                ">     13</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6776" id="line_6776"> 6776.</a></span><span class="count                ">     13</span><span>                warn("unexpected_a");</span></pre>
-<pre><span class="lineno"><a href="#line_6777" id="line_6777"> 6777.</a></span><span class="count                ">     13</span><span>                parse_statement();</span></pre>
+<pre><span class="lineno"><a href="#line_6777" id="line_6777"> 6777.</a></span><span class="count                ">     13</span><span>                parse_statement_single();</span></pre>
 <pre><span class="lineno"><a href="#line_6778" id="line_6778"> 6778.</a></span><span class="count                ">     13</span><span>            } else if (token_nxt.id === "{") {</span></pre>
 <pre><span class="lineno"><a href="#line_6779" id="line_6779"> 6779.</a></span><span class="count                ">     13</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6780" id="line_6780"> 6780.</a></span><span class="count                ">     13</span><span>// test_cause:</span></pre>
@@ -7094,7 +7094,7 @@ body {
 <pre><span class="lineno"><a href="#line_6929" id="line_6929"> 6929.</a></span><span class="count                ">    467</span><span>            the_else = token_now;</span></pre>
 <pre><span class="lineno"><a href="#line_6930" id="line_6930"> 6930.</a></span><span class="count                ">    467</span><span>            the_if.else = (</span></pre>
 <pre><span class="lineno"><a href="#line_6931" id="line_6931"> 6931.</a></span><span class="count                ">    467</span><span>                token_nxt.id === "if"</span></pre>
-<pre><span class="lineno"><a href="#line_6932" id="line_6932"> 6932.</a></span><span class="count                ">    467</span><span>                ? parse_statement()</span></pre>
+<pre><span class="lineno"><a href="#line_6932" id="line_6932"> 6932.</a></span><span class="count                ">    467</span><span>                ? parse_statement_single()</span></pre>
 <pre><span class="lineno"><a href="#line_6933" id="line_6933"> 6933.</a></span><span class="count                ">    467</span><span>                : block()</span></pre>
 <pre><span class="lineno"><a href="#line_6934" id="line_6934"> 6934.</a></span><span class="count                ">    467</span><span>            );</span></pre>
 <pre><span class="lineno"><a href="#line_6935" id="line_6935"> 6935.</a></span><span class="count                ">    467</span><span></span></pre>
@@ -7390,7 +7390,7 @@ body {
 <pre><span class="lineno"><a href="#line_7225" id="line_7225"> 7225.</a></span><span class="count                ">   1142</span><span>// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 24]</span></pre>
 <pre><span class="lineno"><a href="#line_7226" id="line_7226"> 7226.</a></span><span class="count                ">   1142</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7227" id="line_7227"> 7227.</a></span><span class="count                ">   1142</span><span>            check_ordered_case(the_case.expression);</span></pre>
-<pre><span class="lineno"><a href="#line_7228" id="line_7228"> 7228.</a></span><span class="count                ">   1142</span><span>            stmts = parse_statements();</span></pre>
+<pre><span class="lineno"><a href="#line_7228" id="line_7228"> 7228.</a></span><span class="count                ">   1142</span><span>            stmts = parse_statement_block();</span></pre>
 <pre><span class="lineno"><a href="#line_7229" id="line_7229"> 7229.</a></span><span class="count                ">   1142</span><span>            if (stmts.length &lt; 1) {</span></pre>
 <pre><span class="lineno"><a href="#line_7230" id="line_7230"> 7230.</a></span><span class="count                ">   1142</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7231" id="line_7231"> 7231.</a></span><span class="count                ">   1142</span><span>// test_cause:</span></pre>
@@ -7448,7 +7448,7 @@ body {
 <pre><span class="lineno"><a href="#line_7283" id="line_7283"> 7283.</a></span><span class="count                ">    104</span><span>            advance("default");</span></pre>
 <pre><span class="lineno"><a href="#line_7284" id="line_7284"> 7284.</a></span><span class="count                ">    104</span><span>            token_now.switch = true;</span></pre>
 <pre><span class="lineno"><a href="#line_7285" id="line_7285"> 7285.</a></span><span class="count                ">    104</span><span>            advance(":");</span></pre>
-<pre><span class="lineno"><a href="#line_7286" id="line_7286"> 7286.</a></span><span class="count                ">    104</span><span>            the_switch.else = parse_statements();</span></pre>
+<pre><span class="lineno"><a href="#line_7286" id="line_7286"> 7286.</a></span><span class="count                ">    104</span><span>            the_switch.else = parse_statement_block();</span></pre>
 <pre><span class="lineno"><a href="#line_7287" id="line_7287"> 7287.</a></span><span class="count                ">    104</span><span>            if (the_switch.else.length &lt; 1) {</span></pre>
 <pre><span class="lineno"><a href="#line_7288" id="line_7288"> 7288.</a></span><span class="count                ">    104</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7289" id="line_7289"> 7289.</a></span><span class="count                ">    104</span><span>// test_cause:</span></pre>
@@ -8083,7 +8083,7 @@ body {
 <pre><span class="lineno"><a href="#line_7918" id="line_7918"> 7918.</a></span><span class="count                ">    637</span><span>        advance("(string)");</span></pre>
 <pre><span class="lineno"><a href="#line_7919" id="line_7919"> 7919.</a></span><span class="count                ">    637</span><span>        semicolon();</span></pre>
 <pre><span class="lineno"><a href="#line_7920" id="line_7920"> 7920.</a></span><span class="count                ">    642</span><span>    }</span></pre>
-<pre><span class="lineno"><a href="#line_7921" id="line_7921"> 7921.</a></span><span class="count                ">    642</span><span>    state.token_tree = parse_statements();</span></pre>
+<pre><span class="lineno"><a href="#line_7921" id="line_7921"> 7921.</a></span><span class="count                ">    642</span><span>    state.token_tree = parse_statement_block();</span></pre>
 <pre><span class="lineno"><a href="#line_7922" id="line_7922"> 7922.</a></span><span class="count                ">    642</span><span>    advance("(end)");</span></pre>
 <pre><span class="lineno"><a href="#line_7923" id="line_7923"> 7923.</a></span><span class="count                ">    642</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7924" id="line_7924"> 7924.</a></span><span class="count                ">    642</span><span>// Check global functions are ordered.</span></pre>
