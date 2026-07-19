@@ -5101,8 +5101,8 @@ function jslint_phase3_parse(state) {
 // 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.
 // 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
 
+        const id = name.id;
         let earlier;
-        let id = name.id;
         name_list.push(name);
         name.init = init;
         name.readonly = readonly;
@@ -8063,9 +8063,16 @@ function jslint_phase4_walk(state) {
 
         const id = thing.id;
         let the_variable;
-        if (thing.arity !== "variable") {
-            return;
-        }
+
+// PR-xxx - Probably deadcode.
+// if (thing.arity !== "variable") {
+//     return;
+// }
+
+        jslint_assert(
+            thing.arity === "variable",
+            `Expected thing.arity === "variable".`
+        );
 
 // Look up the variable, from current-scope, moving up the scope-chain.
 
@@ -8884,7 +8891,7 @@ function jslint_phase4_walk(state) {
 
     function pre_s_for(thing) {
         let the_variable;
-        if (thing.name !== undefined) {
+        if (thing.name?.identifier) {
 
 // 3.for.1 - Mark 'declared', the for-variable, ???.
 // 3.for.2 - Mark 'alive', the for-variable, before for-block.
@@ -9107,14 +9114,14 @@ function jslint_phase4_walk(state) {
     postamble = amble(posts);
     preaction = action(pres);
     preamble = amble(pres);
-    postaction("assignment", "+=", post_a_pluseq);
     postaction("assignment", "(all)", post_a_assignment);
+    postaction("assignment", "+=", post_a_pluseq);
     postaction("binary", "&&", post_b_and);
     postaction("binary", "(", post_b_lparen);
+    postaction("binary", "(all)", post_b_binary);
     postaction("binary", "=>", post_s_function);
     postaction("binary", "[", post_b_lbracket);
     postaction("binary", "||", post_b_or);
-    postaction("binary", "(all)", post_b_binary);
     postaction("statement", "const", post_s_var);
     postaction("statement", "export", post_s_export_toplevel);
     postaction("statement", "for", post_s_for);
@@ -9125,18 +9132,18 @@ function jslint_phase4_walk(state) {
     postaction("statement", "var", post_s_var);
     postaction("statement", "{", post_s_lbrace_pop_block);
     postaction("ternary", "(all)", post_ternary);
+    postaction("unary", "(all)", post_u);
     postaction("unary", "+", post_u_plus);
     postaction("unary", "function", post_s_function);
-    postaction("unary", "(all)", post_u);
     preaction("assignment", "(all)", pre_a_bitwise);
     preaction("binary", "!=", pre_b_noteq);
+    preaction("binary", "(all)", pre_a_bitwise);
+    preaction("binary", "(all)", pre_b_binary);
     preaction("binary", "==", pre_b_eqeq);
     preaction("binary", "=>", pre_s_function);
     preaction("binary", "in", pre_b_in);
     preaction("binary", "instanceof", pre_b_instanceof);
     preaction("binary", "||", pre_b_or);
-    preaction("binary", "(all)", pre_b_binary);
-    preaction("binary", "(all)", pre_a_bitwise);
     preaction("statement", "for", pre_s_for);
     preaction("statement", "function", pre_s_function);
     preaction("statement", "try", pre_s_try);
