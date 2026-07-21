@@ -1039,7 +1039,6 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 
 </span>    const {
         artifact,
-        block_stack,
         directive_list,
         global_dict,
         global_list,
@@ -1054,6 +1053,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         warn,
         warn_at
     } = state;
+    const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
     let from;                   // The starting column number of the token.
@@ -1070,7 +1070,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
                                 // ... literal.
     let mode_regexp;            // true if regular expression literal seen on
                                 // ... this line.
-    let opener_popped = empty();        // Last token popped from block_stack.
+    let opener_popped = empty();        // Last token popped from opener_stack.
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.
     let token_prv = token_global;       // The previous token including
@@ -1078,8 +1078,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     let token_prv_expr = token_global;  // The previous token excluding
                                         // ... comments.
 
-// Most tokens, including the identifiers, operators, and punctuators, can be
-// found with a regular e...
+// Most tokens, including the identifiers, operators, and ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1214,6 +1213,7 @@ if (!state.mode_json) {
         option_dict,
         scope_stack_pop,
         scope_stack_push,
+        stop,
         syntax_dict,
         test_cause,
         token_global,
@@ -1274,7 +1274,7 @@ if (!state.mode_json) {
 
         return function (the_token) {
 
-// Given a task set that was built by an action function, ...
+// Given a task set that was built by an act...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
