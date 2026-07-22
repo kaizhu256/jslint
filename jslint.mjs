@@ -8712,7 +8712,7 @@ function jslint_phase4_walk(state) {
         }
     }
 
-    function post_s_export_toplevel(thing) {
+    function post_s_export_toplevel(the_thing) {
 
 // Some features must be at the most outermost level.
 
@@ -8723,7 +8723,7 @@ function jslint_phase4_walk(state) {
 // if(0){import aa from "aa";}
 // ", "post_s_export_toplevel", "misplaced_a", "import", 7]
 
-            warn("misplaced_a", thing);
+            warn("misplaced_a", the_thing);
         }
     }
 
