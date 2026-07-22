@@ -25,7 +25,7 @@
     - catch-variable
     - for-variable
     - function-parameter
-    - label-statement
+    - statement-label
 - jslint - Change scope from scope_function to scope_block:
     - const-declaration
     - let-declaration

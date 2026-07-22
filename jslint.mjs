@@ -5135,10 +5135,10 @@ function jslint_phase3_parse(state) {
 // 4.par.2 - Mark 'alive', the function-parameter, after destructuring.
 // 4.par.3 - Mark 'init', the function-parameter, if unwrapped.
 //
-// 5.lab.1 - Mark 'declared', the label-statement, before control-flow-block.
-// 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.
-// 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.
-// 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
+// 5.lab.1 - Mark 'declared', the statement-label, before control-flow-block.
+// 5.lab.2 - Mark 'alive', the statement-label, before control-flow-block.
+// 5.lab.3 - Mark 'init', the statement-label, before control-flow-block.
+// 5.lab.4 - Mark 'out-of-scope', the statement-label, after control-flow-block.
 
         const id = name.id;
         let earlier;
@@ -6595,7 +6595,7 @@ function jslint_phase3_parse(state) {
             ) {
                 if (the_label && !the_label.alive) {
 
-// Warn label-statement is 'out-of-scope'.
+// Warn statement-label is 'out-of-scope'.
 
 // test_cause:
 // ["aa:{function aa(aa){break aa}}", "stmt_break", "out_of_scope_a", "aa", 27]
@@ -7198,7 +7198,7 @@ function jslint_phase3_parse(state) {
         let the_statement;
 
 // PR-xxx - Add hidden scope_block for:
-// - label-statement
+// - statement-label
 
         the_label.scope_label = true;
         scope_block = scope_stack_push(block_stack, the_label, the_label);
@@ -7238,7 +7238,7 @@ function jslint_phase3_parse(state) {
         }
         name_declare(
 
-// 5.lab.1 - Mark 'declared', the label-statement, before control-flow-block.
+// 5.lab.1 - Mark 'declared', the statement-label, before control-flow-block.
 
             //!! scope_block,        // scope_declared
             scope_function,     // scope_declared
@@ -7247,24 +7247,27 @@ function jslint_phase3_parse(state) {
             [],                 // name_list
             the_label,          // name
 
-// 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.
+// 5.lab.3 - Mark 'init', the statement-label, before control-flow-block.
 
             true                // init
         );
 
-// 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.
+// 5.lab.2 - Mark 'alive', the statement-label, before control-flow-block.
 
         the_label.alive = true;
         the_statement = parse_statement_single();
 
-// 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
+// 5.lab.4 - Mark 'out-of-scope', the statement-label, after control-flow-block.
 
         the_label.alive = false;
         //!! the_statement.labeled = the_label;
         //!! the_statement.statement = true;
         scope_function.statement_prv = the_statement;
         scope_block = scope_stack_pop(block_stack);
-        return the_statement;
+        //!! return the_statement;
+        the_label.block = the_statement;
+        the_label.arity = "statement";
+        return the_label;
     }
 
     function stmt_lbrace() {
