@@ -8712,7 +8712,7 @@ function jslint_phase4_walk(state) {
         }
     }
 
-    function post_s_export_toplevel(the_thing) {
+    function post_s_export_toplevel(thing) {
 
 // Some features must be at the most outermost level.
 
@@ -8723,7 +8723,7 @@ function jslint_phase4_walk(state) {
 // if(0){import aa from "aa";}
 // ", "post_s_export_toplevel", "misplaced_a", "import", 7]
 
-            warn("misplaced_a", the_thing);
+            warn("misplaced_a", thing);
         }
     }
 
@@ -8755,14 +8755,12 @@ function jslint_phase4_walk(state) {
         scope_function = scope_stack_pop(function_stack);
     }
 
-    function post_s_import(the_thing) {
-        the_thing.name_list.forEach(function (name) {
+    function post_s_import(thing) {
 
 // 1.imp.2 - Mark 'alive', the import-name, after import-statement.
 
-            name.alive = true;
-        });
-        post_s_export_toplevel(the_thing);
+        post_s_var(thing);
+        post_s_export_toplevel(thing);
     }
 
     function post_s_try(thing) {
@@ -8785,23 +8783,7 @@ function jslint_phase4_walk(state) {
 
     function post_s_var(thing) {
         thing.name_list.forEach(function (name) {
-            if (name.expression) {
-
-// test_cause:
-// ["let aa=0", "post_s_var", "let aa=0", "", 0]
-
-                test_cause("let aa=0");
-                walk_expression(name.expression);
-            } else {
-
-// test_cause:
-// ["let aa", "post_s_var", "let aa", "", 0]
-
-                test_cause("let aa");
-            }
-
-// PR-502 - Fix long-running regression where 'let x = x;'
-// doesn't warn about temporal-dead-zone.
+            walk_expression(name.expression);
 
 // 3.var.2 - Mark 'alive', the variable, after variable-declaration.
 
@@ -9145,27 +9127,10 @@ function jslint_phase4_walk(state) {
                 warn("bad_set", thing);
             }
         }
-        thing.name_list.forEach(function (name) {
-            if (name.expression) {
-
-// test_cause:
-// ["(aa=0)=>0", "pre_s_function", "(aa=0)=>0", "", 0]
-
-                test_cause("(aa=0)=>0");
-            } else {
-
-// test_cause:
-// ["(aa)=>0", "pre_s_function", "(aa)=>0", "", 0]
-// ["aa=>0", "pre_s_function", "(aa)=>0", "", 0]
-
-                test_cause("(aa)=>0");
-            }
-            walk_expression(name.expression);
 
 // 4.par.2 - Mark 'alive', the function-parameter, after destructuring.
 
-            name.alive = true;
-        });
+        post_s_var(thing);
     }
 
     function pre_v_var(thing) {
