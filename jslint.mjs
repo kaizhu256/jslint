@@ -5563,7 +5563,6 @@ function jslint_phase3_parse(state) {
 // an assignment expression, or an invocation expression.
 
         let first;
-        let the_label;
         let the_statement;
         let the_symbol;
         if (token_nxt.id === ";") {
@@ -5572,68 +5571,7 @@ function jslint_phase3_parse(state) {
         }
         advance();
         if (token_now.identifier && token_nxt.id === ":") {
-            the_label = token_now;
-            if (the_label.id === "ignore") {
-
-// test_cause:
-// ["ignore:", "parse_statement_single", "unexpected_a", "ignore", 1]
-
-                warn("unexpected_a", the_label);
-            }
-            advance(":");
-            switch (token_nxt.id) {
-            case "do":
-            case "for":
-            case "switch":
-            case "while":
-
-// test_cause:
-// ["aa:do", "parse_statement_single", "label", "do", 0]
-// ["aa:for", "parse_statement_single", "label", "for", 0]
-// ["aa:switch", "parse_statement_single", "label", "switch", 0]
-// ["aa:while", "parse_statement_single", "label", "while", 0]
-
-                test_cause("label", token_nxt.id);
-                name_declare(
-
-// 5.lab.1 - Mark 'declared', the label-statement, before control-flow-block.
-
-                    scope_function,     // scope_declared
-                    "label",            // role
-                    true,               // readonly
-                    [],                 // name_list
-                    the_label,          // name
-
-// 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.
-
-                    true                // init
-                );
-
-// 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.
-
-                the_label.alive = true;
-                the_statement = parse_statement_single();
-
-// 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
-
-                the_label.alive = false;
-                the_statement.label = the_label;
-                the_statement.statement = true;
-                scope_function.statement_prv = the_statement;
-                return the_statement;
-            default:
-
-// test_cause:
-// ["()=>{aa:0}", "parse_statement_single", "unexpected_label_a", "aa", 6]
-// [";{aa:0}", "parse_statement_single", "unexpected_label_a", "aa", 3]
-// ["aa:", "parse_statement_single", "unexpected_label_a", "aa", 1]
-// ["aa:0", "parse_statement_single", "unexpected_label_a", "aa", 1]
-// ["aa:0?0:0", "parse_statement_single", "unexpected_label_a", "aa", 1]
-// ["aa:bb:0", "parse_statement_single", "unexpected_label_a", "aa", 1]
-
-                warn("unexpected_label_a", the_label);
-                advance();
-            }
+            return stmt_label();
         }
 
 // Parse the statement.
@@ -6659,8 +6597,8 @@ function jslint_phase3_parse(state) {
                     warn("out_of_scope_a");
                 } else {
 
-// test_cause:
-// ["aa:{break aa}", "stmt_break", "not_label_a", "aa", 11]
+//!! // test_cause:
+//!! // ["aa:{break aa}", "stmt_break", "not_label_a", "aa", 11]
 
                     warn("not_label_a");
                 }
@@ -7247,6 +7185,72 @@ function jslint_phase3_parse(state) {
         }
         semicolon();
         return the_import;
+    }
+
+    function stmt_label() {
+        const the_label = token_now;
+        let the_statement;
+        if (the_label.id === "ignore") {
+
+// test_cause:
+// ["ignore:", "stmt_label", "unexpected_a", "ignore", 1]
+
+            warn("unexpected_a", the_label);
+        }
+        advance(":");
+        switch (token_nxt.id) {
+        case "do":
+        case "for":
+        case "switch":
+        case "while":
+
+// test_cause:
+// ["aa:do", "stmt_label", "label", "do", 0]
+// ["aa:for", "stmt_label", "label", "for", 0]
+// ["aa:switch", "stmt_label", "label", "switch", 0]
+// ["aa:while", "stmt_label", "label", "while", 0]
+
+            test_cause("label", token_nxt.id);
+            break;
+        default:
+
+// test_cause:
+// ["()=>{aa:0}", "stmt_label", "unexpected_label_a", "aa", 6]
+// [";{aa:0}", "stmt_label", "unexpected_label_a", "aa", 3]
+// ["aa:", "stmt_label", "unexpected_label_a", "aa", 1]
+// ["aa:0", "stmt_label", "unexpected_label_a", "aa", 1]
+// ["aa:0?0:0", "stmt_label", "unexpected_label_a", "aa", 1]
+// ["aa:bb:0", "stmt_label", "unexpected_label_a", "aa", 1]
+
+            warn("unexpected_label_a", the_label);
+        }
+        name_declare(
+
+// 5.lab.1 - Mark 'declared', the label-statement, before control-flow-block.
+
+            scope_function,     // scope_declared
+            "label",            // role
+            true,               // readonly
+            [],                 // name_list
+            the_label,          // name
+
+// 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.
+
+            true                // init
+        );
+
+// 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.
+
+        the_label.alive = true;
+        the_statement = parse_statement_single();
+
+// 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
+
+        the_label.alive = false;
+        the_statement.label = the_label;
+        the_statement.statement = true;
+        scope_function.statement_prv = the_statement;
+        return the_statement;
     }
 
     function stmt_lbrace() {
