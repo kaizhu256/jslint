@@ -241,6 +241,8 @@
     jstestOnExit,
     keys,
     label,
+    label_goto,
+    labeled,
     lbp,
     led_infix,
     length,
@@ -6609,7 +6611,7 @@ function jslint_phase3_parse(state) {
             } else {
                 the_label.used = true;
             }
-            the_break.label = token_nxt;
+            the_break.label_goto = token_nxt;
             advance();
         }
         semicolon();
@@ -7258,8 +7260,8 @@ function jslint_phase3_parse(state) {
 // 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
 
         the_label.alive = false;
-        the_statement.label = the_label;
-        the_statement.statement = true;
+        //!! the_statement.labeled = the_label;
+        //!! the_statement.statement = true;
         scope_function.statement_prv = the_statement;
         scope_block = scope_stack_pop(block_stack);
         return the_statement;
@@ -7403,7 +7405,7 @@ function jslint_phase3_parse(state) {
             the_cases.push(the_case);
             last = parsed_block[parsed_block.length - 1];
             if (last.disrupt) {
-                if (last.id === "break" && last.label === undefined) {
+                if (last.id === "break" && last.label_goto === undefined) {
                     the_disrupt = false;
                 }
             } else {
@@ -7458,7 +7460,7 @@ function jslint_phase3_parse(state) {
                 ];
                 if (
                     the_last.id === "break"
-                    && the_last.label === undefined
+                    && the_last.label_goto === undefined
                 ) {
 
 // test_cause:
