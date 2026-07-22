@@ -6910,7 +6910,7 @@ function jslint_phase3_parse(state) {
             case ";":
 
 // test_cause:
-// ["for(;0;0){}", "stmt_for", "expected_a_b", "for (;", 5]
+// ["for(;;){}", "stmt_for", "expected_a_b", "for (;", 5]
 
                 warn("expected_a_b", token_nxt, "while (", "for (;");
                 break;
@@ -6943,7 +6943,7 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id === ";") {
 
 // test_cause:
-// ["for(0;;0){}", "stmt_for", "unexpected_a", ";", 7]
+// ["for(;;){}", "stmt_for", "unexpected_a", ";", 6]
 
                 warn("unexpected_a", token_nxt);
             } else {
@@ -6954,7 +6954,7 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id === ")") {
 
 // test_cause:
-// ["for(0;0;){}", "stmt_for", "unexpected_a", ")", 9]
+// ["for(;;){}", "stmt_for", "unexpected_a", ")", 7]
 
                 warn("unexpected_a", token_nxt);
             } else {
