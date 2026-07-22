@@ -690,14 +690,14 @@ await jslint.jslint_cli({
     const tenure = empty();     // The predefined property registry.
     const token_global = {      // The global object; the outermost context.
         async: 0,
-        body: true,
         context: empty(),
         finally: 0,
         from: 0,
+        function_body: true,
         id: "(global)",
         level: 0,
         line: jslint_fudge,
-        loop: 0...
+      ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
