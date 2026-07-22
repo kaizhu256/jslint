@@ -858,13 +858,13 @@ ${String(message).slice(0, 2000)}`
         left = right;
     });
 
-// Cleanup block_stack.
+// Cleanup indent_stack.
 
     <span class="apidocCodeKeywordSpan">jslint_assert</span>(
-        block_stack.length === 0,
-        `block_stack.length=${block_stack.length}.`
+        indent_stack.length === 0,
+        `indent_stack.length=${indent_stack.length}.`
     );
-    block_stack.length = 0;
+    indent_stack.length = 0;
 }
 
 function jslint_report({
@@ -1135,8 +1135,10 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         is_equal,
         option_dict,
         property_dict,
-        scope_stack_pop,
-        scope_stack_push,
+        scope_block_pop,
+        scope_block_push,
+        scope_function_pop,
+        scope_function_push,
         stop,
         syntax_dict,
         tenure,
@@ -1167,9 +1169,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
             token_now.identifier
             &amp;&amp; token_now.id !== "function"
             &amp;&amp; token_now.id !== "async"
-        ) {
-            anon = token_now.id;
-        } else if ...
+      ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1211,8 +1211,10 @@ if (!state.mode_json) {
         is_equal,
         is_weird,
         option_dict,
-        scope_stack_pop,
-        scope_stack_push,
+        scope_block_pop,
+        scope_block_push,
+        scope_function_pop,
+        scope_function_push,
         stop,
         syntax_dict,
         test_cause,
@@ -1272,9 +1274,7 @@ if (!state.mode_json) {
 // Produce a function that will act on the tasks registered by an action
 // function while walking the tree.
 
-        return function (the_token) {
-
-// Given a task set that was built by an act...
+        return function (t...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1309,13 +1309,13 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
 </span>    const {
         artifact,
         block_list,
-        block_stack,
         option_dict,
         test_cause,
         token_global,
         token_list,
         warn
     } = state;
+    const indent_stack = [];
     let closer = "(end)";
     let dot_depth = 0;
 
@@ -1393,7 +1393,7 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
                 if (!name.used) {
 
 // test_cause:
-// ["function aa(bb){return;}", "delve", "unused_a", "bb", 13]...
+// ["function aa(bb){return;}", "delve", "unused_a", "...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
