@@ -8755,12 +8755,12 @@ function jslint_phase4_walk(state) {
         scope_function = scope_stack_pop(function_stack);
     }
 
-    function post_s_import(thing) {
+    function post_s_import(the_thing) {
 
 // 1.imp.2 - Mark 'alive', the import-name, after import-statement.
 
-        post_s_var(thing);
-        post_s_export_toplevel(thing);
+        post_s_var(the_thing);
+        post_s_export_toplevel(the_thing);
     }
 
     function post_s_try(thing) {
