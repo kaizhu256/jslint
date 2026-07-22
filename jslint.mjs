@@ -6840,6 +6840,7 @@ function jslint_phase3_parse(state) {
 // PR-xxx - Add hidden scope_block for:
 // - for-variable
 
+        the_for.scope_block = true;
         scope_block = scope_stack_push(block_stack, the_for, the_for);
         advance("(");
         the_for.free = true;
@@ -8738,7 +8739,6 @@ function jslint_phase4_walk(state) {
         if (thing.for_semicolon) {
             walk_statement(thing.for_semicolon[2]);
         }
-        scope_block = scope_stack_pop(block_stack);
     }
 
     function post_s_function(thing) {
@@ -9085,11 +9085,6 @@ function jslint_phase4_walk(state) {
     }
 
     function pre_s_for(thing) {
-
-// PR-xxx - Add hidden scope_block for:
-// - for-variable
-
-        scope_block = scope_stack_push(block_stack, thing, undefined);
         if (thing.for_semicolon) {
             walk_statement(thing.for_semicolon[0]);
             walk_expression(thing.for_semicolon[1]);
