@@ -26,6 +26,7 @@
 - jslint - Add hidden scope_block for:
     - catch-variable
     - for-variable
+    - function-parameter
 - jslint - Change scope from scope_function to scope_block:
     - const-declaration
     - let-declaration

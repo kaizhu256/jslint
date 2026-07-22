@@ -6064,6 +6064,9 @@ function jslint_phase3_parse(state) {
 //             warn("function_in_loop", the_function);
 //         }
 
+// PR-xxx - Add hidden scope_block for:
+// - function-parameter
+
 // Push the current function context and establish a new one.
 
         scope_block = scope_stack_push(block_stack, the_function, the_function);
@@ -9103,6 +9106,8 @@ function jslint_phase4_walk(state) {
     }
 
     function pre_s_function(thing) {
+        scope_block = scope_stack_push(block_stack, thing, undefined);
+        scope_function = scope_stack_push(function_stack, thing, undefined);
 
 // test_cause:
 // ["()=>0", "pre_s_function", "", "", 0]
@@ -9110,15 +9115,13 @@ function jslint_phase4_walk(state) {
 // ["function aa(){}", "pre_s_function", "", "", 0]
 
         test_cause("");
-        if (thing.arity === "statement" && !scope_block.function_body) {
+        if (thing.arity === "statement" && !block_stack[1].function_body) {
 
 // test_cause:
 // ["if(0){function aa(){}}", "pre_s_function", "unexpected_a", "function", 7]
 
             warn("unexpected_a", thing);
         }
-        scope_block = scope_stack_push(block_stack, thing, undefined);
-        scope_function = scope_stack_push(function_stack, thing, undefined);
         if (thing.extra === "get") {
             if (thing.parameter_count !== 0) {
 
