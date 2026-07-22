@@ -8783,7 +8783,23 @@ function jslint_phase4_walk(state) {
 
     function post_s_var(thing) {
         thing.name_list.forEach(function (name) {
-            walk_expression(name.expression);
+            if (name.expression) {
+
+// test_cause:
+// ["let aa=0", "post_s_var", "let aa=0", "", 0]
+
+                test_cause("let aa=0");
+                walk_expression(name.expression);
+            } else {
+
+// test_cause:
+// ["let aa", "post_s_var", "let aa", "", 0]
+
+                test_cause("let aa");
+            }
+
+// PR-502 - Fix long-running regression where 'let x = x;'
+// doesn't warn about temporal-dead-zone.
 
 // 3.var.2 - Mark 'alive', the variable, after variable-declaration.
 
