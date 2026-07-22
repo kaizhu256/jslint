@@ -7196,8 +7196,9 @@ function jslint_phase3_parse(state) {
         let the_statement;
 
 // PR-xxx - Add hidden scope_block for:
-// - for-variable
+// - label-statement
 
+        the_label.scope_label = true;
         scope_block = scope_stack_push(block_stack, the_label, the_label);
         if (the_label.id === "ignore") {
 
@@ -9251,7 +9252,7 @@ function jslint_phase4_walk(state) {
             thing.forEach(walk_statement);
             return;
         }
-        if (thing.scope_block) {
+        if (thing.scope_block || thing.scope_label) {
             scope_block = scope_stack_push(block_stack, thing, undefined);
         }
         preamble(thing);
@@ -9285,7 +9286,7 @@ function jslint_phase4_walk(state) {
         walk_statement(thing.block);
         walk_statement(thing.else);
         postamble(thing);
-        if (thing.scope_block) {
+        if (thing.scope_block || thing.scope_label) {
             scope_block = scope_stack_pop(block_stack);
         }
     }

@@ -8,8 +8,6 @@
 - jslint - Change warning 'uninitialized_a' to 'unassigned_variable_a'.
 - jslint - Change warning 'out_of_scope_a' to 'temporal_dead_zone_a'.
 - jslint - Add warning and tdz for function-declaration inside block-scope.
-- jslint - Add hidden scope_block for:
-    - label-statement
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add ability to auto-fix whitespace.
@@ -27,6 +25,7 @@
     - catch-variable
     - for-variable
     - function-parameter
+    - label-statement
 - jslint - Change scope from scope_function to scope_block:
     - const-declaration
     - let-declaration
