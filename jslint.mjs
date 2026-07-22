@@ -330,6 +330,7 @@
     round,
     scope_block,
     scope_declared,
+    scope_label,
     scope_stack_pop,
     scope_stack_push,
     scriptId,
@@ -7193,6 +7194,11 @@ function jslint_phase3_parse(state) {
     function stmt_label() {
         const the_label = token_now;
         let the_statement;
+
+// PR-xxx - Add hidden scope_block for:
+// - for-variable
+
+        scope_block = scope_stack_push(block_stack, the_label, the_label);
         if (the_label.id === "ignore") {
 
 // test_cause:
@@ -7231,6 +7237,7 @@ function jslint_phase3_parse(state) {
 
 // 5.lab.1 - Mark 'declared', the label-statement, before control-flow-block.
 
+            //!! scope_block,        // scope_declared
             scope_function,     // scope_declared
             "label",            // role
             true,               // readonly
@@ -7253,6 +7260,7 @@ function jslint_phase3_parse(state) {
         the_statement.label = the_label;
         the_statement.statement = true;
         scope_function.statement_prv = the_statement;
+        scope_block = scope_stack_pop(block_stack);
         return the_statement;
     }
 
