@@ -9962,10 +9962,6 @@ function jslint_phase5_whitage(state) {
         no_space_only();
     }
 
-// Init indent_stack.
-
-    indent_stack.length = 0;
-
 // uninitialized_and_unused();
 // Delve into the functions looking for variables that were not initialized
 // or used. If the file imports or exports, then its global object is also
@@ -10017,14 +10013,10 @@ function jslint_phase5_whitage(state) {
         delete left.used;
         left = right;
     });
-
-// Cleanup indent_stack.
-
     jslint_assert(
         indent_stack.length === 0,
         `indent_stack.length=${indent_stack.length}.`
     );
-    indent_stack.length = 0;
 }
 
 function jslint_report({

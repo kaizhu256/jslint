@@ -853,21 +853,21 @@ ${String(message).slice(0, 2000)}`
     throw error;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-        delete left.open;
-        delete left.used;
-        left = right;
-    });
-
-// Cleanup indent_stack.
-
-    <span class="apidocCodeKeywordSpan">jslint_assert</span>(
-        indent_stack.length === 0,
-        `indent_stack.length=${indent_stack.length}.`
-    );
-    indent_stack.length = 0;
+    delete left.calls;
+    delete left.free;
+    delete left.init;
+    delete left.open;
+    delete left.used;
+    left = right;
+});
+<span class="apidocCodeKeywordSpan">jslint_assert</span>(
+    indent_stack.length === 0,
+    `indent_stack.length=${indent_stack.length}.`
+);
 }
 
 function jslint_report({
+exports,
 ...</pre></li>
 
 <li>
