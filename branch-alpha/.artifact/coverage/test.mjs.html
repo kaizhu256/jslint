@@ -1430,54 +1430,54 @@ body {
 <pre><span class="lineno"><a href="#line_1265" id="line_1265"> 1265.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1266" id="line_1266"> 1266.</a></span><span class="count                ">      1</span><span>        sourceJslintMjs.replace((</span></pre>
 <pre><span class="lineno"><a href="#line_1267" id="line_1267"> 1267.</a></span><span class="count                ">      1</span><span>            /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?) *?\S/g</span></pre>
-<pre><span class="lineno"><a href="#line_1268" id="line_1268"> 1268.</a></span><span class="count                ">    338</span><span>        ), function (match0, header, causeList, footer) {</span></pre>
-<pre><span class="lineno"><a href="#line_1269" id="line_1269"> 1269.</a></span><span class="count                ">    338</span><span>            let tmp;</span></pre>
-<pre><span class="lineno"><a href="#line_1270" id="line_1270"> 1270.</a></span><span class="count                ">    338</span><span>            // console.error(match0);</span></pre>
-<pre><span class="lineno"><a href="#line_1271" id="line_1271"> 1271.</a></span><span class="count                ">    338</span><span>            // Validate header.</span></pre>
-<pre><span class="lineno"><a href="#line_1272" id="line_1272"> 1272.</a></span><span class="count                ">    338</span><span>            assertOrThrow(header === "\n\n// test_cause:\n", match0);</span></pre>
-<pre><span class="lineno"><a href="#line_1273" id="line_1273"> 1273.</a></span><span class="count                ">    338</span><span>            // Validate footer.</span></pre>
-<pre><span class="lineno"><a href="#line_1274" id="line_1274"> 1274.</a></span><span class="count                ">    338</span><span>            assertOrThrow(footer === "\n\n", match0);</span></pre>
-<pre><span class="lineno"><a href="#line_1275" id="line_1275"> 1275.</a></span><span class="count                ">    338</span><span>            // Validate causeList.</span></pre>
-<pre><span class="lineno"><a href="#line_1276" id="line_1276"> 1276.</a></span><span class="count                ">    338</span><span>            causeList = causeList.replace((</span></pre>
-<pre><span class="lineno"><a href="#line_1277" id="line_1277"> 1277.</a></span><span class="count                ">    338</span><span>                /^\/\/ /gm</span></pre>
-<pre><span class="lineno"><a href="#line_1278" id="line_1278"> 1278.</a></span><span class="count                ">    338</span><span>            ), "").replace((</span></pre>
-<pre><span class="lineno"><a href="#line_1279" id="line_1279"> 1279.</a></span><span class="count                ">    338</span><span>                /^\["\n([\S\s]*?)\n"(,.*?)$/gm</span></pre>
+<pre><span class="lineno"><a href="#line_1268" id="line_1268"> 1268.</a></span><span class="count                ">    337</span><span>        ), function (match0, header, causeList, footer) {</span></pre>
+<pre><span class="lineno"><a href="#line_1269" id="line_1269"> 1269.</a></span><span class="count                ">    337</span><span>            let tmp;</span></pre>
+<pre><span class="lineno"><a href="#line_1270" id="line_1270"> 1270.</a></span><span class="count                ">    337</span><span>            // console.error(match0);</span></pre>
+<pre><span class="lineno"><a href="#line_1271" id="line_1271"> 1271.</a></span><span class="count                ">    337</span><span>            // Validate header.</span></pre>
+<pre><span class="lineno"><a href="#line_1272" id="line_1272"> 1272.</a></span><span class="count                ">    337</span><span>            assertOrThrow(header === "\n\n// test_cause:\n", match0);</span></pre>
+<pre><span class="lineno"><a href="#line_1273" id="line_1273"> 1273.</a></span><span class="count                ">    337</span><span>            // Validate footer.</span></pre>
+<pre><span class="lineno"><a href="#line_1274" id="line_1274"> 1274.</a></span><span class="count                ">    337</span><span>            assertOrThrow(footer === "\n\n", match0);</span></pre>
+<pre><span class="lineno"><a href="#line_1275" id="line_1275"> 1275.</a></span><span class="count                ">    337</span><span>            // Validate causeList.</span></pre>
+<pre><span class="lineno"><a href="#line_1276" id="line_1276"> 1276.</a></span><span class="count                ">    337</span><span>            causeList = causeList.replace((</span></pre>
+<pre><span class="lineno"><a href="#line_1277" id="line_1277"> 1277.</a></span><span class="count                ">    337</span><span>                /^\/\/ /gm</span></pre>
+<pre><span class="lineno"><a href="#line_1278" id="line_1278"> 1278.</a></span><span class="count                ">    337</span><span>            ), "").replace((</span></pre>
+<pre><span class="lineno"><a href="#line_1279" id="line_1279"> 1279.</a></span><span class="count                ">    337</span><span>                /^\["\n([\S\s]*?)\n"(,.*?)$/gm</span></pre>
 <pre><span class="lineno"><a href="#line_1280" id="line_1280"> 1280.</a></span><span class="count                ">     37</span><span>            ), function (ignore, source, param) {</span></pre>
 <pre><span class="lineno"><a href="#line_1281" id="line_1281"> 1281.</a></span><span class="count                ">     37</span><span>                source = "[" + JSON.stringify(source) + param;</span></pre>
 <pre><span class="lineno"><a href="#line_1282" id="line_1282"> 1282.</a></span><span class="count                ">     37</span><span>                return source;</span></pre>
 <pre><span class="lineno"><a href="#line_1283" id="line_1283"> 1283.</a></span><span class="count                ">     37</span><span>            }).replace((</span></pre>
-<pre><span class="lineno"><a href="#line_1284" id="line_1284"> 1284.</a></span><span class="count                ">    338</span><span>                / \/\/jslint-ignore-line$/gm</span></pre>
-<pre><span class="lineno"><a href="#line_1285" id="line_1285"> 1285.</a></span><span class="count                ">    338</span><span>            ), "");</span></pre>
-<pre><span class="lineno"><a href="#line_1286" id="line_1286"> 1286.</a></span><span class="count                ">    592</span><span>            tmp = causeList.split("\n").map(function (cause) {</span></pre>
-<pre><span class="lineno"><a href="#line_1287" id="line_1287"> 1287.</a></span><span class="count                ">    592</span><span>                return (</span></pre>
-<pre><span class="lineno"><a href="#line_1288" id="line_1288"> 1288.</a></span><span class="count                ">    592</span><span>                    "["</span></pre>
-<pre><span class="lineno"><a href="#line_1289" id="line_1289"> 1289.</a></span><span class="count                ">   2960</span><span>                    + JSON.parse(cause).map(function (elem) {</span></pre>
-<pre><span class="lineno"><a href="#line_1290" id="line_1290"> 1290.</a></span><span class="count                ">   2960</span><span>                        return JSON.stringify(elem);</span></pre>
-<pre><span class="lineno"><a href="#line_1291" id="line_1291"> 1291.</a></span><span class="count                ">   2960</span><span>                    }).join(", ")</span></pre>
-<pre><span class="lineno"><a href="#line_1292" id="line_1292"> 1292.</a></span><span class="count                ">    592</span><span>                    + "]"</span></pre>
-<pre><span class="lineno"><a href="#line_1293" id="line_1293"> 1293.</a></span><span class="count                ">    592</span><span>                );</span></pre>
-<pre><span class="lineno"><a href="#line_1294" id="line_1294"> 1294.</a></span><span class="count                ">    592</span><span>            }).sort().join("\n");</span></pre>
-<pre><span class="lineno"><a href="#line_1295" id="line_1295"> 1295.</a></span><span class="count                ">    338</span><span>            assertOrThrow(</span></pre>
-<pre><span class="lineno"><a href="#line_1296" id="line_1296"> 1296.</a></span><span class="count                ">    338</span><span>                causeList === tmp,</span></pre>
-<pre><span class="lineno"><a href="#line_1297" id="line_1297"> 1297.</a></span><span class="count                ">    338</span><span>                "\n" + causeList + "\n\n" + tmp</span></pre>
-<pre><span class="lineno"><a href="#line_1298" id="line_1298"> 1298.</a></span><span class="count                ">    338</span><span>            );</span></pre>
-<pre><span class="lineno"><a href="#line_1299" id="line_1299"> 1299.</a></span><span class="count                ">    592</span><span>            causeList.split("\n").forEach(function (cause) {</span></pre>
-<pre><span class="lineno"><a href="#line_1300" id="line_1300"> 1300.</a></span><span class="count                ">    592</span><span>                cause = JSON.parse(cause);</span></pre>
-<pre><span class="lineno"><a href="#line_1301" id="line_1301"> 1301.</a></span><span class="count                ">    592</span><span>                tmp = jslint.jslint(cause[0], {</span></pre>
-<pre><span class="lineno"><a href="#line_1302" id="line_1302"> 1302.</a></span><span class="count                ">    592</span><span>                    beta: true,</span></pre>
-<pre><span class="lineno"><a href="#line_1303" id="line_1303"> 1303.</a></span><span class="count                ">    592</span><span>                    test_cause: true</span></pre>
-<pre><span class="lineno"><a href="#line_1304" id="line_1304"> 1304.</a></span><span class="count                ">    592</span><span>                }).causes;</span></pre>
-<pre><span class="lineno"><a href="#line_1305" id="line_1305"> 1305.</a></span><span class="count                ">    592</span><span>                // Validate cause.</span></pre>
-<pre><span class="lineno"><a href="#line_1306" id="line_1306"> 1306.</a></span><span class="count                ">    592</span><span>                assertOrThrow(</span></pre>
-<pre><span class="lineno"><a href="#line_1307" id="line_1307"> 1307.</a></span><span class="count                ">    592</span><span>                    tmp[JSON.stringify(cause.slice(1))],</span></pre>
-<pre><span class="lineno"><a href="#line_1308" id="line_1308"> 1308.</a></span><span class="count                ">    592</span><span>                    (</span></pre>
-<pre><span class="lineno"><a href="#line_1309" id="line_1309"> 1309.</a></span><span class="count                ">    592</span><span>                        "\n" + JSON.stringify(cause) + "\n\n"</span></pre>
-<pre><span class="lineno"><a href="#line_1310" id="line_1310"> 1310.</a></span><span class="count                ">    592</span><span>                        + Object.keys(tmp).sort().join("\n")</span></pre>
-<pre><span class="lineno"><a href="#line_1311" id="line_1311"> 1311.</a></span><span class="count                ">    592</span><span>                    )</span></pre>
-<pre><span class="lineno"><a href="#line_1312" id="line_1312"> 1312.</a></span><span class="count                ">    592</span><span>                );</span></pre>
-<pre><span class="lineno"><a href="#line_1313" id="line_1313"> 1313.</a></span><span class="count                ">    592</span><span>            });</span></pre>
-<pre><span class="lineno"><a href="#line_1314" id="line_1314"> 1314.</a></span><span class="count                ">    338</span><span>            return "";</span></pre>
-<pre><span class="lineno"><a href="#line_1315" id="line_1315"> 1315.</a></span><span class="count                ">    338</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_1284" id="line_1284"> 1284.</a></span><span class="count                ">    337</span><span>                / \/\/jslint-ignore-line$/gm</span></pre>
+<pre><span class="lineno"><a href="#line_1285" id="line_1285"> 1285.</a></span><span class="count                ">    337</span><span>            ), "");</span></pre>
+<pre><span class="lineno"><a href="#line_1286" id="line_1286"> 1286.</a></span><span class="count                ">    590</span><span>            tmp = causeList.split("\n").map(function (cause) {</span></pre>
+<pre><span class="lineno"><a href="#line_1287" id="line_1287"> 1287.</a></span><span class="count                ">    590</span><span>                return (</span></pre>
+<pre><span class="lineno"><a href="#line_1288" id="line_1288"> 1288.</a></span><span class="count                ">    590</span><span>                    "["</span></pre>
+<pre><span class="lineno"><a href="#line_1289" id="line_1289"> 1289.</a></span><span class="count                ">   2950</span><span>                    + JSON.parse(cause).map(function (elem) {</span></pre>
+<pre><span class="lineno"><a href="#line_1290" id="line_1290"> 1290.</a></span><span class="count                ">   2950</span><span>                        return JSON.stringify(elem);</span></pre>
+<pre><span class="lineno"><a href="#line_1291" id="line_1291"> 1291.</a></span><span class="count                ">   2950</span><span>                    }).join(", ")</span></pre>
+<pre><span class="lineno"><a href="#line_1292" id="line_1292"> 1292.</a></span><span class="count                ">    590</span><span>                    + "]"</span></pre>
+<pre><span class="lineno"><a href="#line_1293" id="line_1293"> 1293.</a></span><span class="count                ">    590</span><span>                );</span></pre>
+<pre><span class="lineno"><a href="#line_1294" id="line_1294"> 1294.</a></span><span class="count                ">    590</span><span>            }).sort().join("\n");</span></pre>
+<pre><span class="lineno"><a href="#line_1295" id="line_1295"> 1295.</a></span><span class="count                ">    337</span><span>            assertOrThrow(</span></pre>
+<pre><span class="lineno"><a href="#line_1296" id="line_1296"> 1296.</a></span><span class="count                ">    337</span><span>                causeList === tmp,</span></pre>
+<pre><span class="lineno"><a href="#line_1297" id="line_1297"> 1297.</a></span><span class="count                ">    337</span><span>                "\n" + causeList + "\n\n" + tmp</span></pre>
+<pre><span class="lineno"><a href="#line_1298" id="line_1298"> 1298.</a></span><span class="count                ">    337</span><span>            );</span></pre>
+<pre><span class="lineno"><a href="#line_1299" id="line_1299"> 1299.</a></span><span class="count                ">    590</span><span>            causeList.split("\n").forEach(function (cause) {</span></pre>
+<pre><span class="lineno"><a href="#line_1300" id="line_1300"> 1300.</a></span><span class="count                ">    590</span><span>                cause = JSON.parse(cause);</span></pre>
+<pre><span class="lineno"><a href="#line_1301" id="line_1301"> 1301.</a></span><span class="count                ">    590</span><span>                tmp = jslint.jslint(cause[0], {</span></pre>
+<pre><span class="lineno"><a href="#line_1302" id="line_1302"> 1302.</a></span><span class="count                ">    590</span><span>                    beta: true,</span></pre>
+<pre><span class="lineno"><a href="#line_1303" id="line_1303"> 1303.</a></span><span class="count                ">    590</span><span>                    test_cause: true</span></pre>
+<pre><span class="lineno"><a href="#line_1304" id="line_1304"> 1304.</a></span><span class="count                ">    590</span><span>                }).causes;</span></pre>
+<pre><span class="lineno"><a href="#line_1305" id="line_1305"> 1305.</a></span><span class="count                ">    590</span><span>                // Validate cause.</span></pre>
+<pre><span class="lineno"><a href="#line_1306" id="line_1306"> 1306.</a></span><span class="count                ">    590</span><span>                assertOrThrow(</span></pre>
+<pre><span class="lineno"><a href="#line_1307" id="line_1307"> 1307.</a></span><span class="count                ">    590</span><span>                    tmp[JSON.stringify(cause.slice(1))],</span></pre>
+<pre><span class="lineno"><a href="#line_1308" id="line_1308"> 1308.</a></span><span class="count                ">    590</span><span>                    (</span></pre>
+<pre><span class="lineno"><a href="#line_1309" id="line_1309"> 1309.</a></span><span class="count                ">    590</span><span>                        "\n" + JSON.stringify(cause) + "\n\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1310" id="line_1310"> 1310.</a></span><span class="count                ">    590</span><span>                        + Object.keys(tmp).sort().join("\n")</span></pre>
+<pre><span class="lineno"><a href="#line_1311" id="line_1311"> 1311.</a></span><span class="count                ">    590</span><span>                    )</span></pre>
+<pre><span class="lineno"><a href="#line_1312" id="line_1312"> 1312.</a></span><span class="count                ">    590</span><span>                );</span></pre>
+<pre><span class="lineno"><a href="#line_1313" id="line_1313"> 1313.</a></span><span class="count                ">    590</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_1314" id="line_1314"> 1314.</a></span><span class="count                ">    337</span><span>            return "";</span></pre>
+<pre><span class="lineno"><a href="#line_1315" id="line_1315"> 1315.</a></span><span class="count                ">    337</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_1316" id="line_1316"> 1316.</a></span><span class="count                ">      1</span><span>    });</span></pre>
 <pre><span class="lineno"><a href="#line_1317" id="line_1317"> 1317.</a></span><span class="count                ">      1</span><span>});</span></pre>
 <pre><span class="lineno"><a href="#line_1318" id="line_1318"> 1318.</a></span><span class="count                ">      1</span><span></span></pre>
