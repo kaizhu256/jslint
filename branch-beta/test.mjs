@@ -704,6 +704,13 @@ String.aa().getTime();
 }());
                     `),
                     (`
+(function for_loop() {
+    for (const {expr} of for_loop) {
+        aa(bb, cc, dd, ee, ff, gg);
+    }
+}());
+                    `),
+                    (`
 /*jslint fart*/
 (({expr}) => {
     aa(bb, cc, dd, ee, ff, gg);
@@ -713,7 +720,7 @@ String.aa().getTime();
                     "let {expr}",
                     "let [aa, bb, cc, dd, ee, ff, gg] = 0;\n{expr}"
                 ].map(function (source) {
-                    source = source.trim().replace("{expr}", String(`
+                    let expr = String(`
 [
     {
         cc,
@@ -727,7 +734,11 @@ String.aa().getTime();
         ...ff
     ]
 ]
-                    `).trim());
+                    `).trim();
+                    if ((/function for_loop/).test(source)) {
+                        expr = expr.replace((/\n/g), "\n    ");
+                    }
+                    source = source.trim().replace("{expr}", expr);
                     if (!(/\=>|function/).test(source)) {
                         source = (`
 ${source} = (function () {
@@ -885,8 +896,46 @@ String
             label: [
                 (`
 function aa() {
-bb:
-    while (true) {
+bb: do {
+        if (true) {
+            break bb;
+        }
+    } while (true);
+}
+aa();
+                `),
+                (`
+function aa() {
+bb: for (const ii of aa) {
+        if (ii) {
+            break bb;
+        }
+    }
+}
+aa();
+                `),
+                (`
+function aa() {
+bb: for (let ii = 0; ii < 0; ii += 1) {
+        if (ii) {
+            break bb;
+        }
+    }
+}
+aa();
+                `),
+                (`
+function aa() {
+bb: switch (aa) {
+    case 0:
+        break bb;
+    }
+}
+aa();
+                `),
+                (`
+function aa() {
+bb: while (true) {
         if (true) {
             break bb;
         }
