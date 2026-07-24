@@ -4611,7 +4611,7 @@ body {
 <pre><span class="lineno"><a href="#line_4446" id="line_4446"> 4446.</a></span><span class="count                ">   5758</span><span>        let the_block;</span></pre>
 <pre><span class="lineno"><a href="#line_4447" id="line_4447"> 4447.</a></span><span class="count                ">     25</span><span>        if (implicit) {</span></pre>
 <pre><span class="lineno"><a href="#line_4448" id="line_4448"> 4448.</a></span><span class="count                ">     25</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_4449" id="line_4449"> 4449.</a></span><span class="count                ">     25</span><span>// PR-xxx - Add implicit scope_block for:</span></pre>
+<pre><span class="lineno"><a href="#line_4449" id="line_4449"> 4449.</a></span><span class="count                ">     25</span><span>// PR-504 - Add implicit scope_block for:</span></pre>
 <pre><span class="lineno"><a href="#line_4450" id="line_4450"> 4450.</a></span><span class="count                ">     25</span><span>// - if-else</span></pre>
 <pre><span class="lineno"><a href="#line_4451" id="line_4451"> 4451.</a></span><span class="count                ">     25</span><span>// - for-loop</span></pre>
 <pre><span class="lineno"><a href="#line_4452" id="line_4452"> 4452.</a></span><span class="count                ">     25</span><span>// - while-loop</span></pre>
@@ -6273,7 +6273,7 @@ body {
 <pre><span class="lineno"><a href="#line_6108" id="line_6108"> 6108.</a></span><span class="count                ">   2047</span><span>        const name = !mode_fart &amp;&amp; token_nxt.identifier &amp;&amp; token_nxt;</span></pre>
 <pre><span class="lineno"><a href="#line_6109" id="line_6109"> 6109.</a></span><span class="count                ">   2068</span><span>        let role = "variable";</span></pre>
 <pre><span class="lineno"><a href="#line_6110" id="line_6110"> 6110.</a></span><span class="count                ">   2068</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6111" id="line_6111"> 6111.</a></span><span class="count                ">   2068</span><span>// PR-xxx - Change scope from scope_function to scope_block:</span></pre>
+<pre><span class="lineno"><a href="#line_6111" id="line_6111"> 6111.</a></span><span class="count                ">   2068</span><span>// PR-504 - Change scope from scope_function to scope_block:</span></pre>
 <pre><span class="lineno"><a href="#line_6112" id="line_6112"> 6112.</a></span><span class="count                ">   2068</span><span>// - function-declaration</span></pre>
 <pre><span class="lineno"><a href="#line_6113" id="line_6113"> 6113.</a></span><span class="count                ">   2068</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6114" id="line_6114"> 6114.</a></span><span class="count                ">   2068</span><span>        let scope_declared = scope_block;</span></pre>
@@ -6297,7 +6297,7 @@ body {
 <pre><span class="lineno"><a href="#line_6132" id="line_6132"> 6132.</a></span><span class="count                ">    977</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6133" id="line_6133"> 6133.</a></span><span class="count                ">    977</span><span>// A function expression may have an optional name.</span></pre>
 <pre><span class="lineno"><a href="#line_6134" id="line_6134"> 6134.</a></span><span class="count                ">    977</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6135" id="line_6135"> 6135.</a></span><span class="count                ">    977</span><span>// PR-xxx - Restrict scope from scope_function to its own function_body:</span></pre>
+<pre><span class="lineno"><a href="#line_6135" id="line_6135"> 6135.</a></span><span class="count                ">    977</span><span>// PR-504 - Restrict scope from scope_function to its own function_body:</span></pre>
 <pre><span class="lineno"><a href="#line_6136" id="line_6136"> 6136.</a></span><span class="count                ">    977</span><span>// - named-function-expression</span></pre>
 <pre><span class="lineno"><a href="#line_6137" id="line_6137"> 6137.</a></span><span class="count                ">    977</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6138" id="line_6138"> 6138.</a></span><span class="count                ">    977</span><span>            scope_declared = the_function;</span></pre>
@@ -6360,7 +6360,7 @@ body {
 <pre><span class="lineno"><a href="#line_6195" id="line_6195"> 6195.</a></span><span class="count                ">   2068</span><span>//             warn("function_in_loop", the_function);</span></pre>
 <pre><span class="lineno"><a href="#line_6196" id="line_6196"> 6196.</a></span><span class="count                ">   2068</span><span>//         }</span></pre>
 <pre><span class="lineno"><a href="#line_6197" id="line_6197"> 6197.</a></span><span class="count                ">   2068</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6198" id="line_6198"> 6198.</a></span><span class="count                ">   2068</span><span>// PR-xxx - Add hidden scope_block for:</span></pre>
+<pre><span class="lineno"><a href="#line_6198" id="line_6198"> 6198.</a></span><span class="count                ">   2068</span><span>// PR-504 - Add hidden scope_block for:</span></pre>
 <pre><span class="lineno"><a href="#line_6199" id="line_6199"> 6199.</a></span><span class="count                ">   2068</span><span>// - function-parameter</span></pre>
 <pre><span class="lineno"><a href="#line_6200" id="line_6200"> 6200.</a></span><span class="count                ">   2068</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6201" id="line_6201"> 6201.</a></span><span class="count                ">   2068</span><span>// Push the current function context and establish a new one.</span></pre>
@@ -7126,7 +7126,7 @@ body {
 <pre><span class="lineno"><a href="#line_6961" id="line_6961"> 6961.</a></span><span class="count                ">     48</span><span>        check_not_top_level(the_for);</span></pre>
 <pre><span class="lineno"><a href="#line_6962" id="line_6962"> 6962.</a></span><span class="count                ">     48</span><span>        scope_function.loop += 1;</span></pre>
 <pre><span class="lineno"><a href="#line_6963" id="line_6963"> 6963.</a></span><span class="count                ">     48</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6964" id="line_6964"> 6964.</a></span><span class="count                ">     48</span><span>// PR-xxx - Add hidden scope_block for:</span></pre>
+<pre><span class="lineno"><a href="#line_6964" id="line_6964"> 6964.</a></span><span class="count                ">     48</span><span>// PR-504 - Add hidden scope_block for:</span></pre>
 <pre><span class="lineno"><a href="#line_6965" id="line_6965"> 6965.</a></span><span class="count                ">     48</span><span>// - for-variable</span></pre>
 <pre><span class="lineno"><a href="#line_6966" id="line_6966"> 6966.</a></span><span class="count                ">     48</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6967" id="line_6967"> 6967.</a></span><span class="count                ">     48</span><span>        scope_block = scope_block_push(the_for, true);</span></pre>
@@ -7516,7 +7516,7 @@ body {
 <pre><span class="lineno"><a href="#line_7351" id="line_7351"> 7351.</a></span><span class="count                ">      7</span><span>            return;</span></pre>
 <pre><span class="lineno"><a href="#line_7352" id="line_7352"> 7352.</a></span><span class="count                ">     16</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_7353" id="line_7353"> 7353.</a></span><span class="count                ">     16</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7354" id="line_7354"> 7354.</a></span><span class="count                ">     16</span><span>// PR-xxx - Add hidden scope_block for:</span></pre>
+<pre><span class="lineno"><a href="#line_7354" id="line_7354"> 7354.</a></span><span class="count                ">     16</span><span>// PR-504 - Add hidden scope_block for:</span></pre>
 <pre><span class="lineno"><a href="#line_7355" id="line_7355"> 7355.</a></span><span class="count                ">     16</span><span>// - label-name</span></pre>
 <pre><span class="lineno"><a href="#line_7356" id="line_7356"> 7356.</a></span><span class="count                ">     16</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7357" id="line_7357"> 7357.</a></span><span class="count                ">     16</span><span>        scope_block = scope_block_push(the_label, true);</span></pre>
@@ -7796,7 +7796,7 @@ body {
 <pre><span class="lineno"><a href="#line_7631" id="line_7631"> 7631.</a></span><span class="count                ">     55</span><span>            the_try.catch = the_catch;</span></pre>
 <pre><span class="lineno"><a href="#line_7632" id="line_7632"> 7632.</a></span><span class="count                ">     55</span><span>            advance("catch");</span></pre>
 <pre><span class="lineno"><a href="#line_7633" id="line_7633"> 7633.</a></span><span class="count                ">     55</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7634" id="line_7634"> 7634.</a></span><span class="count                ">     55</span><span>// PR-xxx - Add hidden scope_block for:</span></pre>
+<pre><span class="lineno"><a href="#line_7634" id="line_7634"> 7634.</a></span><span class="count                ">     55</span><span>// PR-504 - Add hidden scope_block for:</span></pre>
 <pre><span class="lineno"><a href="#line_7635" id="line_7635"> 7635.</a></span><span class="count                ">     55</span><span>// - catch-variable</span></pre>
 <pre><span class="lineno"><a href="#line_7636" id="line_7636"> 7636.</a></span><span class="count                ">     55</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7637" id="line_7637"> 7637.</a></span><span class="count                ">     55</span><span>            scope_block = scope_block_push(the_catch, true);</span></pre>
@@ -7872,7 +7872,7 @@ body {
 <pre><span class="lineno"><a href="#line_7707" id="line_7707"> 7707.</a></span><span class="count                ">   2337</span><span>            token_now.id === "var"</span></pre>
 <pre><span class="lineno"><a href="#line_7708" id="line_7708"> 7708.</a></span><span class="count                ">     20</span><span>            ? scope_function</span></pre>
 <pre><span class="lineno"><a href="#line_7709" id="line_7709"> 7709.</a></span><span class="count                ">   2337</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7710" id="line_7710"> 7710.</a></span><span class="count                ">   2337</span><span>// PR-xxx - Change scope from scope_function to scope_block:</span></pre>
+<pre><span class="lineno"><a href="#line_7710" id="line_7710"> 7710.</a></span><span class="count                ">   2337</span><span>// PR-504 - Change scope from scope_function to scope_block:</span></pre>
 <pre><span class="lineno"><a href="#line_7711" id="line_7711"> 7711.</a></span><span class="count                ">   2337</span><span>// - const-declaration</span></pre>
 <pre><span class="lineno"><a href="#line_7712" id="line_7712"> 7712.</a></span><span class="count                ">   2337</span><span>// - let-declaration</span></pre>
 <pre><span class="lineno"><a href="#line_7713" id="line_7713"> 7713.</a></span><span class="count                ">   2337</span><span></span></pre>
@@ -8484,7 +8484,7 @@ body {
 <pre><span class="lineno"><a href="#line_8319" id="line_8319"> 8319.</a></span><span class="count                ">  32545</span><span>        const id = thing.id;</span></pre>
 <pre><span class="lineno"><a href="#line_8320" id="line_8320"> 8320.</a></span><span class="count                ">  32545</span><span>        let the_variable;</span></pre>
 <pre><span class="lineno"><a href="#line_8321" id="line_8321"> 8321.</a></span><span class="count                ">  32545</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8322" id="line_8322"> 8322.</a></span><span class="count                ">  32545</span><span>// PR-xxx - Probably deadcode.</span></pre>
+<pre><span class="lineno"><a href="#line_8322" id="line_8322"> 8322.</a></span><span class="count                ">  32545</span><span>// PR-504 - Probably deadcode.</span></pre>
 <pre><span class="lineno"><a href="#line_8323" id="line_8323"> 8323.</a></span><span class="count                ">  32545</span><span>// if (thing.arity !== "variable") {</span></pre>
 <pre><span class="lineno"><a href="#line_8324" id="line_8324"> 8324.</a></span><span class="count                ">  32545</span><span>//     return;</span></pre>
 <pre><span class="lineno"><a href="#line_8325" id="line_8325"> 8325.</a></span><span class="count                ">  32545</span><span>// }</span></pre>
@@ -9006,7 +9006,7 @@ body {
 <pre><span class="lineno"><a href="#line_8841" id="line_8841"> 8841.</a></span><span class="count                ">     54</span><span>    function post_s_try(thing) {</span></pre>
 <pre><span class="lineno"><a href="#line_8842" id="line_8842"> 8842.</a></span><span class="count                ">     52</span><span>        if (thing.catch !== undefined) {</span></pre>
 <pre><span class="lineno"><a href="#line_8843" id="line_8843"> 8843.</a></span><span class="count                ">     52</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8844" id="line_8844"> 8844.</a></span><span class="count                ">     52</span><span>// PR-xxx - Add hidden scope_block for:</span></pre>
+<pre><span class="lineno"><a href="#line_8844" id="line_8844"> 8844.</a></span><span class="count                ">     52</span><span>// PR-504 - Add hidden scope_block for:</span></pre>
 <pre><span class="lineno"><a href="#line_8845" id="line_8845"> 8845.</a></span><span class="count                ">     52</span><span>// - catch-variable</span></pre>
 <pre><span class="lineno"><a href="#line_8846" id="line_8846"> 8846.</a></span><span class="count                ">     52</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8847" id="line_8847"> 8847.</a></span><span class="count                ">     52</span><span>            scope_block = scope_block_push(thing.catch, false);</span></pre>
@@ -9322,7 +9322,7 @@ body {
 <pre><span class="lineno"><a href="#line_9157" id="line_9157"> 9157.</a></span><span class="count                ">    598</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9158" id="line_9158"> 9158.</a></span><span class="count                ">     42</span><span>    function pre_s_for(thing) {</span></pre>
 <pre><span class="lineno"><a href="#line_9159" id="line_9159"> 9159.</a></span><span class="count                ">     42</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9160" id="line_9160"> 9160.</a></span><span class="count                ">     42</span><span>// PR-xxx - Add hidden scope_block for:</span></pre>
+<pre><span class="lineno"><a href="#line_9160" id="line_9160"> 9160.</a></span><span class="count                ">     42</span><span>// PR-504 - Add hidden scope_block for:</span></pre>
 <pre><span class="lineno"><a href="#line_9161" id="line_9161"> 9161.</a></span><span class="count                ">     42</span><span>// - for-variable</span></pre>
 <pre><span class="lineno"><a href="#line_9162" id="line_9162"> 9162.</a></span><span class="count                ">     42</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9163" id="line_9163"> 9163.</a></span><span class="count                ">     42</span><span>        scope_block = scope_block_push(thing, false);</span></pre>
@@ -9359,7 +9359,7 @@ body {
 <pre><span class="lineno"><a href="#line_9194" id="line_9194"> 9194.</a></span><span class="count                ">      2</span><span>            warn("unexpected_a", thing);</span></pre>
 <pre><span class="lineno"><a href="#line_9195" id="line_9195"> 9195.</a></span><span class="count                ">      2</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_9196" id="line_9196"> 9196.</a></span><span class="count                ">   2053</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9197" id="line_9197"> 9197.</a></span><span class="count                ">   2053</span><span>// PR-xxx - Add hidden scope_block for:</span></pre>
+<pre><span class="lineno"><a href="#line_9197" id="line_9197"> 9197.</a></span><span class="count                ">   2053</span><span>// PR-504 - Add hidden scope_block for:</span></pre>
 <pre><span class="lineno"><a href="#line_9198" id="line_9198"> 9198.</a></span><span class="count                ">   2053</span><span>// - function-parameter</span></pre>
 <pre><span class="lineno"><a href="#line_9199" id="line_9199"> 9199.</a></span><span class="count                ">   2053</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9200" id="line_9200"> 9200.</a></span><span class="count                ">   2053</span><span>        scope_block = scope_block_push(thing, false);</span></pre>
@@ -9477,7 +9477,7 @@ body {
 <pre><span class="lineno"><a href="#line_9312" id="line_9312"> 9312.</a></span><span class="count                ">   7982</span><span>            return;</span></pre>
 <pre><span class="lineno"><a href="#line_9313" id="line_9313"> 9313.</a></span><span class="count                ">  28491</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_9314" id="line_9314"> 9314.</a></span><span class="count                ">  28491</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9315" id="line_9315"> 9315.</a></span><span class="count                ">  28491</span><span>// PR-xxx - Add hidden scope_block for:</span></pre>
+<pre><span class="lineno"><a href="#line_9315" id="line_9315"> 9315.</a></span><span class="count                ">  28491</span><span>// PR-504 - Add hidden scope_block for:</span></pre>
 <pre><span class="lineno"><a href="#line_9316" id="line_9316"> 9316.</a></span><span class="count                ">  28491</span><span>// - label-name</span></pre>
 <pre><span class="lineno"><a href="#line_9317" id="line_9317"> 9317.</a></span><span class="count                ">  28491</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9318" id="line_9318"> 9318.</a></span><span class="count                ">  28491</span><span>        if (thing.label_name) {</span></pre>
