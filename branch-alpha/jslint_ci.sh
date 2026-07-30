@@ -1615,7 +1615,7 @@ import moduleRepl from "repl";
                     + "}).sort().join(\u0027\\n\u0027))\n"
                 );
                 break;
-            // syntax-sugar - print String(val)
+            // syntax-sugar - print String(value)
             case "print":
                 script = "console.error(String(" + match2 + "))\n";
                 break;
@@ -1711,11 +1711,11 @@ shJsonNormalize() {(set -e
 # 3. write normalized json-data back to file $1
     node --input-type=module --eval '
 import moduleFs from "fs";
-function noop(val) {
+function noop(value) {
 
-// This function will do nothing except return <val>.
+// This function will do nothing except return <value>.
 
-    return val;
+    return value;
 }
 function objectDeepCopyWithKeysSorted(obj) {
 
@@ -2519,13 +2519,13 @@ function v8CoverageListMerge(processCovs) {
   return bb.endOffset - aa.endOffset;
  }
 
- function dictKeyValueAppend(dict, key, val) {
+ function dictKeyValueAppend(dict, key, value) {
   let list = dict.get(key);
   if (list === undefined) {
    list = [];
    dict.set(key, list);
   }
-  list.push(val);
+  list.push(value);
  }
 
  function mergeTreeList(parentTrees) {

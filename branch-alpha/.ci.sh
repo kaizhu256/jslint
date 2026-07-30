@@ -423,19 +423,18 @@ function objectDeepCopyWithKeysSorted(obj) {
     await Promise.all(promiseList);
     Object.entries(dictAll).forEach(function ([dictName, dict]) {
         Object.keys(dict).forEach(function (name) {
-            let val;
             if (dictName !== "ecma_auto" && dictAll.ecma_auto[name]) {
                 delete dict[name];
             }
             if (dictName === "node_auto") {
-                val = ["----", "----"];
+                const value = ["----", "----"];
                 if (dict[name]) {
-                    val[0] = "node";
+                    value[0] = "node";
                 }
                 if (dictAll.browser_auto_node[name]) {
-                    val[1] = "brow";
+                    value[1] = "brow";
                 }
-                dict[name] = val.join(" ");
+                dict[name] = value.join(" ");
             }
         });
     });
@@ -460,11 +459,11 @@ function objectDeepCopyWithKeysSorted(obj) {
                 .trim()
                 .replace((
                     /^( *?".*?": )(".*?")/gm
-                ), function (ignore, name, val) {
+                ), function (ignore, name, value) {
                     return (
                         name
                         + " ".repeat(Math.max(0, 40 - name.length))
-                        + val
+                        + value
                     );
                 })
             + "$2"

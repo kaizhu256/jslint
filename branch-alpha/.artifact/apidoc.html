@@ -264,7 +264,7 @@ function moduleFsInit<span class="apidocSignatureSpan">()</span>
 <li>
 
 <a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.noop">22.
-function noop<span class="apidocSignatureSpan">(val)</span>
+function noop<span class="apidocSignatureSpan">(value)</span>
 </a>
 
 </li>
@@ -1776,15 +1776,15 @@ await moduleFs.promises.rm(".tmp", {
 <li>
     <h2>
     <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.noop" id="apidoc.elem.%22.%2Fjslint.mjs%22.noop">
-    function noop<span class="apidocSignatureSpan">(val)</span>
+    function noop<span class="apidocSignatureSpan">(value)</span>
     </a>
     </h2>
 </li>
-<li>Description and source-code:<pre class="apidocCodePre">function noop(val) {
+<li>Description and source-code:<pre class="apidocCodePre">function noop(value) {
 <span class="apidocCodeCommentSpan">
-// This function will do nothing except return &lt;val&gt;.
+// This function will do nothing except return &lt;value&gt;.
 
-</span>    return val;
+</span>    return value;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
         ]
@@ -1889,16 +1889,16 @@ jstestDescribe((
         return bb.endOffset - aa.endOffset;
     }
 
-    function dictKeyValueAppend(dict, key, val) {
+    function dictKeyValueAppend(dict, key, value) {
 
-// This function will append &lt;val&gt; to list &lt;dict&gt;[&lt;key&gt;].
+// This function will append &lt;value&gt; to list &lt;dict&gt;[&lt;key&gt;].
 
         let list = dict.get(key);
         if (list === undefined) {
             list = [];
             dict.set(key, list);
         }
-        list.push(val);
+        list.push(value);
     }
 
     function mergeTreeList(parentTrees) {
@@ -1922,8 +1922,7 @@ jstestDescribe((
                 return aa + bb.delta;
             }, 0),
             end: parentTrees[0].end,
-            start: parentTrees[0].start
-   ...
+            start: parentTrees[0].sta...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
