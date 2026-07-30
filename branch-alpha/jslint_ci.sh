@@ -1136,7 +1136,7 @@ shGithubPrCreate() {(set -e
     node --input-type=module --eval '
 // init debugInline
 const debugInline = (function () {
-    let consoleError = String;
+    let consoleError = Object;
     function debug(...argList) {
 
 // This function will print <argList> to stderr and then return <argList>[0].
@@ -1144,14 +1144,14 @@ const debugInline = (function () {
         consoleError("\n\ndebugInline");
         consoleError(...argList);
         consoleError("\n");
-        if (consoleError !== console.error) {
+        if (consoleError === Object) {
             consoleError = console.error;
         }
         return argList[0];
     }
     return debug;
 }());
-debugInline(); // Coverage-hack.
+debugInline(); // coverage-hack
 import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";

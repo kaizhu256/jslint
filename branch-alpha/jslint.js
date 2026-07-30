@@ -410,7 +410,7 @@
 
 // init debugInline
 const debugInline = (function () {
-    let consoleError = String;
+    let consoleError = Object;
     function debug(...argList) {
 
 // This function will print <argList> to stderr and then return <argList>[0].
@@ -418,14 +418,14 @@ const debugInline = (function () {
         consoleError("\n\ndebugInline");
         consoleError(...argList);
         consoleError("\n");
-        if (consoleError !== console.error) {
+        if (consoleError === Object) {
             consoleError = console.error;
         }
         return argList[0];
     }
     return debug;
 }());
-debugInline(); // Coverage-hack.
+debugInline(); // coverage-hack
 const jslint_charset_ascii = ( //jslint-ignore-line
     "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
     + "\b\t\n\u000b\f\r\u000e\u000f"
