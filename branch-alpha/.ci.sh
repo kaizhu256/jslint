@@ -19,8 +19,8 @@ shCiArtifactUploadCustom() {(set -e
     node --input-type=module --eval '
 import moduleFs from "fs";
 (async function () {
-    let cacheKey = Math.random().toString(36).slice(-4);
-    let fileDict = {};
+    const cacheKey = Math.random().toString(36).slice(-4);
+    const fileDict = {};
     await Promise.all([
         "index.html"
     ].map(async function (file) {
@@ -49,7 +49,7 @@ import moduleFs from "fs";
 import moduleFs from "fs";
 import moduleChildProcess from "child_process";
 (async function () {
-    let fileDict = {};
+    const fileDict = {};
     let screenshotCurl;
     await Promise.all([
         "README.md"
@@ -130,7 +130,7 @@ echo "\
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 (async function () {
-    let {
+    const {
         GITHUB_BRANCH0,
         GITHUB_GITHUB_IO
     } = process.env;
@@ -192,7 +192,7 @@ shCiBaseCustom() {(set -e
 import jslint from "./jslint.mjs";
 import moduleFs from "fs";
 (async function () {
-    let fileDict = {};
+    const fileDict = {};
     let fileModified;
     let versionBeta;
     let versionMaster;
@@ -244,8 +244,8 @@ import moduleFs from "fs";
             file: "jslint.mjs",
             // update version
             src: fileDict["jslint.mjs"].replace((
-                /^let jslint_edition = ".*?";$/m
-            ), `let jslint_edition = "v${versionBeta}";`)
+                /^const jslint_edition = ".*?";$/m
+            ), `const jslint_edition = "v${versionBeta}";`)
         }, {
             file: "jslint_ci.sh",
             // update coverage-code
@@ -286,7 +286,7 @@ import moduleFs from "fs";
         file,
         src
     }) {
-        let src0 = fileDict[file];
+        const src0 = fileDict[file];
         if (src !== src0) {
             console.error(`update file ${file}`);
             fileModified = file;
@@ -494,7 +494,7 @@ shCiVscePackageJslintWrapperVscode() {(set -e
     node --input-type=module --eval '
 import moduleFs from "fs";
 (async function () {
-    let fileDict = {};
+    const fileDict = {};
     await Promise.all([
         "README.md"
     ].map(async function (file) {
