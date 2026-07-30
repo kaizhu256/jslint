@@ -1135,18 +1135,23 @@ shGithubPrCreate() {(set -e
 # This function will create-and-push a github-pull-commit to origin/alpha.
     node --input-type=module --eval '
 // init debugInline
-(function () {
-    const consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+const debugInline = (function () {
+    let consoleError = String;
+    function debug(...argList) {
 
 // This function will print <argList> to stderr and then return <argList>[0].
 
         consoleError("\n\ndebugInline");
         consoleError(...argList);
         consoleError("\n");
+        if (consoleError !== console.error) {
+            consoleError = console.error;
+        }
         return argList[0];
-    };
+    }
+    return debug;
 }());
+debugInline(); // Coverage-hack.
 import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
