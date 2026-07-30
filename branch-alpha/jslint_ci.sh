@@ -404,7 +404,7 @@ globalThis.assert(
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 (async function () {
-    let fileDict = {};
+    const fileDict = {};
     let fileMain;
     let fileModified;
     let packageJson;
@@ -447,14 +447,14 @@ import moduleFs from "fs";
             file: fileMain,
             // update version
             src: fileDict[fileMain].replace((
-                /^let version = ".*?";$/m
-            ), `let version = "v${versionBeta}";`)
+                /^const version = ".*?";$/m
+            ), `const version = "v${versionBeta}";`)
         }
     ].map(async function ({
         file,
         src
     }) {
-        let src0 = fileDict[file];
+        const src0 = fileDict[file];
         if (src !== src0) {
             console.error(`update file ${file}`);
             fileModified = file;
@@ -650,14 +650,14 @@ import moduleAssert from "assert";
 import moduleFs from "fs";
 import moduleHttps from "https";
 (async function () {
-    let {
+    const {
         GITHUB_BRANCH0,
         GITHUB_GITHUB_IO,
         GITHUB_REPOSITORY,
         UPSTREAM_GITHUB_IO,
         UPSTREAM_REPOSITORY
     } = process.env;
-    let dict = {};
+    const dict = {};
     Array.from(
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
@@ -673,8 +673,8 @@ import moduleHttps from "https";
         data.replace((
             /\bhttps?:\/\/.+?([\s")\]]|\W?$)(<!--no-validate-->)?/gm
         ), function (url, removeLast, noValidate) {
+            const timeStart = Date.now();
             let req;
-            let timeStart = Date.now();
             if (removeLast && removeLast !== "/") {
                 url = url.slice(0, -1);
             }
@@ -1136,7 +1136,7 @@ shGithubPrCreate() {(set -e
     node --input-type=module --eval '
 // init debugInline
 (function () {
-    let consoleError = console.error;
+    const consoleError = console.error;
     globalThis.debugInline = globalThis.debugInline || function (...argList) {
 
 // This function will print <argList> to stderr and then return <argList>[0].

@@ -410,20 +410,20 @@
 
 // init debugInline
 const debugInline = (function () {
-    let __consoleError = function () {
+    let consoleError = function () {
         return;
     };
     function debug(...argList) {
 
 // This function will print <argList> to stderr and then return <argList>[0].
 
-        __consoleError("\n\ndebugInline");
-        __consoleError(...argList);
-        __consoleError("\n");
+        consoleError("\n\ndebugInline");
+        consoleError(...argList);
+        consoleError("\n");
         return argList[0];
     }
     debug(); // Coverage-hack.
-    __consoleError = console.error; //jslint-ignore-line
+    consoleError = console.error;
     return debug;
 }());
 const jslint_charset_ascii = (
