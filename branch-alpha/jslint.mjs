@@ -410,9 +410,9 @@
 
 // init debugInline
 const debugInline = (function () {
-    let consoleError = function () {
+    function consoleError() {
         return;
-    };
+    }
     function debug(...argList) {
 
 // This function will print <argList> to stderr and then return <argList>[0].
@@ -420,10 +420,12 @@ const debugInline = (function () {
         consoleError("\n\ndebugInline");
         consoleError(...argList);
         consoleError("\n");
+        if (consoleError !== console.error) {
+            consoleError = console.error;
+        }
         return argList[0];
     }
     debug(); // Coverage-hack.
-    consoleError = console.error;
     return debug;
 }());
 const jslint_charset_ascii = (
