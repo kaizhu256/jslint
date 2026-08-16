@@ -12,6 +12,7 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.7.30
+- jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.
 - jslint-ecma - Add ES2015-feature for..of.
 - jslint - Disable directive-option /*jslint for*/, replacing it with for-loop specific warnings.
 - jslint - Update scope-related warnings for variables, depending on whether they are let/const (scope_block) or var (scope_function).
