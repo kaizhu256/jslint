@@ -980,7 +980,7 @@ if (false) {
 <br><br>
 # License
 - JSLint is under [Unlicense License](LICENSE).
-- CodeMirror editor is under [MIT License](https://github.com/codemirror/codemirror5/blob/d0e3b2e727c41aa4fd89fbad0adfb3815339174c/LICENSE).
+- CodeMirror editor is under [MIT License](https://github.com/codemirror/codemirror5/blob/34b84359c4ce289086c82c203f66ef74614d8a0d/LICENSE).
 - Function `v8CoverageListMerge` is derived from [MIT Licensed v8-coverage](https://github.com/demurgos/v8-coverage/blob/73446087dc38f61b09832c9867122a23f8577099/ts/LICENSE.md).
 
 
