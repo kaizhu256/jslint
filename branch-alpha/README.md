@@ -1068,7 +1068,7 @@ if (false) {
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
 
-1. goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2026.7.30
+1. goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2026.8.31
     - click `Create pull request`
     - input `Add a title *` with: `# v20yy.mm.dd`
     - input `Add a description` with:
