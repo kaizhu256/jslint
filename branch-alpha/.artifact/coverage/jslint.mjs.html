@@ -12232,14 +12232,14 @@ body {
 <pre><span class="lineno"><a href="#line_12067" id="line_12067">12067.</a></span><span class="count                ">      7</span><span>        let pathnameDict = Object.create(null);</span></pre>
 <pre><span class="lineno"><a href="#line_12068" id="line_12068">12068.</a></span><span class="count                ">      7</span><span>        data = await moduleFs.promises.readFile(coverageDir + file, "utf8");</span></pre>
 <pre><span class="lineno"><a href="#line_12069" id="line_12069">12069.</a></span><span class="count                ">      7</span><span>        data = JSON.parse(data);</span></pre>
-<pre><span class="lineno"><a href="#line_12070" id="line_12070">12070.</a></span><span class="count                ">    445</span><span>        data.result.forEach(function (scriptCov) {</span></pre>
-<pre><span class="lineno"><a href="#line_12071" id="line_12071">12071.</a></span><span class="count                ">    445</span><span>            let pathname = scriptCov.url;</span></pre>
-<pre><span class="lineno"><a href="#line_12072" id="line_12072">12072.</a></span><span class="count                ">    445</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12073" id="line_12073">12073.</a></span><span class="count                ">    445</span><span>// Filter out internal coverages.</span></pre>
-<pre><span class="lineno"><a href="#line_12074" id="line_12074">12074.</a></span><span class="count                ">    445</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12075" id="line_12075">12075.</a></span><span class="count                ">    367</span><span>            if (!pathname.startsWith("file:///")) {</span></pre>
-<pre><span class="lineno"><a href="#line_12076" id="line_12076">12076.</a></span><span class="count                ">    367</span><span>                return;</span></pre>
-<pre><span class="lineno"><a href="#line_12077" id="line_12077">12077.</a></span><span class="count                ">    367</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_12070" id="line_12070">12070.</a></span><span class="count                ">    444</span><span>        data.result.forEach(function (scriptCov) {</span></pre>
+<pre><span class="lineno"><a href="#line_12071" id="line_12071">12071.</a></span><span class="count                ">    444</span><span>            let pathname = scriptCov.url;</span></pre>
+<pre><span class="lineno"><a href="#line_12072" id="line_12072">12072.</a></span><span class="count                ">    444</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_12073" id="line_12073">12073.</a></span><span class="count                ">    444</span><span>// Filter out internal coverages.</span></pre>
+<pre><span class="lineno"><a href="#line_12074" id="line_12074">12074.</a></span><span class="count                ">    444</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_12075" id="line_12075">12075.</a></span><span class="count                ">    366</span><span>            if (!pathname.startsWith("file:///")) {</span></pre>
+<pre><span class="lineno"><a href="#line_12076" id="line_12076">12076.</a></span><span class="count                ">    366</span><span>                return;</span></pre>
+<pre><span class="lineno"><a href="#line_12077" id="line_12077">12077.</a></span><span class="count                ">    366</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_12078" id="line_12078">12078.</a></span><span class="count                ">     78</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_12079" id="line_12079">12079.</a></span><span class="count                ">     78</span><span>// Normalize pathname.</span></pre>
 <pre><span class="lineno"><a href="#line_12080" id="line_12080">12080.</a></span><span class="count                ">     78</span><span></span></pre>
