@@ -7,11 +7,11 @@ sh jslint_ci.sh shCiJslintGlobalDictAllFetch
 
 shCiArtifactUploadCustom() {(set -e
 # this function will run custom-code to upload build-artifacts
-    # !! # .github_cache - restore
-    # !! if [ "$GITHUB_ACTION" ] && [ -d .github_cache ]
-    # !! then
-        # !! cp -a .github_cache/* . || true # js-hack - */
-    # !! fi
+    # .github_cache - restore
+    if [ "$GITHUB_ACTION" ] && [ -d .github_cache ]
+    then
+        cp -a .github_cache/* . || true # js-hack - */
+    fi
     # add jslint.js
     cp jslint.mjs jslint.js
     git add -f jslint.js
