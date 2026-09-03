@@ -1003,19 +1003,19 @@ body {
 <pre><span class="lineno"><a href="#line_838" id="line_838">  838.</a></span><span class="count                ">     59</span><span>// Try writing to pathname.</span></pre>
 <pre><span class="lineno"><a href="#line_839" id="line_839">  839.</a></span><span class="count                ">     59</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_840" id="line_840">  840.</a></span><span class="count                ">     59</span><span>    try {</span></pre>
-<pre><span class="lineno"><a href="#line_841" id="line_841">  841.</a></span><span class="count                ">     46</span><span>        await moduleFs.promises.writeFile(pathname, data);</span></pre>
-<pre><span class="lineno"><a href="#line_842" id="line_842">  842.</a></span><span class="count                ">     46</span><span>    } catch (ignore) {</span></pre>
-<pre><span class="lineno"><a href="#line_843" id="line_843">  843.</a></span><span class="count                ">     13</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_844" id="line_844">  844.</a></span><span class="count                ">     13</span><span>// Lazy mkdirp.</span></pre>
-<pre><span class="lineno"><a href="#line_845" id="line_845">  845.</a></span><span class="count                ">     13</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_846" id="line_846">  846.</a></span><span class="count                ">     13</span><span>        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {</span></pre>
-<pre><span class="lineno"><a href="#line_847" id="line_847">  847.</a></span><span class="count                ">     13</span><span>            recursive: true</span></pre>
-<pre><span class="lineno"><a href="#line_848" id="line_848">  848.</a></span><span class="count                ">     13</span><span>        });</span></pre>
-<pre><span class="lineno"><a href="#line_849" id="line_849">  849.</a></span><span class="count                ">     13</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_850" id="line_850">  850.</a></span><span class="count                ">     13</span><span>// Retry writing to pathname.</span></pre>
-<pre><span class="lineno"><a href="#line_851" id="line_851">  851.</a></span><span class="count                ">     13</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_852" id="line_852">  852.</a></span><span class="count                ">     13</span><span>        await moduleFs.promises.writeFile(pathname, data);</span></pre>
-<pre><span class="lineno"><a href="#line_853" id="line_853">  853.</a></span><span class="count                ">     13</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_841" id="line_841">  841.</a></span><span class="count                ">     41</span><span>        await moduleFs.promises.writeFile(pathname, data);</span></pre>
+<pre><span class="lineno"><a href="#line_842" id="line_842">  842.</a></span><span class="count                ">     41</span><span>    } catch (ignore) {</span></pre>
+<pre><span class="lineno"><a href="#line_843" id="line_843">  843.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_844" id="line_844">  844.</a></span><span class="count                ">     18</span><span>// Lazy mkdirp.</span></pre>
+<pre><span class="lineno"><a href="#line_845" id="line_845">  845.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_846" id="line_846">  846.</a></span><span class="count                ">     18</span><span>        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {</span></pre>
+<pre><span class="lineno"><a href="#line_847" id="line_847">  847.</a></span><span class="count                ">     18</span><span>            recursive: true</span></pre>
+<pre><span class="lineno"><a href="#line_848" id="line_848">  848.</a></span><span class="count                ">     18</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_849" id="line_849">  849.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_850" id="line_850">  850.</a></span><span class="count                ">     18</span><span>// Retry writing to pathname.</span></pre>
+<pre><span class="lineno"><a href="#line_851" id="line_851">  851.</a></span><span class="count                ">     18</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_852" id="line_852">  852.</a></span><span class="count                ">     18</span><span>        await moduleFs.promises.writeFile(pathname, data);</span></pre>
+<pre><span class="lineno"><a href="#line_853" id="line_853">  853.</a></span><span class="count                ">     18</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_854" id="line_854">  854.</a></span><span class="count                ">     59</span><span>    console.error("wrote file " + pathname);</span></pre>
 <pre><span class="lineno"><a href="#line_855" id="line_855">  855.</a></span><span class="count                ">     59</span><span>}</span></pre>
 <pre><span class="lineno"><a href="#line_856" id="line_856">  856.</a></span><span class="count                ">      1</span><span></span></pre>
@@ -12232,14 +12232,14 @@ body {
 <pre><span class="lineno"><a href="#line_12067" id="line_12067">12067.</a></span><span class="count                ">      7</span><span>        let pathnameDict = Object.create(null);</span></pre>
 <pre><span class="lineno"><a href="#line_12068" id="line_12068">12068.</a></span><span class="count                ">      7</span><span>        data = await moduleFs.promises.readFile(coverageDir + file, "utf8");</span></pre>
 <pre><span class="lineno"><a href="#line_12069" id="line_12069">12069.</a></span><span class="count                ">      7</span><span>        data = JSON.parse(data);</span></pre>
-<pre><span class="lineno"><a href="#line_12070" id="line_12070">12070.</a></span><span class="count                ">    444</span><span>        data.result.forEach(function (scriptCov) {</span></pre>
-<pre><span class="lineno"><a href="#line_12071" id="line_12071">12071.</a></span><span class="count                ">    444</span><span>            let pathname = scriptCov.url;</span></pre>
-<pre><span class="lineno"><a href="#line_12072" id="line_12072">12072.</a></span><span class="count                ">    444</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12073" id="line_12073">12073.</a></span><span class="count                ">    444</span><span>// Filter out internal coverages.</span></pre>
-<pre><span class="lineno"><a href="#line_12074" id="line_12074">12074.</a></span><span class="count                ">    444</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12075" id="line_12075">12075.</a></span><span class="count                ">    366</span><span>            if (!pathname.startsWith("file:///")) {</span></pre>
-<pre><span class="lineno"><a href="#line_12076" id="line_12076">12076.</a></span><span class="count                ">    366</span><span>                return;</span></pre>
-<pre><span class="lineno"><a href="#line_12077" id="line_12077">12077.</a></span><span class="count                ">    366</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_12070" id="line_12070">12070.</a></span><span class="count                ">    445</span><span>        data.result.forEach(function (scriptCov) {</span></pre>
+<pre><span class="lineno"><a href="#line_12071" id="line_12071">12071.</a></span><span class="count                ">    445</span><span>            let pathname = scriptCov.url;</span></pre>
+<pre><span class="lineno"><a href="#line_12072" id="line_12072">12072.</a></span><span class="count                ">    445</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_12073" id="line_12073">12073.</a></span><span class="count                ">    445</span><span>// Filter out internal coverages.</span></pre>
+<pre><span class="lineno"><a href="#line_12074" id="line_12074">12074.</a></span><span class="count                ">    445</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_12075" id="line_12075">12075.</a></span><span class="count                ">    367</span><span>            if (!pathname.startsWith("file:///")) {</span></pre>
+<pre><span class="lineno"><a href="#line_12076" id="line_12076">12076.</a></span><span class="count                ">    367</span><span>                return;</span></pre>
+<pre><span class="lineno"><a href="#line_12077" id="line_12077">12077.</a></span><span class="count                ">    367</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_12078" id="line_12078">12078.</a></span><span class="count                ">     78</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_12079" id="line_12079">12079.</a></span><span class="count                ">     78</span><span>// Normalize pathname.</span></pre>
 <pre><span class="lineno"><a href="#line_12080" id="line_12080">12080.</a></span><span class="count                ">     78</span><span></span></pre>
