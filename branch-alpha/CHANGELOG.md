@@ -11,6 +11,9 @@
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
+# v2026.9.29
+ai: jslint - Move 242 line-leading && or || to line end; gate at 0.
+
 # v2026.8.31
 - jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.
 - jslint-editor - Update codemirror-editor to v5.65.21.
