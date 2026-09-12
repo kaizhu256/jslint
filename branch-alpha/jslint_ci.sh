@@ -2640,9 +2640,9 @@ function v8CoverageListMerge(processCovs) {
    let treesMatching = [];
    parentToChildDict.forEach(function (nested) {
     if (
-     nested.length === 1
-     && nested[0].start === openRange.start
-     && nested[0].end === openRange.end
+     nested.length === 1 &&
+     nested[0].start === openRange.start &&
+     nested[0].end === openRange.end
     ) {
      treesMatching.push(nested[0]);
     } else {
@@ -2821,8 +2821,8 @@ function v8CoverageListMerge(processCovs) {
    }
    if (children.length === 1) {
     if (
-     children[0].start === tree.start
-     && children[0].end === tree.end
+     children[0].start === tree.start &&
+     children[0].end === tree.end
     ) {
      tree.delta += children[0].delta;
      tree.children = children[0].children;
@@ -3458,8 +3458,8 @@ function sentinel() {}
       NODE_V8_COVERAGE: coverageDir
      },
      shell: (
-      processArgv0.endsWith(".bat")
-      || processArgv0.endsWith(".cmd")
+      processArgv0.endsWith(".bat") ||
+      processArgv0.endsWith(".cmd")
      ),
      stdio: ["ignore", 1, 2]
     }
@@ -3562,14 +3562,14 @@ function sentinel() {}
     lineList.forEach(function (elem) {
      if (!(
       (
-       elem.startOffset <= startOffset
-       && startOffset <= elem.endOffset
+       elem.startOffset <= startOffset &&
+       startOffset <= elem.endOffset
       ) || (
-       elem.startOffset <= endOffset
-       && endOffset <= elem.endOffset
+       elem.startOffset <= endOffset &&
+       endOffset <= elem.endOffset
       ) || (
-       startOffset <= elem.startOffset
-       && elem.endOffset <= endOffset
+       startOffset <= elem.startOffset &&
+       elem.endOffset <= endOffset
       )
      )) {
       return;

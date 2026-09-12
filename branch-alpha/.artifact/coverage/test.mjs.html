@@ -1366,8 +1366,8 @@ body {
 <pre><span class="lineno"><a href="#line_1201" id="line_1201"> 1201.</a></span><span class="count                ">     24</span><span>            const elemNow = JSON.stringify([option_dict, source]);</span></pre>
 <pre><span class="lineno"><a href="#line_1202" id="line_1202"> 1202.</a></span><span class="count                ">     24</span><span>            const warningsLength = (</span></pre>
 <pre><span class="lineno"><a href="#line_1203" id="line_1203"> 1203.</a></span><span class="count                ">     24</span><span>                (</span></pre>
-<pre><span class="lineno"><a href="#line_1204" id="line_1204"> 1204.</a></span><span class="count                ">     24</span><span>                    option_dict.test_internal_error</span></pre>
-<pre><span class="lineno"><a href="#line_1205" id="line_1205"> 1205.</a></span><span class="count                ">     23</span><span>                    || option_dict.test_unknown_warning_code</span></pre>
+<pre><span class="lineno"><a href="#line_1204" id="line_1204"> 1204.</a></span><span class="count                ">     23</span><span>                    option_dict.test_internal_error ||</span></pre>
+<pre><span class="lineno"><a href="#line_1205" id="line_1205"> 1205.</a></span><span class="count                ">     23</span><span>                    option_dict.test_unknown_warning_code</span></pre>
 <pre><span class="lineno"><a href="#line_1206" id="line_1206"> 1206.</a></span><span class="count                ">     24</span><span>                )</span></pre>
 <pre><span class="lineno"><a href="#line_1207" id="line_1207"> 1207.</a></span><span class="count                ">      2</span><span>                ? 1</span></pre>
 <pre><span class="lineno"><a href="#line_1208" id="line_1208"> 1208.</a></span><span class="count                ">     22</span><span>                : 0</span></pre>
