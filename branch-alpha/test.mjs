@@ -1210,8 +1210,8 @@ function aa() {
             const elemNow = JSON.stringify([option_dict, source]);
             const warningsLength = (
                 (
-                    option_dict.test_internal_error ||
-                    option_dict.test_unknown_warning_code
+                    option_dict.test_internal_error
+                    || option_dict.test_unknown_warning_code
                 )
                 ? 1
                 : 0
