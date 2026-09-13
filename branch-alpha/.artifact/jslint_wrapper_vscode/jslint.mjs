@@ -7002,13 +7002,6 @@ function jslint_phase3_parse(state) {
         if (the_for.for_semicolon) {
             switch (token_nxt.id) {
             case ";":
-                if (for_await) {
-
-// test_cause:
-// ["for await(;;){}", "stmt_for", "expected_a_b", ";", 11]
-
-                    return stop("expected_a_b", token_nxt, "of", ";");
-                }
 
 // test_cause:
 // ["for(;;){}", "stmt_for", "expected_a_b", "for (;", 5]
@@ -7040,6 +7033,13 @@ function jslint_phase3_parse(state) {
             }
             token_nxt.for_init = true;
             the_for.for_semicolon[0] = parse_statement_single();
+            if (for_await) {
+
+// test_cause:
+// ["for await(;;){}", "stmt_for", "expected_a_b", ";", 11]
+
+                return stop("expected_a_b", token_now, "of", token_now.id);
+            }
             token_nxt.for_init = true;
             if (token_nxt.id === ";") {
 
