@@ -14,6 +14,7 @@
 
 # v2026.9.29
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
+- jslint-ci - Merge ci-shell-function shGithubPrUpdatePrxxx() into shGithubPrCreate().
 
 # v2026.8.31
 - jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.
