@@ -374,8 +374,8 @@ jstestIt((
     bb = JSON.stringify(objectDeepCopyWithKeysSorted(bb), undefined, 1);
     if (aa !== bb) {
         throw new Error(
-            "\n" + aa + "\n!==\n" + bb
-            + (
+            "\n" + aa + "\n!==\n" + bb +
+            (
                 typeof message === "string"
                 ? " - " + message
                 : message
@@ -468,12 +468,12 @@ return debug;
 }());
 <span class="apidocCodeKeywordSpan">debugInline</span>(); // coverage-hack
 const jslint_charset_ascii = ( //jslint-ignore-line
-"\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
-+ "\b\t\n\u000b\f\r\u000e\u000f"
-+ "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017"
-+ "\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f"
-+ " !\"#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?"
-+ "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+"\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007" +
+"\b\t\n\u000b\f\r\u000e\u000f" +
+"\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017" +
+"\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f" +
+" !\"#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?" +
+"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_" +
 ...</pre></li>
 
 <li>
@@ -568,10 +568,10 @@ await jslint.jslint_cli({
         ]) {
             list.join(separator).replace(rgx, function (match0, char) {
                 throw new Error(
-                    "Weird character "
-                    + JSON.stringify(char)
-                    + " found in " + name + " "
-                    + JSON.stringify(match0)
+                    "Weird character " +
+                    JSON.stringify(char) +
+                    " found in " + name + " " +
+                    JSON.stringify(match0)
                 );
             });
         });
@@ -816,9 +816,9 @@ ${name}
         example_list.some(function (example2) {
             example2.replace(
                 new RegExp((
-                    "((?:\\n.*?){8}(function )?)\\b"
-                    + key
-                    + "(\\((?:.*?\\n){8})"
+                    "((?:\\n.*?){8}(function )?)\\b" +
+                    key +
+                    "(\\((?:.*?\\n){8})"
                 ), "g"),
                 function (ignore, header, isDeclarati...
 }
@@ -1577,17 +1577,17 @@ fNZOtXKDe39jXdRlkmMnOWIOF...
 // Print test results.
 
     message = (
-        "\n  " + (Date.now() - jstestTimeStart) + "ms"
-        + " - test describe - " + description + "\n"
-        + result.map(function ([
+        "\n  " + (Date.now() - jstestTimeStart) + "ms" +
+        " - test describe - " + description + "\n" +
+        result.map(function ([
             err, description, mode
         ]) {
             jstestItCount += 1;
             if (err) {
                 jstestCountFailed += 1;
                 err = (
-                    "    \u001b[31m\u2718 " + jstestItCount + ". test it - "
-                    + description + "\n" + err.stack + "\u001b[39m"
+                    "    \u001b[31m\u2718 " + jstestItCount + ". test it - " +
+                    description + "\n" + err.stack + "\u001b[39m"
                 );
                 if (mode === "pass") {
                     jstestCountFailed -= 1;
@@ -1595,8 +1595,8 @@ fNZOtXKDe39jXdRlkmMnOWIOF...
                 }
             }
             return err || (
-                "    \u001b[32m\u2714 " + jstestItCount + ". test it - "
-                + description + "\u001b[39m"
+                "    \u001b[32m\u2714 " + jstestItCount + ". test it - " +
+                description + "\u001b[39m"
             );
         }).join("\n")
     );
@@ -1678,14 +1678,14 @@ jstestIt((
             (jstestCountFailed || mode === "testsFailed")
             ? "\n\u001b[31m"
             : "\n\u001b[32m"
-        )
-        + "  tests total  - " + jstestCountTotal + "\n"
-        + "  tests failed - " + jstestCountFailed + "\n"
-        + "\n"
-        + "  time finished - "
-        + Number(Date.now() - jstestTimeStart).toLocaleString()
-        + " ms\n"
-        + "\u001b[39m"
+        ) +
+        "  tests total  - " + jstestCountTotal + "\n" +
+        "  tests failed - " + jstestCountFailed + "\n" +
+        "\n" +
+        "  time finished - " +
+        Number(Date.now() - jstestTimeStart).toLocaleString() +
+        " ms\n" +
+        "\u001b[39m"
     );
     if (mode !== "testsFailed") {
         console.error(message);

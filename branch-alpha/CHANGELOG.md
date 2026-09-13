@@ -1,7 +1,6 @@
 # Changelog
 
 # Todo
-- jslint - Add rule requiring operators to be at end-of-line, instead of beginning-of-line, except for ternary-operators ?, :, and gate it behind /*jslint beta*/, to minimize breakage for existing users.
 - jslint-ecma - Add ES2015-feature iterators.
 - jslint - Audit token-property '.free'.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
@@ -12,6 +11,7 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.9.29
+- jslint - Add beta-warning expected_a_at_end_of_line requiring operators at end-of-line, except ternary ?, : and member-access ., ?.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
 - jslint - Move 242 line-leading && or || to line end.
 

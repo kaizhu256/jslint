@@ -427,13 +427,13 @@ const debugInline = (function () {
 }());
 debugInline(); // coverage-hack
 const jslint_charset_ascii = ( //jslint-ignore-line
-    "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
-    + "\b\t\n\u000b\f\r\u000e\u000f"
-    + "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017"
-    + "\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f"
-    + " !\"#$%&'()*+,-./0123456789:;<=>?"
-    + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
-    + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
+    "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007" +
+    "\b\t\n\u000b\f\r\u000e\u000f" +
+    "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017" +
+    "\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f" +
+    " !\"#$%&'()*+,-./0123456789:;<=>?" +
+    "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_" +
+    "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
 const jslint_edition = "v2026.9.29";
 const jslint_fudge = 1;                 // Fudge starting line and starting
@@ -723,33 +723,33 @@ const jslint_rgx_todo = (
     /\b(?:todo|TO\s?DO|HACK)\b/
 );
 const jslint_rgx_token = new RegExp(
-    "^("
-    + "(\\s+)"
-    + "|([a-zA-Z_$][a-zA-Z0-9_$]*)"
-    + "|[(){}\\[\\],:;'\"~\\`]"
-    + "|\\?\\?="
-    + "|\\?[?.]?"
-    + "|=(?:==?|>)?"
-    + "|\\.+"
-    + "|\\*[*\\/=]?"
-    + "|\\/[*\\/]?"
-    + "|\\+[=+]?"
-    + "|-[=\\-]?"
-    + "|[\\^%]=?"
-    + "|&&="
-    + "|&[&=]?"
-    + "|\\|\\|="
-    + "|\\|[|=]?"
-    + "|>{1,3}=?"
-    + "|<<?=?"
-    + "|!(?:!|==?)?"
+    "^(" +
+    "(\\s+)" +
+    "|([a-zA-Z_$][a-zA-Z0-9_$]*)" +
+    "|[(){}\\[\\],:;'\"~\\`]" +
+    "|\\?\\?=" +
+    "|\\?[?.]?" +
+    "|=(?:==?|>)?" +
+    "|\\.+" +
+    "|\\*[*\\/=]?" +
+    "|\\/[*\\/]?" +
+    "|\\+[=+]?" +
+    "|-[=\\-]?" +
+    "|[\\^%]=?" +
+    "|&&=" +
+    "|&[&=]?" +
+    "|\\|\\|=" +
+    "|\\|[|=]?" +
+    "|>{1,3}=?" +
+    "|<<?=?" +
+    "|!(?:!|==?)?" +
 
 // PR-351 - Add BigInt support.
 // PR-390 - Add numeric-separator support.
 
-    + "|((?:0_?|[1-9][0-9_]*)n?)"
-    + ")"
-    + "(.*)$"
+    "|((?:0_?|[1-9][0-9_]*)n?)" +
+    ")" +
+    "(.*)$"
 );
 const jslint_rgx_url_search_window_jslint = (
     /[&?]window_jslint=1(?:$|&)/m
@@ -795,8 +795,8 @@ function assertJsonEqual(aa, bb, message) {
     bb = JSON.stringify(objectDeepCopyWithKeysSorted(bb), undefined, 1);
     if (aa !== bb) {
         throw new Error(
-            "\n" + aa + "\n!==\n" + bb
-            + (
+            "\n" + aa + "\n!==\n" + bb +
+            (
                 typeof message === "string"
                 ? " - " + message
                 : message
@@ -886,10 +886,10 @@ function globExclude({
         ]) {
             list.join(separator).replace(rgx, function (match0, char) {
                 throw new Error(
-                    "Weird character "
-                    + JSON.stringify(char)
-                    + " found in " + name + " "
-                    + JSON.stringify(match0)
+                    "Weird character " +
+                    JSON.stringify(char) +
+                    " found in " + name + " " +
+                    JSON.stringify(match0)
                 );
             });
         });
@@ -1479,6 +1479,9 @@ function jslint(
         case "expected_a_at_b_c":
             mm = `Expected '${a}' at column ${b}, not column ${c}.`;
             break;
+        case "expected_a_at_end_of_line":
+            mm = `Expected '${a}' at the end of the previous line.`;
+            break;
         case "expected_a_b":
             mm = `Expected '${a}' and instead saw '${b}'.`;
             break;
@@ -1487,8 +1490,8 @@ function jslint(
             break;
         case "expected_a_b_from_c_d":
             mm = (
-                `Expected '${a}' to match '${b}' from line ${c}`
-                + ` and instead saw '${d}'.`
+                `Expected '${a}' to match '${b}' from line ${c}` +
+                ` and instead saw '${d}'.`
             );
             break;
         case "expected_a_before_b":
@@ -1540,8 +1543,8 @@ function jslint(
             break;
         case "infix_in":
             mm = (
-                `Unexpected 'in'. Compare with undefined,`
-                + ` or use Object.hasOwn() instead.`
+                `Unexpected 'in'. Compare with undefined,` +
+                ` or use Object.hasOwn() instead.`
             );
             break;
         case "label_a":
@@ -1606,8 +1609,8 @@ function jslint(
             break;
         case "unclosed_disable":
             mm = (
-                `Directive '/*jslint-disable*/' was not closed`
-                + ` with '/*jslint-enable*/'.`
+                `Directive '/*jslint-disable*/' was not closed` +
+                ` with '/*jslint-enable*/'.`
             );
             break;
         case "unclosed_mega":
@@ -1669,8 +1672,8 @@ function jslint(
             break;
         case "unopened_enable":
             mm = (
-                `Directive '/*jslint-enable*/' was not opened`
-                + ` with '/*jslint-disable*/'.`
+                `Directive '/*jslint-enable*/' was not opened` +
+                ` with '/*jslint-disable*/'.`
             );
             break;
         case "unreachable_a":
@@ -1690,14 +1693,14 @@ function jslint(
 
         case "use_function_not_fart":
             mm = (
-                `Use 'function (...)', not '(...) =>' when arrow functions`
-                + ` become too complex.`
+                `Use 'function (...)', not '(...) =>' when arrow functions` +
+                ` become too complex.`
             );
             break;
         case "use_open":
             mm = (
-                `Wrap a ternary expression in parens,`
-                + ` with a line break after the left paren.`
+                `Wrap a ternary expression in parens,` +
+                ` with a line break after the left paren.`
             );
             break;
         case "use_spaces":
@@ -1735,9 +1738,9 @@ function jslint(
             break;
         case "wrap_immediate":
             mm = (
-                `Wrap an immediate function invocation in parentheses to assist`
-                + ` the reader in understanding that the expression is the`
-                + ` result of a function, and not the function itself.`
+                `Wrap an immediate function invocation in parentheses to` +
+                ` assist the reader in understanding that the expression is` +
+                ` the result of a function, and not the function itself.`
             );
             break;
         case "wrap_regexp":
@@ -1891,12 +1894,12 @@ function jslint(
         stack_trace = ""
     }, ii, list) {
         list[ii].formatted_message = String(
-            String(ii + 1).padStart(2, " ")
-            + ". \u001b[31m" + message + "\u001b[39m"
-            + " \u001b[90m\/\/ line " + line + ", column " + column
-            + "\u001b[39m\n"
-            + ("    " + line_source.trim()).slice(0, 72) + "\n"
-            + stack_trace
+            String(ii + 1).padStart(2, " ") +
+            ". \u001b[31m" + message + "\u001b[39m" +
+            " \u001b[90m\/\/ line " + line + ", column " + column +
+            "\u001b[39m\n" +
+            ("    " + line_source.trim()).slice(0, 72) + "\n" +
+            stack_trace
         ).trimRight();
     });
 
@@ -1994,18 +1997,18 @@ ${name}
         example_list.some(function (example2) {
             example2.replace(
                 new RegExp((
-                    "((?:\\n.*?){8}(function )?)\\b"
-                    + key
-                    + "(\\((?:.*?\\n){8})"
+                    "((?:\\n.*?){8}(function )?)\\b" +
+                    key +
+                    "(\\((?:.*?\\n){8})"
                 ), "g"),
                 function (ignore, header, isDeclaration, footer) {
                     if (!isDeclaration) {
                         example = "..." + trim_start(
-                            htmlEscape(header)
-                            + "<span class=\"apidocCodeKeywordSpan\">"
-                            + htmlEscape(key)
-                            + "</span>"
-                            + htmlEscape(footer)
+                            htmlEscape(header) +
+                            "<span class=\"apidocCodeKeywordSpan\">" +
+                            htmlEscape(key) +
+                            "</span>" +
+                            htmlEscape(footer)
                         ).trimEnd() + "\n...";
                     }
                     return "";
@@ -2069,12 +2072,12 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
 
         let result = await moduleFs.promises.readFile(file, "utf8");
         result = (
-            "\n\n\n\n\n\n\n\n"
+            "\n\n\n\n\n\n\n\n" +
 
 // bug-workaround - Truncate example to manageable size.
 
-            + result.slice(0, 524288)
-            + "\n\n\n\n\n\n\n\n"
+            result.slice(0, 524288) +
+            "\n\n\n\n\n\n\n\n"
         );
         result = result.replace((
             /\r\n*/g
@@ -2202,13 +2205,13 @@ body {
         <li>
             <a class="apidocModuleA" href="#${id}">Module ${moduleName}</a>
             <ul>
-            `)
-            + elem_list.map(function ({
+            `) +
+            elem_list.map(function ({
                 signature
             }) {
                 return "<li>\n" + signature + "\n</li>\n";
-            }).join("")
-            + (`
+            }).join("") +
+            (`
             </ul>
         </li>
             `)
@@ -2226,13 +2229,13 @@ body {
 <div class="apidocSectionDiv">
     <h1><a href="#${id}" id="${id}">Module ${moduleName}</a></h1>
     <ul>
-            `)
-            + elem_list.map(function ({
+            `) +
+            elem_list.map(function ({
                 source
             }) {
                 return source;
-            }).join("")
-            + (`
+            }).join("") +
+            (`
     </ul>
 </div>
             `)
@@ -2386,18 +2389,18 @@ async function jslint_cli({
                     message
                 }, ii) {
                     return (
-                        file
-                        + ":" + ii
-                        + ":" + line
-                        + ":" + column
-                        + ":" + message
+                        file +
+                        ":" + ii +
+                        ":" + line +
+                        ":" + column +
+                        ":" + message
                     );
                 }).join("\n")
 
 // Print warnings in format readable by human.
 
-                : "\u001b[1mjslint " + file + "\u001b[22m\n"
-                + result_from_file.warnings.slice(0, 10).map(function ({
+                : "\u001b[1mjslint " + file + "\u001b[22m\n" +
+                result_from_file.warnings.slice(0, 10).map(function ({
                     formatted_message
                 }) {
                     return formatted_message;
@@ -2503,8 +2506,7 @@ async function jslint_cli({
                 mode_cli
             ) &&
             (
-                moduleUrl.fileURLToPath(import_meta_url)
-                ===
+                moduleUrl.fileURLToPath(import_meta_url) ===
                 modulePath.resolve(process_argv[1])
             )
         ) &&
@@ -4685,8 +4687,8 @@ function jslint_phase3_parse(state) {
                     !option_dict.variable &&
                     variable_prv &&
                     (
-                        variable_prv.id + " " + variable_prv.name_list[0].id
-                        > the_variable.id + " " + the_variable.name_list[0].id
+                        variable_prv.id + " " + variable_prv.name_list[0].id >
+                        the_variable.id + " " + the_variable.name_list[0].id
                     )
                 ) {
 
@@ -10094,6 +10096,28 @@ function jslint_phase5_whitage(state) {
 // Commit 3903449a - Cleanup indent for multiline-method-chaining.
 
         if (left.line !== right.line) {
+
+// Require operators at end-of-line, instead of beginning-of-line. Ternary
+// ?, : and member-access ., ?. are EXCEPTED: jslint itself rejects the
+// trailing form of those with unexpected_space_a_b, so the rule would have
+// no legal target. Gated behind beta to minimize breakage for existing
+// users.
+
+            if (
+                option_dict.beta &&
+                right.arity === "binary" &&
+                right.id !== "." &&
+                right.id !== "?."
+            ) {
+
+// test_cause:
+// ["
+// let aa = 0
+// + 0;
+// ", "jslint_phase5_whitage", "expected_a_at_end_of_line", "+", 1]
+
+                warn("expected_a_at_end_of_line", right, artifact(right));
+            }
             dot_depth = 0;
             switch (right.id) {
             case ".":
@@ -10545,13 +10569,13 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         stack_trace = ""
     }, ii) {
         html += (
-            "<cite>"
-            + address(line, column)
-            + htmlEscape((ii + 1) + ". " + message)
-            + "</cite>"
-            + "<samp>"
-            + htmlEscape(line_source.slice(0, 400) + "\n" + stack_trace)
-            + "</samp>\n"
+            "<cite>" +
+            address(line, column) +
+            htmlEscape((ii + 1) + ". " + message) +
+            "</cite>" +
+            "<samp>" +
+            htmlEscape(line_source.slice(0, 400) + "\n" + stack_trace) +
+            "</samp>\n"
         );
     });
     if (warnings.length === 0) {
@@ -10564,9 +10588,9 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 
     html += "<fieldset id=\"JSLINT_REPORT_PROPERTIES\">\n";
     html += (
-        "<legend>Report: Properties ("
-        + Object.keys(property).length
-        + ")</legend>\n"
+        "<legend>Report: Properties (" +
+        Object.keys(property).length +
+        ")</legend>\n"
     );
     html += "<label>\n";
     html += "<textarea readonly>";
@@ -10645,23 +10669,23 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         } = the_function;
         let list = Object.keys(context);
         html += (
-            "<div class=\"level level" + htmlEscape(level) + "\">"
-            + address(line, from + 1)
-            + "<dfn>"
-            + (
+            "<div class=\"level level" + htmlEscape(level) + "\">" +
+            address(line, from + 1) +
+            "<dfn>" +
+            (
                 id === "=>"
                 ? (
-                    "\u00ab" + htmlEscape(name) + "\u00bb"
-                    + htmlEscape(signature)
-                    + " =>"
+                    "\u00ab" + htmlEscape(name) + "\u00bb" +
+                    htmlEscape(signature) +
+                    " =>"
                 )
                 : (
                     typeof name === "string"
                     ? "\u00ab" + htmlEscape(name) + "\u00bb"
                     : htmlEscape(name.id)
                 ) + htmlEscape(signature)
-            )
-            + "</dfn>"
+            ) +
+            "</dfn>"
         );
         html += detail("parameter", name_list.map(function ({id}) {
             return id;
@@ -10734,17 +10758,17 @@ async function jstestDescribe(description, testFunction) {
 // Print test results.
 
     message = (
-        "\n  " + (Date.now() - jstestTimeStart) + "ms"
-        + " - test describe - " + description + "\n"
-        + result.map(function ([
+        "\n  " + (Date.now() - jstestTimeStart) + "ms" +
+        " - test describe - " + description + "\n" +
+        result.map(function ([
             err, description, mode
         ]) {
             jstestItCount += 1;
             if (err) {
                 jstestCountFailed += 1;
                 err = (
-                    "    \u001b[31m\u2718 " + jstestItCount + ". test it - "
-                    + description + "\n" + err.stack + "\u001b[39m"
+                    "    \u001b[31m\u2718 " + jstestItCount + ". test it - " +
+                    description + "\n" + err.stack + "\u001b[39m"
                 );
                 if (mode === "pass") {
                     jstestCountFailed -= 1;
@@ -10752,8 +10776,8 @@ async function jstestDescribe(description, testFunction) {
                 }
             }
             return err || (
-                "    \u001b[32m\u2714 " + jstestItCount + ". test it - "
-                + description + "\u001b[39m"
+                "    \u001b[32m\u2714 " + jstestItCount + ". test it - " +
+                description + "\u001b[39m"
             );
         }).join("\n")
     );
@@ -10787,14 +10811,14 @@ function jstestOnExit(exitCode, mode) {
             (jstestCountFailed || mode === "testsFailed")
             ? "\n\u001b[31m"
             : "\n\u001b[32m"
-        )
-        + "  tests total  - " + jstestCountTotal + "\n"
-        + "  tests failed - " + jstestCountFailed + "\n"
-        + "\n"
-        + "  time finished - "
-        + Number(Date.now() - jstestTimeStart).toLocaleString()
-        + " ms\n"
-        + "\u001b[39m"
+        ) +
+        "  tests total  - " + jstestCountTotal + "\n" +
+        "  tests failed - " + jstestCountFailed + "\n" +
+        "\n" +
+        "  time finished - " +
+        Number(Date.now() - jstestTimeStart).toLocaleString() +
+        " ms\n" +
+        "\u001b[39m"
     );
     if (mode !== "testsFailed") {
         console.error(message);
@@ -11402,8 +11426,8 @@ function v8CoverageListMerge(processCovs) {
 // This assumes that `ranges` is non-empty (true for valid function coverages).
 
                     (
-                        funcCov.ranges[0].startOffset
-                        + ";" + funcCov.ranges[0].endOffset
+                        funcCov.ranges[0].startOffset +
+                        ";" + funcCov.ranges[0].endOffset
                     ),
                     funcCov
                 );
@@ -11714,17 +11738,17 @@ body {
             });
         }
         txtBorder = (
-            "+" + "-".repeat(padPathname + 2) + "+"
-            + "-".repeat(padLines + 2) + "+"
-            + "-".repeat(padLines + 2) + "+\n"
+            "+" + "-".repeat(padPathname + 2) + "+" +
+            "-".repeat(padLines + 2) + "+" +
+            "-".repeat(padLines + 2) + "+\n"
         );
         txt = "";
         txt += "V8 Coverage Report\n";
         txt += txtBorder;
         txt += (
-            "| " + String("Files covered").padEnd(padPathname, " ") + " | "
-            + String("Lines").padStart(padLines, " ") + " | "
-            + String("Remaining").padStart(padLines, " ") + " |\n"
+            "| " + String("Files covered").padEnd(padPathname, " ") + " | " +
+            String("Lines").padStart(padLines, " ") + " | " +
+            String("Remaining").padStart(padLines, " ") + " |\n"
         );
         txt += txtBorder;
         fileList.forEach(function ({
@@ -11760,17 +11784,17 @@ body {
 
                     "#" + Math.round(
                         (100 - Number(coveragePct)) * 2.21
-                    ).toString(16).padStart(2, "0")
+                    ).toString(16).padStart(2, "0") +
 
 // Badge-color rgb-green.
 
-                    + Math.round(
+                    Math.round(
                         Number(coveragePct) * 2.21
-                    ).toString(16).padStart(2, "0")
+                    ).toString(16).padStart(2, "0") +
 
 // Badge-color rgb-blue.
 
-                    + "00"
+                    "00"
                 );
                 str1 = "coverage";
                 str2 = coveragePct + " %";
@@ -11800,21 +11824,21 @@ body {
                 pathname = "";
             }
             txt += (
-                "| "
-                + String("./" + pathname).padEnd(padPathname, " ") + " | "
-                + String(
+                "| " +
+                String("./" + pathname).padEnd(padPathname, " ") + " | " +
+                String(
                     modeCoverageIgnoreFile + " " + coveragePct + " %"
-                ).padStart(padLines, " ") + " | "
-                + " ".repeat(padLines) + " |\n"
+                ).padStart(padLines, " ") + " | " +
+                " ".repeat(padLines) + " |\n"
             );
             txt += (
                 "| " + "*".repeat(
                     Math.round(0.01 * coveragePct * padPathname)
-                ).padEnd(padPathname, "_") + " | "
-                + String(
+                ).padEnd(padPathname, "_") + " | " +
+                String(
                     linesCovered + " / " + linesTotal
-                ).padStart(padLines, " ") + " | "
-                + String(
+                ).padStart(padLines, " ") + " | " +
+                String(
                     (linesTotal - linesCovered) + " / " + linesTotal
                 ).padStart(padLines, " ") + " |\n"
             );
@@ -11829,14 +11853,14 @@ body {
             ${(
                 modeIndex
                 ? (
-                    "<a href=\"" + (pathname || "index") + ".html\">. / "
-                    + pathname + "</a><br>"
+                    "<a href=\"" + (pathname || "index") + ".html\">. / " +
+                    pathname + "</a><br>"
                 )
                 : (
-                    "<a href=\""
-                    + "../".repeat(pathname.split("/").length - 1)
-                    + "index.html\">. / </a>"
-                    + pathname + "<br>"
+                    "<a href=\"" +
+                    "../".repeat(pathname.split("/").length - 1) +
+                    "index.html\">. / </a>" +
+                    pathname + "<br>"
                 )
             )}
         <div class="percentbar">

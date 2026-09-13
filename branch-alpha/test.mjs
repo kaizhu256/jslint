@@ -1243,13 +1243,13 @@ function aa() {
                 );
                 // test jslint's directive handling-behavior
                 source = (
-                    "/*jslint "
-                    + JSON
+                    "/*jslint " +
+                    JSON
                         .stringify(option_dict)
                         .slice(1, -1)
-                        .replace((/"/g), "")
-                    + "*/\n"
-                    + source.replace((/^#!/), "//")
+                        .replace((/"/g), "") +
+                    "*/\n" +
+                    source.replace((/^#!/), "//")
                 );
                 warnings = jslint(source).warnings;
                 assertOrThrow(
@@ -1293,11 +1293,11 @@ jstestDescribe((
             ), "");
             tmp = causeList.split("\n").map(function (cause) {
                 return (
-                    "["
-                    + JSON.parse(cause).map(function (elem) {
+                    "[" +
+                    JSON.parse(cause).map(function (elem) {
                         return JSON.stringify(elem);
-                    }).join(", ")
-                    + "]"
+                    }).join(", ") +
+                    "]"
                 );
             }).sort().join("\n");
             assertOrThrow(
@@ -1314,8 +1314,8 @@ jstestDescribe((
                 assertOrThrow(
                     tmp[JSON.stringify(cause.slice(1))],
                     (
-                        "\n" + JSON.stringify(cause) + "\n\n"
-                        + Object.keys(tmp).sort().join("\n")
+                        "\n" + JSON.stringify(cause) + "\n\n" +
+                        Object.keys(tmp).sort().join("\n")
                     )
                 );
             });
@@ -1500,8 +1500,8 @@ jstestDescribe((
         });
     });
     jstestIt((
-        "accepts arrays with two identical items for"
-        + " `v8CoverageListMerge`"
+        "accepts arrays with two identical items for" +
+        " `v8CoverageListMerge`"
     ), function () {
         assertJsonEqual(v8CoverageListMerge([
             {
@@ -1621,37 +1621,37 @@ jstestDescribe((
     [
         [
             "v8CoverageReportCreate_high.js", (
-                "switch(0){\n"
-                + "case 0:break;\n"
-                + "}\n"
+                "switch(0){\n" +
+                "case 0:break;\n" +
+                "}\n"
             )
         ], [
             "v8CoverageReportCreate_ignore.js", (
-                "/*coverage-ignore-file*/\n"
-                + "switch(0){\n"
-                + "case 0:break;\n"
-                + "case 1:break;//coverage-ignore-line\n"
-                + "/*coverage-disable*/\n"
-                + "case 2:break;\n"
-                + "/*coverage-enable*/\n"
-                + "}\n"
+                "/*coverage-ignore-file*/\n" +
+                "switch(0){\n" +
+                "case 0:break;\n" +
+                "case 1:break;//coverage-ignore-line\n" +
+                "/*coverage-disable*/\n" +
+                "case 2:break;\n" +
+                "/*coverage-enable*/\n" +
+                "}\n"
             )
         ], [
             "v8CoverageReportCreate_low.js", (
-                "switch(0){\n"
-                + "case 1:break;\n"
-                + "case 2:break;\n"
-                + "case 3:break;\n"
-                + "case 4:break;\n"
-                + "}\n"
+                "switch(0){\n" +
+                "case 1:break;\n" +
+                "case 2:break;\n" +
+                "case 3:break;\n" +
+                "case 4:break;\n" +
+                "}\n"
             )
         ], [
             "v8CoverageReportCreate_medium.js", (
-                "switch(0){\n"
-                + "case 0:break;\n"
-                + "case 1:break;\n"
-                + "case 2:break;\n"
-                + "}\n"
+                "switch(0){\n" +
+                "case 0:break;\n" +
+                "case 1:break;\n" +
+                "case 2:break;\n" +
+                "}\n"
             )
         ]
     ].forEach(function ([
