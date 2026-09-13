@@ -4223,7 +4223,7 @@ function jslint_phase2_lex(state) {
             opener_popped.assignment = the_token;
             break;
 
-// PR-xxx - Add ES2018-feature Asynchronous Iteration - for await...of.
+// PR-508 - Add ES2018-feature Asynchronous Iteration - for await...of.
 
         case "await (":
             if (token_prv_expr.for_loop) {
@@ -4232,7 +4232,7 @@ function jslint_phase2_lex(state) {
             break;
         case "for (":
 
-// PR-xxx - Add ES2018-feature Asynchronous Iteration - for await...of.
+// PR-508 - Add ES2018-feature Asynchronous Iteration - for await...of.
 
         case "for await":
             the_token.for_loop = token_prv_expr;
@@ -6981,7 +6981,7 @@ function jslint_phase3_parse(state) {
 
         scope_block = scope_block_push(the_for, true);
 
-// PR-xxx - Add ES2018-feature Asynchronous Iteration - for await...of.
+// PR-508 - Add ES2018-feature Asynchronous Iteration - for await...of.
 
         if (for_await) {
             if (the_for.for_semicolon) {
