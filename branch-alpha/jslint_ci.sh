@@ -531,6 +531,16 @@ import moduleFs from "fs";
     done
     # shellcheck disable=SC2086
     shLintShell $FILE_LIST
+    # check shell-functions in ascii-order
+    for FILE in $FILE_LIST
+    do
+        if ! grep -o "^[A-Za-z_][A-Za-z0-9_]*() {" "$FILE" | sed "s/() {//" |
+            LC_ALL=C sort -c
+        then
+            printf "%s - shell-functions not in ascii-order\n" "$FILE" >&2
+            exit 1
+        fi
+    done
     JSLINT_BETA=1 node jslint.mjs .
     if (command -v shCiLintCustom >/dev/null)
     then
