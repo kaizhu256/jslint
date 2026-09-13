@@ -666,6 +666,35 @@ jstestDescribe((
             data
         );
 
+// A join that pushes the previous line past 80 columns is STILL MADE, the
+// work is KEPT, and the resulting too_long is reported rather than hidden.
+
+        data = (
+            "/*jslint beta, node*/\n\nconsole.log(\n" +
+            "    " + JSON.stringify("a".repeat(70)) + "\n" +
+            "    + " + JSON.stringify("b".repeat(60)) + "\n);\n"
+        );
+        await fsWriteFileWithParents(".tmp/autofix_long.mjs", data);
+        await jslint.jslint_cli({
+            // suppress error
+            console_error: noop,
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_long.mjs"
+            ],
+            process_exit: processExit0
+        });
+        data = await moduleFs.promises.readFile(
+            ".tmp/autofix_long.mjs",
+            "utf8"
+        );
+        assertOrThrow(
+            data.indexOf(JSON.stringify("a".repeat(70)) + " +") > 0,
+            data
+        );
+
 // An *.html file is fixed the same way, but through its <script> blocks and
 // with browser:true - mirroring how jslint_from_file lints them.
 
