@@ -179,9 +179,9 @@
     finally,
     flag,
     floor,
-    for,
     forEach,
     for_init,
+    for_loop,
     for_of,
     for_semicolon,
     formatted_message,
@@ -4199,8 +4199,8 @@ function jslint_phase2_lex(state) {
             }
             break;
         case ";":
-            if (opener_stack[0]?.for) {
-                opener_stack[0].for.for_semicolon = [
+            if (opener_stack[0]?.for_loop) {
+                opener_stack[0].for_loop.for_semicolon = [
                     undefined,
                     undefined,
                     undefined
@@ -4227,13 +4227,13 @@ function jslint_phase2_lex(state) {
 // PR-xxx - Add ES2018-feature Asynchronous Iteration (for await..of).
 
         case "await (":
-            if (token_prv_expr.for) {
-                the_token.for = token_prv_expr.for;
+            if (token_prv_expr.for_loop) {
+                the_token.for_loop = token_prv_expr.for_loop;
             }
             break;
         case "for (":
         case "for await":
-            the_token.for = token_prv_expr;
+            the_token.for_loop = token_prv_expr;
             break;
         }
 

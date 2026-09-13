@@ -344,9 +344,9 @@ body {
 <pre><span class="lineno"><a href="#line_179" id="line_179">  179.</a></span><span class="count                ">      1</span><span>    finally,</span></pre>
 <pre><span class="lineno"><a href="#line_180" id="line_180">  180.</a></span><span class="count                ">      1</span><span>    flag,</span></pre>
 <pre><span class="lineno"><a href="#line_181" id="line_181">  181.</a></span><span class="count                ">      1</span><span>    floor,</span></pre>
-<pre><span class="lineno"><a href="#line_182" id="line_182">  182.</a></span><span class="count                ">      1</span><span>    for,</span></pre>
-<pre><span class="lineno"><a href="#line_183" id="line_183">  183.</a></span><span class="count                ">      1</span><span>    forEach,</span></pre>
-<pre><span class="lineno"><a href="#line_184" id="line_184">  184.</a></span><span class="count                ">      1</span><span>    for_init,</span></pre>
+<pre><span class="lineno"><a href="#line_182" id="line_182">  182.</a></span><span class="count                ">      1</span><span>    forEach,</span></pre>
+<pre><span class="lineno"><a href="#line_183" id="line_183">  183.</a></span><span class="count                ">      1</span><span>    for_init,</span></pre>
+<pre><span class="lineno"><a href="#line_184" id="line_184">  184.</a></span><span class="count                ">      1</span><span>    for_loop,</span></pre>
 <pre><span class="lineno"><a href="#line_185" id="line_185">  185.</a></span><span class="count                ">      1</span><span>    for_of,</span></pre>
 <pre><span class="lineno"><a href="#line_186" id="line_186">  186.</a></span><span class="count                ">      1</span><span>    for_semicolon,</span></pre>
 <pre><span class="lineno"><a href="#line_187" id="line_187">  187.</a></span><span class="count                ">      1</span><span>    formatted_message,</span></pre>
@@ -4364,8 +4364,8 @@ body {
 <pre><span class="lineno"><a href="#line_4199" id="line_4199"> 4199.</a></span><span class="count                ">  22047</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_4200" id="line_4200"> 4200.</a></span><span class="count                ">  22047</span><span>            break;</span></pre>
 <pre><span class="lineno"><a href="#line_4201" id="line_4201"> 4201.</a></span><span class="count                ">  16508</span><span>        case ";":</span></pre>
-<pre><span class="lineno"><a href="#line_4202" id="line_4202"> 4202.</a></span><span class="count                ">  16508</span><span>            if (opener_stack[0]?.for) {</span></pre>
-<pre><span class="lineno"><a href="#line_4203" id="line_4203"> 4203.</a></span><span class="count                ">  16508</span><span>                opener_stack[0].for.for_semicolon = [</span></pre>
+<pre><span class="lineno"><a href="#line_4202" id="line_4202"> 4202.</a></span><span class="count                ">  16508</span><span>            if (opener_stack[0]?.for_loop) {</span></pre>
+<pre><span class="lineno"><a href="#line_4203" id="line_4203"> 4203.</a></span><span class="count                ">  16508</span><span>                opener_stack[0].for_loop.for_semicolon = [</span></pre>
 <pre><span class="lineno"><a href="#line_4204" id="line_4204"> 4204.</a></span><span class="count                ">  16508</span><span>                    undefined,</span></pre>
 <pre><span class="lineno"><a href="#line_4205" id="line_4205"> 4205.</a></span><span class="count                ">  16508</span><span>                    undefined,</span></pre>
 <pre><span class="lineno"><a href="#line_4206" id="line_4206"> 4206.</a></span><span class="count                ">  16508</span><span>                    undefined</span></pre>
@@ -4392,13 +4392,13 @@ body {
 <pre><span class="lineno"><a href="#line_4227" id="line_4227"> 4227.</a></span><span class="count                "> 260625</span><span>// PR-xxx - Add ES2018-feature Asynchronous Iteration (for await..of).</span></pre>
 <pre><span class="lineno"><a href="#line_4228" id="line_4228"> 4228.</a></span><span class="count                "> 260625</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_4229" id="line_4229"> 4229.</a></span><span class="count                ">      6</span><span>        case "await (":</span></pre>
-<pre><span class="lineno"><a href="#line_4230" id="line_4230"> 4230.</a></span><span class="count                ">      6</span><span>            if (token_prv_expr.for) {</span></pre>
-<pre><span class="lineno"><a href="#line_4231" id="line_4231"> 4231.</a></span><span class="count                ">      6</span><span>                the_token.for = token_prv_expr.for;</span></pre>
+<pre><span class="lineno"><a href="#line_4230" id="line_4230"> 4230.</a></span><span class="count                ">      6</span><span>            if (token_prv_expr.for_loop) {</span></pre>
+<pre><span class="lineno"><a href="#line_4231" id="line_4231"> 4231.</a></span><span class="count                ">      6</span><span>                the_token.for_loop = token_prv_expr.for_loop;</span></pre>
 <pre><span class="lineno"><a href="#line_4232" id="line_4232"> 4232.</a></span><span class="count                ">      6</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_4233" id="line_4233"> 4233.</a></span><span class="count                ">      6</span><span>            break;</span></pre>
 <pre><span class="lineno"><a href="#line_4234" id="line_4234"> 4234.</a></span><span class="count                ">     48</span><span>        case "for (":</span></pre>
 <pre><span class="lineno"><a href="#line_4235" id="line_4235"> 4235.</a></span><span class="count                ">     52</span><span>        case "for await":</span></pre>
-<pre><span class="lineno"><a href="#line_4236" id="line_4236"> 4236.</a></span><span class="count                ">     52</span><span>            the_token.for = token_prv_expr;</span></pre>
+<pre><span class="lineno"><a href="#line_4236" id="line_4236"> 4236.</a></span><span class="count                ">     52</span><span>            the_token.for_loop = token_prv_expr;</span></pre>
 <pre><span class="lineno"><a href="#line_4237" id="line_4237"> 4237.</a></span><span class="count                ">     52</span><span>            break;</span></pre>
 <pre><span class="lineno"><a href="#line_4238" id="line_4238"> 4238.</a></span><span class="count                "> 260621</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_4239" id="line_4239"> 4239.</a></span><span class="count                "> 260621</span><span></span></pre>
