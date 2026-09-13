@@ -6993,8 +6993,6 @@ function jslint_phase3_parse(state) {
 // PR-xxx - Add ES2018-feature Asynchronous Iteration (for await..of).
 
         if (token_nxt.id === "await") {
-            advance("await");
-            the_for.for_await = token_now;
 
 // The async-context rules are prefix_await's, not the loop's - top-level await
 // is allowed, await inside a non-async function is not.
@@ -7002,15 +7000,15 @@ function jslint_phase3_parse(state) {
             if (scope_function.async === 0 && scope_function !== token_global) {
 
 // test_cause:
-// ["
-// function aa(){for await(bb of cc){}}
-// ", "stmt_for", "unexpected_a", "await", 19]
+// ["()=>{for await(bb of cc){}}", "stmt_for", "unexpected_a", "await", 10]
 
-                warn("unexpected_a", token_now);
+                warn("unexpected_a", token_nxt);
             }
             if (scope_function.async === 1) {
                 scope_function.async = 2;
             }
+            advance("await");
+            the_for.for_await = token_now;
 
 // "for await" pairs with "of" ONLY, so reject the semicolon-form here rather
 // than let the "expected_a 'let'" advice below fire on a syntax error. The
