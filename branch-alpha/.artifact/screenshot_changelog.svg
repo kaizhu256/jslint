@@ -89,13 +89,13 @@
     textLength="768"
     x="10"
     y="318"
->- jslint - Add beta-rule to jslint_phase5_whitage requiring binary-operators at end-of-line, exc\</tspan>
+>- jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-lin\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="340"
->  ept dot-operators '.', '?.'.                                                                   </tspan>
+>  e, except dot-operators '.', '?.'.                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
