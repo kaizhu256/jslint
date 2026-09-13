@@ -2371,16 +2371,31 @@ async function jslint_autofix({
             });
             if (blocked.length > 0) {
                 console_error(
-                    "jslint_autofix " + pathname + " - no change - " +
-                    blocked.length +
-                    " warning(s) it cannot fix, repair these by hand first:"
+                    "jslint_autofix " + pathname + " - " +
+                    (
+                        pass === 0
+                        ? "no change"
+                        : "wrote " + pass + " pass(es)"
+                    ) +
+                    " - " + blocked.length +
+                    " warning(s) it cannot fix, repair these by hand:"
                 );
                 console_error(blocked.slice(0, 10).map(function ({
                     formatted_message
                 }) {
                     return formatted_message;
                 }).join("\n"));
-                return;
+
+// BLOCKED ON PASS 0 means the source was ALREADY unfixable - write nothing.
+// BLOCKED LATER means OUR OWN fixes surfaced it, usually a too_long created
+// by joining an operator onto a near-80-column line. KEEP that work. The
+// alternative is discarding every fix made so far, which is how the
+// 241-operator corpus once lost all 241 to a single over-long line.
+
+                if (pass === 0) {
+                    return;
+                }
+                return code;
             }
             if (warnings.length === 0) {
                 break;
@@ -2431,19 +2446,6 @@ async function jslint_autofix({
                         /^ /
                     ), "");
 
-// DECLINE a join that would push the previous line past 80 columns. Joining
-// blind raises too_long, which is NOT fixable here, which blocks the NEXT
-// pass, which throws away every fix already made. Measured on jslint.mjs as
-// of the pre-conversion commit: 241 joins, and exactly ONE of them - the
-// wrap_immediate message - overflows. Leaving that one alone keeps the other
-// 240 and reports the remainder honestly.
-
-                    if (
-                        line_list[jj].replace((/ +$/), "").length +
-                        1 + warning_a.length > 80
-                    ) {
-                        return;
-                    }
                     line_list[jj] = (
                         line_list[jj].replace((/ +$/), "") + " " + warning_a
                     );
