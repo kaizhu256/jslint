@@ -1176,6 +1176,35 @@ shGithubPrCleanup() {(set -e
 
 shGithubPrCreate() {(set -e
 # This function will create-and-push a github-pull-commit to origin/alpha.
+    # Update 'PR-xxx' placeholder in codebase.
+    if git grep -Ei -e '^ *?(//|#) pr-xxx'
+    then
+        export UPSTREAM_REPOSITORY="$(sed -En \
+            -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
+            package.json
+        )"
+        PR_XXX="$(curl -fs --ssl-no-revoke \
+"https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
+        )"
+        PR_XXX="$(
+            printf "%s" "$PR_XXX" | sed -En -e 's/.*"number": ([0-9]+).*/\1/p'
+        )"
+        if [ ! "$PR_XXX" ]
+        then
+            return
+        fi
+        PR_XXX="PR-$((PR_XXX + 1))"
+        FILE_LIST="$(
+git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
+        )"
+        for FILE in $FILE_LIST
+        do
+            sed -Ei.bak \
+                -e "s/^ *?(\/\/|#) pr-xxx - /\1 $PR_XXX - /gi" \
+                "$FILE" && \
+                rm -f "$FILE".bak
+        done
+    fi
     node --input-type=module --eval '
 // init debugInline
 const debugInline = (function () {
@@ -1273,45 +1302,6 @@ import moduleFs from "fs";
     });
 }());
 ' "$@" # '
-)}
-
-shGithubPrUpdatePrxxx() {(set -e
-# This function will update 'PR-xxx' placeholder in codebase
-# to next sequential github issue/pull number.
-    if ! git grep -Ei -e '^ *?(//|#) pr-xxx'
-    then
-        return
-    fi
-    export UPSTREAM_REPOSITORY="$(sed -En \
-        -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
-        package.json
-    )"
-    PR_XXX="$(curl -fs --ssl-no-revoke \
-"https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
-    )"
-    PR_XXX="$(
-        printf "%s" "$PR_XXX" | sed -En -e 's/.*"number": ([0-9]+).*/\1/p'
-    )"
-    if [ ! "$PR_XXX" ]
-    then
-        return
-    fi
-    PR_XXX="PR-$((PR_XXX + 1))"
-    FILE_LIST="$(
-        git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
-    )"
-    for FILE in $FILE_LIST
-    do
-        sed -Ei.bak \
-            -e "s/^ *?(\/\/|#) pr-xxx - /\1 $PR_XXX - /gi" \
-            "$FILE" && \
-            rm -f "$FILE".bak
-    done
-    git --no-pager diff
-    git grep -Ei -e '^ *?(//|#) pr-xxx' || true
-    git commit -am "- ci - Update 'PR-xxx' placeholder to '${PR_XXX}'."
-    printf "\n\n\n\n"
-    git --no-pager log -n 4
 )}
 
 shGithubTokenExport() {

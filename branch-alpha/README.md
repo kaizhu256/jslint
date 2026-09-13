@@ -999,9 +999,6 @@ if (false) {
         # re-run until version propagates
         npm run test2
 
-        # update 'PR-xxx' placeholder
-        sh jslint_ci.sh shGithubPrUpdatePrxxx
-
         # re-run until version propagates
         sh jslint_ci.sh shGithubPrCreate alpha beta # v20yy.mm.dd __pr_beta_pre
 
@@ -1056,9 +1053,6 @@ if (false) {
         ```shell
         # re-run until version propagates
         npm run test2
-
-        # update 'PR-xxx' placeholder
-        sh jslint_ci.sh shGithubPrUpdatePrxxx
 
         # re-run until version propagates
         sh jslint_ci.sh shGithubPrCreate alpha master # v20yy.mm.dd __pr_master_pre
