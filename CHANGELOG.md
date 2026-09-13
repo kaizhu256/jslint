@@ -1,7 +1,7 @@
 # Changelog
 
 # Todo
-- jslint-ecma - Add ES2018-feature Asynchronous Iteration.
+- jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.'.
 - jslint-ecma - Add ES2015-feature iterators.
 - jslint - Audit token-property '.free'.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
@@ -10,6 +10,9 @@
 - jslint - Add html and css linting back into jslint.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
+
+# v2026.9.29
+- jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
 
 # v2026.8.31
 - jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.
