@@ -675,7 +675,19 @@ await aa();
                 `),
 
 // PR-xxx - Add ES2018-feature Asynchronous Iteration (for await..of).
+// This pair is ORDER-LOCKED by the sorted-fixture assert below: "for (" sorts
+// before "for await". The first is an "await (" that is NOT a "for await" -
+// the loop-opener link must not follow it, and the real "for (" beside it must
+// still be linked.
 
+                (`
+async function aa(bb) {
+    for (const cc of await (bb())) {
+        aa(cc);
+    }
+}
+await aa();
+                `),
                 (`
 async function aa(bb) {
     for await (const cc of bb) {

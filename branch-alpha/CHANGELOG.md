@@ -1,6 +1,7 @@
 # Changelog
 
 # Todo
+- jslint - Add rule requiring operators to be at end-of-line, instead of beginning-of-line, except for ternary-operators ?, :, and gate it behind /*jslint beta*/, to minimize breakage for existing users.
 - jslint-ecma - Add ES2015-feature iterators.
 - jslint - Audit token-property '.free'.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.

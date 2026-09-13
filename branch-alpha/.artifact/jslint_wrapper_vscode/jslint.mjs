@@ -4225,17 +4225,25 @@ function jslint_phase2_lex(state) {
             opener_popped.assignment = the_token;
             break;
 // PR-xxx - Add ES2018-feature Asynchronous Iteration (for await..of).
-// The "for (" pairing below is adjacency-only, so "for await (" would leave the
-// opener unlinked and for_semicolon forever unset - carry the link across the
-// intervening "await" in two hops instead. These case-strings are ASCII-ordered
-// like every other switch here; the pair reads out of order on purpose.
+// This pairing is ADJACENCY-ONLY, so "for await (" would leave the opener
+// unlinked and for_semicolon forever unset - hang the link on the "await"
+// first, then hand it to the "(". There is NO lookahead to do it in one hop:
+// this runs in phase 2, where the "(" does not exist yet when "await" is made.
+// Comments need no handling - token_prv_expr SKIPS them by construction.
+// Case-strings are ASCII-ordered, so the propagating arm reads before the two
+// arms that feed it.
 
         case "await (":
-            the_token.for = token_prv_expr.for;
+
+// Most "await (" are an ordinary awaited expression and have NOTHING to do
+// with a loop, so only propagate when the "await" itself carries the mark the
+// arm below hung on it - that mark IS the evidence it was preceded by "for".
+
+            if (token_prv_expr.for) {
+                the_token.for = token_prv_expr.for;
+            }
             break;
         case "for (":
-            the_token.for = token_prv_expr;
-            break;
         case "for await":
             the_token.for = token_prv_expr;
             break;
