@@ -2312,6 +2312,8 @@ async function jslint_autofix({
 
     const fix_list = [
         "expected_a_at_b_c",
+        "expected_a_at_end",
+        "expected_line_break_a_b",
         "expected_space_a_b",
         "unexpected_space_a_b"
     ];
@@ -2355,6 +2357,7 @@ async function jslint_autofix({
         }).forEach(function ({
             column,
             line,
+            a: warning_a,
             b: warning_b,
             code: warning_code
         }) {
@@ -2362,7 +2365,75 @@ async function jslint_autofix({
             let ii = column - 1;
             let indentage_at;
             let jj = ii;
+            let rest;
             if (source === undefined) {
+                return;
+            }
+            if (warning_code === "expected_a_at_end") {
+
+// Move the line-leading operator onto the end of the previous CODE line.
+// THAT IS NOT ALWAYS THE PREVIOUS LINE - blank lines and //-comments sit
+// between an operand and its continuation, so walk back past them. An
+// operator left ALONE on its line leaves an empty line behind; splice it out
+// rather than leave a blank the whitespace rules would then complain about.
+
+                jj = line - 2;
+                while (
+                    jj >= 0 &&
+                    (
+                        line_list[jj].trim() === "" ||
+                        line_list[jj].trim().slice(0, 2) === "//"
+                    )
+                ) {
+                    jj -= 1;
+                }
+                if (jj < 0) {
+                    return;
+                }
+                rest = source.slice(ii + warning_a.length).replace((
+                    /^ /
+                ), "");
+
+// DECLINE a join that would push the previous line past 80 columns. Joining
+// blind raises too_long, which is NOT fixable here, which blocks the NEXT
+// pass, which throws away every fix already made. Measured on jslint.mjs as
+// of the pre-conversion commit: 241 joins, and exactly ONE of them - the
+// wrap_immediate message - overflows. Leaving that one alone keeps the other
+// 240 and reports the remainder honestly.
+
+                if (
+                    line_list[jj].replace((/ +$/), "").length +
+                    1 + warning_a.length > 80
+                ) {
+                    return;
+                }
+                line_list[jj] = (
+                    line_list[jj].replace((/ +$/), "") + " " + warning_a
+                );
+                if (rest.trim() === "") {
+                    line_list.splice(line - 1, 1);
+                    return;
+                }
+                line_list[line - 1] = source.slice(0, ii) + rest;
+                return;
+            }
+            if (warning_code === "expected_line_break_a_b") {
+
+// Split the line at the token. The new line lands unindented and the
+// expected_a_at_b_c pass re-indents it on the NEXT iteration - that division
+// of labour is why this fixer iterates rather than trying to be complete in
+// one pass. Splicing is safe here because fixes run BOTTOM-UP, so every line
+// this shifts has already been visited.
+
+                if (ii === 0) {
+                    return;
+                }
+                line_list.splice(
+                    line - 1,
+                    1,
+                    source.slice(0, ii).replace((/ +$/), ""),
+                    source.slice(ii)
+                );
                 return;
             }
             if (warning_code === "expected_a_at_b_c") {
@@ -2373,10 +2444,18 @@ async function jslint_autofix({
 
                 indentage_at = source.length - source.trimStart().length;
 
-// Only a line-leading token is re-indentable; anything else is a column
-// complaint this fixer cannot honour by moving whitespace.
+// A MID-LINE token cannot be re-indented, but it does not need to be skipped:
+// expected_a_at_b_c reaches here only from at_margin, which fires for tokens
+// that belong AT a margin and therefore on their OWN line. So split first and
+// indent the remainder, which also lands trailing closers correctly.
 
                 if (ii !== indentage_at) {
+                    line_list.splice(
+                        line - 1,
+                        1,
+                        source.slice(0, ii).replace((/ +$/), ""),
+                        " ".repeat(warning_b - 1) + source.slice(ii)
+                    );
                     return;
                 }
                 line_list[line - 1] = (
@@ -2410,7 +2489,23 @@ async function jslint_autofix({
             );
         });
         code = line_list.join("\n");
+
+// A pass that changed NOTHING while warnings remain means every one of them
+// was declined - the 80-column join-guard is the usual reason. Say so. A
+// silent stop here would be indistinguishable from a clean file, which is the
+// failure this whole function is written to avoid.
+
         if (code === code_prv) {
+            console_error(
+                "jslint_autofix " + pathname + " - wrote " + pass +
+                " pass(es), " + warnings.length +
+                " warning(s) left that it declined to fix:"
+            );
+            console_error(warnings.slice(0, 10).map(function ({
+                formatted_message
+            }) {
+                return formatted_message;
+            }).join("\n"));
             break;
         }
         code_prv = code;

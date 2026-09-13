@@ -604,15 +604,44 @@ jstestDescribe((
             data
         );
 
-// A beta line-leading binary-operator raises expected_a_at_end, which is NOT
-// in fix_list, so the file is reported and left byte-identical. It must never
-// be mistaken for an indent and re-indented.
+// A one-liner block is split, re-indented and its closer moved, across
+// passes. The trailing comment must survive, attached to the closer.
 
-        data = (
+        await fsWriteFileWithParents(
+            ".tmp/autofix_break.mjs",
+            "function aa(bb) {\n    if (bb) { return bb; } // keep me\n" +
+            "    return 0;\n}\nexport default Object.freeze(aa);\n"
+        );
+        await jslint.jslint_cli({
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_break.mjs"
+            ],
+            process_exit: processExit0
+        });
+        data = await moduleFs.promises.readFile(
+            ".tmp/autofix_break.mjs",
+            "utf8"
+        );
+        assertOrThrow(
+            data === (
+                "function aa(bb) {\n    if (bb) {\n        return bb;\n" +
+                "    } // keep me\n    return 0;\n}\n" +
+                "export default Object.freeze(aa);\n"
+            ),
+            data
+        );
+
+// A beta line-leading binary-operator raises expected_a_at_end, which IS in
+// fix_list: the operator is JOINED onto the end of the previous line.
+
+        await fsWriteFileWithParents(
+            ".tmp/autofix_beta.mjs",
             "/*jslint beta*/\nfunction aa(bb) {\n    return (\n        bb\n" +
             "        + bb\n    );\n}\nexport default Object.freeze(aa);\n"
         );
-        await fsWriteFileWithParents(".tmp/autofix_beta.mjs", data);
         await jslint.jslint_cli({
             mode_cli: true,
             process_argv: [
@@ -622,12 +651,17 @@ jstestDescribe((
             ],
             process_exit: processExit0
         });
+        data = await moduleFs.promises.readFile(
+            ".tmp/autofix_beta.mjs",
+            "utf8"
+        );
         assertOrThrow(
-            data === await moduleFs.promises.readFile(
-                ".tmp/autofix_beta.mjs",
-                "utf8"
+            data === (
+                "/*jslint beta*/\nfunction aa(bb) {\n    return (\n" +
+                "        bb +\n        bb\n    );\n}\n" +
+                "export default Object.freeze(aa);\n"
             ),
-            "autofix must not rewrite an expected_a_at_end file"
+            data
         );
     });
     jstestIt((
