@@ -383,6 +383,7 @@
     tree,
     trim,
     trimEnd,
+    trimStart,
     try,
     type,
     unlink,
@@ -2280,6 +2281,185 @@ ${String(message).slice(0, 2000)}`
     throw error;
 }
 
+async function jslint_autofix({
+    console_error,
+    pathname
+}) {
+
+// This function will auto-fix whitespace-warnings in file <pathname>.
+//
+// SCOPE IS DELIBERATELY expected_space_a_b AND unexpected_space_a_b ONLY.
+// Both are ONE whitespace-run between TWO TOKENS ON ONE LINE, so the edit is
+// local and provable by re-linting. Add expected_a_at_b_c (indent) and
+// expected_line_break_a_b as further cases in <fix_list>; the loop needs no
+// change.
+//
+// expected_a_at_b_c IS INDENTATION AND NOTHING ELSE. The
+// operators-at-end-of-line rule raises its OWN code, expected_a_at_end,
+// exactly so this fixer never has to guess which line a target column belongs
+// to. Do not merge the two codes back together.
+//
+// ANY warning outside <fix_list> stops the run: the file is REPORTED AND LEFT
+// BYTE-IDENTICAL. Two different causes land here. A NON-WHITESPACE warning
+// means phase 5 never ran at all, so there are no whitespace-warnings to
+// find. A whitespace-warning NOT YET IN <fix_list>, expected_a_at_end today,
+// means phase 5 did run and found work this fixer cannot do. Either way,
+// writing the file back unchanged would make a blocked run look identical to
+// a clean one.
+
+    const fix_list = [
+        "expected_a_at_b_c",
+        "expected_line_break_a_b",
+        "expected_space_a_b",
+        "unexpected_space_a_b"
+    ];
+    const pass_max = 10;
+    let code = await moduleFs.promises.readFile(pathname, "utf8");
+    let code_prv = code;
+    let pass = 0;
+    while (pass < pass_max) {
+        let blocked;
+        let line_list;
+        let warnings;
+        warnings = jslint(code, {}).warnings;
+        blocked = warnings.filter(function ({
+            code: warning_code
+        }) {
+            return !fix_list.includes(warning_code);
+        });
+        if (blocked.length > 0) {
+            console_error(
+                "jslint_autofix " + pathname + " - no change - " +
+                blocked.length +
+                " warning(s) it cannot fix, repair these by hand first:"
+            );
+            console_error(blocked.slice(0, 10).map(function ({
+                formatted_message
+            }) {
+                return formatted_message;
+            }).join("\n"));
+            return;
+        }
+        if (warnings.length === 0) {
+            break;
+        }
+
+// Apply each fix RIGHT-TO-LEFT within its line, so an earlier fix cannot
+// invalidate a later fix's column.
+
+        line_list = code.split("\n");
+        warnings.slice().sort(function (aa, bb) {
+            return bb.line - aa.line || bb.column - aa.column;
+        }).forEach(function ({
+            column,
+            line,
+            b: warning_b,
+            code: warning_code
+        }) {
+            const source = line_list[line - 1];
+            let ii = column - 1;
+            let indentage_at;
+            let jj = ii;
+            if (source === undefined) {
+                return;
+            }
+            if (warning_code === "expected_line_break_a_b") {
+
+// Split the line at the token. The new line lands unindented and the
+// expected_a_at_b_c pass re-indents it on the NEXT iteration - that division
+// of labour is why this fixer iterates rather than trying to be complete in
+// one pass. Splicing is safe here because fixes run BOTTOM-UP, so every line
+// this shifts has already been visited.
+
+                if (ii === 0) {
+                    return;
+                }
+                line_list.splice(
+                    line - 1,
+                    1,
+                    source.slice(0, ii).replace((/ +$/), ""),
+                    source.slice(ii)
+                );
+                return;
+            }
+            if (warning_code === "expected_a_at_b_c") {
+
+// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. The operators-at-end-of-line
+// rule raises expected_a_at_end instead, precisely so this fixer never has to
+// guess which line the target column belongs to.
+
+                indentage_at = source.length - source.trimStart().length;
+
+// A MID-LINE token cannot be re-indented, but it does not need to be skipped:
+// expected_a_at_b_c reaches here only from at_margin, which fires for tokens
+// that belong AT a margin and therefore on their OWN line. So split first and
+// indent the remainder, which also lands trailing closers correctly.
+
+                if (ii !== indentage_at) {
+                    line_list.splice(
+                        line - 1,
+                        1,
+                        source.slice(0, ii).replace((/ +$/), ""),
+                        " ".repeat(warning_b - 1) + source.slice(ii)
+                    );
+                    return;
+                }
+                line_list[line - 1] = (
+                    " ".repeat(warning_b - 1) + source.trimStart()
+                );
+                return;
+            }
+
+// Walk back over the whitespace-run immediately before the token.
+
+            while (jj > 0 && (
+                source[jj - 1] === " " || source[jj - 1] === "\t"
+            )) {
+                jj -= 1;
+            }
+
+// A run reaching column 0 is INDENTATION or a line-join, not a gap between
+// two tokens on one line. Leave it to a future fix_list entry.
+
+            if (jj === 0) {
+                return;
+            }
+            line_list[line - 1] = (
+                source.slice(0, jj) +
+                (
+                    warning_code === "expected_space_a_b"
+                    ? " "
+                    : ""
+                ) +
+                source.slice(ii)
+            );
+        });
+        code = line_list.join("\n");
+
+// A pass that changed NOTHING while warnings remain means every one of them
+// was declined - the 80-column join-guard is the usual reason. Say so. A
+// silent stop here would be indistinguishable from a clean file, which is the
+// failure this whole function is written to avoid.
+
+        if (code === code_prv) {
+            console_error(
+                "jslint_autofix " + pathname + " - wrote " + pass +
+                " pass(es), " + warnings.length +
+                " warning(s) left that it declined to fix:"
+            );
+            console_error(warnings.slice(0, 10).map(function ({
+                formatted_message
+            }) {
+                return formatted_message;
+            }).join("\n"));
+            break;
+        }
+        code_prv = code;
+        pass += 1;
+    }
+    await fsWriteFileWithParents(pathname, code);
+}
+
 async function jslint_cli({
     console_error,
     console_log,
@@ -2524,6 +2704,14 @@ async function jslint_cli({
     case "jslint_apidoc":
         await jslint_apidoc({
             ...JSON.parse(process_argv[3]),
+            pathname: command[1]
+        });
+        return;
+// Add command jslint_autofix.
+
+    case "jslint_autofix":
+        await jslint_autofix({
+            console_error,
             pathname: command[1]
         });
         return;

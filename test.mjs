@@ -520,6 +520,121 @@ jstestDescribe((
         });
     });
     jstestIt((
+        "test cli-autofix handling-behavior"
+    ), async function () {
+        let data;
+
+// Whitespace-only warnings - autofix repairs them and the file lints clean.
+
+        await fsWriteFileWithParents(
+            ".tmp/autofix.mjs",
+            "function aa(bb) {\n    return String( bb)+bb;\n}\n" +
+            "export default Object.freeze(aa);\n"
+        );
+        await jslint.jslint_cli({
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix.mjs"
+            ],
+            process_exit: processExit0
+        });
+        data = await moduleFs.promises.readFile(".tmp/autofix.mjs", "utf8");
+        assertOrThrow(
+            data === (
+                "function aa(bb) {\n    return String(bb) + bb;\n}\n" +
+                "export default Object.freeze(aa);\n"
+            ),
+            data
+        );
+
+// A non-whitespace warning blocks phase-5, so the file is REPORTED and left
+// BYTE-IDENTICAL.
+
+        data = (
+            "function aa(bb) {\n    let cc = 0;\n" +
+            "    return String( bb);\n}\n"
+        );
+        await fsWriteFileWithParents(".tmp/autofix_blocked.mjs", data);
+        await jslint.jslint_cli({
+            // suppress error
+            console_error: noop,
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_blocked.mjs"
+            ],
+            process_exit: processExit0
+        });
+        assertOrThrow(
+            data === await moduleFs.promises.readFile(
+                ".tmp/autofix_blocked.mjs",
+                "utf8"
+            ),
+            "autofix must not rewrite a blocked file"
+        );
+
+// Indentation is re-indented to the expected column, cascading across passes.
+
+        await fsWriteFileWithParents(
+            ".tmp/autofix_indent.mjs",
+            "function aa(bb) {\n        if (bb) {\n  return bb;\n" +
+            "        }\n    return 0;\n}\nexport default Object.freeze(aa);\n"
+        );
+        await jslint.jslint_cli({
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_indent.mjs"
+            ],
+            process_exit: processExit0
+        });
+        data = await moduleFs.promises.readFile(
+            ".tmp/autofix_indent.mjs",
+            "utf8"
+        );
+        assertOrThrow(
+            data === (
+                "function aa(bb) {\n    if (bb) {\n        return bb;\n" +
+                "    }\n    return 0;\n}\nexport default Object.freeze(aa);\n"
+            ),
+            data
+        );
+
+// A one-liner block is split, re-indented and its closer moved, across
+// passes. The trailing comment must survive, attached to the closer.
+
+        await fsWriteFileWithParents(
+            ".tmp/autofix_break.mjs",
+            "function aa(bb) {\n    if (bb) { return bb; } // keep me\n" +
+            "    return 0;\n}\nexport default Object.freeze(aa);\n"
+        );
+        await jslint.jslint_cli({
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_break.mjs"
+            ],
+            process_exit: processExit0
+        });
+        data = await moduleFs.promises.readFile(
+            ".tmp/autofix_break.mjs",
+            "utf8"
+        );
+        assertOrThrow(
+            data === (
+                "function aa(bb) {\n    if (bb) {\n        return bb;\n" +
+                "    } // keep me\n    return 0;\n}\n" +
+                "export default Object.freeze(aa);\n"
+            ),
+            data
+        );
+    });
+    jstestIt((
         "test cli-report handling-behavior"
     ), function () {
         jslint.jslint_cli({
