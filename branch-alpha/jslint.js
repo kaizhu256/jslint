@@ -4223,21 +4223,10 @@ function jslint_phase2_lex(state) {
         case "] =":
             opener_popped.assignment = the_token;
             break;
+
 // PR-xxx - Add ES2018-feature Asynchronous Iteration (for await..of).
-// This pairing is ADJACENCY-ONLY, so "for await (" would leave the opener
-// unlinked and for_semicolon forever unset - hang the link on the "await"
-// first, then hand it to the "(". There is NO lookahead to do it in one hop:
-// this runs in phase 2, where the "(" does not exist yet when "await" is made.
-// Comments need no handling - token_prv_expr SKIPS them by construction.
-// Case-strings are ASCII-ordered, so the propagating arm reads before the two
-// arms that feed it.
 
         case "await (":
-
-// Most "await (" are an ordinary awaited expression and have NOTHING to do
-// with a loop, so only propagate when the "await" itself carries the mark the
-// arm below hung on it - that mark IS the evidence it was preceded by "for".
-
             if (token_prv_expr.for) {
                 the_token.for = token_prv_expr.for;
             }
@@ -7117,13 +7106,8 @@ function jslint_phase3_parse(state) {
             case "in":
                 if (for_await) {
 
-// PR-xxx - "for await" pairs with "of" ONLY; "for await (aa in bb)" is a syntax
-// error, so the Object.keys advice below would be actively misleading.
-
 // test_cause:
-// ["
-// async function aa(){for await(bb in cc){}}
-// ", "stmt_for", "expected_a_b", "in", 34]
+// ["for await(aa in aa){}", "stmt_for", "expected_a_b", "in", 14]
 
                     return stop("expected_a_b", the_operator, "of", "in");
                 }
