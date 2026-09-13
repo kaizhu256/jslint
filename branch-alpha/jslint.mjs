@@ -4228,6 +4228,7 @@ function jslint_phase2_lex(state) {
         case "await (":
             if (token_prv_expr.for_loop) {
                 the_token.for_loop = token_prv_expr.for_loop;
+                delete token_prv_expr.for_loop;
             }
             break;
         case "for (":
