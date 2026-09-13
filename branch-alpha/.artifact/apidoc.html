@@ -824,20 +824,21 @@ ${name}
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-    command[1] = command.slice(1).join("=");
+command[1] = command.slice(1).join("=");
 
-    switch (command[0]) {
+switch (command[0]) {
 
 // PR-362 - Add API Doc.
 
-    case "jslint_apidoc":
-        await <span class="apidocCodeKeywordSpan">jslint_apidoc</span>({
-            ...JSON.parse(process_argv[3]),
-            pathname: command[1]
-        });
-        return;
+case "jslint_apidoc":
+    await <span class="apidocCodeKeywordSpan">jslint_apidoc</span>({
+        ...JSON.parse(process_argv[3]),
+        pathname: command[1]
+    });
+    return;
+// Add command jslint_autofix.
 
-// PR-363 - Add command jslint_report.
+case "jslint_autofix":
 ...</pre></li>
 
 <li>
