@@ -633,6 +633,36 @@ jstestDescribe((
             ),
             data
         );
+
+// A beta line-leading binary-operator raises expected_a_at_end, which IS in
+// fix_list: the operator is JOINED onto the end of the previous line.
+
+        await fsWriteFileWithParents(
+            ".tmp/autofix_beta.mjs",
+            "/*jslint beta*/\nfunction aa(bb) {\n    return (\n        bb\n" +
+            "        + bb\n    );\n}\nexport default Object.freeze(aa);\n"
+        );
+        await jslint.jslint_cli({
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_beta.mjs"
+            ],
+            process_exit: processExit0
+        });
+        data = await moduleFs.promises.readFile(
+            ".tmp/autofix_beta.mjs",
+            "utf8"
+        );
+        assertOrThrow(
+            data === (
+                "/*jslint beta*/\nfunction aa(bb) {\n    return (\n" +
+                "        bb +\n        bb\n    );\n}\n" +
+                "export default Object.freeze(aa);\n"
+            ),
+            data
+        );
     });
     jstestIt((
         "test cli-report handling-behavior"
