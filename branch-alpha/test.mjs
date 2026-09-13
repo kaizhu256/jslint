@@ -575,6 +575,60 @@ jstestDescribe((
             ),
             "autofix must not rewrite a blocked file"
         );
+
+// Indentation is re-indented to the expected column, cascading across passes.
+
+        await fsWriteFileWithParents(
+            ".tmp/autofix_indent.mjs",
+            "function aa(bb) {\n        if (bb) {\n  return bb;\n" +
+            "        }\n    return 0;\n}\nexport default Object.freeze(aa);\n"
+        );
+        await jslint.jslint_cli({
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_indent.mjs"
+            ],
+            process_exit: processExit0
+        });
+        data = await moduleFs.promises.readFile(
+            ".tmp/autofix_indent.mjs",
+            "utf8"
+        );
+        assertOrThrow(
+            data === (
+                "function aa(bb) {\n    if (bb) {\n        return bb;\n" +
+                "    }\n    return 0;\n}\nexport default Object.freeze(aa);\n"
+            ),
+            data
+        );
+
+// A beta line-leading binary-operator raises expected_a_at_end, which is NOT
+// in fix_list, so the file is reported and left byte-identical. It must never
+// be mistaken for an indent and re-indented.
+
+        data = (
+            "/*jslint beta*/\nfunction aa(bb) {\n    return (\n        bb\n" +
+            "        + bb\n    );\n}\nexport default Object.freeze(aa);\n"
+        );
+        await fsWriteFileWithParents(".tmp/autofix_beta.mjs", data);
+        await jslint.jslint_cli({
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_beta.mjs"
+            ],
+            process_exit: processExit0
+        });
+        assertOrThrow(
+            data === await moduleFs.promises.readFile(
+                ".tmp/autofix_beta.mjs",
+                "utf8"
+            ),
+            "autofix must not rewrite an expected_a_at_end file"
+        );
     });
     jstestIt((
         "test cli-report handling-behavior"

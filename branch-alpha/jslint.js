@@ -383,7 +383,7 @@
     tree,
     trim,
     trimEnd,
-    trimRight,
+    trimStart,
     try,
     type,
     unlink,
@@ -1479,6 +1479,9 @@ function jslint(
         case "expected_a_at_b_c":
             mm = `Expected '${a}' at column ${b}, not column ${c}.`;
             break;
+        case "expected_a_at_end":
+            mm = `Expected '${a}' at the end of the previous line.`;
+            break;
         case "expected_a_b":
             mm = `Expected '${a}' and instead saw '${b}'.`;
             break;
@@ -1897,7 +1900,7 @@ function jslint(
             "\u001b[39m\n" +
             ("    " + line_source.trim()).slice(0, 72) + "\n" +
             stack_trace
-        ).trimRight();
+        ).trimEnd();
     });
 
     return {
@@ -2294,18 +2297,21 @@ async function jslint_autofix({
 // expected_line_break_a_b as further cases in <fix_list>; the loop needs no
 // change.
 //
-// WHEN expected_a_at_b_c IS ADDED IT WILL NEED MORE THAN THE WARNING-OBJECT.
-// Ordinary re-indentation and the beta operators-at-line-end rule raise the
-// SAME code with the SAME fields, and the warning alone cannot say whether
-// the target column belongs to this line or to the previous one. Discern it
-// from the token-list, not from the message.
+// expected_a_at_b_c IS INDENTATION AND NOTHING ELSE. The
+// operators-at-end-of-line rule raises its OWN code, expected_a_at_end,
+// exactly so this fixer never has to guess which line a target column belongs
+// to. Do not merge the two codes back together.
 //
-// PHASE 5 ONLY RUNS WHEN warning_list IS EMPTY, so a file carrying ANY
-// non-whitespace warning yields NO whitespace-warnings at all. Such a file is
-// REPORTED AND LEFT UNTOUCHED - writing it back unchanged would make a
-// blocked run look identical to a clean one.
+// ANY warning outside <fix_list> stops the run: the file is REPORTED AND LEFT
+// BYTE-IDENTICAL. Two different causes land here. A NON-WHITESPACE warning
+// means phase 5 never ran at all, so there are no whitespace-warnings to
+// find. A whitespace-warning NOT YET IN <fix_list>, expected_a_at_end today,
+// means phase 5 did run and found work this fixer cannot do. Either way,
+// writing the file back unchanged would make a blocked run look identical to
+// a clean one.
 
     const fix_list = [
+        "expected_a_at_b_c",
         "expected_space_a_b",
         "unexpected_space_a_b"
     ];
@@ -2325,9 +2331,9 @@ async function jslint_autofix({
         });
         if (blocked.length > 0) {
             console_error(
-                "jslint_autofix " + pathname + " - no change - fix these " +
+                "jslint_autofix " + pathname + " - no change - " +
                 blocked.length +
-                " non-whitespace warning(s) first, phase-5 cannot run:"
+                " warning(s) it cannot fix, repair these by hand first:"
             );
             console_error(blocked.slice(0, 10).map(function ({
                 formatted_message
@@ -2349,12 +2355,33 @@ async function jslint_autofix({
         }).forEach(function ({
             column,
             line,
+            b: warning_b,
             code: warning_code
         }) {
             const source = line_list[line - 1];
             let ii = column - 1;
+            let indentage_at;
             let jj = ii;
             if (source === undefined) {
+                return;
+            }
+            if (warning_code === "expected_a_at_b_c") {
+
+// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. The operators-at-end-of-line
+// rule raises expected_a_at_end instead, precisely so this fixer never has to
+// guess which line the target column belongs to.
+
+                indentage_at = source.length - source.trimStart().length;
+
+// Only a line-leading token is re-indentable; anything else is a column
+// complaint this fixer cannot honour by moving whitespace.
+
+                if (ii !== indentage_at) {
+                    return;
+                }
+                line_list[line - 1] = (
+                    " ".repeat(warning_b - 1) + source.trimStart()
+                );
                 return;
             }
 
@@ -10222,7 +10249,14 @@ function jslint_phase5_whitage(state) {
                 right.id !== "." &&
                 right.id !== "?."
             ) {
-                expected_at(left.thru + 1);
+
+// test_cause:
+// ["
+// let aa = 0
+// + 0;
+// ", "jslint_phase5_whitage", "expected_a_at_end", "+", 1]
+
+                warn("expected_a_at_end", right, artifact(right));
             }
             dot_depth = 0;
             switch (right.id) {
