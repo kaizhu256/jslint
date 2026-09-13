@@ -179,9 +179,9 @@
     finally,
     flag,
     floor,
-    for,
     forEach,
     for_init,
+    for_loop,
     for_of,
     for_semicolon,
     formatted_message,
@@ -435,7 +435,7 @@ const jslint_charset_ascii = ( //jslint-ignore-line
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-const jslint_edition = "v2026.8.31";
+const jslint_edition = "v2026.9.29";
 const jslint_fudge = 1;                 // Fudge starting line and starting
                                         // ... column to 1.
 const jslint_global_dict_all = {
@@ -1165,9 +1165,9 @@ function jslint(
         jslint_assert(!(aa === bb), `Expected !(aa === bb).`);
         if (Array.isArray(aa)) {
             return (
-                Array.isArray(bb)
-                && aa.length === bb.length
-                && aa.every(function (value, index) {
+                Array.isArray(bb) &&
+                aa.length === bb.length &&
+                aa.every(function (value, index) {
 
 // test_cause:
 // ["`${0}`&&`${0}`", "is_equal", "recurse_isArray", "", 0]
@@ -1216,8 +1216,8 @@ function jslint(
 
                 test_cause("recurse_arity_id");
                 return (
-                    is_equal(aa.expression, bb.expression)
-                    && is_equal(aa.name, bb.name)
+                    is_equal(aa.expression, bb.expression) &&
+                    is_equal(aa.name, bb.name)
                 );
             }
             if (aa.arity === "unary") {
@@ -1235,9 +1235,9 @@ function jslint(
 
                 test_cause("recurse_binary");
                 return (
-                    aa.id !== "("
-                    && is_equal(aa.expression[0], bb.expression[0])
-                    && is_equal(aa.expression[1], bb.expression[1])
+                    aa.id !== "(" &&
+                    is_equal(aa.expression[0], bb.expression[0]) &&
+                    is_equal(aa.expression[1], bb.expression[1])
                 );
             }
             if (aa.arity === "ternary") {
@@ -1247,9 +1247,9 @@ function jslint(
 
                 test_cause("recurse_ternary");
                 return (
-                    is_equal(aa.expression[0], bb.expression[0])
-                    && is_equal(aa.expression[1], bb.expression[1])
-                    && is_equal(aa.expression[2], bb.expression[2])
+                    is_equal(aa.expression[0], bb.expression[0]) &&
+                    is_equal(aa.expression[1], bb.expression[1]) &&
+                    is_equal(aa.expression[2], bb.expression[2])
                 );
             }
 
@@ -1876,9 +1876,9 @@ function jslint(
 
     warning_list.sort(function (aa, bb) {
         return (
-            Boolean(bb.mode_stop) - Boolean(aa.mode_stop)
-            || aa.line - bb.line
-            || aa.column - bb.column
+            Boolean(bb.mode_stop) - Boolean(aa.mode_stop) ||
+            aa.line - bb.line ||
+            aa.column - bb.column
         );
 
 // Update each warning with formatted_message ready-for-use by jslint_cli.
@@ -2313,8 +2313,8 @@ async function jslint_cli({
     }) {
         let result_from_file;
         if (
-            mode_conditional
-            && !(
+            mode_conditional &&
+            !(
                 /^\/\*jslint\b/m
             ).test(code.slice(0, 65536))
         ) {
@@ -2423,8 +2423,8 @@ async function jslint_cli({
                 mode_conditional,
                 option: {
                     beta: Boolean(
-                        process_env.JSLINT_BETA
-                        && !(
+                        process_env.JSLINT_BETA &&
+                        !(
                             /0|false|null|undefined/
                         ).test(process_env.JSLINT_BETA)
                     ),
@@ -2467,8 +2467,8 @@ async function jslint_cli({
 
     import_meta_url = import_meta_url || jslint_import_meta_url;
     if (
-        jslint_rgx_url_search_window_jslint.test(import_meta_url)
-        && (typeof globalThis === "object" && globalThis)
+        jslint_rgx_url_search_window_jslint.test(import_meta_url) &&
+        (typeof globalThis === "object" && globalThis)
     ) {
         globalThis.jslint = jslint;
     }
@@ -2476,10 +2476,10 @@ async function jslint_cli({
 // Feature-detect nodejs.
 
     if (!(
-        (typeof process === "object" && process)
-        && process.versions
-        && typeof process.versions.node === "string"
-        && !mode_noop
+        (typeof process === "object" && process) &&
+        process.versions &&
+        typeof process.versions.node === "string" &&
+        !mode_noop
     )) {
         return exit_code;
     }
@@ -2494,21 +2494,21 @@ async function jslint_cli({
 
 // Feature-detect nodejs-cli.
 
-            process.execArgv.indexOf("--eval") === -1
-            && process.execArgv.indexOf("-e") === -1
-            && (
+            process.execArgv.indexOf("--eval") === -1 &&
+            process.execArgv.indexOf("-e") === -1 &&
+            (
                 (
                     /[\/|\\]jslint(?:\.[cm]?js)?$/m
-                ).test(process_argv[1])
-                || mode_cli
-            )
-            && (
+                ).test(process_argv[1]) ||
+                mode_cli
+            ) &&
+            (
                 moduleUrl.fileURLToPath(import_meta_url)
                 ===
                 modulePath.resolve(process_argv[1])
             )
-        )
-        && !mode_cli
+        ) &&
+        !mode_cli
     ) {
         return exit_code;
     }
@@ -2610,8 +2610,8 @@ async function jslint_cli({
                 if (
                     (
                         /(?:\b|_)(?:lock|min|raw|rollup)(?:\b|_)/
-                    ).test(file2)
-                    || !(code && code.length < 1048576)
+                    ).test(file2) ||
+                    !(code && code.length < 1048576)
                 ) {
                     return;
                 }
@@ -3168,9 +3168,9 @@ function jslint_phase2_lex(state) {
 // unexpected is going on.
 
         if (
-            (char >= "0" && char <= "9")
-            || (char >= "a" && char <= "z")
-            || (char >= "A" && char <= "Z")
+            (char >= "0" && char <= "9") ||
+            (char >= "a" && char <= "z") ||
+            (char >= "A" && char <= "Z")
         ) {
 
 // test_cause:
@@ -3549,8 +3549,8 @@ function jslint_phase2_lex(state) {
 // Regexp
 // char is a letter.
 
-            (char >= "a" && char <= "z\uffff")
-            || (char >= "A" && char <= "Z\uffff")
+            (char >= "a" && char <= "z\uffff") ||
+            (char >= "A" && char <= "Z\uffff")
         ) {
 
 // RegExp
@@ -3632,9 +3632,9 @@ function jslint_phase2_lex(state) {
 
         let the_token;
         switch (
-            token_prv_expr.identifier
-            && !token_prv_expr.dot
-            && token_prv_expr.id
+            token_prv_expr.identifier &&
+            !token_prv_expr.dot &&
+            token_prv_expr.id
         ) {
         case "case":
         case "delete":
@@ -3938,8 +3938,8 @@ function jslint_phase2_lex(state) {
                 dict_name, dict
             ]) {
                 if (
-                    dict_name.startsWith(key)
-                    || (key === "browser" && dict_name === "node_auto")
+                    dict_name.startsWith(key) ||
+                    (key === "browser" && dict_name === "node_auto")
                 ) {
                     Object.entries(dict).forEach(function ([name, is_global]) {
                         if (dict_name === "node_auto") {
@@ -3989,8 +3989,8 @@ function jslint_phase2_lex(state) {
             : jslint_rgx_digits_decimals
         )[0];
         if (
-            (mode !== mode_digits_empty_string && digits.length === 0)
-            || digits[0] === "_"
+            (mode !== mode_digits_empty_string && digits.length === 0) ||
+            digits[0] === "_"
         ) {
 
 // test_cause:
@@ -4029,12 +4029,12 @@ function jslint_phase2_lex(state) {
 // unsafe characters or is too damn long.
 
         if (
-            !option_dict.long
-            && line_whole.length > 80
-            && line_disable === undefined
-            && !state.mode_json
-            && token_1
-            && !mode_regexp
+            !option_dict.long &&
+            line_whole.length > 80 &&
+            line_disable === undefined &&
+            !state.mode_json &&
+            token_1 &&
+            !mode_regexp
         ) {
 
 // test_cause:
@@ -4075,8 +4075,8 @@ function jslint_phase2_lex(state) {
             }
             line_disable = undefined;
         } else if (
-            line_source.endsWith(" //jslint-ignore-line")
-            || line_source.endsWith(" //jslint-quiet")
+            line_source.endsWith(" //jslint-ignore-line") ||
+            line_source.endsWith(" //jslint-quiet")
         ) {
 
 // test_cause:
@@ -4141,10 +4141,10 @@ function jslint_phase2_lex(state) {
 // This warning is not suppressed by option_dict.white.
 
         if (
-            token_prv.line === line
-            && token_prv.thru === from
-            && (id === "(comment)" || id === "(regexp)" || id === "/")
-            && (token_prv.id === "(comment)" || token_prv.id === "(regexp)")
+            token_prv.line === line &&
+            token_prv.thru === from &&
+            (id === "(comment)" || id === "(regexp)" || id === "/") &&
+            (token_prv.id === "(comment)" || token_prv.id === "(regexp)")
         ) {
 
 // test_cause:
@@ -4185,8 +4185,8 @@ function jslint_phase2_lex(state) {
 
             opener_popped = opener_stack.shift() || empty();
             if (
-                (id === ")" && opener_popped.id !== "(")
-                || (id === "]" && opener_popped.id !== "[")
+                (id === ")" && opener_popped.id !== "(") ||
+                (id === "]" && opener_popped.id !== "[")
             ) {
 
 // test_cause:
@@ -4199,8 +4199,8 @@ function jslint_phase2_lex(state) {
             }
             break;
         case ";":
-            if (opener_stack[0]?.for) {
-                opener_stack[0].for.for_semicolon = [
+            if (opener_stack[0]?.for_loop) {
+                opener_stack[0].for_loop.for_semicolon = [
                     undefined,
                     undefined,
                     undefined
@@ -4223,8 +4223,20 @@ function jslint_phase2_lex(state) {
         case "] =":
             opener_popped.assignment = the_token;
             break;
+
+// PR-xxx - Add ES2018-feature Asynchronous Iteration - for await...of.
+
+        case "await (":
+            if (token_prv_expr.for_loop) {
+                the_token.for_loop = token_prv_expr.for_loop;
+            }
+            break;
         case "for (":
-            the_token.for = token_prv_expr;
+
+// PR-xxx - Add ES2018-feature Asynchronous Iteration - for await...of.
+
+        case "for await":
+            the_token.for_loop = token_prv_expr;
             break;
         }
 
@@ -4329,14 +4341,14 @@ function jslint_phase3_parse(state) {
 // Attempt to give helpful names to anonymous functions.
 
         if (
-            token_now.identifier
-            && token_now.id !== "function"
-            && token_now.id !== "async"
+            token_now.identifier &&
+            token_now.id !== "function" &&
+            token_now.id !== "async"
         ) {
             anon = token_now.id;
         } else if (
-            token_now.id === "(string)"
-            && jslint_rgx_identifier.test(token_now.value)
+            token_now.id === "(string)" &&
+            jslint_rgx_identifier.test(token_now.value)
         ) {
             anon = token_now.value;
         }
@@ -4418,9 +4430,9 @@ function jslint_phase3_parse(state) {
                 the_token.expression = [left, right];
             }
             if (
-                right.arity === "assignment"
-                || right.arity === "preassign"
-                || right.arity === "postassign"
+                right.arity === "assignment" ||
+                right.arity === "preassign" ||
+                right.arity === "postassign"
             ) {
                 warn("unexpected_a", right);
             }
@@ -4476,9 +4488,9 @@ function jslint_phase3_parse(state) {
 // Top level function bodies may include the "use strict" pragma.
 
         if (
-            special === "body"
-            && function_stack.length === 2
-            && token_nxt.value === "use strict"
+            special === "body" &&
+            function_stack.length === 2 &&
+            token_nxt.value === "use strict"
         ) {
             token_nxt.statement = true;
             advance("(string)");
@@ -4517,17 +4529,17 @@ function jslint_phase3_parse(state) {
 
         const id = left.id;
         if (
-            !left.identifier
-            && (
-                left.arity !== "ternary"
-                || (
-                    !check_left(left.expression[1])
-                    && !check_left(left.expression[2])
+            !left.identifier &&
+            (
+                left.arity !== "ternary" ||
+                (
+                    !check_left(left.expression[1]) &&
+                    !check_left(left.expression[2])
                 )
-            )
-            && (
-                left.arity !== "binary"
-                || (id !== "." && id !== "?." && id !== "(" && id !== "[")
+            ) &&
+            (
+                left.arity !== "binary" ||
+                (id !== "." && id !== "?." && id !== "(" && id !== "[")
             )
         ) {
             warn("unexpected_a", right || token_nxt);
@@ -4546,10 +4558,10 @@ function jslint_phase3_parse(state) {
 //      {destructure}
 
         if (
-            the_thing.arity !== "variable"
-            && the_thing.id !== "."
-            && the_thing.id !== "["
-            && the_thing.id !== "{"
+            the_thing.arity !== "variable" &&
+            the_thing.id !== "." &&
+            the_thing.id !== "[" &&
+            the_thing.id !== "{"
         ) {
 
 // test_cause:
@@ -4629,12 +4641,12 @@ function jslint_phase3_parse(state) {
 
 // PR-419 - Hide warning about unordered case-statements behind beta-flag.
 
-                option_dict.beta
-                && !option_dict.unordered
-                && aa && bb
-                && (
-                    aa.order > bb.order
-                    || (aa.order === bb.order && aa.value > bb.value)
+                option_dict.beta &&
+                !option_dict.unordered &&
+                aa && bb &&
+                (
+                    aa.order > bb.order ||
+                    (aa.order === bb.order && aa.value > bb.value)
                 )
             ) {
                 warn(
@@ -4660,19 +4672,19 @@ function jslint_phase3_parse(state) {
 
         function check(variable_prv, bb) {
             switch (
-                Boolean(variable_prv)
-                && !variable_prv.for_init
-                && variable_prv.id
+                Boolean(variable_prv) &&
+                !variable_prv.for_init &&
+                variable_prv.id
             ) {
             case "const":
             case "let":
             case "var":
                 if (
-                    option_dict.beta
-                    && !option_dict.unordered
-                    && !option_dict.variable
-                    && variable_prv
-                    && (
+                    option_dict.beta &&
+                    !option_dict.unordered &&
+                    !option_dict.variable &&
+                    variable_prv &&
+                    (
                         variable_prv.id + " " + variable_prv.name_list[0].id
                         > the_variable.id + " " + the_variable.name_list[0].id
                     )
@@ -4703,9 +4715,9 @@ function jslint_phase3_parse(state) {
                 break;
             default:
                 if (
-                    (variable_prv.id !== "{" || the_variable.id === "var")
-                    && option_dict.beta
-                    && !option_dict.variable
+                    (variable_prv.id !== "{" || the_variable.id === "var") &&
+                    option_dict.beta &&
+                    !option_dict.variable
                 ) {
 
 // test_cause:
@@ -4962,46 +4974,46 @@ function jslint_phase3_parse(state) {
         let name = token_nxt;
         if (
             (
-                left.id !== "(string)"
-                || (
-                    name.id !== "at"
-                    && name.id !== "charCodeAt"
-                    && name.id !== "includes"
-                    && name.id !== "indexOf"
-                    && name.id !== "isWellFormed"
-                    && name.id !== "match"
-                    && name.id !== "repeat"
-                    && name.id !== "replace"
-                    && name.id !== "toLowerCase"
-                    && name.id !== "toUpperCase"
-                    && name.id !== "toWellFormed"
+                left.id !== "(string)" ||
+                (
+                    name.id !== "at" &&
+                    name.id !== "charCodeAt" &&
+                    name.id !== "includes" &&
+                    name.id !== "indexOf" &&
+                    name.id !== "isWellFormed" &&
+                    name.id !== "match" &&
+                    name.id !== "repeat" &&
+                    name.id !== "replace" &&
+                    name.id !== "toLowerCase" &&
+                    name.id !== "toUpperCase" &&
+                    name.id !== "toWellFormed"
                 )
-            )
-            && (
-                left.id !== "["
-                || (
-                    name.id !== "at"
-                    && name.id !== "concat"
-                    && name.id !== "every"
-                    && name.id !== "filter"
-                    && name.id !== "find"
-                    && name.id !== "findIndex"
-                    && name.id !== "flat"
-                    && name.id !== "flatMap"
-                    && name.id !== "forEach"
-                    && name.id !== "includes"
-                    && name.id !== "join"
-                    && name.id !== "map"
-                    && name.id !== "reduce"
-                    && name.id !== "some"
-                    && name.id !== "toReversed"
-                    && name.id !== "toSorted"
+            ) &&
+            (
+                left.id !== "[" ||
+                (
+                    name.id !== "at" &&
+                    name.id !== "concat" &&
+                    name.id !== "every" &&
+                    name.id !== "filter" &&
+                    name.id !== "find" &&
+                    name.id !== "findIndex" &&
+                    name.id !== "flat" &&
+                    name.id !== "flatMap" &&
+                    name.id !== "forEach" &&
+                    name.id !== "includes" &&
+                    name.id !== "join" &&
+                    name.id !== "map" &&
+                    name.id !== "reduce" &&
+                    name.id !== "some" &&
+                    name.id !== "toReversed" &&
+                    name.id !== "toSorted"
                 )
-            )
-            && (left.id !== "+" || name.id !== "slice")
-            && (
-                left.id !== "(regexp)"
-                || (name.id !== "exec" && name.id !== "test")
+            ) &&
+            (left.id !== "+" || name.id !== "slice") &&
+            (
+                left.id !== "(regexp)" ||
+                (name.id !== "exec" && name.id !== "test")
             )
         ) {
 
@@ -5017,8 +5029,8 @@ function jslint_phase3_parse(state) {
 // Issue #468 - Fix optional dynamic-property/function-call not recognized.
 
         if (
-            the_token.id === "?."
-            && (name.id === "[" || name.id === "(")
+            the_token.id === "?." &&
+            (name.id === "[" || name.id === "(")
         ) {
 
 // test_cause:
@@ -5146,11 +5158,11 @@ function jslint_phase3_parse(state) {
             test_cause("free");
             the_paren.free = true;
             if (
-                the_argument.wrapped === true
+                the_argument.wrapped === true &&
 
 // PR-483 - Allow parenthesis after ellipsis inside a function call.
 
-                && the_argument.ellipsis !== true
+                the_argument.ellipsis !== true
             ) {
 
 // test_cause:
@@ -5337,9 +5349,9 @@ function jslint_phase3_parse(state) {
             return;
         }
         if (
-            earlier
-            && role !== "parameter" && role !== "function"
-            && (role !== "exception" || earlier.role !== "exception")
+            earlier &&
+            role !== "parameter" && role !== "function" &&
+            (role !== "exception" || earlier.role !== "exception")
         ) {
 
 // test_cause:
@@ -5361,9 +5373,9 @@ function jslint_phase3_parse(state) {
             return;
         }
         if (
-            option_dict.beta
-            && global_dict[id]
-            && role !== "parameter"
+            option_dict.beta &&
+            global_dict[id] &&
+            role !== "parameter"
         ) {
 
 // test_cause:
@@ -5482,9 +5494,9 @@ function jslint_phase3_parse(state) {
         while (true) {
             the_symbol = syntax_dict[token_nxt.id];
             if (
-                the_symbol === undefined
-                || the_symbol.led_infix === undefined
-                || the_symbol.lbp <= rbp
+                the_symbol === undefined ||
+                the_symbol.led_infix === undefined ||
+                the_symbol.lbp <= rbp
             ) {
                 break;
             }
@@ -5714,12 +5726,12 @@ function jslint_phase3_parse(state) {
         first.statement = true;
         the_symbol = syntax_dict[first.id];
         if (
-            the_symbol !== undefined
-            && the_symbol.fud_stmt !== undefined
+            the_symbol !== undefined &&
+            the_symbol.fud_stmt !== undefined &&
 
 // PR-318 - Bugfix - Fixes issues #316, #317 - dynamic-import().
 
-            && !(the_symbol.id === "import" && token_nxt.id === "(")
+            !(the_symbol.id === "import" && token_nxt.id === "(")
         ) {
             the_symbol.disrupt = false;
             the_symbol.statement = true;
@@ -6172,8 +6184,8 @@ function jslint_phase3_parse(state) {
         the_function.level = scope_function.level + 1;
         the_function.loop = 0;
         the_function.name = (
-            name
-            || (
+            name ||
+            (
                 mode_fart_unwrapped
                 ? "anonymous"
                 : anon
@@ -6264,8 +6276,8 @@ function jslint_phase3_parse(state) {
 // PR-384 - Bugfix - Fixes issue #379 - warn against naked-statement in fart.
 
             if (
-                syntax_dict[token_nxt.id]
-                && syntax_dict[token_nxt.id].fud_stmt
+                syntax_dict[token_nxt.id] &&
+                syntax_dict[token_nxt.id].fud_stmt
             ) {
 
 // test_cause:
@@ -6294,9 +6306,9 @@ function jslint_phase3_parse(state) {
         } else {
             the_function.block = block("body");
             if (
-                the_function.arity === "statement"
-                && token_nxt.line === token_now.line
-                && !option_dict.white
+                the_function.arity === "statement" &&
+                token_nxt.line === token_now.line &&
+                !option_dict.white
             ) {
 
 // PR-503 - Fix jslint unable to continue parsing 'function aa(){}0'.
@@ -6312,8 +6324,8 @@ function jslint_phase3_parse(state) {
                 );
             }
             if (
-                token_nxt.id === "."
-                || token_nxt.id === "?."
+                token_nxt.id === "." ||
+                token_nxt.id === "?."
 
 // PR-459 - Allow destructuring-assignment after function-definition.
 
@@ -6382,8 +6394,8 @@ function jslint_phase3_parse(state) {
             }
             advance();
             if (
-                (name.id === "get" || name.id === "set")
-                && token_nxt.identifier
+                (name.id === "get" || name.id === "set") &&
+                token_nxt.identifier
             ) {
                 if (!option_dict.getset) {
 
@@ -6474,8 +6486,8 @@ function jslint_phase3_parse(state) {
                 advance(":");
                 value = parse_expression(0);
                 if (
-                    value.id === name.id
-                    && value.id !== "function"
+                    value.id === name.id &&
+                    value.id !== "function"
                 ) {
 
 // test_cause:
@@ -6703,8 +6715,8 @@ function jslint_phase3_parse(state) {
         const the_break = token_now;
         let the_label;
         if (
-            (scope_function.loop < 1 && scope_function.switch < 1)
-            || scope_function.finally > 0
+            (scope_function.loop < 1 && scope_function.switch < 1) ||
+            scope_function.finally > 0
         ) {
 
 // test_cause:
@@ -6775,8 +6787,8 @@ function jslint_phase3_parse(state) {
         const the_token = token_now;
         const the_value = parse_expression(0);
         if (
-            (the_value.id !== "." && the_value.id !== "[")
-            || the_value.arity !== "binary"
+            (the_value.id !== "." && the_value.id !== "[") ||
+            the_value.arity !== "binary"
         ) {
 
 // test_cause:
@@ -6829,10 +6841,10 @@ function jslint_phase3_parse(state) {
             advance("default");
             the_thing = parse_expression(0);
             if (
-                the_thing.id !== "("
-                || the_thing.expression[0].id !== "."
-                || the_thing.expression[0].expression.id !== "Object"
-                || the_thing.expression[0].name.id !== "freeze"
+                the_thing.id !== "(" ||
+                the_thing.expression[0].id !== "." ||
+                the_thing.expression[0].expression.id !== "Object" ||
+                the_thing.expression[0].name.id !== "freeze"
             ) {
 
 // test_cause:
@@ -6882,9 +6894,9 @@ function jslint_phase3_parse(state) {
                 the_thing.statement = false;
                 the_thing.arity = "unary";
             } else if (
-                token_nxt.id === "var"
-                || token_nxt.id === "let"
-                || token_nxt.id === "const"
+                token_nxt.id === "var" ||
+                token_nxt.id === "let" ||
+                token_nxt.id === "const"
             ) {
 
 // test_cause:
@@ -6958,6 +6970,7 @@ function jslint_phase3_parse(state) {
     }
 
     function stmt_for() {
+        const for_await = token_nxt.id === "await";
         const the_for = token_now;
         let the_operator;
         let the_variable;
@@ -6968,6 +6981,29 @@ function jslint_phase3_parse(state) {
 // - for-variable
 
         scope_block = scope_block_push(the_for, true);
+
+// PR-xxx - Add ES2018-feature Asynchronous Iteration - for await...of.
+
+        if (for_await) {
+            if (the_for.for_semicolon) {
+
+// test_cause:
+// ["for await(;;){}", "stmt_for", "expected_a", "for await...of", 1]
+
+                return stop("expected_a", the_for, "for await...of");
+            }
+            if (scope_function.async === 0 && scope_function !== token_global) {
+
+// test_cause:
+// ["()=>{for await(aa of aa){}}", "stmt_for", "unexpected_a", "await", 10]
+
+                warn("unexpected_a", token_nxt);
+            }
+            if (scope_function.async === 1) {
+                scope_function.async = 2;
+            }
+            advance("await");
+        }
         advance("(");
         the_for.free = true;
         if (the_for.for_semicolon) {
@@ -7071,6 +7107,13 @@ function jslint_phase3_parse(state) {
             the_variable.for_init = true;
             switch (the_operator.id) {
             case "in":
+                if (for_await) {
+
+// test_cause:
+// ["for await(aa in aa){}", "stmt_for", "expected_a_b", "in", 14]
+
+                    return stop("expected_a_b", the_operator, "of", "in");
+                }
 
 // test_cause:
 // ["for(aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
@@ -7575,8 +7618,8 @@ function jslint_phase3_parse(state) {
                     the_switch.else.length - 1
                 ];
                 if (
-                    the_last.id === "break"
-                    && the_last.label_break === undefined
+                    the_last.id === "break" &&
+                    the_last.label_break === undefined
                 ) {
 
 // test_cause:
@@ -7942,9 +7985,9 @@ function jslint_phase3_parse(state) {
                 warn("unregistered_property_a", name);
             }
         } else if (
-            !option_dict.nomen
-            && name.identifier
-            && jslint_rgx_weird_property.test(id)
+            !option_dict.nomen &&
+            name.identifier &&
+            jslint_rgx_weird_property.test(id)
         ) {
 
 // test_cause:
@@ -8392,11 +8435,11 @@ function jslint_phase4_walk(state) {
             warn("label_a", thing);
         } else if (
             (
-                !the_variable.calls
-                || !scope_function.name
-                || !the_variable.calls[scope_function.name.id]
-            )
-            && !the_variable.alive
+                !the_variable.calls ||
+                !scope_function.name ||
+                !the_variable.calls[scope_function.name.id]
+            ) &&
+            !the_variable.alive
         ) {
 
 // Warn variable is 'out-of-scope'.
@@ -8423,8 +8466,8 @@ function jslint_phase4_walk(state) {
         let right;
         if (thing.id !== "=") {
             if (
-                lvalue.arity === "variable"
-                && (!lvalue.variable || lvalue.variable.readonly)
+                lvalue.arity === "variable" &&
+                (!lvalue.variable || lvalue.variable.readonly)
             ) {
 
 // test_cause:
@@ -8438,14 +8481,14 @@ function jslint_phase4_walk(state) {
             }
             right = syntax_dict[thing.expression[1].id];
             if (
-                right
-                && (
-                    right.id === "function"
-                    || right.id === "=>"
-                    || (
-                        right.constant
-                        && right.id !== "(number)"
-                        && (right.id !== "(string)" || thing.id !== "+=")
+                right &&
+                (
+                    right.id === "function" ||
+                    right.id === "=>" ||
+                    (
+                        right.constant &&
+                        right.id !== "(number)" &&
+                        (right.id !== "(string)" || thing.id !== "+=")
                     )
                 )
             ) {
@@ -8493,12 +8536,12 @@ function jslint_phase4_walk(state) {
         const right = thing.expression[1];
         if (right.constant) {
             if (
-                right.value === ""
-                || (right.id === "(number)" && right.value === "0")
-                || right.id === "(boolean)"
-                || right.id === "null"
-                || right.id === "undefined"
-                || Number.isNaN(right.value)
+                right.value === "" ||
+                (right.id === "(number)" && right.value === "0") ||
+                right.id === "(boolean)" ||
+                right.id === "null" ||
+                right.id === "undefined" ||
+                Number.isNaN(right.value)
             ) {
                 warn("unexpected_a", right);
             }
@@ -8507,10 +8550,10 @@ function jslint_phase4_walk(state) {
 
     function post_b_and(thing) {
         if (
-            is_weird(thing.expression[0])
-            || is_equal(thing.expression[0], thing.expression[1])
-            || thing.expression[0].constant === true
-            || thing.expression[1].constant === true
+            is_weird(thing.expression[0]) ||
+            is_equal(thing.expression[0], thing.expression[1]) ||
+            thing.expression[0].constant === true ||
+            thing.expression[1].constant === true
         ) {
 
 // test_cause:
@@ -8533,12 +8576,12 @@ function jslint_phase4_walk(state) {
         let right;
         if (relationop[thing.id]) {
             if (
-                is_weird(thing.expression[0])
-                || is_weird(thing.expression[1])
-                || is_equal(thing.expression[0], thing.expression[1])
-                || (
-                    thing.expression[0].constant === true
-                    && thing.expression[1].constant === true
+                is_weird(thing.expression[0]) ||
+                is_weird(thing.expression[1]) ||
+                is_equal(thing.expression[0], thing.expression[1]) ||
+                (
+                    thing.expression[0].constant === true &&
+                    thing.expression[1].constant === true
                 )
             ) {
 
@@ -8595,10 +8638,10 @@ function jslint_phase4_walk(state) {
         } else if (thing.id !== "=>" && thing.id !== "(") {
             right = thing.expression[1];
             if (
-                (thing.id === "+" || thing.id === "-")
-                && right.id === thing.id
-                && right.arity === "unary"
-                && !right.wrapped
+                (thing.id === "+" || thing.id === "-") &&
+                right.id === thing.id &&
+                right.arity === "unary" &&
+                !right.wrapped
             ) {
 
 // test_cause:
@@ -8607,8 +8650,8 @@ function jslint_phase4_walk(state) {
                 warn("wrap_unary", right);
             }
             if (
-                thing.expression[0].constant === true
-                && right.constant === true
+                thing.expression[0].constant === true &&
+                right.constant === true
             ) {
                 thing.constant = true;
             }
@@ -8655,12 +8698,12 @@ function jslint_phase4_walk(state) {
         } else if (left.identifier) {
             if (the_new !== undefined) {
                 if (
-                    left.id[0] > "Z"
-                    || left.id === "BigInt"
-                    || left.id === "Boolean"
-                    || left.id === "Number"
-                    || left.id === "String"
-                    || left.id === "Symbol"
+                    left.id[0] > "Z" ||
+                    left.id === "BigInt" ||
+                    left.id === "Boolean" ||
+                    left.id === "Number" ||
+                    left.id === "String" ||
+                    left.id === "Symbol"
                 ) {
 
 // test_cause:
@@ -8703,13 +8746,13 @@ function jslint_phase4_walk(state) {
                 }
             } else {
                 if (
-                    left.id[0] >= "A"
-                    && left.id[0] <= "Z"
-                    && left.id !== "BigInt"
-                    && left.id !== "Boolean"
-                    && left.id !== "Number"
-                    && left.id !== "String"
-                    && left.id !== "Symbol"
+                    left.id[0] >= "A" &&
+                    left.id[0] <= "Z" &&
+                    left.id !== "BigInt" &&
+                    left.id !== "Boolean" &&
+                    left.id !== "Number" &&
+                    left.id !== "String" &&
+                    left.id !== "Symbol"
                 ) {
 
 // test_cause:
@@ -8755,8 +8798,8 @@ function jslint_phase4_walk(state) {
                     if (array.length === 1) {
                         new_date = array[0];
                         if (
-                            new_date.id === "new"
-                            && new_date.expression.id === "Date"
+                            new_date.id === "new" &&
+                            new_date.expression.id === "Date"
                         ) {
 
 // test_cause:
@@ -8779,9 +8822,9 @@ function jslint_phase4_walk(state) {
 
     function post_b_or(thing) {
         if (
-            is_weird(thing.expression[0])
-            || is_equal(thing.expression[0], thing.expression[1])
-            || thing.expression[0].constant === true
+            is_weird(thing.expression[0]) ||
+            is_equal(thing.expression[0], thing.expression[1]) ||
+            thing.expression[0].constant === true
         ) {
 
 // test_cause:
@@ -8887,9 +8930,9 @@ function jslint_phase4_walk(state) {
 
     function post_t_ternary(thing) {
         if (
-            is_weird(thing.expression[0])
-            || thing.expression[0].constant === true
-            || is_equal(thing.expression[1], thing.expression[2])
+            is_weird(thing.expression[0]) ||
+            thing.expression[0].constant === true ||
+            is_equal(thing.expression[1], thing.expression[2])
         ) {
 
 // test_cause:
@@ -8910,8 +8953,8 @@ function jslint_phase4_walk(state) {
 
             warn("expected_a_b", thing, "&&", "?");
         } else if (
-            thing.expression[1].id === "true"
-            && thing.expression[2].id === "false"
+            thing.expression[1].id === "true" &&
+            thing.expression[2].id === "false"
         ) {
 
 // test_cause:
@@ -8919,8 +8962,8 @@ function jslint_phase4_walk(state) {
 
             warn("expected_a_b", thing, "Boolean(...)", "?");
         } else if (
-            thing.expression[1].id === "false"
-            && thing.expression[2].id === "true"
+            thing.expression[1].id === "false" &&
+            thing.expression[2].id === "true"
         ) {
 
 // test_cause:
@@ -8928,10 +8971,10 @@ function jslint_phase4_walk(state) {
 
             warn("expected_a_b", thing, "!", "?");
         } else if (
-            thing.expression[0].wrapped !== true
-            && (
-                thing.expression[0].id === "||"
-                || thing.expression[0].id === "&&"
+            thing.expression[0].wrapped !== true &&
+            (
+                thing.expression[0].id === "||" ||
+                thing.expression[0].id === "&&"
             )
         ) {
 
@@ -8954,9 +8997,9 @@ function jslint_phase4_walk(state) {
         if (right.id === "(" && right.expression[0].id === "new") {
             warn("unexpected_a_before_b", thing, "+", "new");
         } else if (
-            right.constant
-            || right.id === "{"
-            || (right.id === "[" && right.arity !== "binary")
+            right.constant ||
+            right.id === "{" ||
+            (right.id === "[" && right.arity !== "binary")
         ) {
             warn("unexpected_a", thing, "+");
         }
@@ -8982,10 +9025,10 @@ function jslint_phase4_walk(state) {
                 warn("expected_a_b", thing, "Boolean(...)", "!!");
             }
         } else if (
-            thing.id !== "["
-            && thing.id !== "{"
-            && thing.id !== "function"
-            && thing.id !== "new"
+            thing.id !== "[" &&
+            thing.id !== "{" &&
+            thing.id !== "function" &&
+            thing.id !== "new"
         ) {
             if (thing.expression.constant === true) {
                 thing.constant = true;
@@ -9031,15 +9074,15 @@ function jslint_phase4_walk(state) {
             break;
         }
         if (
-            thing.id !== "("
-            && thing.id !== "&&"
-            && thing.id !== "||"
-            && thing.id !== "="
-            && Array.isArray(thing.expression)
-            && thing.expression.length === 2
-            && (
-                relationop[thing.expression[0].id] === true
-                || relationop[thing.expression[1].id] === true
+            thing.id !== "(" &&
+            thing.id !== "&&" &&
+            thing.id !== "||" &&
+            thing.id !== "=" &&
+            Array.isArray(thing.expression) &&
+            thing.expression.length === 2 &&
+            (
+                relationop[thing.expression[0].id] === true ||
+                relationop[thing.expression[1].id] === true
             )
         ) {
 
@@ -9083,13 +9126,13 @@ function jslint_phase4_walk(state) {
 
                         warn("unexpected_typeof_a", right, value);
                     } else if (
-                        value !== "bigint"
-                        && value !== "boolean"
-                        && value !== "function"
-                        && value !== "number"
-                        && value !== "object"
-                        && value !== "string"
-                        && value !== "symbol"
+                        value !== "bigint" &&
+                        value !== "boolean" &&
+                        value !== "function" &&
+                        value !== "number" &&
+                        value !== "object" &&
+                        value !== "string" &&
+                        value !== "symbol"
                     ) {
 
 // test_cause:
@@ -9279,8 +9322,8 @@ function jslint_phase4_walk(state) {
 
                     warn("unexpected_a", thing);
                 } else if (
-                    thing.arity === "statement"
-                    || thing.arity === "assignment"
+                    thing.arity === "statement" ||
+                    thing.arity === "assignment"
                 ) {
 
 // test_cause:
@@ -9335,9 +9378,9 @@ function jslint_phase4_walk(state) {
                 warn("unexpected_expression_a", thing);
             }
         } else if (
-            thing.arity !== "statement"
-            && thing.arity !== "assignment"
-            && thing.id !== "import"
+            thing.arity !== "statement" &&
+            thing.arity !== "assignment" &&
+            thing.id !== "import"
         ) {
 
 // test_cause:
@@ -9560,11 +9603,11 @@ function jslint_phase5_whitage(state) {
 
     function no_space_only() {
         if (
-            left.id !== "(global)"
-            && left.nr + 1 === right.nr
-            && (
-                left.line !== right.line
-                || left.thru !== right.from
+            left.id !== "(global)" &&
+            left.nr + 1 === right.nr &&
+            (
+                left.line !== right.line ||
+                left.thru !== right.from
             )
         ) {
 
@@ -9725,10 +9768,10 @@ function jslint_phase5_whitage(state) {
         }
         if (left.id === ",") {
             if (
-                !open
-                || (
-                    (free || closer === "]")
-                    && left.line === right.line
+                !open ||
+                (
+                    (free || closer === "]") &&
+                    left.line === right.line
                 )
             ) {
 
@@ -9768,9 +9811,9 @@ function jslint_phase5_whitage(state) {
             return;
         }
         if (
-            right.arity === "binary"
-            && right.id === "("
-            && free
+            right.arity === "binary" &&
+            right.id === "(" &&
+            free
         ) {
 
 // test_cause:
@@ -9791,19 +9834,19 @@ function jslint_phase5_whitage(state) {
             return;
         }
         if (
-            left.id === "."
-            || left.id === "?."
-            || left.id === "..."
-            || right.id === ","
-            || right.id === ";"
-            || right.id === ":"
-            || (
-                right.arity === "binary"
-                && (right.id === "(" || right.id === "[")
-            )
-            || (
-                right.arity === "function"
-                && left.id !== "function"
+            left.id === "." ||
+            left.id === "?." ||
+            left.id === "..." ||
+            right.id === "," ||
+            right.id === ";" ||
+            right.id === ":" ||
+            (
+                right.arity === "binary" &&
+                (right.id === "(" || right.id === "[")
+            ) ||
+            (
+                right.arity === "function" &&
+                left.id !== "function"
             )
         ) {
 
@@ -9849,18 +9892,18 @@ function jslint_phase5_whitage(state) {
             return;
         }
         if (
-            left.arity === "ternary"
-            || left.id === "case"
-            || left.id === "catch"
-            || left.id === "else"
-            || left.id === "finally"
-            || left.id === "while"
-            || left.id === "await"
-            || right.id === "catch"
-            || right.id === "else"
-            || right.id === "finally"
-            || (right.id === "while" && !right.statement)
-            || (left.id === ")" && right.id === "{")
+            left.arity === "ternary" ||
+            left.id === "case" ||
+            left.id === "catch" ||
+            left.id === "else" ||
+            left.id === "finally" ||
+            left.id === "while" ||
+            left.id === "await" ||
+            right.id === "catch" ||
+            right.id === "else" ||
+            right.id === "finally" ||
+            (right.id === "while" && !right.statement) ||
+            (left.id === ")" && right.id === "{")
         ) {
 
 // test_cause:
@@ -9874,32 +9917,32 @@ function jslint_phase5_whitage(state) {
 
 // There is a space between left and right.
 
-            spaceop[left.id] === true
-            || spaceop[right.id] === true
-            || (
-                left.arity === "binary"
-                && (left.id === "+" || left.id === "-")
-            )
-            || (
-                right.arity === "binary"
-                && (right.id === "+" || right.id === "-")
-            )
-            || left.id === "function"
-            || left.id === ":"
-            || left.id === "async"
-            || (
+            spaceop[left.id] === true ||
+            spaceop[right.id] === true ||
+            (
+                left.arity === "binary" &&
+                (left.id === "+" || left.id === "-")
+            ) ||
+            (
+                right.arity === "binary" &&
+                (right.id === "+" || right.id === "-")
+            ) ||
+            left.id === "function" ||
+            left.id === ":" ||
+            left.id === "async" ||
+            (
                 (
-                    left.identifier
-                    || left.id === "(string)"
-                    || left.id === "(number)"
+                    left.identifier ||
+                    left.id === "(string)" ||
+                    left.id === "(number)"
+                ) &&
+                (
+                    right.identifier ||
+                    right.id === "(string)" ||
+                    right.id === "(number)"
                 )
-                && (
-                    right.identifier
-                    || right.id === "(string)"
-                    || right.id === "(number)"
-                )
-            )
-            || (left.arity === "statement" && right.id !== ";")
+            ) ||
+            (left.arity === "statement" && right.id !== ";")
         ) {
 
 // test_cause:
@@ -9993,8 +10036,8 @@ function jslint_phase5_whitage(state) {
             return;
         }
         if (
-            (right.statement || right.role === "label")
-            && (!right.for_init || left.line !== right.line)
+            (right.statement || right.role === "label") &&
+            (!right.for_init || left.line !== right.line)
         ) {
 
 // test_cause:
@@ -10632,14 +10675,14 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         }));
         html += detail("closure", list.filter(function (id) {
             return (
-                context[id].closure === true
-                && context[id].scope_declared === the_function
+                context[id].closure === true &&
+                context[id].scope_declared === the_function
             );
         }));
         html += detail("outer", list.filter(function (id) {
             return (
-                context[id].scope_declared.id !== "(global)"
-                && context[id].scope_declared !== the_function
+                context[id].scope_declared.id !== "(global)" &&
+                context[id].scope_declared !== the_function
             );
         }));
         html += detail(module, list.filter(function (id) {
@@ -11018,9 +11061,9 @@ function v8CoverageListMerge(processCovs) {
             let treesMatching = [];
             parentToChildDict.forEach(function (nested) {
                 if (
-                    nested.length === 1
-                    && nested[0].start === openRange.start
-                    && nested[0].end === openRange.end
+                    nested.length === 1 &&
+                    nested[0].start === openRange.start &&
+                    nested[0].end === openRange.end
                 ) {
                     treesMatching.push(nested[0]);
                 } else {
@@ -11263,8 +11306,8 @@ function v8CoverageListMerge(processCovs) {
             }
             if (children.length === 1) {
                 if (
-                    children[0].start === tree.start
-                    && children[0].end === tree.end
+                    children[0].start === tree.start &&
+                    children[0].end === tree.end
                 ) {
                     tree.delta += children[0].delta;
                     tree.children = children[0].children;
@@ -12041,8 +12084,8 @@ function sentinel() {}
 // child_process.spawn and child_process.spawnSync without the shell option set.
 
                     shell: (
-                        processArgv0.endsWith(".bat")
-                        || processArgv0.endsWith(".cmd")
+                        processArgv0.endsWith(".bat") ||
+                        processArgv0.endsWith(".cmd")
                     ),
                     stdio: ["ignore", 1, 2]
                 }
@@ -12175,14 +12218,14 @@ function sentinel() {}
                 lineList.forEach(function (elem) {
                     if (!(
                         (
-                            elem.startOffset <= startOffset
-                            && startOffset <= elem.endOffset
+                            elem.startOffset <= startOffset &&
+                            startOffset <= elem.endOffset
                         ) || (
-                            elem.startOffset <= endOffset
-                            && endOffset <= elem.endOffset
+                            elem.startOffset <= endOffset &&
+                            endOffset <= elem.endOffset
                         ) || (
-                            startOffset <= elem.startOffset
-                            && elem.endOffset <= endOffset
+                            startOffset <= elem.startOffset &&
+                            elem.endOffset <= endOffset
                         )
                     )) {
                         return;

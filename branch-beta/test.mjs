@@ -821,7 +821,7 @@ aa();
             ],
             for: [
                 (`
-function aa(bb, cc) {
+async function aa(bb, cc) {
     for (; bb < 0; bb += 1) { //jslint-ignore-line
         bb(cc);
     }
@@ -837,6 +837,9 @@ function aa(bb, cc) {
     for (const ii in bb) { //jslint-ignore-line
         bb(cc, ii);
     }
+    for (const ii of await (bb())) {
+        bb(cc, ii);
+    }
     for (const ii of bb) {
         bb(cc, ii);
     }
@@ -844,6 +847,12 @@ function aa(bb, cc) {
         bb(cc, ii);
     }
     for (let ii of bb) {
+        bb(cc, ii);
+    }
+    for await (const ii of bb) {
+        bb(cc, ii);
+    }
+    for await (let ii of bb) {
         bb(cc, ii);
     }
 }
@@ -1201,8 +1210,8 @@ function aa() {
             const elemNow = JSON.stringify([option_dict, source]);
             const warningsLength = (
                 (
-                    option_dict.test_internal_error
-                    || option_dict.test_unknown_warning_code
+                    option_dict.test_internal_error ||
+                    option_dict.test_unknown_warning_code
                 )
                 ? 1
                 : 0

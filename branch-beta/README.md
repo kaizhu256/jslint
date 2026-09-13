@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2026.8.31)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
+| Branch | [master<br>(v2026.9.29)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/kaizhu256/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/kaizhu256/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/kaizhu256/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://kaizhu256.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-beta/.artifact/coverage/index.html) | [![coverage](https://kaizhu256.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-beta/.artifact/coverage/index.html) | [![coverage](https://kaizhu256.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-beta/.artifact/coverage/index.html) |
@@ -926,7 +926,7 @@ if (false) {
 |  40. | ✅ | ES2019 | [`Symbol.prototype.description`](https://github.com/tc39/proposal-Symbol-description) |
 |  39. | ✅ | ES2019 | [`JSON superset`](https://github.com/tc39/proposal-json-superset) |
 |  38. | ✅ | ES2019 | [`Optional catch binding`](https://github.com/tc39/proposal-optional-catch-binding) |
-|  37. | ❌ | ES2018 | [`Asynchronous Iteration`](https://github.com/tc39/proposal-async-iteration) |
+|  37. | ⚠️ | ES2018 | [`Asynchronous Iteration`](https://github.com/tc39/proposal-async-iteration) |
 |  36. | ✅ | ES2018 | [`Promise.prototype.finally`](https://github.com/tc39/proposal-promise-finally) |
 |  35. | ✅ | ES2018 | [`RegExp Unicode Property Escapes`](https://github.com/tc39/proposal-regexp-unicode-property-escapes) |
 |  34. | ✅ | ES2018 | [`RegExp Lookbehind Assertions`](https://github.com/tc39/proposal-regexp-lookbehind) |

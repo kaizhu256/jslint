@@ -67,7 +67,7 @@ body {
 </head>
 <body>
 <div class="apidocDiv">
-<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2026.8.31)</a></h1>
+<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2026.9.29)</a></h1>
 <div class="apidocSectionDiv">
     <a href="#apidocTableOfContents1" id="apidocTableOfContents1">
         <h1>Table of Contents</h1>
@@ -940,8 +940,8 @@ exports,
     }) {
         let result_from_file;
         if (
-            mode_conditional
-            &amp;&amp; !(
+            mode_conditional &amp;&amp;
+            !(
                 /^\/\*jslint\b/m
             ).test(code.slice(0, 65536))
         ) {
@@ -1185,9 +1185,9 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 // Attempt to give helpful names to anonymous functions.
 
         if (
-            token_now.identifier
-            &amp;&amp; token_now.id !== "function"
-            &amp;&amp; token_now.id !== "async"
+            token_now.identifier &amp;&amp;
+            token_now.id !== "function" &amp;&amp;
+            token_now.id !== "async"
       ...
 }
 </pre></li>

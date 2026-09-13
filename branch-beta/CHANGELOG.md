@@ -1,7 +1,7 @@
 # Changelog
 
 # Todo
-- jslint-ecma - Add ES2018-feature Asynchronous Iteration.
+- jslint - Add rule requiring operators to be at end-of-line, instead of beginning-of-line, except for ternary-operators ?, :, and gate it behind /*jslint beta*/, to minimize breakage for existing users.
 - jslint-ecma - Add ES2015-feature iterators.
 - jslint - Audit token-property '.free'.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
@@ -10,6 +10,10 @@
 - jslint - Add html and css linting back into jslint.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
+
+# v2026.9.29
+- jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
+- jslint - Move 242 line-leading && or || to line end.
 
 # v2026.8.31
 - jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.
