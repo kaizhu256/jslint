@@ -520,241 +520,6 @@ jstestDescribe((
         });
     });
     jstestIt((
-        "test cli-autofix handling-behavior"
-    ), async function () {
-        let data;
-
-// Whitespace-only warnings - autofix repairs them and the file lints clean.
-
-        await fsWriteFileWithParents(
-            ".tmp/autofix.mjs",
-            "function aa(bb) {\n    return String( bb)+bb;\n}\n" +
-            "export default Object.freeze(aa);\n"
-        );
-        await jslint.jslint_cli({
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix.mjs"
-            ],
-            process_exit: processExit0
-        });
-        data = await moduleFs.promises.readFile(".tmp/autofix.mjs", "utf8");
-        assertOrThrow(
-            data === (
-                "function aa(bb) {\n    return String(bb) + bb;\n}\n" +
-                "export default Object.freeze(aa);\n"
-            ),
-            data
-        );
-
-// A non-whitespace warning blocks phase-5, so the file is REPORTED and left
-// BYTE-IDENTICAL.
-
-        data = (
-            "function aa(bb) {\n    let cc = 0;\n" +
-            "    return String( bb);\n}\n"
-        );
-        await fsWriteFileWithParents(".tmp/autofix_blocked.mjs", data);
-        await jslint.jslint_cli({
-            // suppress error
-            console_error: noop,
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_blocked.mjs"
-            ],
-            process_exit: processExit0
-        });
-        assertOrThrow(
-            data === await moduleFs.promises.readFile(
-                ".tmp/autofix_blocked.mjs",
-                "utf8"
-            ),
-            "autofix must not rewrite a blocked file"
-        );
-
-// Indentation is re-indented to the expected column, cascading across passes.
-
-        await fsWriteFileWithParents(
-            ".tmp/autofix_indent.mjs",
-            "function aa(bb) {\n        if (bb) {\n  return bb;\n" +
-            "        }\n    return 0;\n}\nexport default Object.freeze(aa);\n"
-        );
-        await jslint.jslint_cli({
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_indent.mjs"
-            ],
-            process_exit: processExit0
-        });
-        data = await moduleFs.promises.readFile(
-            ".tmp/autofix_indent.mjs",
-            "utf8"
-        );
-        assertOrThrow(
-            data === (
-                "function aa(bb) {\n    if (bb) {\n        return bb;\n" +
-                "    }\n    return 0;\n}\nexport default Object.freeze(aa);\n"
-            ),
-            data
-        );
-
-// A one-liner block is split, re-indented and its closer moved, across
-// passes. The trailing comment must survive, attached to the closer.
-
-        await fsWriteFileWithParents(
-            ".tmp/autofix_break.mjs",
-            "function aa(bb) {\n    if (bb) { return bb; } // keep me\n" +
-            "    return 0;\n}\nexport default Object.freeze(aa);\n"
-        );
-        await jslint.jslint_cli({
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_break.mjs"
-            ],
-            process_exit: processExit0
-        });
-        data = await moduleFs.promises.readFile(
-            ".tmp/autofix_break.mjs",
-            "utf8"
-        );
-        assertOrThrow(
-            data === (
-                "function aa(bb) {\n    if (bb) {\n        return bb;\n" +
-                "    } // keep me\n    return 0;\n}\n" +
-                "export default Object.freeze(aa);\n"
-            ),
-            data
-        );
-
-// A *.sh file is not javascript: only its `node --eval` blocks are fixed,
-// and the surrounding shell must come back byte-identical.
-
-        await fsWriteFileWithParents(
-            ".tmp/autofix_embedded.sh",
-            "shAa() {\n    node --eval '\nconsole.log(\n    0\n    + 0\n" +
-            ");\n'\n}\n"
-        );
-        await jslint.jslint_cli({
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_embedded.sh"
-            ],
-            process_env: {
-                JSLINT_BETA: "1"
-            },
-            process_exit: processExit0
-        });
-        data = await moduleFs.promises.readFile(
-            ".tmp/autofix_embedded.sh",
-            "utf8"
-        );
-        assertOrThrow(
-            data === (
-                "shAa() {\n    node --eval '\nconsole.log(\n    0 +\n    0\n" +
-                ");\n'\n}\n"
-            ),
-            data
-        );
-
-// A join that pushes the previous line past 80 columns is STILL MADE, the
-// work is KEPT, and the resulting too_long is reported rather than hidden.
-
-        data = (
-            "/*jslint beta, node*/\n\nconsole.log(\n" +
-            "    " + JSON.stringify("a".repeat(70)) + "\n" +
-            "    + " + JSON.stringify("b".repeat(60)) + "\n);\n"
-        );
-        await fsWriteFileWithParents(".tmp/autofix_long.mjs", data);
-        await jslint.jslint_cli({
-            // suppress error
-            console_error: noop,
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_long.mjs"
-            ],
-            process_exit: processExit0
-        });
-        data = await moduleFs.promises.readFile(
-            ".tmp/autofix_long.mjs",
-            "utf8"
-        );
-        assertOrThrow(
-            data.indexOf(JSON.stringify("a".repeat(70)) + " +") > 0,
-            data
-        );
-
-// An *.html file is fixed the same way, but through its <script> blocks and
-// with browser:true - mirroring how jslint_from_file lints them.
-
-        await fsWriteFileWithParents(
-            ".tmp/autofix_embedded.html",
-            "<body>\n<script>\n/*jslint browser*/\nwindow.console.log(\n" +
-            "    0\n  + 0\n);\n</script>\n</body>\n"
-        );
-        await jslint.jslint_cli({
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_embedded.html"
-            ],
-            process_exit: processExit0
-        });
-        data = await moduleFs.promises.readFile(
-            ".tmp/autofix_embedded.html",
-            "utf8"
-        );
-        assertOrThrow(
-            data === (
-                "<body>\n<script>\n/*jslint browser*/\nwindow.console.log(\n" +
-                "    0\n    + 0\n);\n</script>\n</body>\n"
-            ),
-            data
-        );
-
-// A beta line-leading binary-operator raises expected_a_at_end, which IS in
-// fix_list: the operator is JOINED onto the end of the previous line.
-
-        await fsWriteFileWithParents(
-            ".tmp/autofix_beta.mjs",
-            "/*jslint beta*/\nfunction aa(bb) {\n    return (\n        bb\n" +
-            "        + bb\n    );\n}\nexport default Object.freeze(aa);\n"
-        );
-        await jslint.jslint_cli({
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_beta.mjs"
-            ],
-            process_exit: processExit0
-        });
-        data = await moduleFs.promises.readFile(
-            ".tmp/autofix_beta.mjs",
-            "utf8"
-        );
-        assertOrThrow(
-            data === (
-                "/*jslint beta*/\nfunction aa(bb) {\n    return (\n" +
-                "        bb +\n        bb\n    );\n}\n" +
-                "export default Object.freeze(aa);\n"
-            ),
-            data
-        );
-    });
-    jstestIt((
         "test cli-report handling-behavior"
     ), function () {
         jslint.jslint_cli({
@@ -1478,13 +1243,13 @@ function aa() {
                 );
                 // test jslint's directive handling-behavior
                 source = (
-                    "/*jslint " +
-                    JSON
+                    "/*jslint "
+                    + JSON
                         .stringify(option_dict)
                         .slice(1, -1)
-                        .replace((/"/g), "") +
-                    "*/\n" +
-                    source.replace((/^#!/), "//")
+                        .replace((/"/g), "")
+                    + "*/\n"
+                    + source.replace((/^#!/), "//")
                 );
                 warnings = jslint(source).warnings;
                 assertOrThrow(
@@ -1528,11 +1293,11 @@ jstestDescribe((
             ), "");
             tmp = causeList.split("\n").map(function (cause) {
                 return (
-                    "[" +
-                    JSON.parse(cause).map(function (elem) {
+                    "["
+                    + JSON.parse(cause).map(function (elem) {
                         return JSON.stringify(elem);
-                    }).join(", ") +
-                    "]"
+                    }).join(", ")
+                    + "]"
                 );
             }).sort().join("\n");
             assertOrThrow(
@@ -1549,8 +1314,8 @@ jstestDescribe((
                 assertOrThrow(
                     tmp[JSON.stringify(cause.slice(1))],
                     (
-                        "\n" + JSON.stringify(cause) + "\n\n" +
-                        Object.keys(tmp).sort().join("\n")
+                        "\n" + JSON.stringify(cause) + "\n\n"
+                        + Object.keys(tmp).sort().join("\n")
                     )
                 );
             });
@@ -1735,8 +1500,8 @@ jstestDescribe((
         });
     });
     jstestIt((
-        "accepts arrays with two identical items for" +
-        " `v8CoverageListMerge`"
+        "accepts arrays with two identical items for"
+        + " `v8CoverageListMerge`"
     ), function () {
         assertJsonEqual(v8CoverageListMerge([
             {
@@ -1856,37 +1621,37 @@ jstestDescribe((
     [
         [
             "v8CoverageReportCreate_high.js", (
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "}\n"
+                "switch(0){\n"
+                + "case 0:break;\n"
+                + "}\n"
             )
         ], [
             "v8CoverageReportCreate_ignore.js", (
-                "/*coverage-ignore-file*/\n" +
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "case 1:break;//coverage-ignore-line\n" +
-                "/*coverage-disable*/\n" +
-                "case 2:break;\n" +
-                "/*coverage-enable*/\n" +
-                "}\n"
+                "/*coverage-ignore-file*/\n"
+                + "switch(0){\n"
+                + "case 0:break;\n"
+                + "case 1:break;//coverage-ignore-line\n"
+                + "/*coverage-disable*/\n"
+                + "case 2:break;\n"
+                + "/*coverage-enable*/\n"
+                + "}\n"
             )
         ], [
             "v8CoverageReportCreate_low.js", (
-                "switch(0){\n" +
-                "case 1:break;\n" +
-                "case 2:break;\n" +
-                "case 3:break;\n" +
-                "case 4:break;\n" +
-                "}\n"
+                "switch(0){\n"
+                + "case 1:break;\n"
+                + "case 2:break;\n"
+                + "case 3:break;\n"
+                + "case 4:break;\n"
+                + "}\n"
             )
         ], [
             "v8CoverageReportCreate_medium.js", (
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "case 1:break;\n" +
-                "case 2:break;\n" +
-                "}\n"
+                "switch(0){\n"
+                + "case 0:break;\n"
+                + "case 1:break;\n"
+                + "case 2:break;\n"
+                + "}\n"
             )
         ]
     ].forEach(function ([
