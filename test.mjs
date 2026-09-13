@@ -634,6 +634,67 @@ jstestDescribe((
             data
         );
 
+// A *.sh file is not javascript: only its `node --eval` blocks are fixed,
+// and the surrounding shell must come back byte-identical.
+
+        await fsWriteFileWithParents(
+            ".tmp/autofix_embedded.sh",
+            "shAa() {\n    node --eval '\nconsole.log(\n    0\n    + 0\n" +
+            ");\n'\n}\n"
+        );
+        await jslint.jslint_cli({
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_embedded.sh"
+            ],
+            process_env: {
+                JSLINT_BETA: "1"
+            },
+            process_exit: processExit0
+        });
+        data = await moduleFs.promises.readFile(
+            ".tmp/autofix_embedded.sh",
+            "utf8"
+        );
+        assertOrThrow(
+            data === (
+                "shAa() {\n    node --eval '\nconsole.log(\n    0 +\n    0\n" +
+                ");\n'\n}\n"
+            ),
+            data
+        );
+
+// An *.html file is fixed the same way, but through its <script> blocks and
+// with browser:true - mirroring how jslint_from_file lints them.
+
+        await fsWriteFileWithParents(
+            ".tmp/autofix_embedded.html",
+            "<body>\n<script>\n/*jslint browser*/\nwindow.console.log(\n" +
+            "    0\n  + 0\n);\n</script>\n</body>\n"
+        );
+        await jslint.jslint_cli({
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_embedded.html"
+            ],
+            process_exit: processExit0
+        });
+        data = await moduleFs.promises.readFile(
+            ".tmp/autofix_embedded.html",
+            "utf8"
+        );
+        assertOrThrow(
+            data === (
+                "<body>\n<script>\n/*jslint browser*/\nwindow.console.log(\n" +
+                "    0\n    + 0\n);\n</script>\n</body>\n"
+            ),
+            data
+        );
+
 // A beta line-leading binary-operator raises expected_a_at_end, which IS in
 // fix_list: the operator is JOINED onto the end of the previous line.
 

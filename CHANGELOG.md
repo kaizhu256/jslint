@@ -12,6 +12,7 @@
 
 # v2026.9.29
 - jslint-cli - Add cli-option jslint_autofix=filename to auto-fix whitespace-warnings.
+- jslint-cli - Extend jslint_autofix to embedded javascript in shell-scripts and html-files.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
 
 # v2026.8.31
