@@ -181,7 +181,6 @@
     floor,
     for,
     forEach,
-    for_await,
     for_init,
     for_of,
     for_semicolon,
@@ -6979,6 +6978,7 @@ function jslint_phase3_parse(state) {
     }
 
     function stmt_for() {
+        const for_await = token_nxt.id === "await";
         const the_for = token_now;
         let the_operator;
         let the_variable;
@@ -6992,7 +6992,7 @@ function jslint_phase3_parse(state) {
 
 // PR-xxx - Add ES2018-feature Asynchronous Iteration (for await..of).
 
-        if (token_nxt.id === "await") {
+        if (for_await) {
             if (scope_function.async === 0 && scope_function !== token_global) {
 
 // test_cause:
@@ -7003,7 +7003,6 @@ function jslint_phase3_parse(state) {
             if (scope_function.async === 1) {
                 scope_function.async = 2;
             }
-            the_for.for_await = token_nxt;
             advance("await");
         }
         advance("(");
@@ -7011,7 +7010,7 @@ function jslint_phase3_parse(state) {
         if (the_for.for_semicolon) {
             switch (token_nxt.id) {
             case ";":
-                if (the_for.for_await) {
+                if (for_await) {
 
 // test_cause:
 // ["for await(;;){}", "stmt_for", "expected_a_b", ";", 11]
@@ -7116,7 +7115,7 @@ function jslint_phase3_parse(state) {
             the_variable.for_init = true;
             switch (the_operator.id) {
             case "in":
-                if (the_for.for_await) {
+                if (for_await) {
 
 // PR-xxx - "for await" pairs with "of" ONLY; "for await (aa in bb)" is a syntax
 // error, so the Object.keys advice below would be actively misleading.
