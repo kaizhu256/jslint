@@ -4232,6 +4232,9 @@ function jslint_phase2_lex(state) {
             }
             break;
         case "for (":
+
+// PR-xxx - Add ES2018-feature Asynchronous Iteration (for await..of).
+
         case "for await":
             the_token.for_loop = token_prv_expr;
             break;
