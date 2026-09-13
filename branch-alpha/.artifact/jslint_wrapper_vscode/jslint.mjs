@@ -2281,6 +2281,117 @@ ${String(message).slice(0, 2000)}`
     throw error;
 }
 
+async function jslint_autofix({
+    console_error,
+    pathname
+}) {
+
+// This function will auto-fix whitespace-warnings in file <pathname>.
+//
+// SCOPE IS DELIBERATELY expected_space_a_b AND unexpected_space_a_b ONLY.
+// Both are ONE whitespace-run between TWO TOKENS ON ONE LINE, so the edit is
+// local and provable by re-linting. Add expected_a_at_b_c (indent) and
+// expected_line_break_a_b as further cases in <fix_list>; the loop needs no
+// change.
+//
+// WHEN expected_a_at_b_c IS ADDED IT WILL NEED MORE THAN THE WARNING-OBJECT.
+// Ordinary re-indentation and the beta operators-at-line-end rule raise the
+// SAME code with the SAME fields, and the warning alone cannot say whether
+// the target column belongs to this line or to the previous one. Discern it
+// from the token-list, not from the message.
+//
+// PHASE 5 ONLY RUNS WHEN warning_list IS EMPTY, so a file carrying ANY
+// non-whitespace warning yields NO whitespace-warnings at all. Such a file is
+// REPORTED AND LEFT UNTOUCHED - writing it back unchanged would make a
+// blocked run look identical to a clean one.
+
+    const fix_list = [
+        "expected_space_a_b",
+        "unexpected_space_a_b"
+    ];
+    const pass_max = 10;
+    let code = await moduleFs.promises.readFile(pathname, "utf8");
+    let code_prv = code;
+    let pass = 0;
+    while (pass < pass_max) {
+        let blocked;
+        let line_list;
+        let warnings;
+        warnings = jslint(code, {}).warnings;
+        blocked = warnings.filter(function ({
+            code: warning_code
+        }) {
+            return !fix_list.includes(warning_code);
+        });
+        if (blocked.length > 0) {
+            console_error(
+                "jslint_autofix " + pathname + " - no change - fix these " +
+                blocked.length +
+                " non-whitespace warning(s) first, phase-5 cannot run:"
+            );
+            console_error(blocked.slice(0, 10).map(function ({
+                formatted_message
+            }) {
+                return formatted_message;
+            }).join("\n"));
+            return;
+        }
+        if (warnings.length === 0) {
+            break;
+        }
+
+// Apply each fix RIGHT-TO-LEFT within its line, so an earlier fix cannot
+// invalidate a later fix's column.
+
+        line_list = code.split("\n");
+        warnings.slice().sort(function (aa, bb) {
+            return bb.line - aa.line || bb.column - aa.column;
+        }).forEach(function ({
+            column,
+            line,
+            code: warning_code
+        }) {
+            const source = line_list[line - 1];
+            let ii = column - 1;
+            let jj = ii;
+            if (source === undefined) {
+                return;
+            }
+
+// Walk back over the whitespace-run immediately before the token.
+
+            while (jj > 0 && (
+                source[jj - 1] === " " || source[jj - 1] === "\t"
+            )) {
+                jj -= 1;
+            }
+
+// A run reaching column 0 is INDENTATION or a line-join, not a gap between
+// two tokens on one line. Leave it to a future fix_list entry.
+
+            if (jj === 0) {
+                return;
+            }
+            line_list[line - 1] = (
+                source.slice(0, jj) +
+                (
+                    warning_code === "expected_space_a_b"
+                    ? " "
+                    : ""
+                ) +
+                source.slice(ii)
+            );
+        });
+        code = line_list.join("\n");
+        if (code === code_prv) {
+            break;
+        }
+        code_prv = code;
+        pass += 1;
+    }
+    await fsWriteFileWithParents(pathname, code);
+}
+
 async function jslint_cli({
     console_error,
     console_log,
@@ -2524,6 +2635,15 @@ async function jslint_cli({
     case "jslint_apidoc":
         await jslint_apidoc({
             ...JSON.parse(process_argv[3]),
+            pathname: command[1]
+        });
+        return;
+
+// Add command jslint_autofix.
+
+    case "jslint_autofix":
+        await jslint_autofix({
+            console_error,
             pathname: command[1]
         });
         return;
