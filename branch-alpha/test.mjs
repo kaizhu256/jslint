@@ -672,6 +672,17 @@ async function aa() {
     }
 }
 await aa();
+                `),
+
+// PR-xxx - Add ES2018-feature Asynchronous Iteration.
+
+                (`
+async function aa(bb) {
+    for await (const cc of bb) {
+        aa(cc);
+    }
+}
+await aa();
                 `)
             ],
 

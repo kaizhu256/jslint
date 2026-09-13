@@ -181,6 +181,7 @@
     floor,
     for,
     forEach,
+    for_await,
     for_init,
     for_of,
     for_semicolon,
@@ -4223,7 +4224,19 @@ function jslint_phase2_lex(state) {
         case "] =":
             opener_popped.assignment = the_token;
             break;
+// PR-xxx - Add ES2018-feature Asynchronous Iteration.
+// The "for (" pairing below is adjacency-only, so "for await (" would leave the
+// opener unlinked and for_semicolon forever unset - carry the link across the
+// intervening "await" in two hops instead. These case-strings are ASCII-ordered
+// like every other switch here; the pair reads out of order on purpose.
+
+        case "await (":
+            the_token.for = token_prv_expr.for;
+            break;
         case "for (":
+            the_token.for = token_prv_expr;
+            break;
+        case "for await":
             the_token.for = token_prv_expr;
             break;
         }
@@ -6968,6 +6981,43 @@ function jslint_phase3_parse(state) {
 // - for-variable
 
         scope_block = scope_block_push(the_for, true);
+
+// PR-xxx - Add ES2018-feature Asynchronous Iteration.
+
+        if (token_nxt.id === "await") {
+            advance("await");
+            the_for.for_await = token_now;
+
+// The async-context rules are prefix_await's, not the loop's - top-level await
+// is allowed, await inside a non-async function is not.
+
+            if (scope_function.async === 0 && scope_function !== token_global) {
+
+// test_cause:
+// ["
+// function aa(){for await(bb of cc){}}
+// ", "stmt_for", "unexpected_a", "await", 19]
+
+                warn("unexpected_a", token_now);
+            }
+            if (scope_function.async === 1) {
+                scope_function.async = 2;
+            }
+
+// "for await" pairs with "of" ONLY, so reject the semicolon-form here rather
+// than let the "expected_a 'let'" advice below fire on a syntax error. The
+// lexer has already run, so for_semicolon is known before "(" is consumed.
+
+            if (the_for.for_semicolon) {
+
+// test_cause:
+// ["
+// async function aa(bb){for await(bb=0;bb;bb+=1){aa(bb);}}
+// ", "stmt_for", "expected_a_b", ";", 23]
+
+                return stop("expected_a_b", the_for, "of", ";");
+            }
+        }
         advance("(");
         the_for.free = true;
         if (the_for.for_semicolon) {
@@ -7071,6 +7121,18 @@ function jslint_phase3_parse(state) {
             the_variable.for_init = true;
             switch (the_operator.id) {
             case "in":
+                if (the_for.for_await) {
+
+// PR-xxx - "for await" pairs with "of" ONLY; "for await (aa in bb)" is a syntax
+// error, so the Object.keys advice below would be actively misleading.
+
+// test_cause:
+// ["
+// async function aa(){for await(bb in cc){}}
+// ", "stmt_for", "expected_a_b", "in", 34]
+
+                    return stop("expected_a_b", the_operator, "of", "in");
+                }
 
 // test_cause:
 // ["for(aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
