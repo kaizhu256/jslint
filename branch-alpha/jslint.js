@@ -6985,6 +6985,13 @@ function jslint_phase3_parse(state) {
 // PR-xxx - Add ES2018-feature Asynchronous Iteration (for await..of).
 
         if (for_await) {
+            if (the_for.for_semicolon) {
+
+// test_cause:
+// ["for await(;;){}", "stmt_for", "expected_a", "for..await..of", 1]
+
+                return stop("expected_a", the_for, "for..await..of");
+            }
             if (scope_function.async === 0 && scope_function !== token_global) {
 
 // test_cause:
@@ -7033,13 +7040,6 @@ function jslint_phase3_parse(state) {
             }
             token_nxt.for_init = true;
             the_for.for_semicolon[0] = parse_statement_single();
-            if (for_await) {
-
-// test_cause:
-// ["for await(;;){}", "stmt_for", "expected_a_b", ";", 11]
-
-                return stop("expected_a_b", token_now, "of", token_now.id);
-            }
             token_nxt.for_init = true;
             if (token_nxt.id === ";") {
 
