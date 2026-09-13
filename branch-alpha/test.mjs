@@ -633,6 +633,97 @@ jstestDescribe((
             ),
             data
         );
+
+// A *.sh file is not javascript: only its `node --eval` blocks are fixed,
+// and the surrounding shell must come back byte-identical.
+
+        await fsWriteFileWithParents(
+            ".tmp/autofix_embedded.sh",
+            "shAa() {\n    node --eval '\nconsole.log(\n    0\n    + 0\n" +
+            ");\n'\n}\n"
+        );
+        await jslint.jslint_cli({
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_embedded.sh"
+            ],
+            process_env: {
+                JSLINT_BETA: "1"
+            },
+            process_exit: processExit0
+        });
+        data = await moduleFs.promises.readFile(
+            ".tmp/autofix_embedded.sh",
+            "utf8"
+        );
+        assertOrThrow(
+            data === (
+                "shAa() {\n    node --eval '\nconsole.log(\n    0 +\n    0\n" +
+                ");\n'\n}\n"
+            ),
+            data
+        );
+
+// An *.html file is fixed the same way, but through its <script> blocks and
+// with browser:true - mirroring how jslint_from_file lints them.
+
+        await fsWriteFileWithParents(
+            ".tmp/autofix_embedded.html",
+            "<body>\n<script>\n/*jslint browser*/\nwindow.console.log(\n" +
+            "    0\n  + 0\n);\n</script>\n</body>\n"
+        );
+        await jslint.jslint_cli({
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_embedded.html"
+            ],
+            process_exit: processExit0
+        });
+        data = await moduleFs.promises.readFile(
+            ".tmp/autofix_embedded.html",
+            "utf8"
+        );
+        assertOrThrow(
+            data === (
+                "<body>\n<script>\n/*jslint browser*/\nwindow.console.log(\n" +
+                "    0\n    + 0\n);\n</script>\n</body>\n"
+            ),
+            data
+        );
+
+// A beta line-leading binary-operator raises expected_a_at_end, which IS in
+// fix_list: the operator is JOINED onto the end of the previous line.
+
+        await fsWriteFileWithParents(
+            ".tmp/autofix_beta.mjs",
+            "/*jslint beta*/\nfunction aa(bb) {\n    return (\n        bb\n" +
+            "        + bb\n    );\n}\nexport default Object.freeze(aa);\n"
+        );
+        await jslint.jslint_cli({
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_beta.mjs"
+            ],
+            process_exit: processExit0
+        });
+        data = await moduleFs.promises.readFile(
+            ".tmp/autofix_beta.mjs",
+            "utf8"
+        );
+        assertOrThrow(
+            data === (
+                "/*jslint beta*/\nfunction aa(bb) {\n    return (\n" +
+                "        bb +\n        bb\n    );\n}\n" +
+                "export default Object.freeze(aa);\n"
+            ),
+            data
+        );
     });
     jstestIt((
         "test cli-report handling-behavior"
@@ -1358,13 +1449,13 @@ function aa() {
                 );
                 // test jslint's directive handling-behavior
                 source = (
-                    "/*jslint "
-                    + JSON
+                    "/*jslint " +
+                    JSON
                         .stringify(option_dict)
                         .slice(1, -1)
-                        .replace((/"/g), "")
-                    + "*/\n"
-                    + source.replace((/^#!/), "//")
+                        .replace((/"/g), "") +
+                    "*/\n" +
+                    source.replace((/^#!/), "//")
                 );
                 warnings = jslint(source).warnings;
                 assertOrThrow(
@@ -1408,11 +1499,11 @@ jstestDescribe((
             ), "");
             tmp = causeList.split("\n").map(function (cause) {
                 return (
-                    "["
-                    + JSON.parse(cause).map(function (elem) {
+                    "[" +
+                    JSON.parse(cause).map(function (elem) {
                         return JSON.stringify(elem);
-                    }).join(", ")
-                    + "]"
+                    }).join(", ") +
+                    "]"
                 );
             }).sort().join("\n");
             assertOrThrow(
@@ -1429,8 +1520,8 @@ jstestDescribe((
                 assertOrThrow(
                     tmp[JSON.stringify(cause.slice(1))],
                     (
-                        "\n" + JSON.stringify(cause) + "\n\n"
-                        + Object.keys(tmp).sort().join("\n")
+                        "\n" + JSON.stringify(cause) + "\n\n" +
+                        Object.keys(tmp).sort().join("\n")
                     )
                 );
             });
@@ -1615,8 +1706,8 @@ jstestDescribe((
         });
     });
     jstestIt((
-        "accepts arrays with two identical items for"
-        + " `v8CoverageListMerge`"
+        "accepts arrays with two identical items for" +
+        " `v8CoverageListMerge`"
     ), function () {
         assertJsonEqual(v8CoverageListMerge([
             {
@@ -1736,37 +1827,37 @@ jstestDescribe((
     [
         [
             "v8CoverageReportCreate_high.js", (
-                "switch(0){\n"
-                + "case 0:break;\n"
-                + "}\n"
+                "switch(0){\n" +
+                "case 0:break;\n" +
+                "}\n"
             )
         ], [
             "v8CoverageReportCreate_ignore.js", (
-                "/*coverage-ignore-file*/\n"
-                + "switch(0){\n"
-                + "case 0:break;\n"
-                + "case 1:break;//coverage-ignore-line\n"
-                + "/*coverage-disable*/\n"
-                + "case 2:break;\n"
-                + "/*coverage-enable*/\n"
-                + "}\n"
+                "/*coverage-ignore-file*/\n" +
+                "switch(0){\n" +
+                "case 0:break;\n" +
+                "case 1:break;//coverage-ignore-line\n" +
+                "/*coverage-disable*/\n" +
+                "case 2:break;\n" +
+                "/*coverage-enable*/\n" +
+                "}\n"
             )
         ], [
             "v8CoverageReportCreate_low.js", (
-                "switch(0){\n"
-                + "case 1:break;\n"
-                + "case 2:break;\n"
-                + "case 3:break;\n"
-                + "case 4:break;\n"
-                + "}\n"
+                "switch(0){\n" +
+                "case 1:break;\n" +
+                "case 2:break;\n" +
+                "case 3:break;\n" +
+                "case 4:break;\n" +
+                "}\n"
             )
         ], [
             "v8CoverageReportCreate_medium.js", (
-                "switch(0){\n"
-                + "case 0:break;\n"
-                + "case 1:break;\n"
-                + "case 2:break;\n"
-                + "}\n"
+                "switch(0){\n" +
+                "case 0:break;\n" +
+                "case 1:break;\n" +
+                "case 2:break;\n" +
+                "}\n"
             )
         ]
     ].forEach(function ([
