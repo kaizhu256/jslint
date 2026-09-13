@@ -674,7 +674,7 @@ async function aa() {
 await aa();
                 `),
 
-// PR-xxx - Add ES2018-feature Asynchronous Iteration.
+// PR-xxx - Add ES2018-feature Asynchronous Iteration (for await..of).
 
                 (`
 async function aa(bb) {

@@ -4224,7 +4224,7 @@ function jslint_phase2_lex(state) {
         case "] =":
             opener_popped.assignment = the_token;
             break;
-// PR-xxx - Add ES2018-feature Asynchronous Iteration.
+// PR-xxx - Add ES2018-feature Asynchronous Iteration (for await..of).
 // The "for (" pairing below is adjacency-only, so "for await (" would leave the
 // opener unlinked and for_semicolon forever unset - carry the link across the
 // intervening "await" in two hops instead. These case-strings are ASCII-ordered
@@ -6982,7 +6982,7 @@ function jslint_phase3_parse(state) {
 
         scope_block = scope_block_push(the_for, true);
 
-// PR-xxx - Add ES2018-feature Asynchronous Iteration.
+// PR-xxx - Add ES2018-feature Asynchronous Iteration (for await..of).
 
         if (token_nxt.id === "await") {
             advance("await");
