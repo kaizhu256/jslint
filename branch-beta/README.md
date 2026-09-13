@@ -999,9 +999,6 @@ if (false) {
         # re-run until version propagates
         npm run test2
 
-        # update 'PR-xxx' placeholder
-        sh jslint_ci.sh shGithubPrUpdatePrxxx
-
         # re-run until version propagates
         sh jslint_ci.sh shGithubPrCreate alpha beta # v20yy.mm.dd __pr_beta_pre
 
@@ -1010,7 +1007,7 @@ if (false) {
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
 
-1. goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-p2026.7.20
+1. goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-p20yy.mm.dd
     - click `Create pull request`
     - input `Add a title *` with: `<CHANGELOG.md entry #1>`
     - input `Add a description` with:
@@ -1057,9 +1054,6 @@ if (false) {
         # re-run until version propagates
         npm run test2
 
-        # update 'PR-xxx' placeholder
-        sh jslint_ci.sh shGithubPrUpdatePrxxx
-
         # re-run until version propagates
         sh jslint_ci.sh shGithubPrCreate alpha master # v20yy.mm.dd __pr_master_pre
 
@@ -1068,7 +1062,7 @@ if (false) {
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
 
-1. goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v2026.8.31
+1. goto https://github.com/kaizhu256/jslint/compare/beta...kaizhu256:jslint:branch-v20yy.mm.dd
     - click `Create pull request`
     - input `Add a title *` with: `# v20yy.mm.dd`
     - input `Add a description` with:

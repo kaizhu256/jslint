@@ -1176,6 +1176,35 @@ shGithubPrCleanup() {(set -e
 
 shGithubPrCreate() {(set -e
 # This function will create-and-push a github-pull-commit to origin/alpha.
+    # Update 'PR-xxx' placeholder in codebase.
+    if git grep -Ei -e '^ *?(//|#) pr-xxx'
+    then
+        export UPSTREAM_REPOSITORY="$(sed -En \
+            -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
+            package.json
+        )"
+        PR_XXX="$(curl -fs --ssl-no-revoke \
+"https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
+        )"
+        PR_XXX="$(
+            printf "%s" "$PR_XXX" | sed -En -e 's/.*"number": ([0-9]+).*/\1/p'
+        )"
+        if [ ! "$PR_XXX" ]
+        then
+            return
+        fi
+        PR_XXX="PR-$((PR_XXX + 1))"
+        FILE_LIST="$(
+git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
+        )"
+        for FILE in $FILE_LIST
+        do
+            sed -Ei.bak \
+                -e "s/^ *?(\/\/|#) pr-xxx - /\1 $PR_XXX - /gi" \
+                "$FILE" && \
+                rm -f "$FILE".bak
+        done
+    fi
     node --input-type=module --eval '
 // init debugInline
 const debugInline = (function () {
@@ -1241,21 +1270,6 @@ import moduleFs from "fs";
         commitMessage = `- shGithubPrCreate ${commitMessage}`;
     }
     branchPull = `branch-${version}`;
-    // update README.md
-    data = await moduleFs.promises.readFile("README.md", "utf8");
-    data = data.replace(
-        new RegExp(
-            (
-                "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
-                + "\\/compare"
-                + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
-                + `:branch-${version[0]}\\d\\d\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
-            ),
-            "g"
-        ),
-        `$1:${branchPull}`
-    );
-    await moduleFs.promises.writeFile("README.md", data);
     // security - sanitize commitMessage
     commitMessage = commitMessage.trim().replace((/\u0027/g), "$&\"$&\"$&");
     moduleChildProcess.spawn(
@@ -1288,45 +1302,6 @@ import moduleFs from "fs";
     });
 }());
 ' "$@" # '
-)}
-
-shGithubPrUpdatePrxxx() {(set -e
-# This function will update 'PR-xxx' placeholder in codebase
-# to next sequential github issue/pull number.
-    if ! git grep -Ei -e '^ *?(//|#) pr-xxx'
-    then
-        return
-    fi
-    export UPSTREAM_REPOSITORY="$(sed -En \
-        -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
-        package.json
-    )"
-    PR_XXX="$(curl -fs --ssl-no-revoke \
-"https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
-    )"
-    PR_XXX="$(
-        printf "%s" "$PR_XXX" | sed -En -e 's/.*"number": ([0-9]+).*/\1/p'
-    )"
-    if [ ! "$PR_XXX" ]
-    then
-        return
-    fi
-    PR_XXX="PR-$((PR_XXX + 1))"
-    FILE_LIST="$(
-        git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
-    )"
-    for FILE in $FILE_LIST
-    do
-        sed -Ei.bak \
-            -e "s/^ *?(\/\/|#) pr-xxx - /\1 $PR_XXX - /gi" \
-            "$FILE" && \
-            rm -f "$FILE".bak
-    done
-    git --no-pager diff
-    git grep -Ei -e '^ *?(//|#) pr-xxx' || true
-    git commit -am "- ci - Update 'PR-xxx' placeholder to '${PR_XXX}'."
-    printf "\n\n\n\n"
-    git --no-pager log -n 4
 )}
 
 shGithubTokenExport() {
@@ -2650,9 +2625,9 @@ function v8CoverageListMerge(processCovs) {
    let treesMatching = [];
    parentToChildDict.forEach(function (nested) {
     if (
-     nested.length === 1 &&
-     nested[0].start === openRange.start &&
-     nested[0].end === openRange.end
+     nested.length === 1
+     && nested[0].start === openRange.start
+     && nested[0].end === openRange.end
     ) {
      treesMatching.push(nested[0]);
     } else {
@@ -2831,8 +2806,8 @@ function v8CoverageListMerge(processCovs) {
    }
    if (children.length === 1) {
     if (
-     children[0].start === tree.start &&
-     children[0].end === tree.end
+     children[0].start === tree.start
+     && children[0].end === tree.end
     ) {
      tree.delta += children[0].delta;
      tree.children = children[0].children;
@@ -3468,8 +3443,8 @@ function sentinel() {}
       NODE_V8_COVERAGE: coverageDir
      },
      shell: (
-      processArgv0.endsWith(".bat") ||
-      processArgv0.endsWith(".cmd")
+      processArgv0.endsWith(".bat")
+      || processArgv0.endsWith(".cmd")
      ),
      stdio: ["ignore", 1, 2]
     }
@@ -3572,14 +3547,14 @@ function sentinel() {}
     lineList.forEach(function (elem) {
      if (!(
       (
-       elem.startOffset <= startOffset &&
-       startOffset <= elem.endOffset
+       elem.startOffset <= startOffset
+       && startOffset <= elem.endOffset
       ) || (
-       elem.startOffset <= endOffset &&
-       endOffset <= elem.endOffset
+       elem.startOffset <= endOffset
+       && endOffset <= elem.endOffset
       ) || (
-       startOffset <= elem.startOffset &&
-       elem.endOffset <= endOffset
+       startOffset <= elem.startOffset
+       && elem.endOffset <= endOffset
       )
      )) {
       return;

@@ -1002,22 +1002,22 @@ body {
 <pre><span class="lineno"><a href="#line_837" id="line_837">  837.</a></span><span class="count                ">      1</span><span>    for (const ii in bb) { //jslint-ignore-line</span></pre>
 <pre><span class="lineno"><a href="#line_838" id="line_838">  838.</a></span><span class="count                ">      1</span><span>        bb(cc, ii);</span></pre>
 <pre><span class="lineno"><a href="#line_839" id="line_839">  839.</a></span><span class="count                ">      1</span><span>    }</span></pre>
-<pre><span class="lineno"><a href="#line_840" id="line_840">  840.</a></span><span class="count                ">      1</span><span>    for (const ii of await (bb())) {</span></pre>
+<pre><span class="lineno"><a href="#line_840" id="line_840">  840.</a></span><span class="count                ">      1</span><span>    for (const ii of bb) {</span></pre>
 <pre><span class="lineno"><a href="#line_841" id="line_841">  841.</a></span><span class="count                ">      1</span><span>        bb(cc, ii);</span></pre>
 <pre><span class="lineno"><a href="#line_842" id="line_842">  842.</a></span><span class="count                ">      1</span><span>    }</span></pre>
-<pre><span class="lineno"><a href="#line_843" id="line_843">  843.</a></span><span class="count                ">      1</span><span>    for (const ii of bb) {</span></pre>
+<pre><span class="lineno"><a href="#line_843" id="line_843">  843.</a></span><span class="count                ">      1</span><span>    for (let ii = 0; ii &lt; 0; ii += 1) {</span></pre>
 <pre><span class="lineno"><a href="#line_844" id="line_844">  844.</a></span><span class="count                ">      1</span><span>        bb(cc, ii);</span></pre>
 <pre><span class="lineno"><a href="#line_845" id="line_845">  845.</a></span><span class="count                ">      1</span><span>    }</span></pre>
-<pre><span class="lineno"><a href="#line_846" id="line_846">  846.</a></span><span class="count                ">      1</span><span>    for (let ii = 0; ii &lt; 0; ii += 1) {</span></pre>
+<pre><span class="lineno"><a href="#line_846" id="line_846">  846.</a></span><span class="count                ">      1</span><span>    for (let ii of bb) {</span></pre>
 <pre><span class="lineno"><a href="#line_847" id="line_847">  847.</a></span><span class="count                ">      1</span><span>        bb(cc, ii);</span></pre>
 <pre><span class="lineno"><a href="#line_848" id="line_848">  848.</a></span><span class="count                ">      1</span><span>    }</span></pre>
-<pre><span class="lineno"><a href="#line_849" id="line_849">  849.</a></span><span class="count                ">      1</span><span>    for (let ii of bb) {</span></pre>
+<pre><span class="lineno"><a href="#line_849" id="line_849">  849.</a></span><span class="count                ">      1</span><span>    for await (const ii of bb) {</span></pre>
 <pre><span class="lineno"><a href="#line_850" id="line_850">  850.</a></span><span class="count                ">      1</span><span>        bb(cc, ii);</span></pre>
 <pre><span class="lineno"><a href="#line_851" id="line_851">  851.</a></span><span class="count                ">      1</span><span>    }</span></pre>
-<pre><span class="lineno"><a href="#line_852" id="line_852">  852.</a></span><span class="count                ">      1</span><span>    for await (const ii of bb) {</span></pre>
+<pre><span class="lineno"><a href="#line_852" id="line_852">  852.</a></span><span class="count                ">      1</span><span>    for await (let ii of bb) {</span></pre>
 <pre><span class="lineno"><a href="#line_853" id="line_853">  853.</a></span><span class="count                ">      1</span><span>        bb(cc, ii);</span></pre>
 <pre><span class="lineno"><a href="#line_854" id="line_854">  854.</a></span><span class="count                ">      1</span><span>    }</span></pre>
-<pre><span class="lineno"><a href="#line_855" id="line_855">  855.</a></span><span class="count                ">      1</span><span>    for await (let ii of bb) {</span></pre>
+<pre><span class="lineno"><a href="#line_855" id="line_855">  855.</a></span><span class="count                ">      1</span><span>    for (const ii of await (bb())) {</span></pre>
 <pre><span class="lineno"><a href="#line_856" id="line_856">  856.</a></span><span class="count                ">      1</span><span>        bb(cc, ii);</span></pre>
 <pre><span class="lineno"><a href="#line_857" id="line_857">  857.</a></span><span class="count                ">      1</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_858" id="line_858">  858.</a></span><span class="count                ">      1</span><span>}</span></pre>
@@ -1375,8 +1375,8 @@ body {
 <pre><span class="lineno"><a href="#line_1210" id="line_1210"> 1210.</a></span><span class="count                ">     24</span><span>            const elemNow = JSON.stringify([option_dict, source]);</span></pre>
 <pre><span class="lineno"><a href="#line_1211" id="line_1211"> 1211.</a></span><span class="count                ">     24</span><span>            const warningsLength = (</span></pre>
 <pre><span class="lineno"><a href="#line_1212" id="line_1212"> 1212.</a></span><span class="count                ">     24</span><span>                (</span></pre>
-<pre><span class="lineno"><a href="#line_1213" id="line_1213"> 1213.</a></span><span class="count                ">     23</span><span>                    option_dict.test_internal_error ||</span></pre>
-<pre><span class="lineno"><a href="#line_1214" id="line_1214"> 1214.</a></span><span class="count                ">     23</span><span>                    option_dict.test_unknown_warning_code</span></pre>
+<pre><span class="lineno"><a href="#line_1213" id="line_1213"> 1213.</a></span><span class="count                ">     24</span><span>                    option_dict.test_internal_error</span></pre>
+<pre><span class="lineno"><a href="#line_1214" id="line_1214"> 1214.</a></span><span class="count                ">     23</span><span>                    || option_dict.test_unknown_warning_code</span></pre>
 <pre><span class="lineno"><a href="#line_1215" id="line_1215"> 1215.</a></span><span class="count                ">     24</span><span>                )</span></pre>
 <pre><span class="lineno"><a href="#line_1216" id="line_1216"> 1216.</a></span><span class="count                ">      2</span><span>                ? 1</span></pre>
 <pre><span class="lineno"><a href="#line_1217" id="line_1217"> 1217.</a></span><span class="count                ">     22</span><span>                : 0</span></pre>

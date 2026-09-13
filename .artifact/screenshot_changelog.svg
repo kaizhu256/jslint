@@ -1,5 +1,5 @@
-<svg height="1240" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1240" fill="#222" width="800"></rect>
+<svg height="1218" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1218" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -29,19 +29,19 @@
     textLength="768"
     x="10"
     y="98"
->- jslint - Add rule requiring operators to be at end-of-line, instead of beginning-of-line, exce\</tspan>
+>- jslint - Add support for tab-indent.                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="120"
->  pt for ternary-operators ?, :, and gate it behind /*jslint beta*/, to minimize breakage for ex\</tspan>
+>- jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-lin\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="142"
->  isting users.                                                                                  </tspan>
+>  e, except dot-operators '.', '?.'.                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -71,7 +71,7 @@
     textLength="768"
     x="10"
     y="252"
->- jslint - Add ability to auto-fix whitespace.                                                   </tspan>
+>- jslint-cli - Add cli-option jslint_autofix=filename to auto-fix whitespace-warnings.           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -113,7 +113,7 @@
     textLength="768"
     x="10"
     y="406"
->- jslint - Move 242 line-leading &amp;&amp; or || to line end.                                           </tspan>
+>- jslint-ci - Merge ci-shell-function shGithubPrUpdatePrxxx() into shGithubPrCreate().           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -330,12 +330,6 @@
     x="10"
     y="1198"
 >- jslint-ci - Add automated ci for shellcheck to lint shell-scripts.                             </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1220"
->- jslint-regression - Cleanup indent for multiline-method-chaining.                              </tspan>
 
 </text>
 </svg>
