@@ -2317,7 +2317,7 @@ async function jslint_autofix({
         "expected_space_a_b",
         "unexpected_space_a_b"
     ];
-    const pass_max = 100;
+    const pass_max = 255;
     let code = await moduleFs.promises.readFile(pathname, "utf8");
     let code_prv = code;
     let pass = 0;
