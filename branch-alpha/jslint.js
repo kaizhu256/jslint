@@ -6988,7 +6988,7 @@ function jslint_phase3_parse(state) {
             if (scope_function.async === 0 && scope_function !== token_global) {
 
 // test_cause:
-// ["()=>{for await(bb of cc){}}", "stmt_for", "unexpected_a", "await", 10]
+// ["()=>{for await(aa of aa){}}", "stmt_for", "unexpected_a", "await", 10]
 
                 warn("unexpected_a", token_nxt);
             }

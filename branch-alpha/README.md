@@ -926,7 +926,7 @@ if (false) {
 |  40. | ✅ | ES2019 | [`Symbol.prototype.description`](https://github.com/tc39/proposal-Symbol-description) |
 |  39. | ✅ | ES2019 | [`JSON superset`](https://github.com/tc39/proposal-json-superset) |
 |  38. | ✅ | ES2019 | [`Optional catch binding`](https://github.com/tc39/proposal-optional-catch-binding) |
-|  37. | ❌ | ES2018 | [`Asynchronous Iteration`](https://github.com/tc39/proposal-async-iteration) |
+|  37. | ⚠️ | ES2018 | [`Asynchronous Iteration`](https://github.com/tc39/proposal-async-iteration) |
 |  36. | ✅ | ES2018 | [`Promise.prototype.finally`](https://github.com/tc39/proposal-promise-finally) |
 |  35. | ✅ | ES2018 | [`RegExp Unicode Property Escapes`](https://github.com/tc39/proposal-regexp-unicode-property-escapes) |
 |  34. | ✅ | ES2018 | [`RegExp Lookbehind Assertions`](https://github.com/tc39/proposal-regexp-lookbehind) |
