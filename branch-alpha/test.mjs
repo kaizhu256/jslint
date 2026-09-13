@@ -837,6 +837,9 @@ async function aa(bb, cc) {
     for (const ii in bb) { //jslint-ignore-line
         bb(cc, ii);
     }
+    for (const ii of await (bb())) {
+        bb(cc, ii);
+    }
     for (const ii of bb) {
         bb(cc, ii);
     }
