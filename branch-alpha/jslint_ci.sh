@@ -1241,21 +1241,6 @@ import moduleFs from "fs";
         commitMessage = `- shGithubPrCreate ${commitMessage}`;
     }
     branchPull = `branch-${version}`;
-    // update README.md
-    data = await moduleFs.promises.readFile("README.md", "utf8");
-    data = data.replace(
-        new RegExp(
-            (
-                "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
-                + "\\/compare"
-                + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
-                + `:branch-${version[0]}\\d\\d\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
-            ),
-            "g"
-        ),
-        `$1:${branchPull}`
-    );
-    await moduleFs.promises.writeFile("README.md", data);
     // security - sanitize commitMessage
     commitMessage = commitMessage.trim().replace((/\u0027/g), "$&\"$&\"$&");
     moduleChildProcess.spawn(
