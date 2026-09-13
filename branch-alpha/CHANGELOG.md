@@ -12,7 +12,7 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.9.29
-- jslint - Move 242 line-leading && or || to line end; gate at 0.
+- jslint - Move 242 line-leading && or || to line end.
 
 # v2026.8.31
 - jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.
