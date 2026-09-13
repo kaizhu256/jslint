@@ -107,7 +107,7 @@
     textLength="768"
     x="10"
     y="384"
->- jslint-ecma - Add ES2018-feature Asynchronous Iteration (for await..of).                       </tspan>
+>- jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
