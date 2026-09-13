@@ -6993,10 +6993,6 @@ function jslint_phase3_parse(state) {
 // PR-xxx - Add ES2018-feature Asynchronous Iteration (for await..of).
 
         if (token_nxt.id === "await") {
-
-// The async-context rules are prefix_await's, not the loop's - top-level await
-// is allowed, await inside a non-async function is not.
-
             if (scope_function.async === 0 && scope_function !== token_global) {
 
 // test_cause:
