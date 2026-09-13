@@ -1,17 +1,17 @@
 # Changelog
 
 # Todo
+- jslint - Add rule requiring operators to be at end-of-line, instead of beginning-of-line, except for ternary-operators ?, :, and gate it behind /*jslint beta*/, to minimize breakage for existing users.
 - jslint-ecma - Add ES2015-feature iterators.
 - jslint - Audit token-property '.free'.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
+- jslint - Add ability to auto-fix whitespace.
 - jslint - Add html and css linting back into jslint.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.9.29
-- jslint - Add command jslint_autofix to auto-fix whitespace-warnings expected_space_a_b, unexpected_space_a_b, indentation expected_a_at_b_c, line-break expected_line_break_a_b, and operator-end-of-line expected_a_at_end.
-- jslint - Add beta-warning expected_a_at_end to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.'.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
 - jslint - Move 242 line-leading && or || to line end.
 
