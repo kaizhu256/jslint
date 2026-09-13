@@ -89,13 +89,13 @@
     textLength="768"
     x="10"
     y="318"
->- jslint - Add beta-warning expected_a_at_end_of_line requiring operators at end-of-line, except\</tspan>
+>- jslint - Add beta-rule to jslint_phase5_whitage requiring binary-operators at end-of-line, exc\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="340"
->   ternary ?, : and member-access ., ?.                                                          </tspan>
+>  ept dot-operators '.', '?.'.                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

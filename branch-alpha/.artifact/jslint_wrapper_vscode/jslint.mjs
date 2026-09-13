@@ -1479,9 +1479,6 @@ function jslint(
         case "expected_a_at_b_c":
             mm = `Expected '${a}' at column ${b}, not column ${c}.`;
             break;
-        case "expected_a_at_end_of_line":
-            mm = `Expected '${a}' at the end of the previous line.`;
-            break;
         case "expected_a_b":
             mm = `Expected '${a}' and instead saw '${b}'.`;
             break;
@@ -10097,11 +10094,7 @@ function jslint_phase5_whitage(state) {
 
         if (left.line !== right.line) {
 
-// Require operators at end-of-line, instead of beginning-of-line. Ternary
-// ?, : and member-access ., ?. are EXCEPTED: jslint itself rejects the
-// trailing form of those with unexpected_space_a_b, so the rule would have
-// no legal target. Gated behind beta to minimize breakage for existing
-// users.
+// PR-xxx - Binary operators at end-of-line.
 
             if (
                 option_dict.beta &&
@@ -10109,14 +10102,7 @@ function jslint_phase5_whitage(state) {
                 right.id !== "." &&
                 right.id !== "?."
             ) {
-
-// test_cause:
-// ["
-// let aa = 0
-// + 0;
-// ", "jslint_phase5_whitage", "expected_a_at_end_of_line", "+", 1]
-
-                warn("expected_a_at_end_of_line", right, artifact(right));
+                expected_at(left.thru + 1);
             }
             dot_depth = 0;
             switch (right.id) {
