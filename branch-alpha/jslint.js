@@ -383,7 +383,6 @@
     tree,
     trim,
     trimEnd,
-    trimRight,
     try,
     type,
     unlink,
@@ -1897,7 +1896,7 @@ function jslint(
             + "\u001b[39m\n"
             + ("    " + line_source.trim()).slice(0, 72) + "\n"
             + stack_trace
-        ).trimRight();
+        ).trimEnd();
     });
 
     return {
