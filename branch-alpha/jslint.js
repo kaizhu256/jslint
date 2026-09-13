@@ -7003,28 +7003,21 @@ function jslint_phase3_parse(state) {
             if (scope_function.async === 1) {
                 scope_function.async = 2;
             }
+            the_for.for_await = token_nxt;
             advance("await");
-            the_for.for_await = token_now;
-
-// "for await" pairs with "of" ONLY, so reject the semicolon-form here rather
-// than let the "expected_a 'let'" advice below fire on a syntax error. The
-// lexer has already run, so for_semicolon is known before "(" is consumed.
-
-            if (the_for.for_semicolon) {
-
-// test_cause:
-// ["
-// async function aa(bb){for await(bb=0;bb;bb+=1){aa(bb);}}
-// ", "stmt_for", "expected_a_b", ";", 23]
-
-                return stop("expected_a_b", the_for, "of", ";");
-            }
         }
         advance("(");
         the_for.free = true;
         if (the_for.for_semicolon) {
             switch (token_nxt.id) {
             case ";":
+                if (the_for.for_await) {
+
+// test_cause:
+// ["for await(;;){}", "stmt_for", "expected_a_b", ";", 11]
+
+                    return stop("expected_a_b", token_nxt, "of", ";");
+                }
 
 // test_cause:
 // ["for(;;){}", "stmt_for", "expected_a_b", "for (;", 5]
