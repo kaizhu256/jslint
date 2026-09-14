@@ -371,6 +371,7 @@
     suffix_file,
     switch,
     syntax_dict,
+    tab,
     tenure,
     test,
     test_cause,
@@ -433,14 +434,17 @@ const debugInline = (function () {
     return debug;
 }());
 debugInline(); // coverage-hack
-// The four phase-5 whitespace-codes autofix can repair. Exported so a report
-// can say whether a source is blocked BEFORE anyone clicks Autofix.
+// The codes autofix can repair: the four phase-5 whitespace-codes, plus the
+// two phase-2 indentation-character codes. Exported so a report can say
+// whether a source is blocked BEFORE anyone clicks Autofix.
 
 const jslint_autofix_warning_list = [ //jslint-ignore-line
     "expected_a_at_b_c",
     "expected_line_break_a_b",
     "expected_space_a_b",
-    "unexpected_space_a_b"
+    "unexpected_space_a_b",
+    "use_spaces",
+    "use_tabs"
 ];
 const jslint_charset_ascii = ( //jslint-ignore-line
     "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
@@ -1727,6 +1731,9 @@ function jslint(
             break;
         case "use_spaces":
             mm = `Use spaces, not tabs.`;
+            break;
+        case "use_tabs":
+            mm = `Use tabs, not spaces.`;
             break;
         case "var_on_top_a_b":
             mm = `Move ${a} declaration to top of ${b} or script.`;
@@ -4037,6 +4044,7 @@ function jslint_phase2_lex(state) {
         case "nomen":           // Allow weird property name.
         case "single":          // Allow single-quote strings.
         case "subscript":       // Allow identifier in subscript-notation.
+        case "tab":             // Use tab-indent.
         case "test_cause":      // Test jslint's causes.
         case "test_internal_error":     // Test jslint's internal-error
                                         // ... handling-ability.
@@ -4167,6 +4175,7 @@ function jslint_phase2_lex(state) {
 // replace them with spaces and give a warning. Also warn if the line contains
 // unsafe characters or is too damn long.
 
+        let tab_at;
         if (
             !option_dict.long
             && line_whole.length > 80
@@ -4232,14 +4241,37 @@ function jslint_phase2_lex(state) {
             test_cause("line_disable");
             line_source = "";
         }
-        // jslint_rgx_tab
-        if (line_source.indexOf("\t") >= 0) {
-            if (!option_dict.white) {
+// Directive tab wants tabs, so a SPACE in the leading run is the mirror of
+// use_spaces - and phase 5 cannot catch it: it sees each tab as ONE column
+// (the replace below), so one space lands exactly where one tab would.
+
+        if (option_dict.tab && !option_dict.white && (
+            /^\t* /
+        ).test(line_source)) {
 
 // test_cause:
+// ["/*jslint tab*/\n 0", "read_line", "use_tabs", "", 1]
+
+            warn_at("use_tabs", line, line_source.indexOf(" ") + 1);
+        }
+        // jslint_rgx_tab
+        if (line_source.indexOf("\t") >= 0) {
+
+// Directive tab allows tabs as INDENTATION only, so look for the first tab
+// AFTER the leading run; without the directive, the first tab anywhere.
+
+            tab_at = line_source.indexOf("\t", (
+                option_dict.tab
+                ? line_source.length - line_source.trimStart().length
+                : 0
+            ));
+            if (!option_dict.white && tab_at >= 0) {
+
+// test_cause:
+// ["/*jslint tab*/\n\t0\t0", "read_line", "use_spaces", "", 3]
 // ["\t", "read_line", "use_spaces", "", 1]
 
-                warn_at("use_spaces", line, line_source.indexOf("\t") + 1);
+                warn_at("use_spaces", line, tab_at + 1);
             }
             line_source = line_source.replace(jslint_rgx_tab, " ");
         }
@@ -9655,10 +9687,16 @@ function jslint_phase5_whitage(state) {
     let mode_indent = (
 
 // PR-330 - Allow 2-space indent.
+// Directive tab: read_line turned each tab into ONE space, so one tab-level is
+// one column, and tab wins over indent2.
 
-        option_dict.indent2
-        ? 2
-        : 4
+        option_dict.tab
+        ? 1
+        : (
+            option_dict.indent2
+            ? 2
+            : 4
+        )
     );
     let nr_comments_skipped = 0;
     let open = true;
@@ -10279,6 +10317,16 @@ function jslint_phase6_autofix(state) {
 // Anything else BLOCKS the pass - repair exactly what the linter reports,
 // never more.
 
+    const indent_char = (       // What one indent-level is written in.
+        state.option_dict.tab
+        ? "\t"
+        : " "
+    );
+    const indent_unit = (       // Spaces per level, converting to or from
+        state.option_dict.indent2   // ... tabs. Same derivation as phase 5's
+        ? 2                         // ... mode_indent, minus the tab arm.
+        : 4
+    );
     const {
         source,
         warning_list
@@ -10374,13 +10422,45 @@ function jslint_phase6_autofix(state) {
                         / +$/
                     ), ""),
                     line_eol,
-                    " ".repeat(b - 1) + line_source.slice(ii)
+                    indent_char.repeat(b - 1) + line_source.slice(ii)
                 );
                 return;
             }
             line_list[kk] = (
-                " ".repeat(b - 1) + line_source.trimStart()
+                indent_char.repeat(b - 1) + line_source.trimStart()
             );
+            return;
+        }
+        if (code === "use_spaces" || code === "use_tabs") {
+
+// Indentation in the WRONG character. Rewrite the LEADING run only: each tab
+// becomes <indent_unit> spaces, or the spaces become tabs at <indent_unit>
+// per tab, rounded - phase 5's column check corrects any wrong level on the
+// next pass. Under directive tab, use_spaces means a tab AFTER the first
+// token; that is not indentation, so leave it and let it stay reported - the
+// fall-through below would DELETE it as a stray whitespace-run.
+
+            if (code === "use_spaces" && state.option_dict.tab) {
+                return;
+            }
+            line_list[kk] = line_source.replace((
+                /^[\t ]*/
+            ), function (run) {
+                return (
+                    code === "use_spaces"
+                    ? run.replace((
+                        /\t/g
+                    ), " ".repeat(indent_unit))
+                    : "\t".repeat(
+                        run.replace((
+                            / /g
+                        ), "").length +
+                        Math.round(run.replace((
+                            /\t/g
+                        ), "").length / indent_unit)
+                    )
+                );
+            });
             return;
         }
 

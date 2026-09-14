@@ -67,6 +67,7 @@ Douglas Crockford <douglas@crockford.com>
         - [`/*jslint nomen*/`](#jslint-nomen)
         - [`/*jslint single*/`](#jslint-single)
         - [`/*jslint subscript*/`](#jslint-subscript)
+        - [`/*jslint tab*/`](#jslint-tab)
         - [`/*jslint this*/`](#jslint-this)
         - [`/*jslint trace*/`](#jslint-trace)
         - [`/*jslint unordered*/`](#jslint-unordered)
@@ -713,6 +714,18 @@ let foo = '';
 
 let foo = {};
 foo["bar"] = 1;
+```
+
+<br>
+
+##### `/*jslint tab*/`
+```js
+/*jslint tab*/
+// Use tab-indent.
+
+function foo() {
+	return;
+}
 ```
 
 <br>
