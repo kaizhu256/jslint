@@ -9,6 +9,7 @@
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 
 # v2026.9.29
+- jslint-cli - Skip dotfiles when linting a directory.
 - jslint - Improve parser to parse jquery.js without stopping - for-init comma, numeric object-key.
 - jslint - Remove dead token-property 'free' from parser and whitage.
 - jslint-directive - Add new directive 'tab' to support tab-indent.

@@ -542,6 +542,11 @@ import moduleFs from "fs";
         fi
     done
     JSLINT_BETA=1 node jslint.mjs .
+    # directory-lint skips dotfiles, so lint embedded-js in .ci.sh explicitly
+    if [ -f .ci.sh ]
+    then
+        JSLINT_BETA=1 node jslint.mjs .ci.sh
+    fi
     if (command -v shCiLintCustom >/dev/null)
     then
         shCiLintCustom
