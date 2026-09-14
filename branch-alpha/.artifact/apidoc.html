@@ -1512,11 +1512,12 @@ if (mode_autofix) {
         if (mode_autofix) {
             autofixed = <span class="apidocCodeKeywordSpan">jslint_phase6_autofix</span>(state) || state.source;
             if (autofixed !== state.source) {
+                return {
+autofixed,
 
-// The recursion hands back the INNERMOST lint, so &lt;warnings&gt; and &lt;ok&gt;
-// describe the FIXED source. That lint's own &lt;autofixed&gt; is absent once it
-// converges, so fill it from THIS frame - a deeper frame's value is more
-// fixed and therefore wins the spread.
+// Recurse jslint().
+
+...jslint(
 ...</pre></li>
 
 <li>

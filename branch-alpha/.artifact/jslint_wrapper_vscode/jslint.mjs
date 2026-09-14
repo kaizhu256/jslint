@@ -1876,12 +1876,6 @@ function jslint(
         if (mode_autofix) {
             autofixed = jslint_phase6_autofix(state) || state.source;
             if (autofixed !== state.source) {
-
-// The recursion hands back the INNERMOST lint, so <warnings> and <ok>
-// describe the FIXED source. That lint's own <autofixed> is absent once it
-// converges, so fill it from THIS frame - a deeper frame's value is more
-// fixed and therefore wins the spread.
-
                 return {
                     autofixed,
 
