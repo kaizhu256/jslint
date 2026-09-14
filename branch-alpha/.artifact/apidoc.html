@@ -1432,7 +1432,7 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
 // PHASE 6. Autofix whitespace-warnings in &lt;source&gt;, and re-lint the result.
 
 if (mode_autofix) {
-    autofixed = jslint_phase6_autofix(state);
+    autofixed = jslint_phase6_autofix(state) || state.source;
     if (autofixed !== state.source) {
 ...</pre></li>
 
@@ -1472,7 +1472,6 @@ if (mode_autofix) {
         return line_source;
     });
     const {
-        source,
         warning_list
     } = state;
 
@@ -1486,7 +1485,7 @@ if (mode_autofix) {
 // them, and a warning-free source would come back CHANGED - which is how a
 // clean run gets written to disk.
 
-    if (war...
+    if (warning_list.length...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1497,7 +1496,7 @@ if (mode_autofix) {
 // PHASE 6. Autofix whitespace-warnings in &lt;source&gt;, and re-lint the result.
 
         if (mode_autofix) {
-            autofixed = <span class="apidocCodeKeywordSpan">jslint_phase6_autofix</span>(state);
+            autofixed = <span class="apidocCodeKeywordSpan">jslint_phase6_autofix</span>(state) || state.source;
             if (autofixed !== state.source) {
 
 // The recursion hands back the INNERMOST lint, so &lt;warnings&gt; and &lt;ok&gt;

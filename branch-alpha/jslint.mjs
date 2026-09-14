@@ -1877,7 +1877,7 @@ function jslint(
 // PHASE 6. Autofix whitespace-warnings in <source>, and re-lint the result.
 
         if (mode_autofix) {
-            autofixed = jslint_phase6_autofix(state);
+            autofixed = jslint_phase6_autofix(state) || state.source;
             if (autofixed !== state.source) {
 
 // The recursion hands back the INNERMOST lint, so <warnings> and <ok>
@@ -1887,10 +1887,13 @@ function jslint(
 
                 return {
                     autofixed,
-                    ...jslint(autofixed, {
-                        ...option_dict,
-                        autofix: mode_autofix - 1
-                    })
+                    ...jslint(
+                        autofixed,
+                        {
+                            ...option_dict,
+                            autofix: mode_autofix - 1
+                        }
+                    )
                 };
             }
         }
@@ -10283,7 +10286,6 @@ function jslint_phase6_autofix(state) {
         return line_source;
     });
     const {
-        source,
         warning_list
     } = state;
 
@@ -10298,11 +10300,11 @@ function jslint_phase6_autofix(state) {
 // clean run gets written to disk.
 
     if (warning_list.length === 0) {
-        return source;
+        return;
     }
     for (const {code} of warning_list) {
         if (!jslint_autofix_warning_list.includes(code)) {
-            return source;
+            return;
         }
     }
 
