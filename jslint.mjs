@@ -7193,6 +7193,21 @@ function jslint_phase3_parse(state) {
             }
             token_nxt.for_init = true;
             the_for.for_semicolon[0] = parse_statement_single();
+
+// jquery.js - Tolerate comma-expression in for-init `for (i = 0, l = n;;)`.
+// semicolon() has already warned expected_a_b at the comma; parse the rest
+// instead of stopping in parse_expression().
+
+            while (token_nxt.id === ",") {
+
+// test_cause:
+// ["for(aa=0,bb=0;;){}", "stmt_for", "for_init_comma", "", 0]
+
+                test_cause("for_init_comma");
+                advance(",");
+                parse_expression(0);
+                semicolon();
+            }
             token_nxt.for_init = true;
             if (token_nxt.id === ";") {
 
@@ -8093,6 +8108,16 @@ function jslint_phase3_parse(state) {
 // to the identifier rules.
 
         switch (id) {
+        case "(number)":
+
+// jquery.js - Tolerate numeric object-key `{0: 200}` - warn, do not stop.
+// Like a non-identifier string-key, it is not tallied for /*property*/.
+
+// test_cause:
+// ["let aa={0:0}", "survey", "unexpected_a", "0", 9]
+
+            warn("unexpected_a", name);
+            return name.value;
         case "(string)":
             id = name.value;
             if (!jslint_rgx_identifier.test(id)) {
@@ -8111,7 +8136,7 @@ function jslint_phase3_parse(state) {
             if (!name.identifier) {
 
 // test_cause:
-// ["let aa={0:0}", "survey", "expected_identifier_a", "0", 9]
+// ["let aa={[aa]:0}", "survey", "expected_identifier_a", "[", 9]
 
                 return stop("expected_identifier_a", name);
             }
