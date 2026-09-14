@@ -1,5 +1,5 @@
-<svg height="536" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="536" fill="#222" width="800"></rect>
+<svg height="558" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="558" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -53,31 +53,31 @@
     textLength="768"
     x="10"
     y="186"
->&gt; let source = "function foo() {\nreturn  0;\n}\nfoo();\n";                                      </tspan>
+>&gt; let source = (`                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="208"
->&gt;                                                                                                </tspan>
+>&gt; /*jslint devel*/                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="230"
->&gt; // Autofix whitespace-warnings in &lt;source&gt; in javascript. No fs, no cli -                      </tspan>
+>&gt; console.log(                                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="252"
->&gt; // &lt;autofixed&gt; is the repaired source, or undefined if nothing was written,                    </tspan>
+>&gt; "hello world");                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="274"
->&gt; // and &lt;warnings&gt; and &lt;ok&gt; then describe &lt;autofixed&gt;, not &lt;source&gt;.                            </tspan>
+>&gt; `);                                                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -125,25 +125,31 @@
     textLength="768"
     x="10"
     y="450"
->function foo() {                                                                                 </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="472"
->    return 0;                                                                                    </tspan>
+>/*jslint devel*/                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="494"
->}                                                                                                </tspan>
+>console.log(                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="516"
->foo();                                                                                           </tspan>
+>    "hello world"                                                                                </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="538"
+>);                                                                                               </tspan>
 
 </text>
 </svg>
