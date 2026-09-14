@@ -2427,9 +2427,7 @@ async function jslint_cli({
                         browser: true,
                         ...option
                     },
-                    rgx: (
-                        /^<script\b[^>]*?>\n([\S\s]*?\n)<\/script>$/gm
-                    ),
+                    rgx: (/^<script\b[^>]*?>\n([\S\s]*?\n)<\/script>$/gm),
                     suffix: "</script>",
                     suffix_file: ".<script>.js"
                 })
@@ -2524,9 +2522,7 @@ async function jslint_cli({
                     node: true,
                     ...option
                 },
-                rgx: (
-                    /\bnode\b.*? (?:--eval|-e) '\n([\S\s]*?\n)'/gm
-                ),
+                rgx: (/\bnode\b.*? (?:--eval|-e) '\n([\S\s]*?\n)'/gm),
                 suffix: "'",
                 suffix_file: ".<node -e>.js"
             })
@@ -10287,9 +10283,16 @@ function jslint_phase6_autofix(state) {
         const line_source = line_list[line];
         let indentage_at;
         let jj = ii;
-        if (line_source === undefined) {
-            return;
-        }
+
+// UNREACHABLE, KEPT AS A GUARD [enumerated 2026-09-14]. Every fixable code is
+// raised by warn() on a REAL token, and the only token whose line is out of
+// range - (end), whose line is always line_list.length - is skipped by the
+// whitage loop before any warning can name it. Delete this and a future
+// out-of-range warning becomes a TypeError instead of a skipped fix.
+
+        if (line_source === undefined) { //coverage-ignore-line
+            return; //coverage-ignore-line
+        } //coverage-ignore-line
         switch (code) {
         case "expected_a_at_b_c":
 
@@ -10330,9 +10333,15 @@ function jslint_phase6_autofix(state) {
 // of labour is why autofix iterates rather than trying to be complete in one
 // pass.
 
-            if (ii === 0) {
-                return;
-            }
+// UNREACHABLE, KEPT AS A GUARD [enumerated 2026-09-14]. Both raise sites of
+// expected_line_break_a_b need the token to FOLLOW something on its own line -
+// prefix_function requires token_nxt.line === token_now.line, and
+// whitage_opener is reached only when <opening> is false, i.e. left.line ===
+// right.line - so right.from >= 1 and the column is never 1.
+
+            if (ii === 0) { //coverage-ignore-line
+                return; //coverage-ignore-line
+            } //coverage-ignore-line
             line_list.splice(
                 line,
                 1,

@@ -944,6 +944,43 @@ jstestDescribe((
         });
         assertOrThrow(result.autofixed === undefined, result.autofixed);
         assertOrThrow(result.ok, JSON.stringify(result.warnings));
+
+// A ONE-LINE source carries NO terminator at all, so jslint_rgx_crlf.exec()
+// returns null and the rejoin falls back to "\n". The result has no trailing
+// newline either - the fixer adds terminators BETWEEN lines, never after the
+// last one.
+
+        result = jslint.jslint("function aa(bb) { return bb; } aa();", {
+            autofix: true,
+            node: true
+        });
+        assertOrThrow(result.ok, JSON.stringify(result.warnings));
+        assertOrThrow(
+            result.autofixed === (
+                "function aa(bb) {\n    return bb;\n}\naa();"
+            ),
+            result.autofixed
+        );
+
+// A whitespace-run reaching column 0 is INDENTATION or a line-join, not a gap
+// between two tokens on one line, so the fix is DECLINED and the warning is
+// reported against a byte-identical file. Here the run is the whole indent of
+// a continuation line, which is why the warned column is 9 and not 1.
+
+        result = jslint.jslint((
+            "function aa(bb) {\n    return aa\n        (bb);\n}\naa();\n"
+        ), {
+            autofix: true,
+            node: true
+        });
+        assertOrThrow(result.autofixed === undefined, result.autofixed);
+        assertOrThrow(
+            result.warnings.length === 1 &&
+            result.warnings[0].code === "unexpected_space_a_b" &&
+            result.warnings[0].line === 3 &&
+            result.warnings[0].column === 9,
+            JSON.stringify(result.warnings)
+        );
     });
     jstestIt((
         "test cli-report handling-behavior"
