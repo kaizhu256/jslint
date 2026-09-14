@@ -35,21 +35,25 @@ Douglas Crockford <douglas@crockford.com>
     - [To import `jslint.mjs` in CommonJS environment:](#to-import-jslintmjs-in-commonjs-environment)
     - [To JSLint entire directory in shell:](#to-jslint-entire-directory-in-shell)
 
-2. [Quickstart JSLint Report](#quickstart-jslint-report)
+2. [Quickstart Autofix Whitespace](#quickstart-autofix-whitespace)
+    - [To autofix whitespace in shell:](#to-autofix-whitespace-in-shell)
+    - [To autofix whitespace in javascript:](#to-autofix-whitespace-in-javascript)
+
+3. [Quickstart JSLint Report](#quickstart-jslint-report)
     - [To create a JSLint report in shell:](#to-create-a-jslint-report-in-shell)
     - [To create a JSLint report in javascript:](#to-create-a-jslint-report-in-javascript)
 
-3. [Quickstart V8 Coverage Report](#quickstart-v8-coverage-report)
+4. [Quickstart V8 Coverage Report](#quickstart-v8-coverage-report)
     - [To create V8 coverage report from Node.js / Npm program in shell:](#to-create-v8-coverage-report-from-nodejs--npm-program-in-shell)
     - [To create V8 coverage report from Node.js / Npm program in javascript:](#to-create-v8-coverage-report-from-nodejs--npm-program-in-javascript)
 
-4. [Quickstart JSLint in CodeMirror](#quickstart-jslint-in-codemirror)
+5. [Quickstart JSLint in CodeMirror](#quickstart-jslint-in-codemirror)
 
-5. [Quickstart JSLint in Vim](#quickstart-jslint-in-vim)
+6. [Quickstart JSLint in Vim](#quickstart-jslint-in-vim)
 
-6. [Quickstart JSLint in VSCode](#quickstart-jslint-in-vscode)
+7. [Quickstart JSLint in VSCode](#quickstart-jslint-in-vscode)
 
-7. [Documentation](#documentation)
+8. [Documentation](#documentation)
     - [API Doc](#api-doc)
     - [Directive](#directive)
         - [`/*jslint beta*/`](#jslint-beta)
@@ -79,13 +83,13 @@ Douglas Crockford <douglas@crockford.com>
         - [`//coverage-ignore-line`](#coverage-ignore-line)
     - [ECMAScript Feature Support](#ecmascript-feature-support)
 
-8. [Package Listing](#package-listing)
+9. [Package Listing](#package-listing)
 
-9. [Changelog](#changelog)
+10. [Changelog](#changelog)
 
-10. [License](#license)
+11. [License](#license)
 
-11. [Devops Instruction](#devops-instruction)
+12. [Devops Instruction](#devops-instruction)
     - [pull-request merge](#pull-request-merge)
     - [branch-master commit](#branch-master-commit)
     - [branch-master publish](#branch-master-publish)
@@ -205,6 +209,58 @@ node jslint.mjs .
 - shell output
 
 ![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_jslint_dir.svg)
+
+
+<br><br>
+# Quickstart Autofix Whitespace
+
+
+<br><br>
+### To autofix whitespace in shell:
+```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_autofix_file.svg -->
+#!/bin/sh
+
+printf "function foo() {\nreturn  0;\n}\nfoo();\n" > hello.js
+
+# Autofix whitespace-warnings in file 'hello.js', rewriting it IN-PLACE.
+# Only whitespace is repaired - any other warning blocks the file entirely,
+# leaving it byte-identical and exiting nonzero.
+
+node jslint.mjs jslint_autofix=hello.js
+
+# Print the repaired file.
+
+cat hello.js
+```
+- shell output
+
+![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_jslint_autofix_file.svg)
+
+
+<br><br>
+### To autofix whitespace in javascript:
+```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_jslint_autofix_file.svg -->
+#!/bin/sh
+
+node --input-type=module --eval '
+
+/*jslint devel*/
+import jslint from "./jslint.mjs";
+let result;
+let source = "function foo() {\nreturn  0;\n}\nfoo();\n";
+
+// Autofix whitespace-warnings in <source> in javascript. No fs, no cli -
+// <autofixed> is the repaired source, or undefined if nothing was written,
+// and <warnings> and <ok> then describe <autofixed>, not <source>.
+
+result = jslint.jslint(source, {autofix: true});
+console.log(result.autofixed);
+
+'
+```
+- shell output
+
+![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_jslint_autofix_file.svg)
 
 
 <br><br>
