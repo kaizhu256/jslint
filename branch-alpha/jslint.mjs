@@ -10260,24 +10260,6 @@ function jslint_phase5_whitage(state) {
 function jslint_phase6_autofix(state) {
 
 // PHASE 6. Autofix whitespace-warnings in <source>, and return the result.
-//
-// THE RECURSION IS jslint's, NOT THIS PHASE'S. A fix can surface a new
-// warning - re-indenting a long string creates a too_long - so the only way
-// to know what is left is to lint the fix again. jslint compares what this
-// returns against <source>, spends one pass of the budget and re-enters
-// itself; the INNERMOST result is the one handed back, so <warnings> and <ok>
-// describe <autofixed>, never <source>.
-//
-// RETURNING <source> UNCHANGED MEANS "NOTHING TO WRITE", and it is how a
-// blocked or already-clean source is reported. THIS FUNCTION NEVER RETURNS
-// undefined - it is jslint that turns an unchanged return into an ABSENT
-// <autofixed> key. A caller that writes only on a defined <autofixed> can
-// therefore never rewrite a file byte-identically, which would make a blocked
-// run look exactly like a clean one.
-
-// jslint_autofix_warning_list, module-level, is the entire fixable set.
-// Anything else BLOCKS the pass - repair exactly what the linter reports,
-// never more.
 
     const crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
     const line_list = state.line_list.map(function ({
@@ -10285,20 +10267,7 @@ function jslint_phase6_autofix(state) {
     }) {
         return line_source;
     });
-    const {
-        warning_list
-    } = state;
-
-// BLOCKED ON THE FIRST PASS means the source was ALREADY unfixable, and
-// nothing is written. BLOCKED LATER means OUR OWN fix surfaced it, and the
-// recursion one level up keeps the work it had already done - discarding
-// every fix made so far is far worse than leaving one warning for a human.
-
-// NOTHING TO REPAIR - return <source> ITSELF, never a rejoin. line_list
-// carries no terminators, so rejoining a MIXED file normalizes every one of
-// them, and a warning-free source would come back CHANGED - which is how a
-// clean run gets written to disk.
-
+    const warning_list = state.warning_list;
     if (warning_list.length === 0) {
         return;
     }

@@ -1446,46 +1446,67 @@ if (mode_autofix) {
 <li>Description and source-code:<pre class="apidocCodePre">function jslint_phase6_autofix(state) {
 <span class="apidocCodeCommentSpan">
 // PHASE 6. Autofix whitespace-warnings in &lt;source&gt;, and return the result.
-//
-// THE RECURSION IS jslint's, NOT THIS PHASE'S. A fix can surface a new
-// warning - re-indenting a long string creates a too_long - so the only way
-// to know what is left is to lint the fix again. jslint compares what this
-// returns against &lt;source&gt;, spends one pass of the budget and re-enters
-// itself; the INNERMOST result is the one handed back, so &lt;warnings&gt; and &lt;ok&gt;
-// describe &lt;autofixed&gt;, never &lt;source&gt;.
-//
-// RETURNING &lt;source&gt; UNCHANGED MEANS "NOTHING TO WRITE", and it is how a
-// blocked or already-clean source is reported. THIS FUNCTION NEVER RETURNS
-// undefined - it is jslint that turns an unchanged return into an ABSENT
-// &lt;autofixed&gt; key. A caller that writes only on a defined &lt;autofixed&gt; can
-// therefore never rewrite a file byte-identically, which would make a blocked
-// run look exactly like a clean one.
 
-</span>// jslint_autofix_warning_list, module-level, is the entire fixable set.
-// Anything else BLOCKS the pass - repair exactly what the linter reports,
-// never more.
-
-    const crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
+</span>    const crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
     const line_list = state.line_list.map(function ({
         line_source
     }) {
         return line_source;
     });
-    const {
-        warning_list
-    } = state;
+    const warning_list = state.warning_list;
+    if (warning_list.length === 0) {
+        return;
+    }
+    for (const {code} of warning_list) {
+        if (!jslint_autofix_warning_list.includes(code)) {
+            return;
+        }
+    }
 
-// BLOCKED ON THE FIRST PASS means the source was ALREADY unfixable, and
-// nothing is written. BLOCKED LATER means OUR OWN fix surfaced it, and the
-// recursion one level up keeps the work it had already done - discarding
-// every fix made so far is far worse than leaving one warning for a human.
+// Apply each fix RIGHT-TO-LEFT within a line, so an earlier fix cannot
+// invalidate a later fix's column, and BOTTOM-UP across lines, so every line
+// a splice shifts has already been visited.
 
-// NOTHING TO REPAIR - return &lt;source&gt; ITSELF, never a rejoin. line_list
-// carries no terminators, so rejoining a MIXED file normalizes every one of
-// them, and a warning-free source would come back CHANGED - which is how a
-// clean run gets written to disk.
+    warning_list.slice().sort(function (aa, bb) {
+        return bb.line - aa.line || bb.column - aa.column;
+    }).forEach(function ({
+        b,
+        code,
+        column,
+        line
+    }) {
+        const ii = column - 1;
+        const line_source = line_list[line];
+        let indentage_at;
+        let jj = ii;
+        if (line_source === undefined) {
+            return;
+        }
+        if (code === "expected_line_break_a_b") {
 
-    if (warning_list.length...
+// Split the line at the token. The new line lands unindented and the
+// expected_a_at_b_c pass re-indents it on the NEXT recursion - that division
+// of labour is why autofix iterates rather than trying to be complete in one
+// pass.
+
+            if (ii === 0) {
+                return;
+            }
+            line_list.splice(
+                line,
+                1,
+                line_source.slice(0, ii).replace((
+                    / +$/
+                ), ""),
+                line_source.slice(ii)
+            );
+            return;
+        }
+        if (code === "expected_a_at_b_c") {
+
+// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FIVE
+// callers, not one: at_margin and two expected_at(margin) warn a token that
+// already belongs at a margin, so the target column belongs to ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
