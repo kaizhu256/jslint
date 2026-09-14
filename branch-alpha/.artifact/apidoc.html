@@ -710,11 +710,16 @@ await jslint.jslint_cli({
     const import_list = [];     // The array collecting all import-from strings.
     const line_list = String(   // The array containing source lines.
         "\n" + source
-    ).split(jslint_rgx_crlf).map(function (line_source) {
-        return {
-            line_source
-        };
-    });
+    )
+        .split(jslint_rgx_crlf)
+        .filter(function (ignore, ii) {
+            return ii % 2 === 0;
+        })
+        .map(function (line_source) {
+            return {
+                line_source
+            };
+        });
     const mode_autofix = (
         option_dict.autofix === true
         ? 256
@@ -726,10 +731,7 @@ await jslint.jslint_cli({
     const state = empty();      // jslint state-object to be passed between
     const syntax_dict = empty();        // The object containing the parser.
     const tenure = empty();     // The predefined property registry.
-    const token_global = {      // The global object; the outermost context.
-        async: 0,
-        context: empty(),
- ...
+    ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

@@ -687,10 +687,7 @@ const jslint_rgx_cap = (
     /^[A-Z]/
 );
 const jslint_rgx_crlf = (
-    /\n|\r\n?/
-);
-const jslint_rgx_crlf_capture = (   // jslint_rgx_crlf, keeping each terminator
-    /(\n|\r\n?)/                    // ... as its own element when split.
+    /(\n|\r\n?)/
 );
 const jslint_rgx_digits_bits = (
     /^[01_]*/
@@ -1126,11 +1123,16 @@ function jslint(
     const import_list = [];     // The array collecting all import-from strings.
     const line_list = String(   // The array containing source lines.
         "\n" + source
-    ).split(jslint_rgx_crlf).map(function (line_source) {
-        return {
-            line_source
-        };
-    });
+    )
+        .split(jslint_rgx_crlf)
+        .filter(function (ignore, ii) {
+            return ii % 2 === 0;
+        })
+        .map(function (line_source) {
+            return {
+                line_source
+            };
+        });
     const mode_autofix = (
         option_dict.autofix === true
         ? 256
@@ -10308,7 +10310,7 @@ function jslint_phase6_autofix(state) {
 // 2*kk+1 - so a split line inherits its own terminator and a CRLF file comes
 // back CRLF, not mixed. [fable review 2026-09-13, both reproduced]
 
-    line_list = source.split(jslint_rgx_crlf_capture);
+    line_list = source.split(jslint_rgx_crlf);
     warning_list.slice().sort(function (aa, bb) {
         return bb.line - aa.line || bb.column - aa.column;
     }).forEach(function ({
