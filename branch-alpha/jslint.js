@@ -2623,7 +2623,7 @@ async function jslint_cli({
         });
         return;
 
-// PR-xxx - Add command jslint_autofix.
+// PR-509 - Add command jslint_autofix.
 
     case "jslint_autofix":
 
