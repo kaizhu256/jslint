@@ -433,16 +433,13 @@ const debugInline = (function () {
     return debug;
 }());
 debugInline(); // coverage-hack
-// The four phase-5 whitespace-codes autofix can repair. Exported so a report
-// can say whether a source is blocked BEFORE anyone clicks Autofix.
-
 const jslint_autofix_warning_list = [ //jslint-ignore-line
     "expected_a_at_b_c",
     "expected_line_break_a_b",
     "expected_space_a_b",
     "unexpected_space_a_b"
 ];
-const jslint_charset_ascii = ( //jslint-ignore-line
+const jslint_charset_ascii = (
     "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
     + "\b\t\n\u000b\f\r\u000e\u000f"
     + "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017"

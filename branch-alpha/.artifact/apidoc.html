@@ -473,21 +473,21 @@ jstestIt((
     return argList[0];
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-    if (consoleError === Object) {
-        consoleError = console.error;
+        if (consoleError === Object) {
+            consoleError = console.error;
+        }
+        return argList[0];
     }
-    return argList[0];
-}
-return debug;
+    return debug;
 }());
 <span class="apidocCodeKeywordSpan">debugInline</span>(); // coverage-hack
-// The four phase-5 whitespace-codes autofix can repair. Exported so a report
-// can say whether a source is blocked BEFORE anyone clicks Autofix.
-
 const jslint_autofix_warning_list = [ //jslint-ignore-line
-"expected_a_at_b_c",
-"expected_line_break_a_b",
-"expected_space_a_b",
+    "expected_a_at_b_c",
+    "expected_line_break_a_b",
+    "expected_space_a_b",
+    "unexpected_space_a_b"
+];
+const jslint_charset_ascii = (
 ...</pre></li>
 
 <li>
