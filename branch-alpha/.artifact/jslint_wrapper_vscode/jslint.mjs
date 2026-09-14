@@ -10283,12 +10283,6 @@ function jslint_phase6_autofix(state) {
         const line_source = line_list[line];
         let indentage_at;
         let jj = ii;
-
-// <line_source> is never undefined: every fixable code is raised by warn() on
-// a REAL token, and the only token whose line is out of range - (end), whose
-// line is always line_list.length - is skipped by the whitage loop before any
-// warning can name it. [enumerated 2026-09-14, guard deleted as deadcode]
-
         switch (code) {
         case "expected_a_at_b_c":
 
@@ -10326,12 +10320,6 @@ function jslint_phase6_autofix(state) {
 // expected_a_at_b_c pass re-indents it on the NEXT recursion - that division
 // of labour is why autofix iterates rather than trying to be complete in one
 // pass.
-
-// <ii> is never 0 here: both raise sites of expected_line_break_a_b need the
-// token to FOLLOW something on its own line - prefix_function requires
-// token_nxt.line === token_now.line, and whitage_opener is reached only when
-// <opening> is false, i.e. left.line === right.line - so right.from >= 1 and
-// the column is never 1. [enumerated 2026-09-14, guard deleted as deadcode]
 
             line_list.splice(
                 line,

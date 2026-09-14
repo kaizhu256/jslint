@@ -1479,12 +1479,6 @@ if (mode_autofix) {
         const line_source = line_list[line];
         let indentage_at;
         let jj = ii;
-
-// &lt;line_source&gt; is never undefined: every fixable code is raised by warn() on
-// a REAL token, and the only token whose line is out of range - (end), whose
-// line is always line_list.length - is skipped by the whitage loop before any
-// warning can name it. [enumerated 2026-09-14, guard deleted as deadcode]
-
         switch (code) {
         case "expected_a_at_b_c":
 
@@ -1496,7 +1490,12 @@ if (mode_autofix) {
 // weird_loop or unused_a, which blocks the pass. So do NOT read "always at a
 // margin" as licence to drop the mid-line branch below.
 
-            indentage_at = line_source.length - lin...
+            indentage_at = line_source.length - line_source.trimStart().length;
+
+// A MID-LINE token cannot be re-indented, but it does not need to be skipped:
+// at_margin fires for tokens that belong AT a margin and therefore on their
+// OWN line. So split first and indent the remainder, which also lands a
+// trailing closer correctly, and is what line-breaks a sing...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
