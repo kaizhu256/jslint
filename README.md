@@ -220,15 +220,13 @@ node jslint.mjs .
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_autofix_file.svg -->
 #!/bin/sh
 
-printf "function foo() {\nreturn  0;\n}\nfoo();\n" > hello.js
-
-# Autofix whitespace-warnings in file 'hello.js', rewriting it IN-PLACE.
-# Only whitespace is repaired - any other warning blocks the file entirely,
-# leaving it byte-identical and exiting nonzero.
+printf '
+/*jslint devel*/
+console.log(
+"hello world");
+' > hello.js
 
 node jslint.mjs jslint_autofix=hello.js
-
-# Print the repaired file.
 
 cat hello.js
 ```
@@ -247,11 +245,11 @@ node --input-type=module --eval '
 /*jslint devel*/
 import jslint from "./jslint.mjs";
 let result;
-let source = "function foo() {\nreturn  0;\n}\nfoo();\n";
-
-// Autofix whitespace-warnings in <source> in javascript. No fs, no cli -
-// <autofixed> is the repaired source, or undefined if nothing was written,
-// and <warnings> and <ok> then describe <autofixed>, not <source>.
+let source = (`
+/*jslint devel*/
+console.log(
+"hello world");
+`);
 
 result = jslint.jslint(source, {autofix: true});
 console.log(result.autofixed);
