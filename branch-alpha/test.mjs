@@ -896,10 +896,13 @@ jstestDescribe((
         assertOrThrow(!result.ok, "expected warnings");
 
 // THE FIXER'S LINE MODEL MUST BE THE LINTER'S (jslint_rgx_crlf). A CRLF file
-// must come back CRLF - the lines a split creates inherit their terminator -
-// and a lone \r, which the linter counts as a line break, must not shift every
-// later fix onto the wrong line. Both were real: the second deleted spaces
-// from a comment while the warned line stayed untouched.
+// must come back CRLF - line_list carries NO terminators and the rejoin uses
+// the file's OWN first one - and a lone \r, which the linter counts as a line
+// break, must not shift every later fix onto the wrong line. Both were real:
+// the second deleted spaces from a comment while the warned line stayed
+// untouched. A MIXED file is NORMALIZED to that first terminator, which is
+// what the second case pins: the fix lands on the right line, the comment is
+// untouched, and every \n comes back \r.
 
         result = jslint.jslint((
             "function aa(bb) {\r\n    if (bb) { return bb; }\r\n" +
@@ -924,11 +927,23 @@ jstestDescribe((
         });
         assertOrThrow(
             result.autofixed === (
-                "function bb(cc) {\r    cc();\n    return String(cc);\n" +
-                "    // xx              yy\n}\nbb();\n"
+                "function bb(cc) {\r    cc();\r    return String(cc);\r" +
+                "    // xx              yy\r}\rbb();\r"
             ),
             result.autofixed
         );
+
+// A WARNING-FREE source is returned UNTOUCHED, never rejoined - otherwise a
+// clean mixed-terminator file would come back normalized and get written.
+
+        result = jslint.jslint((
+            "function cc(dd) {\r\n    dd();\r    return 0;\n}\ncc();\n"
+        ), {
+            autofix: true,
+            node: true
+        });
+        assertOrThrow(result.autofixed === undefined, result.autofixed);
+        assertOrThrow(result.ok, JSON.stringify(result.warnings));
     });
     jstestIt((
         "test cli-report handling-behavior"

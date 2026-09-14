@@ -687,7 +687,7 @@ const jslint_rgx_cap = (
     /^[A-Z]/
 );
 const jslint_rgx_crlf = (
-    /(\n|\r\n?)/
+    /\n|\r\n?/
 );
 const jslint_rgx_digits_bits = (
     /^[01_]*/
@@ -1123,16 +1123,11 @@ function jslint(
     const import_list = [];     // The array collecting all import-from strings.
     const line_list = String(   // The array containing source lines.
         "\n" + source
-    )
-        .split(jslint_rgx_crlf)
-        .filter(function (ignore, ii) {
-            return ii % 2 === 0;
-        })
-        .map(function (line_source) {
-            return {
-                line_source
-            };
-        });
+    ).split(jslint_rgx_crlf).map(function (line_source) {
+        return {
+            line_source
+        };
+    });
     const mode_autofix = (
         option_dict.autofix === true
         ? 256
@@ -10281,17 +10276,30 @@ function jslint_phase6_autofix(state) {
 // Anything else BLOCKS the pass - repair exactly what the linter reports,
 // never more.
 
+    const crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
+    const line_list = state.line_list.map(function ({
+        line_source
+    }) {
+        return line_source;
+    });
     const {
         source,
         warning_list
     } = state;
-    let line_list;
 
 // BLOCKED ON THE FIRST PASS means the source was ALREADY unfixable, and
 // nothing is written. BLOCKED LATER means OUR OWN fix surfaced it, and the
 // recursion one level up keeps the work it had already done - discarding
 // every fix made so far is far worse than leaving one warning for a human.
 
+// NOTHING TO REPAIR - return <source> ITSELF, never a rejoin. line_list
+// carries no terminators, so rejoining a MIXED file normalizes every one of
+// them, and a warning-free source would come back CHANGED - which is how a
+// clean run gets written to disk.
+
+    if (warning_list.length === 0) {
+        return source;
+    }
     for (const {code} of warning_list) {
         if (!jslint_autofix_warning_list.includes(code)) {
             return source;
@@ -10301,16 +10309,7 @@ function jslint_phase6_autofix(state) {
 // Apply each fix RIGHT-TO-LEFT within a line, so an earlier fix cannot
 // invalidate a later fix's column, and BOTTOM-UP across lines, so every line
 // a splice shifts has already been visited.
-//
-// THE LINE MODEL MUST BE THE LINTER'S. Warnings carry line numbers computed
-// by jslint_rgx_crlf, which counts a lone \r as a line break; a plain
-// split("\n") does not, so one stray \r shifted every later fix onto the
-// wrong line and deleted spaces from a comment. The CAPTURING split keeps each
-// terminator as its own element - line kk is at 2*kk, its terminator at
-// 2*kk+1 - so a split line inherits its own terminator and a CRLF file comes
-// back CRLF, not mixed. [fable review 2026-09-13, both reproduced]
 
-    line_list = source.split(jslint_rgx_crlf);
     warning_list.slice().sort(function (aa, bb) {
         return bb.line - aa.line || bb.column - aa.column;
     }).forEach(function ({
@@ -10320,9 +10319,7 @@ function jslint_phase6_autofix(state) {
         line
     }) {
         const ii = column - 1;
-        const kk = 2 * (line - 1);
-        const line_eol = line_list[kk + 1] || line_list[kk - 1] || "\n";
-        const line_source = line_list[kk];
+        const line_source = line_list[line];
         let indentage_at;
         let jj = ii;
         if (line_source === undefined) {
@@ -10339,12 +10336,11 @@ function jslint_phase6_autofix(state) {
                 return;
             }
             line_list.splice(
-                kk,
+                line,
                 1,
                 line_source.slice(0, ii).replace((
                     / +$/
                 ), ""),
-                line_eol,
                 line_source.slice(ii)
             );
             return;
@@ -10370,17 +10366,16 @@ function jslint_phase6_autofix(state) {
 
             if (ii !== indentage_at) {
                 line_list.splice(
-                    kk,
+                    line,
                     1,
                     line_source.slice(0, ii).replace((
                         / +$/
                     ), ""),
-                    line_eol,
                     " ".repeat(b - 1) + line_source.slice(ii)
                 );
                 return;
             }
-            line_list[kk] = (
+            line_list[line] = (
                 " ".repeat(b - 1) + line_source.trimStart()
             );
             return;
@@ -10401,7 +10396,7 @@ function jslint_phase6_autofix(state) {
         if (jj === 0) {
             return;
         }
-        line_list[kk] = (
+        line_list[line] = (
             line_source.slice(0, jj) + (
                 code === "expected_space_a_b"
                 ? " "
@@ -10409,7 +10404,7 @@ function jslint_phase6_autofix(state) {
             ) + line_source.slice(ii)
         );
     });
-    return line_list.join("");
+    return line_list.slice(jslint_fudge).join(crlf);
 }
 
 function jslint_report({
