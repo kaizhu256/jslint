@@ -1887,6 +1887,9 @@ function jslint(
 
                 return {
                     autofixed,
+
+// Recurse jslint().
+
                     ...jslint(
                         autofixed,
                         {
@@ -10296,27 +10299,8 @@ function jslint_phase6_autofix(state) {
         if (line_source === undefined) {
             return;
         }
-        if (code === "expected_line_break_a_b") {
-
-// Split the line at the token. The new line lands unindented and the
-// expected_a_at_b_c pass re-indents it on the NEXT recursion - that division
-// of labour is why autofix iterates rather than trying to be complete in one
-// pass.
-
-            if (ii === 0) {
-                return;
-            }
-            line_list.splice(
-                line,
-                1,
-                line_source.slice(0, ii).replace((
-                    / +$/
-                ), ""),
-                line_source.slice(ii)
-            );
-            return;
-        }
-        if (code === "expected_a_at_b_c") {
+        switch (code) {
+        case "expected_a_at_b_c":
 
 // expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FIVE
 // callers, not one: at_margin and two expected_at(margin) warn a token that
@@ -10348,6 +10332,25 @@ function jslint_phase6_autofix(state) {
             }
             line_list[line] = (
                 " ".repeat(b - 1) + line_source.trimStart()
+            );
+            return;
+        case "expected_line_break_a_b":
+
+// Split the line at the token. The new line lands unindented and the
+// expected_a_at_b_c pass re-indents it on the NEXT recursion - that division
+// of labour is why autofix iterates rather than trying to be complete in one
+// pass.
+
+            if (ii === 0) {
+                return;
+            }
+            line_list.splice(
+                line,
+                1,
+                line_source.slice(0, ii).replace((
+                    / +$/
+                ), ""),
+                line_source.slice(ii)
             );
             return;
         }

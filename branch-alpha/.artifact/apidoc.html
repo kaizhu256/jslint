@@ -1482,31 +1482,24 @@ if (mode_autofix) {
         if (line_source === undefined) {
             return;
         }
-        if (code === "expected_line_break_a_b") {
-
-// Split the line at the token. The new line lands unindented and the
-// expected_a_at_b_c pass re-indents it on the NEXT recursion - that division
-// of labour is why autofix iterates rather than trying to be complete in one
-// pass.
-
-            if (ii === 0) {
-                return;
-            }
-            line_list.splice(
-                line,
-                1,
-                line_source.slice(0, ii).replace((
-                    / +$/
-                ), ""),
-                line_source.slice(ii)
-            );
-            return;
-        }
-        if (code === "expected_a_at_b_c") {
+        switch (code) {
+        case "expected_a_at_b_c":
 
 // expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FIVE
 // callers, not one: at_margin and two expected_at(margin) warn a token that
-// already belongs at a margin, so the target column belongs to ...
+// already belongs at a margin, so the target column belongs to the warned
+// line itself. The two expected_at(0) are LABEL placement and DO warn a
+// mid-line token - unreachable here only because a label always co-raises
+// weird_loop or unused_a, which blocks the pass. So do NOT read "always at a
+// margin" as licence to drop the mid-line branch below.
+
+            indentage_at = (
+                line_source.length - line_source.trimStart().length
+            );
+
+// A MID-LINE token cannot be re-indented, but it does not need to be skipped:
+// at_margin fires for tokens that belong AT a margin and therefore on their
+// OWN line. So split first an...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
