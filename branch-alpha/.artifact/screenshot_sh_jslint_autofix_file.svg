@@ -1,5 +1,5 @@
-<svg height="426" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="426" fill="#222" width="800"></rect>
+<svg height="448" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="448" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -47,7 +47,7 @@
     textLength="768"
     x="10"
     y="164"
->&gt; ' &gt; hello.js                                                                                   </tspan>
+>&gt; ' &gt; autofixed.js                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -59,7 +59,7 @@
     textLength="768"
     x="10"
     y="208"
->&gt; node jslint.mjs jslint_autofix=hello.js                                                        </tspan>
+>&gt; node jslint.mjs jslint_autofix=autofixed.js                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -71,7 +71,7 @@
     textLength="768"
     x="10"
     y="252"
->&gt; cat hello.js                                                                                   </tspan>
+>&gt; cat autofixed.js                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -89,31 +89,37 @@
     textLength="768"
     x="10"
     y="318"
->jslint hello.js                                                                                  </tspan>
+>wrote file autofixed.js                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="340"
-> 1. Undeclared 'console'. // line 1, column 17                                                   </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="362"
->    function foo() {console.log('hello world');}                                                 </tspan>
+>/*jslint devel*/                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="384"
-> 2. Use double quotes, not single quotes. // line 1, column 29                                   </tspan>
+>console.log(                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="406"
->    function foo() {console.log('hello world');}                                                 </tspan>
+>    "hello world"                                                                                </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="428"
+>);                                                                                               </tspan>
 
 </text>
 </svg>

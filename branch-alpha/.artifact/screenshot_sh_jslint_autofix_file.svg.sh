@@ -5,11 +5,11 @@ printf '> #!/bin/sh
 > /*jslint devel*/
 > console.log(
 > "hello world");
-> '"'"' > hello.js
+> '"'"' > autofixed.js
 > 
-> node jslint.mjs jslint_autofix=hello.js
+> node jslint.mjs jslint_autofix=autofixed.js
 > 
-> cat hello.js
+> cat autofixed.js
 
 
 '
@@ -19,9 +19,9 @@ printf '
 /*jslint devel*/
 console.log(
 "hello world");
-' > hello.js
+' > autofixed.js
 
-node jslint.mjs jslint_autofix=hello.js
+node jslint.mjs jslint_autofix=autofixed.js
 
-cat hello.js
+cat autofixed.js
 )
