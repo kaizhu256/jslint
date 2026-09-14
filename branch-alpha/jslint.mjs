@@ -10310,9 +10310,7 @@ function jslint_phase6_autofix(state) {
                 );
                 return;
             }
-            line_list[line] = (
-                " ".repeat(b - 1) + line_source.trimStart()
-            );
+            line_list[line] = " ".repeat(b - 1) + line_source.trimStart();
             return;
         case "expected_line_break_a_b":
 
