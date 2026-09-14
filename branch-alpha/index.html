@@ -13,9 +13,9 @@
     <meta name="author" content="Douglas Crockford">
     <link rel="icon" type="image/png" href="asset_image_logo_256.svg">
     <title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
-    <script defer src="./asset_codemirror_rollup.js?cc=2o1r"></script>
-    <script type="module" src="./jslint.mjs?cc=2o1r?window_jslint=1"></script>
-    <script defer src="./jslint_wrapper_codemirror.js?cc=2o1r"></script>
+    <script defer src="./asset_codemirror_rollup.js?cc=wqul"></script>
+    <script type="module" src="./jslint.mjs?cc=wqul?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js?cc=wqul"></script>
 <style>
 /*jslint-disable*/
 /*
@@ -1083,6 +1083,10 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 </fieldset>
 <div id="JSLINT_BUTTONS">
     <button name="JSLint" title="Ctrl + Enter">JSLint</button>
+    <button
+        name="autofix"
+        title="Autofix whitespace-warnings in source, then JSLint."
+    >Autofix Whitespace</button>
     <button name="clear_source">Clear Source</button>
     <button name="clear_options">Clear Options</button>
 </div>
@@ -1202,17 +1206,19 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 
 /*jslint beta, browser*/
 /*property
-    CodeMirror, Tab, addEventListener, ch, checked, clear, click, closest,
-    ctrlKey, display, dom_style_report_unmatched, editor, error, extraKeys,
+    CodeMirror, Tab, addEventListener, autofix, autofixed, ch, checked, clear,
+    click, closest, code, ctrlKey, display, dom_style_report_unmatched, editor,
+    error, extraKeys,
     focus, forEach, from, fromTextArea, getItem, getValue, globals, gutters,
-    indentSelection, indentUnit, innerHTML, jslint, jslint_edition,
+    includes, indentSelection, indentUnit, innerHTML, jslint,
+    jslint_autofix_warning_list, jslint_edition,
     jslint_report, key, length, line, lineNumbers, lineWrapping, lint,
     lintOnChange, matchBrackets, metaKey, mode, name, offsetWidth, on, options,
     parse, performLint, preventDefault, push, querySelector, querySelectorAll,
     replace, replaceSelection, result, reverse, search, setCursor, setItem,
-    setSize, setValue, showTrailingSpace, somethingSelected, sort, split,
+    setSize, setValue, showTrailingSpace, some, somethingSelected, sort, split,
     stopPropagation, stringify, style, styleActiveLine, tagName, target, test,
-    textContent, trim, value, width
+    textContent, trim, value, warnings, width
 */
 
 // This is the web script companion file for JSLint. It includes code for
@@ -1257,9 +1263,33 @@ function dom_style_report_unmatched() {
     });
 }
 
-async function jslint_run() {
+function jslint_option_dict_update() {
+
+// This function will update jslint_option_dict from ui-inputs. Shared by the
+// JSLint and Autofix buttons, so an autofix never runs on stale options.
+
+    document.querySelectorAll(
+        "#JSLINT_OPTIONS input[type=checkbox]"
+    ).forEach(function (elem) {
+        jslint_option_dict[elem.value] = elem.checked;
+    });
+    jslint_option_dict.globals = document.querySelector(
+        "#JSLINT_GLOBALS"
+    ).value.trim().split(
+        /[\s,;'"]+/
+    );
+}
+
+async function jslint_run(result_autofix) {
 
 // This function will run jslint in browser and create html-reports.
+// <result_autofix> is the Autofix button's own jslint() result when that
+// button was clicked, and undefined for a plain JSLint - Report: Autofix says
+// something ONLY after a click.
+
+    let blocked = false;
+    let notice = "";
+    let result;
 
 // Show ui-loader-animation.
 
@@ -1272,19 +1302,7 @@ async function jslint_run() {
         await new Promise(function (resolve) {
             setTimeout(resolve);
         });
-
-// Update jslint_option_dict from ui-inputs.
-
-        document.querySelectorAll(
-            "#JSLINT_OPTIONS input[type=checkbox]"
-        ).forEach(function (elem) {
-            jslint_option_dict[elem.value] = elem.checked;
-        });
-        jslint_option_dict.globals = document.querySelector(
-            "#JSLINT_GLOBALS"
-        ).value.trim().split(
-            /[\s,;'"]+/
-        );
+        jslint_option_dict_update();
 
 // Execute linter.
 
@@ -1292,10 +1310,39 @@ async function jslint_run() {
 
 // Generate the reports.
 // Display the reports.
+//
+// Report: Autofix is a PERMANENT section above the others, shaped like them -
+// a bare legend and a body - and EMPTY after a plain JSLint. After an Autofix
+// click the body is one of two: the error, RED, when a warning outside
+// jslint_autofix_warning_list still stands (a blocked click otherwise looks
+// like nothing happened); else "Autofix successful." - WHETHER OR NOT the
+// editor changed, because a click on an already-clean source is a success to
+// the person who clicked. <result.warnings> is the CURRENT lint, i.e. the
+// residual.
 
-        document.querySelector(
-            ".JSLINT_REPORT_"
-        ).innerHTML = jslint.jslint_report(jslint_option_dict.result);
+        result = jslint_option_dict.result;
+        if (result_autofix !== undefined) {
+            blocked = result.warnings.some(function ({
+                code
+            }) {
+                return !jslint.jslint_autofix_warning_list.includes(code);
+            });
+            notice = (
+                blocked
+                ? "Please fix non-whitespace warnings below first."
+                : "Autofix successful."
+            );
+        }
+        document.querySelector(".JSLINT_REPORT_").innerHTML = (
+            "<fieldset id=\"JSLINT_REPORT_AUTOFIX\"" + (
+                blocked
+                ? " class=\"blocked\""
+                : ""
+            ) + ">\n<legend>Report: Autofix</legend>\n" +
+            "<div>\n<cite>" + notice + "</cite>\n</div>\n" +
+            "</fieldset>\n" +
+            jslint.jslint_report(result)
+        );
         listener_window_onresize();
     } catch (err) {
         console.error(err); //jslint-ignore-line
@@ -1432,9 +1479,29 @@ document.querySelector(
 ).addEventListener("click", function ({
     target
 }) {
+    let result;
     switch (target.name) {
     case "JSLint":
         jslint_run();
+        break;
+    case "autofix":
+
+// Autofix whitespace-warnings in the editor, then lint whatever is left.
+// <autofix> is a ONE-SHOT option, never left in jslint_option_dict: the
+// lint-markers would otherwise describe the fixed text while the editor still
+// held the old one. <autofixed> is absent when there is nothing to write - a
+// clean source, or one blocked by a warning autofix cannot fix - and the
+// follow-up lint's Report: Autofix then says exactly what blocked it.
+
+        jslint_option_dict_update();
+        result = jslint.jslint(editor.getValue(), {
+            ...jslint_option_dict,
+            autofix: true
+        }, jslint_option_dict.globals);
+        if (result.autofixed !== undefined) {
+            editor.setValue(result.autofixed);
+        }
+        jslint_run(result);
         break;
     case "clear_options":
         document.querySelectorAll(
