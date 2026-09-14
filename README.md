@@ -224,11 +224,11 @@ printf '
 /*jslint devel*/
 console.log(
 "hello world");
-' > autofixed.js
+' > hello_autofix.js
 
-node jslint.mjs jslint_autofix=autofixed.js
+node jslint.mjs jslint_autofix=hello_autofix.js
 
-cat autofixed.js
+cat hello_autofix.js
 ```
 - shell output
 
@@ -270,13 +270,13 @@ console.log(result.autofixed);
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_report_file.svg -->
 #!/bin/sh
 
-printf "function foo() {console.log('hello world');}\n" > hello.js
+printf "function foo() {console.log('hello world');}\n" > hello_report.js
 
-# Create JSLint report from file 'hello.js' in shell.
+# Create JSLint report from file 'hello_report.js' in shell.
 
 node jslint.mjs \
     jslint_report=.artifact/jslint_report_hello.html \
-    hello.js
+    hello_report.js
 ```
 - shell output
 
