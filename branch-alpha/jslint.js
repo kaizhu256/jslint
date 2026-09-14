@@ -2353,7 +2353,7 @@ async function jslint_cli({
     let mode_wrapper_vim;
     let result;
 
-    function fix_embedded({
+    function autofix_embeded({
         code,
         file,
         mode_conditional,
@@ -2429,7 +2429,7 @@ async function jslint_cli({
 // Recursively jslint embedded "<script>\n...\n</script>".
 
             return {
-                autofixed: fix_embedded({
+                autofixed: autofix_embeded({
                     code,
                     file,
                     option: {
@@ -2519,7 +2519,7 @@ async function jslint_cli({
         option = empty()
     }) {
         return {
-            autofixed: fix_embedded({
+            autofixed: autofix_embeded({
                 code,
                 file,
                 mode_conditional,

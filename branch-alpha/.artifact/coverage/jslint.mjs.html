@@ -2518,7 +2518,7 @@ body {
 <pre><span class="lineno"><a href="#line_2353" id="line_2353"> 2353.</a></span><span class="count                ">     48</span><span>    let mode_wrapper_vim;</span></pre>
 <pre><span class="lineno"><a href="#line_2354" id="line_2354"> 2354.</a></span><span class="count                ">     48</span><span>    let result;</span></pre>
 <pre><span class="lineno"><a href="#line_2355" id="line_2355"> 2355.</a></span><span class="count                ">     48</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2356" id="line_2356"> 2356.</a></span><span class="count                ">     10</span><span>    function fix_embedded({</span></pre>
+<pre><span class="lineno"><a href="#line_2356" id="line_2356"> 2356.</a></span><span class="count                ">     10</span><span>    function autofix_embeded({</span></pre>
 <pre><span class="lineno"><a href="#line_2357" id="line_2357"> 2357.</a></span><span class="count                ">     10</span><span>        code,</span></pre>
 <pre><span class="lineno"><a href="#line_2358" id="line_2358"> 2358.</a></span><span class="count                ">     10</span><span>        file,</span></pre>
 <pre><span class="lineno"><a href="#line_2359" id="line_2359"> 2359.</a></span><span class="count                ">     10</span><span>        mode_conditional,</span></pre>
@@ -2594,7 +2594,7 @@ body {
 <pre><span class="lineno"><a href="#line_2429" id="line_2429"> 2429.</a></span><span class="count                ">      4</span><span>// Recursively jslint embedded "&lt;script&gt;\n...\n&lt;/script&gt;".</span></pre>
 <pre><span class="lineno"><a href="#line_2430" id="line_2430"> 2430.</a></span><span class="count                ">      4</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2431" id="line_2431"> 2431.</a></span><span class="count                ">      4</span><span>            return {</span></pre>
-<pre><span class="lineno"><a href="#line_2432" id="line_2432"> 2432.</a></span><span class="count                ">      4</span><span>                autofixed: fix_embedded({</span></pre>
+<pre><span class="lineno"><a href="#line_2432" id="line_2432"> 2432.</a></span><span class="count                ">      4</span><span>                autofixed: autofix_embeded({</span></pre>
 <pre><span class="lineno"><a href="#line_2433" id="line_2433"> 2433.</a></span><span class="count                ">      4</span><span>                    code,</span></pre>
 <pre><span class="lineno"><a href="#line_2434" id="line_2434"> 2434.</a></span><span class="count                ">      4</span><span>                    file,</span></pre>
 <pre><span class="lineno"><a href="#line_2435" id="line_2435"> 2435.</a></span><span class="count                ">      4</span><span>                    option: {</span></pre>
@@ -2684,7 +2684,7 @@ body {
 <pre><span class="lineno"><a href="#line_2519" id="line_2519"> 2519.</a></span><span class="count                ">      6</span><span>        option = empty()</span></pre>
 <pre><span class="lineno"><a href="#line_2520" id="line_2520"> 2520.</a></span><span class="count                ">      6</span><span>    }) {</span></pre>
 <pre><span class="lineno"><a href="#line_2521" id="line_2521"> 2521.</a></span><span class="count                ">      6</span><span>        return {</span></pre>
-<pre><span class="lineno"><a href="#line_2522" id="line_2522"> 2522.</a></span><span class="count                ">      6</span><span>            autofixed: fix_embedded({</span></pre>
+<pre><span class="lineno"><a href="#line_2522" id="line_2522"> 2522.</a></span><span class="count                ">      6</span><span>            autofixed: autofix_embeded({</span></pre>
 <pre><span class="lineno"><a href="#line_2523" id="line_2523"> 2523.</a></span><span class="count                ">      6</span><span>                code,</span></pre>
 <pre><span class="lineno"><a href="#line_2524" id="line_2524"> 2524.</a></span><span class="count                ">      6</span><span>                file,</span></pre>
 <pre><span class="lineno"><a href="#line_2525" id="line_2525"> 2525.</a></span><span class="count                ">      6</span><span>                mode_conditional,</span></pre>
