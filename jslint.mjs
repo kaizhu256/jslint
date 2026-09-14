@@ -1886,7 +1886,8 @@ function jslint(
                         {
                             ...option_dict,
                             autofix: mode_autofix - 1
-                        }
+                        },
+                        global_list
                     )
                 };
             }
@@ -10358,6 +10359,7 @@ function jslint_phase6_autofix(state) {
 }
 
 function jslint_report({
+    autofix,
     exports,
     froms,
     functions,
@@ -10376,6 +10378,11 @@ function jslint_report({
 //  let result = jslint("console.log('hello world')");
 //  let html = jslint_report(result);
 
+    const autofix_blocked = autofix && warnings.some(function ({
+        code
+    }) {
+        return !jslint.jslint_autofix_warning_list.includes(code);
+    });
     let html = "";
     let length_80 = 1111;
 
@@ -10653,6 +10660,15 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     width: 100%;
     word-wrap: break-word;
 }
+.JSLINT_ #JSLINT_REPORT_AUTOFIX > div {
+    background: honeydew;
+}
+.JSLINT_ #JSLINT_REPORT_AUTOFIX.blocked > div {
+    background: pink;
+}
+.JSLINT_ #JSLINT_REPORT_AUTOFIX.blocked > legend {
+    background: #b44;
+}
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS .level {
     background: cornsilk;
     padding: 8px 16px;
@@ -10756,13 +10772,39 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     background: #b44;
 }
 </style>
-            `).trim() + "\n";
+    `).trim() + "\n";
 
 // Produce the Title.
 
     html += "<div class=\"center\" id=\"JSLINT_REPORT_TITLE\">\n";
     html += "JSLint Report\n";
     html += "</div>\n";
+
+// Produce the Autofix Report.
+
+    html += String(`
+<fieldset
+    class="
+    ${(
+        autofix_blocked
+        ? "blocked"
+        : ""
+    )}
+    "
+    id="JSLINT_REPORT_AUTOFIX"
+>
+<legend>Report: Autofix</legend>
+<div class="center">
+    ${(
+        autofix_blocked
+        ? "Autofix blocked. Fix non-whitespace warnings below."
+        : autofix
+        ? "Autofix successful."
+        : ""
+    )}
+</div>
+</fieldset>
+    `).trim() + "\n";
 
 // Produce the HTML Error Report.
 // <cite>

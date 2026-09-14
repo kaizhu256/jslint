@@ -13,6 +13,7 @@
 
 # v2026.9.29
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
+- jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
 - jslint-ci - Merge ci-shell-function shGithubPrUpdatePrxxx() into shGithubPrCreate().
 
