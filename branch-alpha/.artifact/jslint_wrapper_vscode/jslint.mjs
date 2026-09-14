@@ -10323,9 +10323,7 @@ function jslint_phase6_autofix(state) {
                 line_list.splice(
                     line,
                     1,
-                    line_source.slice(0, ii).replace((
-                        / +$/
-                    ), ""),
+                    line_source.slice(0, ii).replace((/ +$/), ""),
                     " ".repeat(b - 1) + line_source.slice(ii)
                 );
                 return;
@@ -10347,9 +10345,7 @@ function jslint_phase6_autofix(state) {
             line_list.splice(
                 line,
                 1,
-                line_source.slice(0, ii).replace((
-                    / +$/
-                ), ""),
+                line_source.slice(0, ii).replace((/ +$/), ""),
                 line_source.slice(ii)
             );
             return;
@@ -10357,9 +10353,10 @@ function jslint_phase6_autofix(state) {
 
 // Walk back over the whitespace-run immediately before the token.
 
-        while (jj > 0 && (
-            line_source[jj - 1] === " " || line_source[jj - 1] === "\t"
-        )) {
+        while (
+            jj > 0 &&
+            (line_source[jj - 1] === " " || line_source[jj - 1] === "\t")
+        ) {
             jj -= 1;
         }
 
@@ -10371,11 +10368,13 @@ function jslint_phase6_autofix(state) {
             return;
         }
         line_list[line] = (
-            line_source.slice(0, jj) + (
+            line_source.slice(0, jj) +
+            (
                 code === "expected_space_a_b"
                 ? " "
                 : ""
-            ) + line_source.slice(ii)
+            ) +
+            line_source.slice(ii)
         );
     });
     return line_list.slice(jslint_fudge).join(crlf);
