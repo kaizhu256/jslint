@@ -945,6 +945,26 @@ jstestDescribe((
         assertOrThrow(result.autofixed === undefined, result.autofixed);
         assertOrThrow(result.ok, JSON.stringify(result.warnings));
 
+// AN EMPTY source is the one input whose rejoin is the EMPTY STRING, which
+// the call site's <|| state.source> would read as "nothing happened". It is
+// harmless ONLY because state.source is empty too, so the two agree - but a
+// non-empty source can never rejoin to "", because a warning implies a token
+// implies a non-empty line. Whitespace-only sources are blocked instead:
+// unexpected_trailing_space and use_spaces are not in the fixable set.
+
+        [
+            "", "\n", "\n\n", " ", "    ", "  \n  ", "\t"
+        ].forEach(function (source_degenerate) {
+            result = jslint.jslint(source_degenerate, {
+                autofix: true,
+                node: true
+            });
+            assertOrThrow(
+                result.autofixed === undefined,
+                JSON.stringify([source_degenerate, result.autofixed])
+            );
+        });
+
 // A ONE-LINE source carries NO terminator at all, so jslint_rgx_crlf.exec()
 // returns null and the rejoin falls back to "\n". The result has no trailing
 // newline either - the fixer adds terminators BETWEEN lines, never after the
