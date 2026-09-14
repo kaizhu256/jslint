@@ -1003,6 +1003,76 @@ jstestDescribe((
         );
     });
     jstestIt((
+        "test report-autofix handling-behavior"
+    ), function () {
+        let result;
+
+// The report's Autofix section SPEAKS ONLY AFTER THE BUTTON - index.html sets
+// <autofix> on the button's own lint-result, so a plain JSLint renders an
+// empty, default-coloured body. Blocked - a residual warning outside
+// jslint_autofix_warning_list - is the ONLY state that goes red, and a fixable
+// residual still reads as success.
+
+        function reportAutofix(source, autofix) {
+            let html = jslint.jslint_report({
+                ...jslint.jslint(source, {}),
+                autofix
+            });
+            return html.slice(
+                html.indexOf("<fieldset\n    class="),
+                html.indexOf("<fieldset id=\"JSLINT_REPORT_WARNINGS\"")
+            );
+        }
+
+        function reportAutofixExpect(klass, body) {
+            return (
+                "<fieldset\n    class=\"\n    " + klass + "\n    \"\n"
+                + "    id=\"JSLINT_REPORT_AUTOFIX\"\n>\n"
+                + "<legend>Report: Autofix</legend>\n"
+                + "<div class=\"center\">\n    " + body + "\n</div>\n"
+                + "</fieldset>\n"
+            );
+        }
+
+// A clean source autofixes to itself, and the click is STILL a success - an
+// empty body would read to the clicker as a missing success message.
+
+        result = reportAutofix((
+            "function aa(bb) {\n    return bb;\n}\naa();\n"
+        ), true);
+        assertOrThrow(
+            result === reportAutofixExpect("", "Autofix successful."),
+            result
+        );
+
+// A residual warning INSIDE the fixable set is not a blocker, so every
+// jslint_autofix_warning_list member must survive the <some> callback.
+
+        result = reportAutofix((
+            "function aa(bb) {\n    return String( bb);\n}\naa();\n"
+        ), true);
+        assertOrThrow(
+            result === reportAutofixExpect("", "Autofix successful."),
+            result
+        );
+
+// A warning outside the set blocks, and the class is what paints it red.
+
+        result = reportAutofix("console.log(1);\n", true);
+        assertOrThrow(
+            result === reportAutofixExpect("blocked", (
+                "Autofix blocked. Fix non-whitespace warnings below."
+            )),
+            result
+        );
+
+// A plain JSLint is ALWAYS empty and default-coloured, even on a source that
+// WOULD block - <autofix> is undefined, so <some> never runs.
+
+        result = reportAutofix("console.log(1);\n", undefined);
+        assertOrThrow(result === reportAutofixExpect("", ""), result);
+    });
+    jstestIt((
         "test cli-report handling-behavior"
     ), function () {
         jslint.jslint_cli({
