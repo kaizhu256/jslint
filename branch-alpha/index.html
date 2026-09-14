@@ -13,9 +13,9 @@
     <meta name="author" content="Douglas Crockford">
     <link rel="icon" type="image/png" href="asset_image_logo_256.svg">
     <title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
-    <script defer src="./asset_codemirror_rollup.js?cc=5dlp"></script>
-    <script type="module" src="./jslint.mjs?cc=5dlp?window_jslint=1"></script>
-    <script defer src="./jslint_wrapper_codemirror.js?cc=5dlp"></script>
+    <script defer src="./asset_codemirror_rollup.js?cc=mc6e"></script>
+    <script type="module" src="./jslint.mjs?cc=mc6e?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js?cc=mc6e"></script>
 <style>
 /*jslint-disable*/
 /*
@@ -1213,17 +1213,16 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 /*jslint beta, browser*/
 /*property
     CodeMirror, Tab, addEventListener, autofix, autofixed, ch, checked, clear,
-    click, closest, code, ctrlKey, display, dom_style_report_unmatched, editor,
-    error, extraKeys, focus, forEach, from, fromTextArea, getItem, getValue,
-    globals, gutters, includes, indentSelection, indentUnit, innerHTML, jslint,
-    jslint_autofix_warning_list, jslint_edition, jslint_report, key, length,
-    line, lineNumbers, lineWrapping, lint, lintOnChange, matchBrackets, metaKey,
-    mode, name, offsetWidth, on, options, parse, performLint, preventDefault,
-    push, querySelector, querySelectorAll, replace, replaceSelection, result,
-    reverse, search, setCursor, setItem, setSize, setValue, showTrailingSpace,
-    some, somethingSelected, sort, split, stopPropagation, stringify, style,
-    styleActiveLine, tagName, target, test, textContent, trim, value, warnings,
-    width
+    click, closest, ctrlKey, display, dom_style_report_unmatched, editor, error,
+    extraKeys, focus, forEach, from, fromTextArea, getItem, getValue, globals,
+    gutters, indentSelection, indentUnit, innerHTML, jslint, jslint_edition,
+    jslint_report, key, length, line, lineNumbers, lineWrapping, lint,
+    lintOnChange, matchBrackets, metaKey, mode, name, offsetWidth, on, options,
+    parse, performLint, preventDefault, push, querySelector, querySelectorAll,
+    replace, replaceSelection, result, reverse, search, setCursor, setItem,
+    setSize, setValue, showTrailingSpace, somethingSelected, sort, split,
+    stopPropagation, stringify, style, styleActiveLine, tagName, target, test,
+    textContent, trim, value, width
 */
 
 // This is the web script companion file for JSLint. It includes code for
@@ -1285,6 +1284,9 @@ async function jslint_run(mode) {
         await new Promise(function (resolve) {
             setTimeout(resolve);
         });
+
+// Update jslint_option_dict from ui-inputs.
+
         document.querySelectorAll(
             "#JSLINT_OPTIONS input[type=checkbox]"
         ).forEach(function (elem) {
