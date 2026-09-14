@@ -3,7 +3,6 @@
 # Todo
 - jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.'.
 - jslint-ecma - Add ES2015-feature iterators.
-- jslint - Audit token-property '.free'.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add html and css linting back into jslint.
@@ -11,6 +10,7 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.9.29
+- jslint - Remove dead token-property 'free' from parser and whitage.
 - jslint-directive - Add new directive 'tab' to support tab-indent.
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
