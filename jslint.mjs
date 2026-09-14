@@ -228,6 +228,7 @@
     jslint,
     jslint_apidoc,
     jslint_assert,
+    jslint_autofix_warning_list,
     jslint_charset_ascii,
     jslint_cli,
     jslint_edition,
@@ -432,6 +433,15 @@ const debugInline = (function () {
     return debug;
 }());
 debugInline(); // coverage-hack
+// The four phase-5 whitespace-codes autofix can repair. Exported so a report
+// can say whether a source is blocked BEFORE anyone clicks Autofix.
+
+const jslint_autofix_warning_list = [ //jslint-ignore-line
+    "expected_a_at_b_c",
+    "expected_line_break_a_b",
+    "expected_space_a_b",
+    "unexpected_space_a_b"
+];
 const jslint_charset_ascii = ( //jslint-ignore-line
     "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
     + "\b\t\n\u000b\f\r\u000e\u000f"
@@ -10265,15 +10275,10 @@ function jslint_phase6_autofix(state) {
 // therefore never rewrite a file byte-identically, which would make a blocked
 // run look exactly like a clean one.
 
-// The four phase-5 whitespace-codes are the entire fixable set. Anything else
-// BLOCKS the pass - repair exactly what the linter reports, never more.
+// jslint_autofix_warning_list, module-level, is the entire fixable set.
+// Anything else BLOCKS the pass - repair exactly what the linter reports,
+// never more.
 
-    const autofix_warning_list = [
-        "expected_a_at_b_c",
-        "expected_line_break_a_b",
-        "expected_space_a_b",
-        "unexpected_space_a_b"
-    ];
     const {
         source,
         warning_list
@@ -10286,7 +10291,7 @@ function jslint_phase6_autofix(state) {
 // every fix made so far is far worse than leaving one warning for a human.
 
     for (const {code} of warning_list) {
-        if (!autofix_warning_list.includes(code)) {
+        if (!jslint_autofix_warning_list.includes(code)) {
             return source;
         }
     }
@@ -10388,7 +10393,8 @@ function jslint_phase6_autofix(state) {
         }
 
 // A run reaching column 0 is INDENTATION or a line-join, not a gap between
-// two tokens on one line. Leave it to a future <autofix_warning_list> entry.
+// two tokens on one line. Leave it to a future jslint_autofix_warning_list
+// entry.
 
         if (jj === 0) {
             return;
@@ -12609,6 +12615,7 @@ jslint_export = Object.freeze(
             jslint,
             jslint_apidoc,
             jslint_assert,
+            jslint_autofix_warning_list,
             jslint_charset_ascii,
             jslint_cli,
             jslint_edition,
