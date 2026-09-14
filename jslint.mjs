@@ -107,6 +107,8 @@
     assigned,
     assignment,
     async,
+    autofix,
+    autofixed,
     b,
     beta,
     bitwise,
@@ -226,6 +228,7 @@
     jslint,
     jslint_apidoc,
     jslint_assert,
+    jslint_autofix_warning_list,
     jslint_charset_ascii,
     jslint_cli,
     jslint_edition,
@@ -234,6 +237,7 @@
     jslint_phase3_parse,
     jslint_phase4_walk,
     jslint_phase5_whitage,
+    jslint_phase6_autofix,
     jslint_report,
     json,
     jstestDescribe,
@@ -328,6 +332,7 @@
     resolve,
     result,
     reverse,
+    rgx,
     role,
     round,
     scope_block,
@@ -362,6 +367,8 @@
     stop_at,
     stringify,
     subscript,
+    suffix,
+    suffix_file,
     switch,
     syntax_dict,
     tenure,
@@ -383,6 +390,7 @@
     tree,
     trim,
     trimEnd,
+    trimStart,
     try,
     type,
     unlink,
@@ -425,7 +433,13 @@ const debugInline = (function () {
     return debug;
 }());
 debugInline(); // coverage-hack
-const jslint_charset_ascii = ( //jslint-ignore-line
+const jslint_autofix_warning_list = [ //jslint-ignore-line
+    "expected_a_at_b_c",
+    "expected_line_break_a_b",
+    "expected_space_a_b",
+    "unexpected_space_a_b"
+];
+const jslint_charset_ascii = (
     "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
     + "\b\t\n\u000b\f\r\u000e\u000f"
     + "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017"
@@ -1111,6 +1125,11 @@ function jslint(
             line_source
         };
     });
+    const mode_autofix = (
+        option_dict.autofix === true
+        ? 256
+        : Math.max(0, Number(option_dict.autofix) || 0)
+    );
     const property_dict = empty();      // The object containing the tallied
                                         // ... property names.
                                 // jslint functions.
@@ -1133,6 +1152,7 @@ function jslint(
     };
     const token_list = [];      // The array of tokens.
     const warning_list = [];    // The array collecting all generated warnings.
+    let autofixed;              // The <source> after one autofix pass.
     let mode_stop = false;      // true if JSLint cannot finish.
 
 // Error reportage functions:
@@ -1850,6 +1870,27 @@ function jslint(
         if (!state.mode_json && warning_list.length === 0) {
             jslint_phase5_whitage(state);
         }
+
+// PHASE 6. Autofix whitespace-warnings in <source>, and re-lint the result.
+
+        if (mode_autofix) {
+            autofixed = jslint_phase6_autofix(state) || state.source;
+            if (autofixed !== state.source) {
+                return {
+                    autofixed,
+
+// Recurse jslint().
+
+                    ...jslint(
+                        autofixed,
+                        {
+                            ...option_dict,
+                            autofix: mode_autofix - 1
+                        }
+                    )
+                };
+            }
+        }
         if (option_dict.test_internal_error) {
             jslint_assert(undefined, "test_internal_error");
         }
@@ -2303,6 +2344,54 @@ async function jslint_cli({
     let mode_wrapper_vim;
     let result;
 
+    function autofix_embeded({
+        code,
+        file,
+        mode_conditional,
+        option,
+        rgx,
+        suffix,
+        suffix_file
+    }) {
+
+// This function will jslint each embedded block <rgx> matches, and return
+// <code> with every autofixed block spliced back between the SAME delimiters
+// - or undefined if no block was autofixed. <suffix> is the closing
+// delimiter, which the capture deliberately excludes.
+//
+// A BLOCKED BLOCK IS LEFT AS IT WAS AND THE REST ARE STILL REPAIRED, unlike a
+// blocked whole-file, which is not written at all.
+
+        const code_fixed = code.replace(rgx, function (match0, match1, ii) {
+            const result_embedded = jslint_from_file({
+                code: match1,
+                file: file + suffix_file,
+                line_offset: string_line_count(code.slice(0, ii)) + 1,
+                mode_conditional,
+                option
+            });
+            if (
+                result_embedded === undefined ||
+                result_embedded.autofixed === undefined
+            ) {
+                return match0;
+            }
+            return (
+                match0.slice(
+                    0,
+                    match0.length - match1.length - suffix.length
+                ) +
+                result_embedded.autofixed +
+                suffix
+            );
+        });
+        return (
+            code_fixed === code
+            ? undefined
+            : code_fixed
+        );
+    }
+
     function jslint_from_file({
         code,
         file,
@@ -2330,44 +2419,50 @@ async function jslint_cli({
 
 // Recursively jslint embedded "<script>\n...\n</script>".
 
-            code.replace((
-                /^<script\b[^>]*?>\n([\S\s]*?\n)<\/script>$/gm
-            ), function (ignore, match1, ii) {
-                jslint_from_file({
-                    code: match1,
-                    file: file + ".<script>.js",
-                    line_offset: string_line_count(code.slice(0, ii)) + 1,
+            return {
+                autofixed: autofix_embeded({
+                    code,
+                    file,
                     option: {
                         browser: true,
                         ...option
-                    }
-                });
-                return "";
-            });
-            return;
+                    },
+                    rgx: (/^<script\b[^>]*?>\n([\S\s]*?\n)<\/script>$/gm),
+                    suffix: "</script>",
+                    suffix_file: ".<script>.js"
+                })
+            };
         case ".md":
 
 // Recursively jslint embedded "node --eval '\n...\n'".
 
-            jslint_node_eval({
+            return jslint_node_eval({
                 code,
                 file,
                 mode_conditional: true,
                 option
             });
-            return;
         case ".sh":
 
 // Recursively jslint embedded "node --eval '\n...\n'".
 
-            jslint_node_eval({
+            return jslint_node_eval({
                 code,
                 file,
                 option
             });
-            return;
         default:
             result_from_file = jslint("\n".repeat(line_offset) + code, option);
+
+// The <line_offset> newlines prefixed above make the warnings absolute, and
+// they ride along in <autofixed> too. Strip exactly them back off, so the
+// caller splices the block back between its OWN delimiters.
+
+            if (line_offset > 0 && result_from_file.autofixed !== undefined) {
+                result_from_file.autofixed = (
+                    result_from_file.autofixed.slice(line_offset)
+                );
+            }
         }
 
 // Print only first 10 warnings to stderr.
@@ -2412,13 +2507,10 @@ async function jslint_cli({
         mode_conditional,
         option = empty()
     }) {
-        code.replace((
-            /\bnode\b.*? (?:--eval|-e) '\n([\S\s]*?\n)'/gm
-        ), function (ignore, match1, ii) {
-            jslint_from_file({
-                code: match1,
-                file: file + ".<node -e>.js",
-                line_offset: string_line_count(code.slice(0, ii)) + 1,
+        return {
+            autofixed: autofix_embeded({
+                code,
+                file,
                 mode_conditional,
                 option: {
                     beta: Boolean(
@@ -2429,10 +2521,12 @@ async function jslint_cli({
                     ),
                     node: true,
                     ...option
-                }
-            });
-            return "";
-        });
+                },
+                rgx: (/\bnode\b.*? (?:--eval|-e) '\n([\S\s]*?\n)'/gm),
+                suffix: "'",
+                suffix_file: ".<node -e>.js"
+            })
+        };
     }
 
     function string_line_count(code) {
@@ -2527,6 +2621,42 @@ async function jslint_cli({
             pathname: command[1]
         });
         return;
+
+// PR-xxx - Add command jslint_autofix.
+
+    case "jslint_autofix":
+
+// Autofix whitespace-warnings in file <command[1]>, IN PLACE. The extension
+// dispatch, the embedded-javascript recursion and the per-container options
+// all belong to jslint_from_file, not to this command - so autofix repairs
+// precisely the sources `node jslint.mjs .` complains about, and no others.
+//
+// <autofixed> is undefined when there is nothing to write: an already-clean
+// source, one blocked on the first pass by a warning autofix cannot fix, or
+// one whose every fix was declined. A silent no-op write would make a blocked
+// run look identical to a clean one, so write ONLY when it is defined.
+
+        file = command[1];
+        data = await moduleFs.promises.readFile(file, "utf8");
+        result = jslint_from_file({
+            code: data,
+            file,
+            option: {
+                ...option,
+                autofix: true
+            }
+        });
+        if (result.autofixed !== undefined) {
+            await fsWriteFileWithParents(file, result.autofixed);
+        }
+
+// Exit nonzero when the residual lint still warns, exactly as a plain lint
+// does - jslint_from_file has already set <exit_code> and printed them. A
+// bare return here would report success while stderr says otherwise, and a
+// `jslint_autofix=... && <deploy>` would proceed on unlinted source.
+
+        process_exit(exit_code);
+        return exit_code;
 
 // PR-363 - Add command jslint_report.
 
@@ -10117,6 +10247,116 @@ function jslint_phase5_whitage(state) {
     );
 }
 
+function jslint_phase6_autofix(state) {
+
+// PHASE 6. Autofix whitespace-warnings in <source>, and return the result.
+
+    const crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
+    const line_list = state.line_list.map(function ({
+        line_source
+    }) {
+        return line_source;
+    });
+    const warning_list = state.warning_list;
+    if (warning_list.length === 0) {
+        return;
+    }
+    for (const {code} of warning_list) {
+        if (!jslint_autofix_warning_list.includes(code)) {
+            return;
+        }
+    }
+
+// Apply each fix RIGHT-TO-LEFT within a line, so an earlier fix cannot
+// invalidate a later fix's column, and BOTTOM-UP across lines, so every line
+// a splice shifts has already been visited.
+
+    warning_list.slice().sort(function (aa, bb) {
+        return bb.line - aa.line || bb.column - aa.column;
+    }).forEach(function ({
+        b,
+        code,
+        column,
+        line
+    }) {
+        const ii = column - 1;
+        const line_source = line_list[line];
+        let indentage_at;
+        let jj = ii;
+        switch (code) {
+        case "expected_a_at_b_c":
+
+// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FIVE
+// callers, not one: at_margin and two expected_at(margin) warn a token that
+// already belongs at a margin, so the target column belongs to the warned
+// line itself. The two expected_at(0) are LABEL placement and DO warn a
+// mid-line token - unreachable here only because a label always co-raises
+// weird_loop or unused_a, which blocks the pass. So do NOT read "always at a
+// margin" as licence to drop the mid-line branch below.
+
+            indentage_at = line_source.length - line_source.trimStart().length;
+
+// A MID-LINE token cannot be re-indented, but it does not need to be skipped:
+// at_margin fires for tokens that belong AT a margin and therefore on their
+// OWN line. So split first and indent the remainder, which also lands a
+// trailing closer correctly, and is what line-breaks a single-line ternary.
+
+            if (ii !== indentage_at) {
+                line_list.splice(
+                    line,
+                    1,
+                    line_source.slice(0, ii).replace((/ +$/), ""),
+                    " ".repeat(b - 1) + line_source.slice(ii)
+                );
+                return;
+            }
+            line_list[line] = " ".repeat(b - 1) + line_source.trimStart();
+            return;
+        case "expected_line_break_a_b":
+
+// Split the line at the token. The new line lands unindented and the
+// expected_a_at_b_c pass re-indents it on the NEXT recursion - that division
+// of labour is why autofix iterates rather than trying to be complete in one
+// pass.
+
+            line_list.splice(
+                line,
+                1,
+                line_source.slice(0, ii).replace((/ +$/), ""),
+                line_source.slice(ii)
+            );
+            return;
+        }
+
+// Walk back over the whitespace-run immediately before the token.
+
+        while (
+            jj > 0 &&
+            (line_source[jj - 1] === " " || line_source[jj - 1] === "\t")
+        ) {
+            jj -= 1;
+        }
+
+// A run reaching column 0 is INDENTATION or a line-join, not a gap between
+// two tokens on one line. Leave it to a future jslint_autofix_warning_list
+// entry.
+
+        if (jj === 0) {
+            return;
+        }
+        line_list[line] = (
+            line_source.slice(0, jj) +
+            (
+                code === "expected_space_a_b"
+                ? " "
+                : ""
+            ) +
+            line_source.slice(ii)
+        );
+    });
+    return line_list.slice(jslint_fudge).join(crlf);
+}
+
 function jslint_report({
     exports,
     froms,
@@ -12322,6 +12562,7 @@ jslint_export = Object.freeze(
             jslint,
             jslint_apidoc,
             jslint_assert,
+            jslint_autofix_warning_list,
             jslint_charset_ascii,
             jslint_cli,
             jslint_edition,
@@ -12330,6 +12571,7 @@ jslint_export = Object.freeze(
             jslint_phase3_parse,
             jslint_phase4_walk,
             jslint_phase5_whitage,
+            jslint_phase6_autofix,
             jslint_report,
             jstestDescribe,
             jstestIt,
