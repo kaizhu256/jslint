@@ -55,12 +55,14 @@ Douglas Crockford <douglas@crockford.com>
 
 8. [Documentation](#documentation)
     - [API Doc](#api-doc)
-    - [Directive `/*jslint*/`](#directive-jslint)
-    - [Directive `/*global*/`](#directive-global)
-    - [Directive `/*property*/`](#directive-property)
-    - [Directive `/*jslint-disable*/ ... /*jslint-enable*/`](#directive-jslint-disable--jslint-enable)
-    - [Directive `//jslint-ignore-line`](#directive-jslint-ignore-line)
-    - [Directive `/*coverage-disable*/ ... /*coverage-enable*/`](#directive-coverage-disable--coverage-enable)
+    - [Directive](#directive)
+        - [`/*jslint*/`](#jslint)
+        - [`/*global*/`](#global)
+        - [`/*property*/`](#property)
+        - [`/*jslint-disable*/ ... /*jslint-enable*/`](#jslint-disable--jslint-enable)
+        - [`//jslint-ignore-line`](#jslint-ignore-line)
+        - [`/*coverage-disable*/ ... /*coverage-enable*/`](#coverage-disable--coverage-enable)
+        - [`//coverage-ignore-line`](#coverage-ignore-line)
     - [ECMAScript Feature Support](#ecmascript-feature-support)
 
 9. [Package Listing](#package-listing)
@@ -575,7 +577,11 @@ window.addEventListener("load", function () {
 
 
 <br><br>
-### Directive `/*jslint*/`
+### Directive
+
+<br>
+
+##### `/*jslint*/`
 
 <br>
 
@@ -822,12 +828,9 @@ export {
 let foo = 1; let bar = 2;
 ```
 
-
-<br><br>
-### Directive `/*global*/`
-
 <br>
 
+##### `/*global*/`
 ```js
 /*global foo, bar*/
 // Declare global variables foo, bar.
@@ -836,12 +839,9 @@ foo();
 bar();
 ```
 
-
-<br><br>
-### Directive `/*property*/`
-
 <br>
 
+##### `/*property*/`
 ```js
 /*property foo, bar*/
 // Restrict property-access to only .foo, .bar.
@@ -849,12 +849,9 @@ bar();
 let aa = {bar: 1, foo: 2};
 ```
 
-
-<br><br>
-### Directive `/*jslint-disable*/ ... /*jslint-enable*/`
-
 <br>
 
+##### `/*jslint-disable*/ ... /*jslint-enable*/`
 ```js
 /*jslint-disable*/
 
@@ -864,12 +861,9 @@ Syntax error.
 /*jslint-enable*/
 ```
 
-
-<br><br>
-### Directive `//jslint-ignore-line`
-
 <br>
 
+##### `//jslint-ignore-line`
 ```js
 // JSLint will ignore non-fatal warnings at given line.
 
@@ -878,10 +872,7 @@ eval("1"); //jslint-ignore-line
 
 <br>
 
-
-<br><br>
-### Directive `/*coverage-disable*/ ... /*coverage-enable*/`
-
+##### `/*coverage-disable*/ ... /*coverage-enable*/`
 ```js
 /*coverage-disable*/
 
@@ -896,7 +887,7 @@ if (false) {
 
 <br>
 
-- `//coverage-ignore-line`
+##### `//coverage-ignore-line`
 ```js
 // JSLint will ignore code-coverage at given line.
 
