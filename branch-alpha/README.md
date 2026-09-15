@@ -2,8 +2,6 @@
 Douglas Crockford <douglas@crockford.com>
 
 
-<br><br>
-
 # Status
 | Branch | [master<br>(v2026.9.29)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
