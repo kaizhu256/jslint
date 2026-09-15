@@ -10233,7 +10233,7 @@ function jslint_phase5_whitage(state) {
     );
 }
 
-// PR-509 - Add command jslint_autofix.
+// PR-509 - Add function jslint_phase6_autofix.
 
 function jslint_phase6_autofix(state) {
 
