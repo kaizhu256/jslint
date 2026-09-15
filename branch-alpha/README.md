@@ -55,12 +55,12 @@ Douglas Crockford <douglas@crockford.com>
 
 8. [Documentation](#documentation)
     - [API Doc](#api-doc)
-    - [Directive jslint](#directive-jslint)
-    - [Directive global](#directive-global)
-    - [Directive property](#directive-property)
-    - [Directive jslint-disable](#directive-jslint-disable)
-    - [Directive jslint-ignore-line](#directive-jslint-ignore-line)
-    - [Directive coverage-disable](#directive-coverage-disable)
+    - [Directive `/*jslint*/`](#directive-jslint)
+    - [Directive `/*global*/`](#directive-global)
+    - [Directive `/*property*/`](#directive-property)
+    - [Directive `/*jslint-disable*/.../*jslint-enable*/`](#directive-jslint-disablejslint-enable)
+    - [Directive `//jslint-ignore-line`](#directive-jslint-ignore-line)
+    - [Directive `/*coverage-disable*/.../*coverage-enable*/`](#directive-coverage-disablecoverage-enable)
     - [ECMAScript Feature Support](#ecmascript-feature-support)
 
 9. [Package Listing](#package-listing)
@@ -575,7 +575,7 @@ window.addEventListener("load", function () {
 
 
 <br><br>
-### Directive jslint
+### Directive `/*jslint*/`
 
 <br>
 
@@ -824,11 +824,10 @@ let foo = 1; let bar = 2;
 
 
 <br><br>
-### Directive global
+### Directive `/*global*/`
 
 <br>
 
-- `/*global*/`
 ```js
 /*global foo, bar*/
 // Declare global variables foo, bar.
@@ -839,11 +838,10 @@ bar();
 
 
 <br><br>
-### Directive property
+### Directive `/*property*/`
 
 <br>
 
-- `/*property*/`
 ```js
 /*property foo, bar*/
 // Restrict property-access to only .foo, .bar.
@@ -853,11 +851,10 @@ let aa = {bar: 1, foo: 2};
 
 
 <br><br>
-### Directive jslint-disable
+### Directive `/*jslint-disable*/.../*jslint-enable*/`
 
 <br>
 
-- `/*jslint-disable*/.../*jslint-enable*/`
 ```js
 /*jslint-disable*/
 
@@ -869,11 +866,10 @@ Syntax error.
 
 
 <br><br>
-### Directive jslint-ignore-line
+### Directive `//jslint-ignore-line`
 
 <br>
 
-- `//jslint-ignore-line`
 ```js
 // JSLint will ignore non-fatal warnings at given line.
 
@@ -884,9 +880,8 @@ eval("1"); //jslint-ignore-line
 
 
 <br><br>
-### Directive coverage-disable
+### Directive `/*coverage-disable*/.../*coverage-enable*/`
 
-- `/*coverage-disable*/.../*coverage-enable*/`
 ```js
 /*coverage-disable*/
 
