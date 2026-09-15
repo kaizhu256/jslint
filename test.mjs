@@ -522,87 +522,82 @@ jstestDescribe((
     jstestIt((
         "test cli-autofix handling-behavior"
     ), async function () {
-        let data;
+        let source;
+
+// This function will autofix <name> in .tmp and assert it became <expect>.
+// <exit> is processExit1 exactly when a residual warning remains - autofix
+// exits nonzero like a plain lint, so `jslint_autofix=x.js && deploy` cannot
+// succeed on a file it failed to repair.
+
+        async function autofixFile({
+            exit = processExit0,
+            expect,
+            name,
+            process_env,
+            source
+        }) {
+            let file = ".tmp/" + name;
+            await fsWriteFileWithParents(file, source);
+            await jslint.jslint_cli({
+                // suppress error
+                console_error: noop,
+                mode_cli: true,
+                process_argv: [
+                    "node",
+                    "jslint.mjs",
+                    "jslint_autofix=" + file
+                ],
+                process_env,
+                process_exit: exit
+            });
+            assertOrThrow(
+                expect === await moduleFs.promises.readFile(file, "utf8"),
+                file
+            );
+        }
 
 // Whitespace-only warnings - autofix repairs them and the file lints clean.
 
-        await fsWriteFileWithParents(
-            ".tmp/autofix.mjs",
-            "function aa(bb) {\n    return String( bb)+bb;\n}\n" +
-            "export default Object.freeze(aa);\n"
-        );
-        await jslint.jslint_cli({
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix.mjs"
-            ],
-            process_exit: processExit0
-        });
-        data = await moduleFs.promises.readFile(".tmp/autofix.mjs", "utf8");
-        assertOrThrow(
-            data === (
+        await autofixFile({
+            expect: (
                 "function aa(bb) {\n    return String(bb) + bb;\n}\n" +
                 "export default Object.freeze(aa);\n"
             ),
-            data
-        );
+            name: "autofix.mjs",
+            source: (
+                "function aa(bb) {\n    return String( bb)+bb;\n}\n" +
+                "export default Object.freeze(aa);\n"
+            )
+        });
 
 // A non-whitespace warning blocks phase-5, so the file is REPORTED and left
 // BYTE-IDENTICAL.
 
-        data = (
+        source = (
             "function aa(bb) {\n    let cc = 0;\n" +
             "    return String( bb);\n}\n"
         );
-        await fsWriteFileWithParents(".tmp/autofix_blocked.mjs", data);
-        await jslint.jslint_cli({
-            // suppress error
-            console_error: noop,
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_blocked.mjs"
-            ],
-            process_exit: processExit1
+        await autofixFile({
+            exit: processExit1,
+            expect: source,
+            name: "autofix_blocked.mjs",
+            source
         });
-        assertOrThrow(
-            data === await moduleFs.promises.readFile(
-                ".tmp/autofix_blocked.mjs",
-                "utf8"
-            ),
-            "autofix must not rewrite a blocked file"
-        );
 
 // Indentation is re-indented to the expected column, cascading across passes.
 
-        await fsWriteFileWithParents(
-            ".tmp/autofix_indent.mjs",
-            "function aa(bb) {\n        if (bb) {\n  return bb;\n" +
-            "        }\n    return 0;\n}\nexport default Object.freeze(aa);\n"
-        );
-        await jslint.jslint_cli({
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_indent.mjs"
-            ],
-            process_exit: processExit0
-        });
-        data = await moduleFs.promises.readFile(
-            ".tmp/autofix_indent.mjs",
-            "utf8"
-        );
-        assertOrThrow(
-            data === (
+        await autofixFile({
+            expect: (
                 "function aa(bb) {\n    if (bb) {\n        return bb;\n" +
                 "    }\n    return 0;\n}\nexport default Object.freeze(aa);\n"
             ),
-            data
-        );
+            name: "autofix_indent.mjs",
+            source: (
+                "function aa(bb) {\n        if (bb) {\n  return bb;\n" +
+                "        }\n    return 0;\n}\n" +
+                "export default Object.freeze(aa);\n"
+            )
+        });
 
 // A SINGLE-LINE TERNARY WARNS ONLY expected_a_at_b_c, yet what it actually
 // wants is a line break before ? and before :. Autofix still gets there,
@@ -611,58 +606,31 @@ jstestDescribe((
 // that justifies the mid-line branch; without it the fixer would skip these
 // and never converge.
 
-        await fsWriteFileWithParents(
-            ".tmp/autofix_ternary.mjs",
-            "function aa(bb) {\n    return (\n        bb ? 0 : 1\n    );\n}\n" +
-            "export default Object.freeze(aa);\n"
-        );
-        await jslint.jslint_cli({
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_ternary.mjs"
-            ],
-            process_exit: processExit0
-        });
-        data = await moduleFs.promises.readFile(
-            ".tmp/autofix_ternary.mjs",
-            "utf8"
-        );
-        assertOrThrow(
-            data === (
+        await autofixFile({
+            expect: (
                 "function aa(bb) {\n    return (\n        bb\n        ? 0\n" +
                 "        : 1\n    );\n}\nexport default Object.freeze(aa);\n"
             ),
-            data
-        );
+            name: "autofix_ternary.mjs",
+            source: (
+                "function aa(bb) {\n    return (\n        bb ? 0 : 1\n" +
+                "    );\n}\nexport default Object.freeze(aa);\n"
+            )
+        });
 
 // An UNPARENTHESISED ternary warns something else entirely, which is not in
 // fix_list, so the file must come back byte-identical.
 
-        data = (
+        source = (
             "function aa(bb) {\n    return (bb ? 0 : 1);\n}\n" +
             "export default Object.freeze(aa);\n"
         );
-        await fsWriteFileWithParents(".tmp/autofix_ternary2.mjs", data);
-        await jslint.jslint_cli({
-            // suppress error
-            console_error: noop,
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_ternary2.mjs"
-            ],
-            process_exit: processExit1
+        await autofixFile({
+            exit: processExit1,
+            expect: source,
+            name: "autofix_ternary2.mjs",
+            source
         });
-        assertOrThrow(
-            data === await moduleFs.promises.readFile(
-                ".tmp/autofix_ternary2.mjs",
-                "utf8"
-            ),
-            "autofix must not touch an unparenthesised ternary"
-        );
 
 // A CLOSED-FORM statement block - opener and body on ONE line - needs BOTH
 // kinds of fix, in separate passes, because a statement block is always open
@@ -697,160 +665,91 @@ jstestDescribe((
 // A one-liner block is split, re-indented and its closer moved, across
 // passes. The trailing comment must survive, attached to the closer.
 
-        await fsWriteFileWithParents(
-            ".tmp/autofix_break.mjs",
-            "function aa(bb) {\n    if (bb) { return bb; } // keep me\n" +
-            "    return 0;\n}\nexport default Object.freeze(aa);\n"
-        );
-        await jslint.jslint_cli({
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_break.mjs"
-            ],
-            process_exit: processExit0
-        });
-        data = await moduleFs.promises.readFile(
-            ".tmp/autofix_break.mjs",
-            "utf8"
-        );
-        assertOrThrow(
-            data === (
+        await autofixFile({
+            expect: (
                 "function aa(bb) {\n    if (bb) {\n        return bb;\n" +
                 "    } // keep me\n    return 0;\n}\n" +
                 "export default Object.freeze(aa);\n"
             ),
-            data
-        );
+            name: "autofix_break.mjs",
+            source: (
+                "function aa(bb) {\n    if (bb) { return bb; } // keep me\n" +
+                "    return 0;\n}\nexport default Object.freeze(aa);\n"
+            )
+        });
 
 // A *.sh file is not javascript: only its `node --eval` blocks are fixed,
 // and the surrounding shell must come back byte-identical.
 
-        await fsWriteFileWithParents(
-            ".tmp/autofix_embedded.sh",
-            "shAa() {\n    node --eval '\nconsole.log(\n    0\n  + 0\n" +
-            ");\n'\n}\n"
-        );
-        await jslint.jslint_cli({
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_embedded.sh"
-            ],
-            process_env: {
-                JSLINT_BETA: "1"
-            },
-            process_exit: processExit0
-        });
-        data = await moduleFs.promises.readFile(
-            ".tmp/autofix_embedded.sh",
-            "utf8"
-        );
-        assertOrThrow(
-            data === (
+        await autofixFile({
+            expect: (
                 "shAa() {\n    node --eval '\nconsole.log(\n    0\n    + 0\n" +
                 ");\n'\n}\n"
             ),
-            data
-        );
+            name: "autofix_embedded.sh",
+            process_env: {
+                JSLINT_BETA: "1"
+            },
+            source: (
+                "shAa() {\n    node --eval '\nconsole.log(\n    0\n  + 0\n" +
+                ");\n'\n}\n"
+            )
+        });
 
 // A fix that SURFACES a warning it cannot fix must KEEP its work, not throw
 // it away. Re-indenting this string to column 13 makes the line 82 columns,
 // so too_long blocks the next pass - and the indent must still be written.
 
-        data = (
+        source = (
             "function aa(bb) {\n    if (bb) {\n        return (\n" +
             JSON.stringify("a".repeat(68)) + "\n        );\n    }\n" +
             "    return 0;\n}\nexport default Object.freeze(aa);\n"
         );
-        await fsWriteFileWithParents(".tmp/autofix_long.mjs", data);
-        await jslint.jslint_cli({
-            // suppress error
-            console_error: noop,
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_long.mjs"
-            ],
-            process_exit: processExit1
-        });
-        assertOrThrow(
-            await moduleFs.promises.readFile(
-                ".tmp/autofix_long.mjs",
-                "utf8"
-            ) === data.replace(
+        await autofixFile({
+            exit: processExit1,
+            expect: source.replace(
                 "\n" + JSON.stringify("a".repeat(68)),
                 "\n            " + JSON.stringify("a".repeat(68))
             ),
-            "autofix must keep work that surfaces an unfixable warning"
-        );
+            name: "autofix_long.mjs",
+            source
+        });
 
 // An *.html file is fixed the same way, but through its <script> blocks and
 // with browser:true - mirroring how jslint_from_file lints them.
 
-        await fsWriteFileWithParents(
-            ".tmp/autofix_embedded.html",
-            "<body>\n<script>\n/*jslint browser*/\nwindow.console.log(\n" +
-            "    0\n  + 0\n);\n</script>\n</body>\n"
-        );
-        await jslint.jslint_cli({
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_embedded.html"
-            ],
-            process_exit: processExit0
-        });
-        data = await moduleFs.promises.readFile(
-            ".tmp/autofix_embedded.html",
-            "utf8"
-        );
-        assertOrThrow(
-            data === (
+        await autofixFile({
+            expect: (
                 "<body>\n<script>\n/*jslint browser*/\nwindow.console.log(\n" +
                 "    0\n    + 0\n);\n</script>\n</body>\n"
             ),
-            data
-        );
+            name: "autofix_embedded.html",
+            source: (
+                "<body>\n<script>\n/*jslint browser*/\nwindow.console.log(\n" +
+                "    0\n  + 0\n);\n</script>\n</body>\n"
+            )
+        });
 
 // A *.md file is linted with mode_conditional, i.e. only blocks carrying a
 // /*jslint directive. Autofix inherits that from jslint_from_file, so the
 // FIRST block below is repaired and the SECOND is left byte-identical.
 
-        await fsWriteFileWithParents(
-            ".tmp/autofix_embedded.md",
-            "# aa\n\nnode --eval '\n/*jslint node*/\nconsole.log(\n" +
-            "    0\n  + 0\n);\n'\n\nnode --eval '\nconsole.log(\n" +
-            "    0\n  + 0\n);\n'\n"
-        );
-        await jslint.jslint_cli({
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_embedded.md"
-            ],
-            process_env: {
-                JSLINT_BETA: "1"
-            },
-            process_exit: processExit0
-        });
-        data = await moduleFs.promises.readFile(
-            ".tmp/autofix_embedded.md",
-            "utf8"
-        );
-        assertOrThrow(
-            data === (
+        await autofixFile({
+            expect: (
                 "# aa\n\nnode --eval '\n/*jslint node*/\nconsole.log(\n" +
                 "    0\n    + 0\n);\n'\n\nnode --eval '\nconsole.log(\n" +
                 "    0\n  + 0\n);\n'\n"
             ),
-            data
-        );
+            name: "autofix_embedded.md",
+            process_env: {
+                JSLINT_BETA: "1"
+            },
+            source: (
+                "# aa\n\nnode --eval '\n/*jslint node*/\nconsole.log(\n" +
+                "    0\n  + 0\n);\n'\n\nnode --eval '\nconsole.log(\n" +
+                "    0\n  + 0\n);\n'\n"
+            )
+        });
     });
     jstestIt((
         "test autofix-api handling-behavior"
@@ -858,24 +757,36 @@ jstestDescribe((
         let result;
         let source;
 
-// Option autofix makes jslint() a PURE fixer - no fs, no cli. <warnings> and
-// <ok> then describe <autofixed>, so a repairable source comes back ok.
+// This function will autofix <source_api> through the API - no fs, no cli -
+// and assert <autofixed> became <expect_api>. Option node is harmless to
+// every fixture here, so one option-object serves them all.
+
+        function assertAutofix(expect_api, source_api) {
+            let result_api = jslint.jslint(source_api, {
+                autofix: true,
+                node: true
+            });
+            assertOrThrow(
+                result_api.autofixed === expect_api,
+                JSON.stringify([
+                    source_api, result_api.autofixed
+                ])
+            );
+            return result_api;
+        }
+
+// Option autofix makes jslint() a PURE fixer. <warnings> and <ok> then
+// describe <autofixed>, so a repairable source comes back ok.
 
         source = (
             "function aa(bb) {\n    return String( bb)+bb;\n}\n" +
             "export default Object.freeze(aa);\n"
         );
-        result = jslint.jslint(source, {
-            autofix: true
-        });
+        result = assertAutofix((
+            "function aa(bb) {\n    return String(bb) + bb;\n}\n" +
+            "export default Object.freeze(aa);\n"
+        ), source);
         assertOrThrow(result.ok, JSON.stringify(result.warnings));
-        assertOrThrow(
-            result.autofixed === (
-                "function aa(bb) {\n    return String(bb) + bb;\n}\n" +
-                "export default Object.freeze(aa);\n"
-            ),
-            result.autofixed
-        );
 
 // Without the option, <autofixed> is undefined and the warnings are the
 // source's own.
@@ -887,12 +798,9 @@ jstestDescribe((
 // A warning autofix cannot fix BLOCKS the first pass, so there is nothing to
 // write and <autofixed> stays undefined.
 
-        result = jslint.jslint((
+        result = assertAutofix(undefined, (
             "function aa(bb) {\n    let cc = 0;\n    return String( bb);\n}\n"
-        ), {
-            autofix: true
-        });
-        assertOrThrow(result.autofixed === undefined, result.autofixed);
+        ));
         assertOrThrow(!result.ok, "expected warnings");
 
 // THE FIXER'S LINE MODEL MUST BE THE LINTER'S (jslint_rgx_crlf). A CRLF file
@@ -904,45 +812,27 @@ jstestDescribe((
 // what the second case pins: the fix lands on the right line, the comment is
 // untouched, and every \n comes back \r.
 
-        result = jslint.jslint((
+        assertAutofix((
+            "function aa(bb) {\r\n    if (bb) {\r\n        return bb;\r\n" +
+            "    }\r\n    return 0;\r\n}\r\naa();\r\n"
+        ), (
             "function aa(bb) {\r\n    if (bb) { return bb; }\r\n" +
             "    return 0;\r\n}\r\naa();\r\n"
-        ), {
-            autofix: true,
-            node: true
-        });
-        assertOrThrow(
-            result.autofixed === (
-                "function aa(bb) {\r\n    if (bb) {\r\n        return bb;\r\n" +
-                "    }\r\n    return 0;\r\n}\r\naa();\r\n"
-            ),
-            result.autofixed
-        );
-        result = jslint.jslint((
+        ));
+        assertAutofix((
+            "function bb(cc) {\r    cc();\r    return String(cc);\r" +
+            "    // xx              yy\r}\rbb();\r"
+        ), (
             "function bb(cc) {\r    cc();\n    return String( cc);\n" +
             "    // xx              yy\n}\nbb();\n"
-        ), {
-            autofix: true,
-            node: true
-        });
-        assertOrThrow(
-            result.autofixed === (
-                "function bb(cc) {\r    cc();\r    return String(cc);\r" +
-                "    // xx              yy\r}\rbb();\r"
-            ),
-            result.autofixed
-        );
+        ));
 
 // A WARNING-FREE source is returned UNTOUCHED, never rejoined - otherwise a
 // clean mixed-terminator file would come back normalized and get written.
 
-        result = jslint.jslint((
+        result = assertAutofix(undefined, (
             "function cc(dd) {\r\n    dd();\r    return 0;\n}\ncc();\n"
-        ), {
-            autofix: true,
-            node: true
-        });
-        assertOrThrow(result.autofixed === undefined, result.autofixed);
+        ));
         assertOrThrow(result.ok, JSON.stringify(result.warnings));
 
 // AN EMPTY source is the one input whose rejoin is the EMPTY STRING, which
@@ -955,14 +845,7 @@ jstestDescribe((
         [
             "", "\n", "\n\n", " ", "    ", "  \n  ", "\t"
         ].forEach(function (source_degenerate) {
-            result = jslint.jslint(source_degenerate, {
-                autofix: true,
-                node: true
-            });
-            assertOrThrow(
-                result.autofixed === undefined,
-                JSON.stringify([source_degenerate, result.autofixed])
-            );
+            assertAutofix(undefined, source_degenerate);
         });
 
 // A ONE-LINE source carries NO terminator at all, so jslint_rgx_crlf.exec()
@@ -970,30 +853,19 @@ jstestDescribe((
 // newline either - the fixer adds terminators BETWEEN lines, never after the
 // last one.
 
-        result = jslint.jslint("function aa(bb) { return bb; } aa();", {
-            autofix: true,
-            node: true
-        });
+        result = assertAutofix((
+            "function aa(bb) {\n    return bb;\n}\naa();"
+        ), "function aa(bb) { return bb; } aa();");
         assertOrThrow(result.ok, JSON.stringify(result.warnings));
-        assertOrThrow(
-            result.autofixed === (
-                "function aa(bb) {\n    return bb;\n}\naa();"
-            ),
-            result.autofixed
-        );
 
 // A whitespace-run reaching column 0 is INDENTATION or a line-join, not a gap
 // between two tokens on one line, so the fix is DECLINED and the warning is
 // reported against a byte-identical file. Here the run is the whole indent of
 // a continuation line, which is why the warned column is 9 and not 1.
 
-        result = jslint.jslint((
+        result = assertAutofix(undefined, (
             "function aa(bb) {\n    return aa\n        (bb);\n}\naa();\n"
-        ), {
-            autofix: true,
-            node: true
-        });
-        assertOrThrow(result.autofixed === undefined, result.autofixed);
+        ));
         assertOrThrow(
             result.warnings.length === 1 &&
             result.warnings[0].code === "unexpected_space_a_b" &&
