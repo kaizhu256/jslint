@@ -56,35 +56,11 @@ Douglas Crockford <douglas@crockford.com>
 8. [Documentation](#documentation)
     - [API Doc](#api-doc)
     - [Directive jslint](#directive-jslint)
-        - [`/*jslint beta*/`](#jslint-beta)
-        - [`/*jslint bitwise*/`](#jslint-bitwise)
-        - [`/*jslint browser*/`](#jslint-browser)
-        - [`/*jslint convert*/`](#jslint-convert)
-        - [`/*jslint couch*/`](#jslint-couch)
-        - [`/*jslint devel*/`](#jslint-devel)
-        - [`/*jslint eval*/`](#jslint-eval)
-        - [`/*jslint fart*/`](#jslint-fart)
-        - [`/*jslint getset*/`](#jslint-getset)
-        - [`/*jslint indent2*/`](#jslint-indent2)
-        - [`/*jslint long*/`](#jslint-long)
-        - [`/*jslint node*/`](#jslint-node)
-        - [`/*jslint nomen*/`](#jslint-nomen)
-        - [`/*jslint single*/`](#jslint-single)
-        - [`/*jslint subscript*/`](#jslint-subscript)
-        - [`/*jslint this*/`](#jslint-this)
-        - [`/*jslint trace*/`](#jslint-trace)
-        - [`/*jslint unordered*/`](#jslint-unordered)
-        - [`/*jslint white*/`](#jslint-white)
     - [Directive global](#directive-global)
-        - [`/*global*/`](#global)
     - [Directive property](#directive-property)
-        - [`/*property*/`](#property)
     - [Directive jslint-disable](#directive-jslint-disable)
-        - [`/*jslint-disable*/.../*jslint-enable*/`](#jslint-disablejslint-enable)
     - [Directive jslint-ignore-line](#directive-jslint-ignore-line)
-        - [`//jslint-ignore-line`](#jslint-ignore-line)
     - [Directive coverage-disable](#directive-coverage-disable)
-        - [`//coverage-ignore-line`](#coverage-ignore-line)
     - [ECMAScript Feature Support](#ecmascript-feature-support)
 
 9. [Package Listing](#package-listing)
@@ -603,7 +579,7 @@ window.addEventListener("load", function () {
 
 <br>
 
-##### `/*jslint beta*/`
+- `/*jslint beta*/`
 ```js
 /*jslint beta*/
 // Enable experimental warnings.
@@ -617,7 +593,7 @@ window.addEventListener("load", function () {
 
 <br>
 
-##### `/*jslint bitwise*/`
+- `/*jslint bitwise*/`
 ```js
 /*jslint bitwise*/
 // Allow bitwise operator.
@@ -627,7 +603,7 @@ let foo = 0 | 1;
 
 <br>
 
-##### `/*jslint browser*/`
+- `/*jslint browser*/`
 ```js
 /*jslint browser*/
 // Assume browser environment.
@@ -637,7 +613,7 @@ localStorage.getItem("foo");
 
 <br>
 
-##### `/*jslint convert*/`
+- `/*jslint convert*/`
 ```js
 /*jslint convert*/
 // Allow conversion operator.
@@ -648,7 +624,7 @@ let bar = !!0;
 
 <br>
 
-##### `/*jslint couch*/`
+- `/*jslint couch*/`
 ```js
 /*jslint couch*/
 // Assume CouchDb environment.
@@ -658,7 +634,7 @@ registerType("text-json", "text/json");
 
 <br>
 
-##### `/*jslint devel*/`
+- `/*jslint devel*/`
 ```js
 /*jslint devel*/
 // Allow console.log() and friends.
@@ -668,7 +644,7 @@ console.log("hello");
 
 <br>
 
-##### `/*jslint eval*/`
+- `/*jslint eval*/`
 ```js
 /*jslint eval*/
 // Allow eval().
@@ -678,7 +654,7 @@ eval("1");
 
 <br>
 
-##### `/*jslint fart*/`
+- `/*jslint fart*/`
 ```js
 /*jslint fart*/
 // Allow complex fat-arrow.
@@ -690,7 +666,7 @@ let foo = async ({bar, baz}) => {
 
 <br>
 
-##### `/*jslint getset*/`
+- `/*jslint getset*/`
 ```js
 /*jslint getset, this, devel*/
 // Allow get() and set().
@@ -711,7 +687,7 @@ console.log(foo.getBar); // 1
 
 <br>
 
-##### `/*jslint indent2*/`
+- `/*jslint indent2*/`
 ```js
 /*jslint indent2*/
 // Use 2-space indent.
@@ -723,7 +699,7 @@ function foo() {
 
 <br>
 
-##### `/*jslint long*/`
+- `/*jslint long*/`
 ```js
 /*jslint long*/
 // Allow long lines.
@@ -733,7 +709,7 @@ let foo = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 <br>
 
-##### `/*jslint node*/`
+- `/*jslint node*/`
 ```js
 /*jslint node*/
 // Assume Node.js environment.
@@ -743,7 +719,7 @@ require("fs");
 
 <br>
 
-##### `/*jslint nomen*/`
+- `/*jslint nomen*/`
 ```js
 /*jslint nomen*/
 // Allow weird property name.
@@ -754,7 +730,7 @@ foo._bar = 1;
 
 <br>
 
-##### `/*jslint single*/`
+- `/*jslint single*/`
 ```js
 /*jslint single*/
 // Allow single-quote strings.
@@ -764,7 +740,7 @@ let foo = '';
 
 <br>
 
-##### `/*jslint subscript*/`
+- `/*jslint subscript*/`
 ```js
 /*jslint subscript*/
 // Allow identifiers in subscript-notation.
@@ -775,7 +751,7 @@ foo["bar"] = 1;
 
 <br>
 
-##### `/*jslint this*/`
+- `/*jslint this*/`
 ```js
 /*jslint this*/
 // Allow 'this'.
@@ -787,7 +763,7 @@ function foo() {
 
 <br>
 
-##### `/*jslint trace*/`
+- `/*jslint trace*/`
 ```js
 /*jslint trace*/
 // Include jslint stack-trace in warnings.
@@ -816,7 +792,7 @@ Error
 
 <br>
 
-##### `/*jslint unordered*/`
+- `/*jslint unordered*/`
 ```js
 /*jslint unordered*/
 // Allow unordered cases, params, properties, variables, and exports.
@@ -838,7 +814,7 @@ export {
 
 <br>
 
-##### `/*jslint white*/`
+- `/*jslint white*/`
 ```js
 /*jslint white*/
 // Allow messy whitespace.
@@ -852,7 +828,7 @@ let foo = 1; let bar = 2;
 
 <br>
 
-##### `/*global*/`
+- `/*global*/`
 ```js
 /*global foo, bar*/
 // Declare global variables foo, bar.
@@ -867,7 +843,7 @@ bar();
 
 <br>
 
-##### `/*property*/`
+- `/*property*/`
 ```js
 /*property foo, bar*/
 // Restrict property-access to only .foo, .bar.
@@ -881,7 +857,7 @@ let aa = {bar: 1, foo: 2};
 
 <br>
 
-##### `/*jslint-disable*/.../*jslint-enable*/`
+- `/*jslint-disable*/.../*jslint-enable*/`
 ```js
 /*jslint-disable*/
 
@@ -897,7 +873,7 @@ Syntax error.
 
 <br>
 
-##### `//jslint-ignore-line`
+- `//jslint-ignore-line`
 ```js
 // JSLint will ignore non-fatal warnings at given line.
 
@@ -910,7 +886,7 @@ eval("1"); //jslint-ignore-line
 <br><br>
 ### Directive coverage-disable
 
-##### `/*coverage-disable*/.../*coverage-enable*/`
+- `/*coverage-disable*/.../*coverage-enable*/`
 ```js
 /*coverage-disable*/
 
@@ -925,7 +901,7 @@ if (false) {
 
 <br>
 
-##### `//coverage-ignore-line`
+- `//coverage-ignore-line`
 ```js
 // JSLint will ignore code-coverage at given line.
 
