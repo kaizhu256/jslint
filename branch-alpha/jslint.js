@@ -5746,10 +5746,10 @@ function jslint_phase3_parse(state) {
                     }
                     advance(":");
                     container.expression.push(
+                        Object.assign(
 
 // Recurse parse_json.
 
-                        Object.assign(
                             parse_json(),
                             {
                                 name_alias: name
@@ -8966,10 +8966,10 @@ function jslint_phase4_walk(state) {
     }
 
     function post_s_for(thing) {
+        if (thing.for_semicolon) {
 
 // Recurse walk_statement.
 
-        if (thing.for_semicolon) {
             walk_statement(thing.for_semicolon[2]);
         }
         scope_block = scope_block_pop();

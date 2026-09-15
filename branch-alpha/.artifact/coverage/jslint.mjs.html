@@ -2252,8 +2252,8 @@ body {
 <pre><span class="lineno"><a href="#line_2087" id="line_2087"> 2087.</a></span><span class="count                ">    166</span><span>            /^ */gm</span></pre>
 <pre><span class="lineno"><a href="#line_2088" id="line_2088"> 2088.</a></span><span class="count                ">  13826</span><span>        ), function (match0) {</span></pre>
 <pre><span class="lineno"><a href="#line_2089" id="line_2089"> 2089.</a></span><span class="count                ">   8834</span><span>            if (whitespace === "" || match0.length &lt; whitespace.length) {</span></pre>
-<pre><span class="lineno"><a href="#line_2090" id="line_2090"> 2090.</a></span><span class="count                ">   7094</span><span>                whitespace = match0;</span></pre>
-<pre><span class="lineno"><a href="#line_2091" id="line_2091"> 2091.</a></span><span class="count                ">   7094</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_2090" id="line_2090"> 2090.</a></span><span class="count                ">   7096</span><span>                whitespace = match0;</span></pre>
+<pre><span class="lineno"><a href="#line_2091" id="line_2091"> 2091.</a></span><span class="count                ">   7096</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_2092" id="line_2092"> 2092.</a></span><span class="count                ">  13826</span><span>            return "";</span></pre>
 <pre><span class="lineno"><a href="#line_2093" id="line_2093"> 2093.</a></span><span class="count                ">  13826</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_2094" id="line_2094"> 2094.</a></span><span class="count                ">    166</span><span>        str = str.replace(new RegExp("^" + whitespace, "gm"), "");</span></pre>
@@ -5911,10 +5911,10 @@ body {
 <pre><span class="lineno"><a href="#line_5746" id="line_5746"> 5746.</a></span><span class="count                ">   9637</span><span>                    }</span></pre>
 <pre><span class="lineno"><a href="#line_5747" id="line_5747"> 5747.</a></span><span class="count                ">   9637</span><span>                    advance(":");</span></pre>
 <pre><span class="lineno"><a href="#line_5748" id="line_5748"> 5748.</a></span><span class="count                ">   9637</span><span>                    container.expression.push(</span></pre>
-<pre><span class="lineno"><a href="#line_5749" id="line_5749"> 5749.</a></span><span class="count                ">   9637</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5750" id="line_5750"> 5750.</a></span><span class="count                ">   9637</span><span>// Recurse parse_json.</span></pre>
-<pre><span class="lineno"><a href="#line_5751" id="line_5751"> 5751.</a></span><span class="count                ">   9637</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5752" id="line_5752"> 5752.</a></span><span class="count                ">   9637</span><span>                        Object.assign(</span></pre>
+<pre><span class="lineno"><a href="#line_5749" id="line_5749"> 5749.</a></span><span class="count                ">   9637</span><span>                        Object.assign(</span></pre>
+<pre><span class="lineno"><a href="#line_5750" id="line_5750"> 5750.</a></span><span class="count                ">   9637</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_5751" id="line_5751"> 5751.</a></span><span class="count                ">   9637</span><span>// Recurse parse_json.</span></pre>
+<pre><span class="lineno"><a href="#line_5752" id="line_5752"> 5752.</a></span><span class="count                ">   9637</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5753" id="line_5753"> 5753.</a></span><span class="count                ">   9637</span><span>                            parse_json(),</span></pre>
 <pre><span class="lineno"><a href="#line_5754" id="line_5754"> 5754.</a></span><span class="count                ">   9637</span><span>                            {</span></pre>
 <pre><span class="lineno"><a href="#line_5755" id="line_5755"> 5755.</a></span><span class="count                ">   9637</span><span>                                name_alias: name</span></pre>
@@ -9131,10 +9131,10 @@ body {
 <pre><span class="lineno"><a href="#line_8966" id="line_8966"> 8966.</a></span><span class="count                ">    100</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_8967" id="line_8967"> 8967.</a></span><span class="count                ">    647</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8968" id="line_8968"> 8968.</a></span><span class="count                ">     51</span><span>    function post_s_for(thing) {</span></pre>
-<pre><span class="lineno"><a href="#line_8969" id="line_8969"> 8969.</a></span><span class="count                ">     51</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8970" id="line_8970"> 8970.</a></span><span class="count                ">     51</span><span>// Recurse walk_statement.</span></pre>
-<pre><span class="lineno"><a href="#line_8971" id="line_8971"> 8971.</a></span><span class="count                ">     51</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8972" id="line_8972"> 8972.</a></span><span class="count                ">     15</span><span>        if (thing.for_semicolon) {</span></pre>
+<pre><span class="lineno"><a href="#line_8969" id="line_8969"> 8969.</a></span><span class="count                ">     15</span><span>        if (thing.for_semicolon) {</span></pre>
+<pre><span class="lineno"><a href="#line_8970" id="line_8970"> 8970.</a></span><span class="count                ">     15</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_8971" id="line_8971"> 8971.</a></span><span class="count                ">     15</span><span>// Recurse walk_statement.</span></pre>
+<pre><span class="lineno"><a href="#line_8972" id="line_8972"> 8972.</a></span><span class="count                ">     15</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8973" id="line_8973"> 8973.</a></span><span class="count                ">     15</span><span>            walk_statement(thing.for_semicolon[2]);</span></pre>
 <pre><span class="lineno"><a href="#line_8974" id="line_8974"> 8974.</a></span><span class="count                ">     15</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_8975" id="line_8975"> 8975.</a></span><span class="count                ">     51</span><span>        scope_block = scope_block_pop();</span></pre>
