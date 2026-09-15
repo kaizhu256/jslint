@@ -55,7 +55,7 @@ Douglas Crockford <douglas@crockford.com>
 
 8. [Documentation](#documentation)
     - [API Doc](#api-doc)
-    - [Directive](#directive)
+    - [Directive jslint](#directive-jslint)
         - [`/*jslint beta*/`](#jslint-beta)
         - [`/*jslint bitwise*/`](#jslint-bitwise)
         - [`/*jslint browser*/`](#jslint-browser)
@@ -75,11 +75,15 @@ Douglas Crockford <douglas@crockford.com>
         - [`/*jslint trace*/`](#jslint-trace)
         - [`/*jslint unordered*/`](#jslint-unordered)
         - [`/*jslint white*/`](#jslint-white)
+    - [Directive global](#directive-global)
         - [`/*global*/`](#global)
+    - [Directive property](#directive-property)
         - [`/*property*/`](#property)
+    - [Directive jslint-disable](#directive-jslint-disable)
         - [`/*jslint-disable*/.../*jslint-enable*/`](#jslint-disablejslint-enable)
+    - [Directive jslint-ignore-line](#directive-jslint-ignore-line)
         - [`//jslint-ignore-line`](#jslint-ignore-line)
-        - [`/*coverage-disable*/.../*coverage-enable*/`](#coverage-disablecoverage-enable)
+    - [Directive coverage-disable](#directive-coverage-disable)
         - [`//coverage-ignore-line`](#coverage-ignore-line)
     - [ECMAScript Feature Support](#ecmascript-feature-support)
 
@@ -595,7 +599,7 @@ window.addEventListener("load", function () {
 
 
 <br><br>
-### Directive
+### Directive jslint
 
 <br>
 
@@ -842,6 +846,10 @@ export {
 let foo = 1; let bar = 2;
 ```
 
+
+<br><br>
+### Directive global
+
 <br>
 
 ##### `/*global*/`
@@ -853,6 +861,10 @@ foo();
 bar();
 ```
 
+
+<br><br>
+### Directive property
+
 <br>
 
 ##### `/*property*/`
@@ -862,6 +874,10 @@ bar();
 
 let aa = {bar: 1, foo: 2};
 ```
+
+
+<br><br>
+### Directive jslint-disable
 
 <br>
 
@@ -875,6 +891,10 @@ Syntax error.
 /*jslint-enable*/
 ```
 
+
+<br><br>
+### Directive jslint-ignore-line
+
 <br>
 
 ##### `//jslint-ignore-line`
@@ -885,6 +905,10 @@ eval("1"); //jslint-ignore-line
 ```
 
 <br>
+
+
+<br><br>
+### Directive coverage-disable
 
 ##### `/*coverage-disable*/.../*coverage-enable*/`
 ```js
