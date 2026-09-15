@@ -58,9 +58,9 @@ Douglas Crockford <douglas@crockford.com>
     - [Directive `/*jslint*/`](#directive-jslint)
     - [Directive `/*global*/`](#directive-global)
     - [Directive `/*property*/`](#directive-property)
-    - [Directive `/*jslint-disable*/.../*jslint-enable*/`](#directive-jslint-disablejslint-enable)
+    - [Directive `/*jslint-disable*/ ... /*jslint-enable*/`](#directive-jslint-disable--jslint-enable)
     - [Directive `//jslint-ignore-line`](#directive-jslint-ignore-line)
-    - [Directive `/*coverage-disable*/.../*coverage-enable*/`](#directive-coverage-disablecoverage-enable)
+    - [Directive `/*coverage-disable*/ ... /*coverage-enable*/`](#directive-coverage-disable--coverage-enable)
     - [ECMAScript Feature Support](#ecmascript-feature-support)
 
 9. [Package Listing](#package-listing)
@@ -851,7 +851,7 @@ let aa = {bar: 1, foo: 2};
 
 
 <br><br>
-### Directive `/*jslint-disable*/.../*jslint-enable*/`
+### Directive `/*jslint-disable*/ ... /*jslint-enable*/`
 
 <br>
 
@@ -880,7 +880,7 @@ eval("1"); //jslint-ignore-line
 
 
 <br><br>
-### Directive `/*coverage-disable*/.../*coverage-enable*/`
+### Directive `/*coverage-disable*/ ... /*coverage-enable*/`
 
 ```js
 /*coverage-disable*/
