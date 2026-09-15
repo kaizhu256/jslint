@@ -1879,7 +1879,7 @@ function jslint(
                 return {
                     autofixed,
 
-// Recurse jslint().
+// Recurse jslint.
 
                     ...jslint(
                         autofixed,
@@ -3519,7 +3519,7 @@ function jslint_phase2_lex(state) {
                     }
 
 // RegExp
-// Recurse lex_regexp_group().
+// Recurse lex_regexp_group.
 
                     lex_regexp_group();
                     char_after(")");
@@ -5658,7 +5658,7 @@ function jslint_phase3_parse(state) {
             negative.arity = "unary";
             advance("-");
 
-// Recurse parse_json().
+// Recurse parse_json.
 
             negative.expression = parse_json();
             return negative;
@@ -5674,7 +5674,7 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id !== "]") {
                 while (true) {
 
-// Recurse parse_json().
+// Recurse parse_json.
 
                     container.expression.push(parse_json());
                     if (token_nxt.id !== ",") {
@@ -5747,7 +5747,7 @@ function jslint_phase3_parse(state) {
                     advance(":");
                     container.expression.push(
 
-// Recurse parse_json().
+// Recurse parse_json.
 
                         Object.assign(
                             parse_json(),
@@ -8967,7 +8967,7 @@ function jslint_phase4_walk(state) {
 
     function post_s_for(thing) {
 
-// Recurse walk_statement().
+// Recurse walk_statement.
 
         if (thing.for_semicolon) {
             walk_statement(thing.for_semicolon[2]);
@@ -9008,7 +9008,7 @@ function jslint_phase4_walk(state) {
 
             scope_block = scope_block_push(thing.catch, false);
 
-// Recurse walk_statement().
+// Recurse walk_statement.
 
             walk_statement(thing.catch.block);
 
@@ -9422,7 +9422,7 @@ function jslint_phase4_walk(state) {
 
                     test_cause("function", thing.id);
 
-// Recurse walk_statement().
+// Recurse walk_statement.
 
                     walk_statement(thing.block);
                 }
@@ -9468,7 +9468,7 @@ function jslint_phase4_walk(state) {
 
             test_cause("isArray");
 
-// Recurse walk_statement().
+// Recurse walk_statement.
 
             thing.forEach(walk_statement);
             return;
@@ -9509,7 +9509,7 @@ function jslint_phase4_walk(state) {
             warn("unexpected_expression_a", thing);
         }
 
-// Recurse walk_statement().
+// Recurse walk_statement.
 
         walk_statement(thing.block);
         walk_statement(thing.else);
@@ -11349,7 +11349,7 @@ function v8CoverageListMerge(processCovs) {
             });
             parentToChildDict.clear();
 
-// Recurse mergeTreeList().
+// Recurse mergeTreeList.
 
             resultChildren.push(mergeTreeList(treesMatching));
         }
@@ -11372,7 +11372,7 @@ function v8CoverageListMerge(processCovs) {
                 child = tree.children[ii];
                 if (child.start < offset && offset < child.end) {
 
-// Recurse treeSplit().
+// Recurse treeSplit.
 
                     mid = treeSplit(child, offset);
                     leftChildLen = ii + 1;
@@ -11552,7 +11552,7 @@ function v8CoverageListMerge(processCovs) {
                     tail.length = 0;
                 }
 
-// Recurse normalizeRange().
+// Recurse normalizeRange.
 
                 normalizeRange(head);
                 children.push(head);
