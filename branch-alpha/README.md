@@ -12,6 +12,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 <br><br>
+
 # Web Demo
 - https://www.jslint.com
 
@@ -19,6 +20,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 <br><br>
+
 # Web Demo Archived
 - [Web Demo 2020](https://www.jslint.com/branch-v2020.11.6/index.html)
 - [Web Demo 2014 (ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
@@ -26,6 +28,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 <br><br>
+
 # Table of Contents
 
 1. [Quickstart Install](#quickstart-install)
@@ -79,10 +82,12 @@ Douglas Crockford <douglas@crockford.com>
 
 
 <br><br>
+
 # Quickstart Install
 
 
 <br><br>
+
 ### To install, just download and save https://www.jslint.com/jslint.mjs to file:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_install_download.svg -->
 #!/bin/sh
@@ -95,6 +100,7 @@ curl -L https://www.jslint.com/jslint.mjs > jslint.mjs
 
 
 <br><br>
+
 ### To run `jslint.mjs` in shell:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_file.svg -->
 #!/bin/sh
@@ -109,6 +115,7 @@ node jslint.mjs hello.js
 
 
 <br><br>
+
 ### To import `jslint.mjs` in ES Module environment:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_import_esm.svg -->
 #!/bin/sh
@@ -143,6 +150,7 @@ result.warnings.forEach(function ({
 
 
 <br><br>
+
 ### To import `jslint.mjs` in CommonJS environment:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_import_cjs.svg -->
 #!/bin/sh
@@ -180,6 +188,7 @@ node --eval '
 
 
 <br><br>
+
 ### To JSLint entire directory in shell:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_dir.svg -->
 #!/bin/sh
@@ -194,10 +203,12 @@ node jslint.mjs .
 
 
 <br><br>
+
 # Quickstart Autofix Whitespace
 
 
 <br><br>
+
 ### To autofix whitespace in shell:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_autofix_file.svg -->
 #!/bin/sh
@@ -218,6 +229,7 @@ cat hello_autofix.js
 
 
 <br><br>
+
 ### To autofix whitespace in javascript:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_jslint_autofix_file.svg -->
 #!/bin/sh
@@ -244,10 +256,12 @@ console.log(result.autofixed);
 
 
 <br><br>
+
 # Quickstart JSLint Report
 
 
 <br><br>
+
 ### To create a JSLint report in shell:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_report_file.svg -->
 #!/bin/sh
@@ -270,6 +284,7 @@ node jslint.mjs \
 
 
 <br><br>
+
 ### To create a JSLint report in javascript:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_jslint_report_file.svg -->
 #!/bin/sh
@@ -306,10 +321,12 @@ import fs from "fs";
 
 
 <br><br>
+
 # Quickstart V8 Coverage Report
 
 
 <br><br>
+
 ### To create V8 coverage report from Node.js / Npm program in shell:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_coverage_report_spawn.svg -->
 #!/bin/sh
@@ -359,6 +376,7 @@ node ../jslint.mjs \
 
 
 <br><br>
+
 ### To create V8 coverage report from Node.js / Npm program in javascript:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_coverage_report_spawn.svg -->
 #!/bin/sh
@@ -420,6 +438,7 @@ import jslint from "../jslint.mjs";
 
 
 <br><br>
+
 # Quickstart JSLint in CodeMirror
 1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint_wrapper_codemirror.js`](https://www.jslint.com/jslint_wrapper_codemirror.js) to file.
 
@@ -537,6 +556,7 @@ window.addEventListener("load", function () {
 
 
 <br><br>
+
 # Quickstart JSLint in Vim
 1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint_wrapper_vim.vim`](https://www.jslint.com/jslint_wrapper_vim.vim) to directory `~/.vim/`
 2. Add vim-command `:source ~/.vim/jslint_wrapper_vim.vim` to file `~/.vimrc`
@@ -552,6 +572,7 @@ window.addEventListener("load", function () {
 
 
 <br><br>
+
 # Quickstart JSLint in VSCode
 1. In VSCode, search and install extension [`vscode-jslint`](https://marketplace.visualstudio.com/items?itemName=jslint.vscode-jslint)
 2. In VSCode, while editing a javascript file:
@@ -564,12 +585,14 @@ window.addEventListener("load", function () {
 
 
 <br><br>
+
 # Documentation
 - [jslint.mjs](jslint.mjs) contains the jslint function. It parses and analyzes a source file, returning an object with information about the file. It can also take an object that sets options.
 - [index.html](index.html) runs the jslint.mjs function in a web page.
 
 
 <br><br>
+
 ### API Doc
 - https://www.jslint.com/apidoc.html
 
@@ -577,6 +600,7 @@ window.addEventListener("load", function () {
 
 
 <br><br>
+
 ### Directive
 
 <br>
@@ -898,6 +922,7 @@ if (false) {
 
 
 <br><br>
+
 ### ECMAScript Feature Support
 - https://github.com/tc39/proposals/blob/main/finished-proposals.md
 - https://github.com/lukehoban/es6features
@@ -1006,11 +1031,13 @@ if (false) {
 
 
 <br><br>
+
 # Package Listing
 ![screenshot_package_listing.svg](https://kaizhu256.github.io/jslint/branch-alpha/.artifact/screenshot_package_listing.svg)
 
 
 <br><br>
+
 # Changelog
 - [Full CHANGELOG.md](CHANGELOG.md)
 
@@ -1018,6 +1045,7 @@ if (false) {
 
 
 <br><br>
+
 # License
 - JSLint is under [Unlicense License](LICENSE).
 - CodeMirror editor is under [MIT License](https://github.com/codemirror/codemirror5/blob/34b84359c4ce289086c82c203f66ef74614d8a0d/LICENSE).
@@ -1025,10 +1053,12 @@ if (false) {
 
 
 <br><br>
+
 # Devops Instruction
 
 
 <br><br>
+
 ### pull-request merge
 1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
     - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
@@ -1084,6 +1114,7 @@ if (false) {
 
 
 <br><br>
+
 ### branch-master commit
 1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
     - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
@@ -1140,6 +1171,7 @@ if (false) {
 
 
 <br><br>
+
 ### branch-master publish
 1. goto https://www.npmjs.com/package/@kaizhu256/jslint/access <!--no-validate-->
     - click `Github Actions`
@@ -1176,6 +1208,7 @@ if (false) {
 
 
 <br><br>
+
 ### vscode-jslint publish
 1. goto https://github.com/kaizhu256/jslint/tree/gh-pages/branch-alpha/.artifact/jslint_wrapper_vscode
     - click `vscode-jslint-20yy.mm.dd.vsix`
