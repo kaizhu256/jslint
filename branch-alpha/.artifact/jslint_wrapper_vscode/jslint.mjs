@@ -2345,6 +2345,8 @@ async function jslint_cli({
     let mode_wrapper_vim;
     let result;
 
+// PR-509 - Add command jslint_autofix.
+
     function autofix_embeded({
         code,
         file,
@@ -2626,17 +2628,6 @@ async function jslint_cli({
 // PR-509 - Add command jslint_autofix.
 
     case "jslint_autofix":
-
-// Autofix whitespace-warnings in file <command[1]>, IN PLACE. The extension
-// dispatch, the embedded-javascript recursion and the per-container options
-// all belong to jslint_from_file, not to this command - so autofix repairs
-// precisely the sources `node jslint.mjs .` complains about, and no others.
-//
-// <autofixed> is undefined when there is nothing to write: an already-clean
-// source, one blocked on the first pass by a warning autofix cannot fix, or
-// one whose every fix was declined. A silent no-op write would make a blocked
-// run look identical to a clean one, so write ONLY when it is defined.
-
         file = command[1];
         data = await moduleFs.promises.readFile(file, "utf8");
         result = jslint_from_file({
@@ -2650,12 +2641,6 @@ async function jslint_cli({
         if (result.autofixed !== undefined) {
             await fsWriteFileWithParents(file, result.autofixed);
         }
-
-// Exit nonzero when the residual lint still warns, exactly as a plain lint
-// does - jslint_from_file has already set <exit_code> and printed them. A
-// bare return here would report success while stderr says otherwise, and a
-// `jslint_autofix=... && <deploy>` would proceed on unlinted source.
-
         process_exit(exit_code);
         return exit_code;
 
@@ -10248,6 +10233,8 @@ function jslint_phase5_whitage(state) {
     );
 }
 
+// PR-509 - Add command jslint_autofix.
+
 function jslint_phase6_autofix(state) {
 
 // PHASE 6. Autofix whitespace-warnings in <source>, and return the result.
@@ -10780,7 +10767,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     html += "JSLint Report\n";
     html += "</div>\n";
 
-// Produce the Autofix Report.
+// PR-509 - Produce the Autofix Report.
 
     html += String(`
 <fieldset

@@ -13,9 +13,9 @@
     <meta name="author" content="Douglas Crockford">
     <link rel="icon" type="image/png" href="asset_image_logo_256.svg">
     <title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
-    <script defer src="./asset_codemirror_rollup.js?cc=duvh"></script>
-    <script type="module" src="./jslint.mjs?cc=duvh?window_jslint=1"></script>
-    <script defer src="./jslint_wrapper_codemirror.js?cc=duvh"></script>
+    <script defer src="./asset_codemirror_rollup.js?cc=wf1e"></script>
+    <script type="module" src="./jslint.mjs?cc=wf1e?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js?cc=wf1e"></script>
 <style>
 /*jslint-disable*/
 /*
@@ -1298,7 +1298,7 @@ async function jslint_run(mode) {
             /[\s,;'"]+/
         );
 
-// Autofix
+// PR-509 - Autofix.
 
         if (mode === "autofix") {
             result = jslint.jslint(
