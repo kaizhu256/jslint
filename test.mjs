@@ -943,6 +943,48 @@ jstestDescribe((
 
         result = reportAutofix("console.log(1);\n", undefined);
         assertOrThrow(result === reportAutofixExpect("", ""), result);
+
+// INDENTATION CHARACTER IS FIXABLE, BOTH WAYS. Leading tabs become spaces
+// under default options (use_spaces); leading spaces become tabs under
+// directive tab (use_tabs). A tab AFTER the first token is not indentation:
+// it stays a blocker and the file comes back untouched.
+
+        result = jslint.jslint((
+            "function aa(bb) {\n\treturn bb;\n}\naa();\n"
+        ), {
+            autofix: true,
+            node: true
+        });
+        assertOrThrow(
+            result.autofixed === (
+                "function aa(bb) {\n    return bb;\n}\naa();\n"
+            ),
+            result.autofixed
+        );
+        result = jslint.jslint((
+            "function aa(bb) {\n    return bb;\n}\naa();\n"
+        ), {
+            autofix: true,
+            node: true,
+            tab: true
+        });
+        assertOrThrow(
+            result.autofixed === (
+                "function aa(bb) {\n\treturn bb;\n}\naa();\n"
+            ),
+            result.autofixed
+        );
+        result = jslint.jslint((
+            "function aa(bb) {\n    return\tbb;\n}\naa();\n"
+        ), {
+            autofix: true,
+            node: true
+        });
+        assertOrThrow(result.autofixed === undefined, result.autofixed);
+        assertOrThrow(
+            result.warnings[0].code === "use_spaces",
+            JSON.stringify(result.warnings)
+        );
     });
     jstestIt((
         "test cli-report handling-behavior"
@@ -1594,6 +1636,7 @@ jstestDescribe((
 // PR-404 - Add new directive "subscript" to play nice with Google Closure.
 
         [{subscript: true}, "String[\"aa\"]();"],
+        [{tab: true}, "function aa() {\n\treturn;\n}\naa();"],
         [{test_internal_error: true}, ""],
         [{test_unknown_warning_code: true}, ""],
         [{this: true}, "String(this);"],
