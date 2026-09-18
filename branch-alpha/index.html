@@ -13,9 +13,9 @@
     <meta name="author" content="Douglas Crockford">
     <link rel="icon" type="image/png" href="asset_image_logo_256.svg">
     <title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
-    <script defer src="./asset_codemirror_rollup.js?cc=7n2t"></script>
-    <script type="module" src="./jslint.mjs?cc=7n2t?window_jslint=1"></script>
-    <script defer src="./jslint_wrapper_codemirror.js?cc=7n2t"></script>
+    <script defer src="./asset_codemirror_rollup.js?cc=ifh9"></script>
+    <script type="module" src="./jslint.mjs?cc=ifh9?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js?cc=ifh9"></script>
 <style>
 /*jslint-disable*/
 /*
@@ -1133,20 +1133,17 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         <div title="Allow complex fat-arrow.">
         <label><input type="checkbox" value="fart">fart</label>
         </div>
-        <div title="Allow for-statement.">
-        <label><input type="checkbox" value="for">for</label>
-        </div>
         <div title="Allow get() and set().">
         <label><input type="checkbox" value="getset">getset</label>
         </div>
         <div title="Use 2-space indent.">
         <label><input type="checkbox" value="indent2">indent2</label>
         </div>
-    </div>
-    <div>&nbsp;
         <div title="Allow long lines.">
         <label><input type="checkbox" value="long">long</label>
         </div>
+    </div>
+    <div>&nbsp;
         <div title="Allow weird property name.">
         <label><input type="checkbox" value="nomen">nomen</label>
         </div>
@@ -1155,6 +1152,9 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         </div>
         <div title="Allow identifier in subscript-notation.">
         <label><input type="checkbox" value="subscript">subscript</label>
+        </div>
+        <div title="Use tab-indent.">
+        <label><input type="checkbox" value="tab">tab</label>
         </div>
     </div>
     <div>&nbsp;
@@ -1658,6 +1658,8 @@ await (async function () {
 // .... /*jslint trace*/ ......... Include jslint stack-trace in warnings.
 // .... /*jslint unordered*/ ..... Allow unordered cases, params, properties,
 // ................................... variables, and exports.
+// .... /*jslint variable*/ ...... Allow unordered const and let declarations
+// ................................... that are not at top of scope_function.
 // .... /*jslint white*/ ......... Allow messy whitespace.
     `).trim() + "\n");
 }

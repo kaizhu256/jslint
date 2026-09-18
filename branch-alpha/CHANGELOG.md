@@ -1,7 +1,6 @@
 # Changelog
 
 # Todo
-- jslint - Add support for tab-indent.
 - jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.'.
 - jslint-ecma - Add ES2015-feature iterators.
 - jslint - Audit token-property '.free'.
@@ -12,6 +11,7 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.9.29
+- jslint-directive - Add new directive 'tab' to support tab-indent.
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.

@@ -781,6 +781,18 @@ foo["bar"] = 1;
 
 <br>
 
+- `/*jslint tab*/`
+```js
+/*jslint tab*/
+// Use tab-indent.
+
+function foo() {
+	return;
+}
+```
+
+<br>
+
 - `/*jslint this*/`
 ```js
 /*jslint this*/
