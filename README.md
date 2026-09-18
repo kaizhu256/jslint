@@ -856,6 +856,18 @@ export {
 
 <br>
 
+- `/*jslint variable*/`
+```js
+/*jslint devel, variable*/
+// Allow unordered const and let declarations not at top of function-scope.
+
+console.log("hello");
+let aa = "goodbye";
+console.log(aa);
+```
+
+<br>
+
 - `/*jslint white*/`
 ```js
 /*jslint white*/
