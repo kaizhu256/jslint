@@ -4250,6 +4250,14 @@ function jslint_phase2_lex(state) {
             }
             line_source = line_source.replace(jslint_rgx_tab, " ");
         }
+        if (!option_dict.white && line_source.endsWith(" ")) {
+
+// test_cause:
+// [" ", "read_line", "unexpected_trailing_space", "", 1]
+
+            warn_at("unexpected_trailing_space", line, line_source.length - 1);
+        }
+        return line_source;
     }
 
     function token_create(id, value, identifier) {
@@ -9657,6 +9665,11 @@ function jslint_phase5_whitage(state) {
 
         option_dict.indent2
         ? 2
+
+// PR-xxx - Allow tab indent.
+
+        : option_dict.tab
+        ? 1
         : 4
     );
     let nr_comments_skipped = 0;
@@ -10262,7 +10275,17 @@ function jslint_phase6_autofix(state) {
 
 // PHASE 6. Autofix whitespace-warnings in <source>, and return the result.
 
-    const crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
+    const indent_char = (       // What one indent-level is written in.
+        state.option_dict.tab
+        ? "\t"
+        : " "
+    );
+    const indent_unit = (       // Spaces per level, converting to or from
+        state.option_dict.indent2   // ... tabs. Same derivation as phase 5's
+        ? 2                         // ... mode_indent, minus the tab arm.
+        : 4
+    );
+    const line_crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
     const line_list = state.line_list.map(function ({
         line_source
     }) {
@@ -10317,11 +10340,13 @@ function jslint_phase6_autofix(state) {
                     line,
                     1,
                     line_source.slice(0, ii).replace((/ +$/), ""),
-                    " ".repeat(b - 1) + line_source.slice(ii)
+                    indent_char.repeat(b - 1) + line_source.slice(ii)
                 );
                 return;
             }
-            line_list[line] = " ".repeat(b - 1) + line_source.trimStart();
+            line_list[line] = (
+                indent_char.repeat(b - 1) + line_source.trimStart()
+            );
             return;
         case "expected_line_break_a_b":
 
@@ -10336,6 +10361,30 @@ function jslint_phase6_autofix(state) {
                 line_source.slice(0, ii).replace((/ +$/), ""),
                 line_source.slice(ii)
             );
+            return;
+        case "use_spaces":
+            line_list[line] = line_source.replace((
+                /^[\t ]*/
+            ), function (match0) {
+                return match0.replace((/\t/g), " ".repeat(indent_unit));
+            });
+            return;
+        case "use_tabs":
+            line_list[line] = line_source.replace((
+                /^[\t ]*/
+            ), function (match0) {
+                return (
+                    "\t".repeat(
+                        Math.round(
+                            match0.length +
+                            (
+                                match0.replace((/ /g), "").length *
+                                (indent_unit - 1)
+                            )
+                        )
+                    )
+                );
+            });
             return;
         }
 
@@ -10365,7 +10414,7 @@ function jslint_phase6_autofix(state) {
             line_source.slice(ii)
         );
     });
-    return line_list.slice(jslint_fudge).join(crlf);
+    return line_list.slice(jslint_fudge).join(line_crlf);
 }
 
 function jslint_report({
