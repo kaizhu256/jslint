@@ -4216,8 +4216,8 @@ function jslint_phase2_lex(state) {
             line_source = "";
         }
         if (
-            option_dict.tab &&
             !option_dict.white &&
+            option_dict.tab &&
             jslint_rgx_use_tabs.test(line_source)
         ) {
 
@@ -4227,19 +4227,18 @@ function jslint_phase2_lex(state) {
             warn_at("use_tabs", line, line_source.indexOf(" ") + 1);
         }
         if (
+            !option_dict.white &&
 
 // PR-xxx - Allow tab indent.
 
             !option_dict.tab &&
             line_source.indexOf("\t") >= 0
         ) {
-            if (!option_dict.white) {
 
 // test_cause:
 // ["\t", "read_line", "use_spaces", "", 1]
 
-                warn_at("use_spaces", line, line_source.indexOf("\t") + 1);
-            }
+            warn_at("use_spaces", line, line_source.indexOf("\t") + 1);
         }
         if (!option_dict.white && line_source.endsWith(" ")) {
 
