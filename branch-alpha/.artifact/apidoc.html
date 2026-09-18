@@ -474,21 +474,21 @@ jstestIt((
     return argList[0];
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-        if (consoleError === Object) {
-            consoleError = console.error;
-        }
-        return argList[0];
+    if (consoleError === Object) {
+        consoleError = console.error;
     }
-    return debug;
+    return argList[0];
+}
+return debug;
 }());
 <span class="apidocCodeKeywordSpan">debugInline</span>(); // coverage-hack
 const jslint_autofix_warning_list = [ //jslint-ignore-line
-    "expected_a_at_b_c",
-    "expected_line_break_a_b",
-    "expected_space_a_b",
-    "unexpected_space_a_b"
-];
-const jslint_charset_ascii = (
+"expected_a_at_b_c",
+"expected_line_break_a_b",
+"expected_space_a_b",
+"unexpected_space_a_b",
+"use_spaces",
+"use_tabs"
 ...</pre></li>
 
 <li>
@@ -1372,6 +1372,11 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
 
         option_dict.indent2
         ? 2
+
+// PR-xxx - Allow tab indent.
+
+        : option_dict.tab
+        ? 1
         : 4
     );
     let nr_comments_skipped = 0;
@@ -1414,9 +1419,7 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
 
                 test_cause("id");
                 if (!name.used) {
-
-// test_cause:
-// ["function aa(bb){return;}", "delve", "unused_a", "...
+...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1448,7 +1451,17 @@ if (mode_autofix) {
 <span class="apidocCodeCommentSpan">
 // PHASE 6. Autofix whitespace-warnings in &lt;source&gt;, and return the result.
 
-</span>    const crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
+</span>    const indent_char = (       // What one indent-level is written in.
+        state.option_dict.tab
+        ? "\t"
+        : " "
+    );
+    const indent_unit = (       // Spaces per level, converting to or from
+        state.option_dict.indent2   // ... tabs. Same derivation as phase 5's
+        ? 2                         // ... mode_indent, minus the tab arm.
+        : 4
+    );
+    const line_crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
     const line_list = state.line_list.map(function ({
         line_source
     }) {
@@ -1489,14 +1502,7 @@ if (mode_autofix) {
 // line itself. The two expected_at(0) are LABEL placement and DO warn a
 // mid-line token - unreachable here only because a label always co-raises
 // weird_loop or unused_a, which blocks the pass. So do NOT read "always at a
-// margin" as licence to drop the mid-line branch below.
-
-            indentage_at = line_source.length - line_source.trimStart().length;
-
-// A MID-LINE token cannot be re-indented, but it does not need to be skipped:
-// at_margin fires for tokens that belong AT a margin and therefore on their
-// OWN line. So split first and indent the remainder, which also lands a
-// trailing closer correctly, and is what line-breaks a sing...
+// margin" as licence to drop the mid-...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

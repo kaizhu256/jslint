@@ -13,9 +13,9 @@
     <meta name="author" content="Douglas Crockford">
     <link rel="icon" type="image/png" href="asset_image_logo_256.svg">
     <title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
-    <script defer src="./asset_codemirror_rollup.js?cc=ifh9"></script>
-    <script type="module" src="./jslint.mjs?cc=ifh9?window_jslint=1"></script>
-    <script defer src="./jslint_wrapper_codemirror.js?cc=ifh9"></script>
+    <script defer src="./asset_codemirror_rollup.js?cc=vlcd"></script>
+    <script type="module" src="./jslint.mjs?cc=vlcd?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js?cc=vlcd"></script>
 <style>
 /*jslint-disable*/
 /*
@@ -1164,7 +1164,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         <div title="Allow unordered cases, params, properties, variables, and exports.">
         <label><input type="checkbox" value="unordered">unordered</label>
         </div>
-        <div title="Allow unordered const and let declarations that are not at top of function-scope.">
+        <div title="Allow unordered const and let declarations not at top of function-scope.">
         <label><input type="checkbox" value="variable">variable</label>
         </div>
         <div title="Allow messy whitespace.">
@@ -1659,7 +1659,7 @@ await (async function () {
 // .... /*jslint unordered*/ ..... Allow unordered cases, params, properties,
 // ................................... variables, and exports.
 // .... /*jslint variable*/ ...... Allow unordered const and let declarations
-// ................................... that are not at top of scope_function.
+// ................................... not at top of function-scope.
 // .... /*jslint white*/ ......... Allow messy whitespace.
     `).trim() + "\n");
 }

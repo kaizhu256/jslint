@@ -372,6 +372,7 @@
     switch,
     syntax_dict,
     tenure,
+    tab,
     test,
     test_cause,
     test_internal_error,
@@ -437,7 +438,9 @@ const jslint_autofix_warning_list = [ //jslint-ignore-line
     "expected_a_at_b_c",
     "expected_line_break_a_b",
     "expected_space_a_b",
-    "unexpected_space_a_b"
+    "unexpected_space_a_b",
+    "use_spaces",
+    "use_tabs"
 ];
 const jslint_charset_ascii = (
     "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
@@ -1721,6 +1724,9 @@ function jslint(
             break;
         case "use_spaces":
             mm = `Use spaces, not tabs.`;
+            break;
+        case "use_tabs":
+            mm = `Use tabs, not spaces.`;
             break;
         case "var_on_top_a_b":
             mm = `Move ${a} declaration to top of ${b} or script.`;
@@ -4005,7 +4011,6 @@ function jslint_phase2_lex(state) {
         case "ecma":            // Assume ECMAScript environment.
         case "eval":            // Allow eval().
         case "fart":            // Allow complex fat-arrow.
-        case "for":             // Allow for-statement.
         case "getset":          // Allow get() and set().
         case "indent2":         // Use 2-space indent.
         case "long":            // Allow long lines.
@@ -4013,6 +4018,7 @@ function jslint_phase2_lex(state) {
         case "nomen":           // Allow weird property name.
         case "single":          // Allow single-quote strings.
         case "subscript":       // Allow identifier in subscript-notation.
+        case "tab":             // Use tab-indent.
         case "test_cause":      // Test jslint's causes.
         case "test_internal_error":     // Test jslint's internal-error
                                         // ... handling-ability.
@@ -4023,7 +4029,7 @@ function jslint_phase2_lex(state) {
         case "unordered":       // Allow unordered cases, params, properties,
                                 // ... variables, and exports.
         case "variable":        // Allow unordered const and let declarations
-                                // ... that are not at top of scope_function.
+                                // ... not at top of function-scope.
         case "white":           // Allow messy whitespace.
             option_dict[key] = value;
             break;
@@ -4143,6 +4149,7 @@ function jslint_phase2_lex(state) {
 // replace them with spaces and give a warning. Also warn if the line contains
 // unsafe characters or is too damn long.
 
+        let tab_at;
         if (
             !option_dict.long
             && line_whole.length > 80
@@ -4208,14 +4215,38 @@ function jslint_phase2_lex(state) {
             test_cause("line_disable");
             line_source = "";
         }
-        // jslint_rgx_tab
-        if (line_source.indexOf("\t") >= 0) {
-            if (!option_dict.white) {
+
+// Directive tab wants tabs, so a SPACE in the leading run is the mirror of
+// use_spaces - and phase 5 cannot catch it: it sees each tab as ONE column
+// (the replace below), so one space lands exactly where one tab would.
+
+        if (option_dict.tab && !option_dict.white && (
+            /^\t* /
+        ).test(line_source)) {
 
 // test_cause:
+// ["/*jslint tab*/\n 0", "read_line", "use_tabs", "", 1]
+
+            warn_at("use_tabs", line, line_source.indexOf(" ") + 1);
+        }
+        // jslint_rgx_tab
+        if (line_source.indexOf("\t") >= 0) {
+
+// Directive tab allows tabs as INDENTATION only, so look for the first tab
+// AFTER the leading run; without the directive, the first tab anywhere.
+
+            tab_at = line_source.indexOf("\t", (
+                option_dict.tab
+                ? line_source.length - line_source.trimStart().length
+                : 0
+            ));
+            if (!option_dict.white && tab_at >= 0) {
+
+// test_cause:
+// ["/*jslint tab*/\n\t0\t0", "read_line", "use_spaces", "", 3]
 // ["\t", "read_line", "use_spaces", "", 1]
 
-                warn_at("use_spaces", line, line_source.indexOf("\t") + 1);
+                warn_at("use_spaces", line, tab_at + 1);
             }
             line_source = line_source.replace(jslint_rgx_tab, " ");
         }
@@ -9634,6 +9665,11 @@ function jslint_phase5_whitage(state) {
 
         option_dict.indent2
         ? 2
+
+// PR-xxx - Allow tab indent.
+
+        : option_dict.tab
+        ? 1
         : 4
     );
     let nr_comments_skipped = 0;
@@ -10239,7 +10275,17 @@ function jslint_phase6_autofix(state) {
 
 // PHASE 6. Autofix whitespace-warnings in <source>, and return the result.
 
-    const crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
+    const indent_char = (       // What one indent-level is written in.
+        state.option_dict.tab
+        ? "\t"
+        : " "
+    );
+    const indent_unit = (       // Spaces per level, converting to or from
+        state.option_dict.indent2   // ... tabs. Same derivation as phase 5's
+        ? 2                         // ... mode_indent, minus the tab arm.
+        : 4
+    );
+    const line_crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
     const line_list = state.line_list.map(function ({
         line_source
     }) {
@@ -10294,11 +10340,13 @@ function jslint_phase6_autofix(state) {
                     line,
                     1,
                     line_source.slice(0, ii).replace((/ +$/), ""),
-                    " ".repeat(b - 1) + line_source.slice(ii)
+                    indent_char.repeat(b - 1) + line_source.slice(ii)
                 );
                 return;
             }
-            line_list[line] = " ".repeat(b - 1) + line_source.trimStart();
+            line_list[line] = (
+                indent_char.repeat(b - 1) + line_source.trimStart()
+            );
             return;
         case "expected_line_break_a_b":
 
@@ -10313,6 +10361,30 @@ function jslint_phase6_autofix(state) {
                 line_source.slice(0, ii).replace((/ +$/), ""),
                 line_source.slice(ii)
             );
+            return;
+        case "use_spaces":
+            line_list[line] = line_source.replace((
+                /^[\t ]*/
+            ), function (match0) {
+                return match0.replace((/\t/g), " ".repeat(indent_unit));
+            });
+            return;
+        case "use_tabs":
+            line_list[line] = line_source.replace((
+                /^[\t ]*/
+            ), function (match0) {
+                return (
+                    "\t".repeat(
+                        Math.round(
+                            match0.length +
+                            (
+                                match0.replace((/ /g), "").length *
+                                (indent_unit - 1)
+                            )
+                        )
+                    )
+                );
+            });
             return;
         }
 
@@ -10342,7 +10414,7 @@ function jslint_phase6_autofix(state) {
             line_source.slice(ii)
         );
     });
-    return line_list.slice(jslint_fudge).join(crlf);
+    return line_list.slice(jslint_fudge).join(line_crlf);
 }
 
 function jslint_report({
