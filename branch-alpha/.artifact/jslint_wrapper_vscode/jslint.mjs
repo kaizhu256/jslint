@@ -710,6 +710,9 @@ const jslint_rgx_directive_part = (
 const jslint_rgx_identifier = (
     /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/
 );
+const jslint_rgx_indent_use_tabs = (
+    /^\t*? /
+);
 const jslint_rgx_json_number = (
 
 // https://datatracker.ietf.org/doc/html/rfc7159#section-6
@@ -4224,7 +4227,7 @@ function jslint_phase2_lex(state) {
         if (
             option_dict.tab &&
             !option_dict.white &&
-            (/^\t* /).test(line_source)
+            jslint_rgx_indent_use_tabs.test(line_source)
         ) {
 
 // test_cause:
@@ -4232,7 +4235,6 @@ function jslint_phase2_lex(state) {
 
             warn_at("use_tabs", line, line_source.indexOf(" ") + 1);
         }
-        // jslint_rgx_tab
         if (line_source.indexOf("\t") >= 0) {
 
 // Directive tab allows tabs as INDENTATION only, so look for the first tab
@@ -10369,7 +10371,7 @@ function jslint_phase6_autofix(state) {
             line_list[line] = line_source.replace((
                 /^[\t ]*/
             ), function (match0) {
-                return match0.replace((/\t/g), " ".repeat(indent_unit));
+                return match0.replace(jslint_rgx_tab, " ".repeat(indent_unit));
             });
             return;
         case "use_tabs":
