@@ -4011,6 +4011,7 @@ function jslint_phase2_lex(state) {
         case "ecma":            // Assume ECMAScript environment.
         case "eval":            // Allow eval().
         case "fart":            // Allow complex fat-arrow.
+        case "for":             // Allow for-statement (deprecated).
         case "getset":          // Allow get() and set().
         case "indent2":         // Use 2-space indent.
         case "long":            // Allow long lines.
@@ -4220,9 +4221,11 @@ function jslint_phase2_lex(state) {
 // use_spaces - and phase 5 cannot catch it: it sees each tab as ONE column
 // (the replace below), so one space lands exactly where one tab would.
 
-        if (option_dict.tab && !option_dict.white && (
-            /^\t* /
-        ).test(line_source)) {
+        if (
+            option_dict.tab &&
+            !option_dict.white &&
+            (/^\t* /).test(line_source)
+        ) {
 
 // test_cause:
 // ["/*jslint tab*/\n 0", "read_line", "use_tabs", "", 1]
