@@ -4150,6 +4150,7 @@ function jslint_phase2_lex(state) {
 // replace them with spaces and give a warning. Also warn if the line contains
 // unsafe characters or is too damn long.
 
+        let match;
         if (
             !option_dict.long
             && line_whole.length > 80
@@ -4215,19 +4216,21 @@ function jslint_phase2_lex(state) {
             test_cause("line_disable");
             line_source = "";
         }
-        if (
-            !option_dict.white &&
-            option_dict.tab &&
-            jslint_rgx_indent_tabs.test(line_source)
-        ) {
+        if (option_dict.white) {
+            return line_source;
+        }
+        match = option_dict.tab && jslint_rgx_indent_tabs.exec(line_source);
+        if (match) {
 
 // test_cause:
 // ["/*jslint tab*/\n\t 0", "read_line", "indent_tabs", "", 2]
 
-            warn_at("indent_tabs", line, line_source.indexOf(" ") + 1);
-        }
-        if (option_dict.white) {
-            return line_source;
+            //!! warn_at("indent_tabs", line, line_source.indexOf(" ") + 1);
+            warn_at("indent_tabs", line, match.index + match[0].length);
+            //!! debugInline(
+                //!! line_source.indexOf(" "),
+                //!! match.index + match[0].length
+            //!! );
         }
         if (
 

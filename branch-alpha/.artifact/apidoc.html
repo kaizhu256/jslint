@@ -474,21 +474,21 @@ jstestIt((
     return argList[0];
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-    if (consoleError === Object) {
-        consoleError = console.error;
-    }
-    return argList[0];
-}
-return debug;
-}());
-<span class="apidocCodeKeywordSpan">debugInline</span>(); // coverage-hack
-const jslint_autofix_warning_list = [ //jslint-ignore-line
-"expected_a_at_b_c",
-"expected_line_break_a_b",
-"expected_space_a_b",
-"indent_tabs",
-"unexpected_space_a_b",
-"use_spaces"
+        if (match) {
+
+// test_cause:
+// ["/*jslint tab*/\n\t 0", "read_line", "indent_tabs", "", 2]
+
+            //!! warn_at("indent_tabs", line, line_source.indexOf(" ") + 1);
+            warn_at("indent_tabs", line, match.index + match[0].length);
+            //!! <span class="apidocCodeKeywordSpan">debugInline</span>(
+                //!! line_source.indexOf(" "),
+                //!! match.index + match[0].length
+            //!! );
+        }
+        if (
+
+// PR-xxx - Allow tab indent.
 ...</pre></li>
 
 <li>
