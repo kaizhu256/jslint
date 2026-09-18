@@ -710,9 +710,6 @@ const jslint_rgx_directive_part = (
 const jslint_rgx_identifier = (
     /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/
 );
-const jslint_rgx_indent_use_tabs = (
-    /^\t* /
-);
 const jslint_rgx_json_number = (
 
 // https://datatracker.ietf.org/doc/html/rfc7159#section-6
@@ -772,6 +769,9 @@ const jslint_rgx_token = new RegExp(
 );
 const jslint_rgx_url_search_window_jslint = (
     /[&?]window_jslint=1(?:$|&)/m
+);
+const jslint_rgx_use_tabs = (
+    /^\t* /
 );
 const jslint_rgx_weird_property = (
     /^_|\$|Sync$|_$/m
@@ -4153,7 +4153,6 @@ function jslint_phase2_lex(state) {
 // replace them with spaces and give a warning. Also warn if the line contains
 // unsafe characters or is too damn long.
 
-        let tab_at;
         if (
             !option_dict.long
             && line_whole.length > 80
@@ -4222,7 +4221,7 @@ function jslint_phase2_lex(state) {
         if (
             option_dict.tab &&
             !option_dict.white &&
-            jslint_rgx_indent_use_tabs.test(line_source)
+            jslint_rgx_use_tabs.test(line_source)
         ) {
 
 // test_cause:
@@ -4230,23 +4229,15 @@ function jslint_phase2_lex(state) {
 
             warn_at("use_tabs", line, line_source.indexOf(" ") + 1);
         }
-        if (line_source.indexOf("\t") >= 0) {
-
-// Directive tab allows tabs as INDENTATION only, so look for the first tab
-// AFTER the leading run; without the directive, the first tab anywhere.
-
-            tab_at = line_source.indexOf("\t", (
-                option_dict.tab
-                ? line_source.length - line_source.trimStart().length
-                : 0
-            ));
-            if (!option_dict.white && tab_at >= 0) {
+        if (!option_dict.tab && line_source.indexOf("\t") >= 0) {
+            if (!option_dict.white) {
 
 // test_cause:
-// ["/*jslint tab*/\n\t0\t0", "read_line", "use_spaces", "", 3]
 // ["\t", "read_line", "use_spaces", "", 1]
 
-                warn_at("use_spaces", line, tab_at + 1);
+//!! // ["/*jslint tab*/\n\t0\t0", "read_line", "use_spaces", "", 3]
+
+                warn_at("use_spaces", line, line_source.indexOf("\t") + 1);
             }
             line_source = line_source.replace(jslint_rgx_tab, " ");
         }
@@ -10373,17 +10364,7 @@ function jslint_phase6_autofix(state) {
             line_list[line] = line_source.replace((
                 /^[\t ]*/
             ), function (match0) {
-                return (
-                    "\t".repeat(
-                        Math.round(
-                            match0.length +
-                            (
-                                match0.replace((/ /g), "").length *
-                                (indent_unit - 1)
-                            )
-                        )
-                    )
-                );
+                return match0.replace(/ /g, "");
             });
             return;
         }
