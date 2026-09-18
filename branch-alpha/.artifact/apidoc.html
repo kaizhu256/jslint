@@ -1368,15 +1368,15 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
     let margin = 0;
     let mode_indent = (
 
-// PR-330 - Allow 2-space indent.
-
-        option_dict.indent2
-        ? 2
-
 // PR-xxx - Allow tab indent.
 
-        : option_dict.tab
+        option_dict.tab
         ? 1
+
+// PR-330 - Allow 2-space indent.
+
+        : option_dict.indent2
+        ? 2
         : 4
     );
     let nr_comments_skipped = 0;

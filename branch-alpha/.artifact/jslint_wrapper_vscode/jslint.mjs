@@ -4226,7 +4226,13 @@ function jslint_phase2_lex(state) {
 
             warn_at("use_tabs", line, line_source.indexOf(" ") + 1);
         }
-        if (!option_dict.tab && line_source.indexOf("\t") >= 0) {
+        if (
+
+// PR-xxx - Allow tab indent.
+
+            !option_dict.tab &&
+            line_source.indexOf("\t") >= 0
+        ) {
             if (!option_dict.white) {
 
 // test_cause:
@@ -5224,7 +5230,7 @@ function jslint_phase3_parse(state) {
         if (the_subscript.id === "(string)" || the_subscript.id === "`") {
             name = survey(the_subscript);
 
-// PR-404 - Add new directive "subscript" to play nice with Google Closure.
+// PR-404 - Add new directive-flag "subscript" to play nice with Google Closure.
 
             if (!option_dict.subscript && jslint_rgx_identifier.test(name)) {
 
@@ -9646,15 +9652,15 @@ function jslint_phase5_whitage(state) {
     let margin = 0;
     let mode_indent = (
 
-// PR-330 - Allow 2-space indent.
-
-        option_dict.indent2
-        ? 2
-
 // PR-xxx - Allow tab indent.
 
-        : option_dict.tab
+        option_dict.tab
         ? 1
+
+// PR-330 - Allow 2-space indent.
+
+        : option_dict.indent2
+        ? 2
         : 4
     );
     let nr_comments_skipped = 0;
