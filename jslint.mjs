@@ -710,6 +710,9 @@ const jslint_rgx_directive_part = (
 const jslint_rgx_identifier = (
     /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/
 );
+const jslint_rgx_indent_spaces = (
+    /^ *\t/
+);
 const jslint_rgx_indent_tabs = (
     /^\t* /
 );
@@ -1559,6 +1562,9 @@ function jslint(
 
         case "illegal_num_separator":
             mm = `Illegal numeric separator '_' at column ${column}.`;
+            break;
+        case "indent_spaces":
+            mm = `Indent with spaces, not tabs.`;
             break;
         case "indent_tabs":
             mm = `Indent with tabs, not spaces.`;
@@ -4219,18 +4225,21 @@ function jslint_phase2_lex(state) {
         if (option_dict.white) {
             return line_source;
         }
+        match = !option_dict.tab && jslint_rgx_indent_spaces.exec(line_source);
+        if (match) {
+
+// test_cause:
+// [" \t0", "read_line", "indent_spaces", "", 2]
+
+            warn_at("indent_spaces", line, match.index + match[0].length);
+        }
         match = option_dict.tab && jslint_rgx_indent_tabs.exec(line_source);
         if (match) {
 
 // test_cause:
 // ["/*jslint tab*/\n\t 0", "read_line", "indent_tabs", "", 2]
 
-            //!! warn_at("indent_tabs", line, line_source.indexOf(" ") + 1);
             warn_at("indent_tabs", line, match.index + match[0].length);
-            //!! debugInline(
-                //!! line_source.indexOf(" "),
-                //!! match.index + match[0].length
-            //!! );
         }
         if (
 
