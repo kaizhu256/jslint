@@ -438,9 +438,9 @@ const jslint_autofix_warning_list = [ //jslint-ignore-line
     "expected_a_at_b_c",
     "expected_line_break_a_b",
     "expected_space_a_b",
+    "indent_tab",
     "unexpected_space_a_b",
-    "use_spaces",
-    "use_tabs"
+    "use_spaces_indent"
 ];
 const jslint_charset_ascii = (
     "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
@@ -710,6 +710,15 @@ const jslint_rgx_directive_part = (
 const jslint_rgx_identifier = (
     /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/
 );
+const jslint_rgx_indent_space = (
+    /^ *\t/
+);
+const jslint_rgx_indent_tab = (
+    /^\t* /
+);
+const jslint_rgx_indent_white = (
+    /^( *?)\t+|^(\t*?) +/
+);
 const jslint_rgx_json_number = (
 
 // https://datatracker.ietf.org/doc/html/rfc7159#section-6
@@ -766,9 +775,6 @@ const jslint_rgx_token = new RegExp(
 );
 const jslint_rgx_url_search_window_jslint = (
     /[&?]window_jslint=1(?:$|&)/m
-);
-const jslint_rgx_use_tabs = (
-    /^\t* /
 );
 const jslint_rgx_weird_property = (
     /^_|\$|Sync$|_$/m
@@ -1560,6 +1566,9 @@ function jslint(
         case "illegal_num_separator":
             mm = `Illegal numeric separator '_' at column ${column}.`;
             break;
+        case "indent_tab":
+            mm = `Indent with tabs, not spaces.`;
+            break;
         case "infix_in":
             mm = (
                 `Unexpected 'in'. Compare with undefined,`
@@ -1725,8 +1734,8 @@ function jslint(
         case "use_spaces":
             mm = `Use spaces, not tabs.`;
             break;
-        case "use_tabs":
-            mm = `Use tabs, not spaces.`;
+        case "use_spaces_indent":
+            mm = `Use spaces, not tabs.`;
             break;
         case "var_on_top_a_b":
             mm = `Move ${a} declaration to top of ${b} or script.`;
@@ -4150,6 +4159,7 @@ function jslint_phase2_lex(state) {
 // replace them with spaces and give a warning. Also warn if the line contains
 // unsafe characters or is too damn long.
 
+        let match;
         if (
             !option_dict.long
             && line_whole.length > 80
@@ -4215,31 +4225,46 @@ function jslint_phase2_lex(state) {
             test_cause("line_disable");
             line_source = "";
         }
-        if (
-            option_dict.tab &&
-            !option_dict.white &&
-            jslint_rgx_use_tabs.test(line_source)
-        ) {
+        if (option_dict.white) {
+            return line_source;
+        }
+        match = jslint_rgx_indent_white.exec(line_source) || empty();
+        //!! match =  && jslint_rgx_indent_space.exec(line_source);
+        if (!option_dict.tab && match[1] >= "") {
 
 // test_cause:
-// ["/*jslint tab*/\n\t 0", "read_line", "use_tabs", "", 2]
+// [" \t0", "read_line", "indent_space", "", 2]
 
-            warn_at("use_tabs", line, line_source.indexOf(" ") + 1);
+            warn_at(
+                "indent_tab",
+                line,
+                match.index + match + jslint_fudge
+            );
+        }
+        if (option_dict.tab && jslint_rgx_indent_tab.test(line_source)) {
+
+// test_cause:
+// ["/*jslint tab*/\n\t 0", "read_line", "indent_tab", "", 2]
+
+            warn_at(
+                "indent_tab",
+                line,
+                line_source.indexOf(" ") + jslint_fudge
+            );
         }
         if (
+            !option_dict.white &&
 
 // PR-xxx - Allow tab indent.
 
             !option_dict.tab &&
             line_source.indexOf("\t") >= 0
         ) {
-            if (!option_dict.white) {
 
 // test_cause:
-// ["\t", "read_line", "use_spaces", "", 1]
+// [" \t", "read_line", "use_spaces_indent", "", 1]
 
-                warn_at("use_spaces", line, line_source.indexOf("\t") + 1);
-            }
+            warn_at("use_spaces_indent", line, line_source.indexOf("\t") + 1);
         }
         if (!option_dict.white && line_source.endsWith(" ")) {
 
@@ -10348,18 +10373,18 @@ function jslint_phase6_autofix(state) {
                 line_source.slice(ii)
             );
             return;
-        case "use_spaces":
-            line_list[line] = line_source.replace((
-                /^[\t ]*/
-            ), function (match0) {
-                return match0.replace((/\t/g), "");
-            });
-            return;
-        case "use_tabs":
+        case "indent_tab":
             line_list[line] = line_source.replace((
                 /^[\t ]*/
             ), function (match0) {
                 return match0.replace((/ /g), "");
+            });
+            return;
+        case "use_spaces_indent":
+            line_list[line] = line_source.replace((
+                /^[\t ]*/
+            ), function (match0) {
+                return match0.replace((/\t/g), "");
             });
             return;
         }
