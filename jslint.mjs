@@ -4005,7 +4005,6 @@ function jslint_phase2_lex(state) {
         case "ecma":            // Assume ECMAScript environment.
         case "eval":            // Allow eval().
         case "fart":            // Allow complex fat-arrow.
-        case "for":             // Allow for-statement.
         case "getset":          // Allow get() and set().
         case "indent2":         // Use 2-space indent.
         case "long":            // Allow long lines.
@@ -4018,12 +4017,13 @@ function jslint_phase2_lex(state) {
                                         // ... handling-ability.
         case "test_unknown_warning_code": // Test jslint's unknown-warning-code
                                         // ... handling-ability.
+        case "tab":             // Use tab-indent.
         case "this":            // Allow 'this'.
         case "trace":           // Include jslint stack-trace in warnings.
         case "unordered":       // Allow unordered cases, params, properties,
                                 // ... variables, and exports.
         case "variable":        // Allow unordered const and let declarations
-                                // ... that are not at top of scope_function.
+                                // ... not at top of function-scope.
         case "white":           // Allow messy whitespace.
             option_dict[key] = value;
             break;
