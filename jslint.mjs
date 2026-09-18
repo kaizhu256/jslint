@@ -732,9 +732,6 @@ const jslint_rgx_numeric_separator_illegal = (
 const jslint_rgx_slash_star_or_slash = (
     /\/\*|\/$/
 );
-const jslint_rgx_tab = (
-    /\t/g
-);
 const jslint_rgx_todo = (
     /\b(?:todo|TO\s?DO|HACK)\b/
 );
@@ -4235,11 +4232,8 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\t", "read_line", "use_spaces", "", 1]
 
-//!! // ["/*jslint tab*/\n\t0\t0", "read_line", "use_spaces", "", 3]
-
                 warn_at("use_spaces", line, line_source.indexOf("\t") + 1);
             }
-            line_source = line_source.replace(jslint_rgx_tab, " ");
         }
         if (!option_dict.white && line_source.endsWith(" ")) {
 
@@ -10352,14 +10346,14 @@ function jslint_phase6_autofix(state) {
             line_list[line] = line_source.replace((
                 /^[\t ]*/
             ), function (match0) {
-                return match0.replace(jslint_rgx_tab, "");
+                return match0.replace((/\t/g), "");
             });
             return;
         case "use_tabs":
             line_list[line] = line_source.replace((
                 /^[\t ]*/
             ), function (match0) {
-                return match0.replace(/ /g, "");
+                return match0.replace((/ /g), "");
             });
             return;
         }
