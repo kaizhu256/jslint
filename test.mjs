@@ -1636,7 +1636,7 @@ jstestDescribe((
 // PR-404 - Add new directive "subscript" to play nice with Google Closure.
 
         [{subscript: true}, "String[\"aa\"]();"],
-        [{tab: true}, "function aa() {\n\treturn;\n}\naa();"],
+        [{tab: true}, "String(\n\t0\n);"],
         [{test_internal_error: true}, ""],
         [{test_unknown_warning_code: true}, ""],
         [{this: true}, "String(this);"],

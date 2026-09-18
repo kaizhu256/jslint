@@ -710,9 +710,6 @@ const jslint_rgx_directive_part = (
 const jslint_rgx_identifier = (
     /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/
 );
-const jslint_rgx_indent_use_tabs = (
-    /^\t*? /
-);
 const jslint_rgx_json_number = (
 
 // https://datatracker.ietf.org/doc/html/rfc7159#section-6
@@ -735,8 +732,11 @@ const jslint_rgx_numeric_separator_illegal = (
 const jslint_rgx_slash_star_or_slash = (
     /\/\*|\/$/
 );
-const jslint_rgx_tab = (
+const jslint_rgx_tab_any = (
     /\t/g
+);
+const jslint_rgx_tab_indent = (
+    /(^\t*? )|(\t)/m
 );
 const jslint_rgx_todo = (
     /\b(?:todo|TO\s?DO|HACK)\b/
@@ -4154,6 +4154,7 @@ function jslint_phase2_lex(state) {
 // unsafe characters or is too damn long.
 
         let tab_at;
+        let tab_match;
         if (
             !option_dict.long
             && line_whole.length > 80
@@ -4219,23 +4220,22 @@ function jslint_phase2_lex(state) {
             test_cause("line_disable");
             line_source = "";
         }
-
-// Directive tab wants tabs, so a SPACE in the leading run is the mirror of
-// use_spaces - and phase 5 cannot catch it: it sees each tab as ONE column
-// (the replace below), so one space lands exactly where one tab would.
-
+        tab_match = jslint_rgx_tab_indent.exec(line_source) || empty();
         if (
             option_dict.tab &&
             !option_dict.white &&
-            jslint_rgx_indent_use_tabs.test(line_source)
+            tab_match[1]
         ) {
 
 // test_cause:
-// ["/*jslint tab*/\n 0", "read_line", "use_tabs", "", 1]
+// ["/*jslint tab*/\n\t 0", "read_line", "use_tabs", "", 2]
 
             warn_at("use_tabs", line, line_source.indexOf(" ") + 1);
         }
-        if (line_source.indexOf("\t") >= 0) {
+        if (
+            (tab_match[1] && !option_dict.tab) ||
+            tab_match[2]
+        ) {
 
 // Directive tab allows tabs as INDENTATION only, so look for the first tab
 // AFTER the leading run; without the directive, the first tab anywhere.
@@ -4248,12 +4248,12 @@ function jslint_phase2_lex(state) {
             if (!option_dict.white && tab_at >= 0) {
 
 // test_cause:
-// ["/*jslint tab*/\n\t0\t0", "read_line", "use_spaces", "", 3]
 // ["\t", "read_line", "use_spaces", "", 1]
 
+//!! // ["/*jslint tab*/\n\t0\t0", "read_line", "use_spaces", "", 3]
                 warn_at("use_spaces", line, tab_at + 1);
             }
-            line_source = line_source.replace(jslint_rgx_tab, " ");
+            line_source = line_source.replace(jslint_rgx_tab_any, " ");
         }
         if (!option_dict.white && line_source.endsWith(" ")) {
 
@@ -10371,7 +10371,10 @@ function jslint_phase6_autofix(state) {
             line_list[line] = line_source.replace((
                 /^[\t ]*/
             ), function (match0) {
-                return match0.replace(jslint_rgx_tab, " ".repeat(indent_unit));
+                return match0.replace(
+                    jslint_rgx_tab_any,
+                    " ".repeat(indent_unit)
+                );
             });
             return;
         case "use_tabs":
