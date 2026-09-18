@@ -1451,15 +1451,10 @@ if (mode_autofix) {
 <span class="apidocCodeCommentSpan">
 // PHASE 6. Autofix whitespace-warnings in &lt;source&gt;, and return the result.
 
-</span>    const indent_char = (       // What one indent-level is written in.
+</span>    const indent_char = (
         state.option_dict.tab
         ? "\t"
         : " "
-    );
-    const indent_unit = (       // Spaces per level, converting to or from
-        state.option_dict.indent2   // ... tabs. Same derivation as phase 5's
-        ? 2                         // ... mode_indent, minus the tab arm.
-        : 4
     );
     const line_crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
     const line_list = state.line_list.map(function ({
@@ -1502,7 +1497,13 @@ if (mode_autofix) {
 // line itself. The two expected_at(0) are LABEL placement and DO warn a
 // mid-line token - unreachable here only because a label always co-raises
 // weird_loop or unused_a, which blocks the pass. So do NOT read "always at a
-// margin" as licence to drop the mid-...
+// margin" as licence to drop the mid-line branch below.
+
+            indentage_at = line_source.length - line_source.trimStart().length;
+
+// A MID-LINE token cannot be re-indented, but it does not need to be skipped:
+// at_margin fires for tokens that belong AT a margin and therefore on their
+// OWN line. So split first and inde...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

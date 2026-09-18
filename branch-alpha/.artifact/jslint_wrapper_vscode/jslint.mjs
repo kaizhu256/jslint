@@ -10266,15 +10266,10 @@ function jslint_phase6_autofix(state) {
 
 // PHASE 6. Autofix whitespace-warnings in <source>, and return the result.
 
-    const indent_char = (       // What one indent-level is written in.
+    const indent_char = (
         state.option_dict.tab
         ? "\t"
         : " "
-    );
-    const indent_unit = (       // Spaces per level, converting to or from
-        state.option_dict.indent2   // ... tabs. Same derivation as phase 5's
-        ? 2                         // ... mode_indent, minus the tab arm.
-        : 4
     );
     const line_crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
     const line_list = state.line_list.map(function ({
@@ -10357,7 +10352,7 @@ function jslint_phase6_autofix(state) {
             line_list[line] = line_source.replace((
                 /^[\t ]*/
             ), function (match0) {
-                return match0.replace(jslint_rgx_tab, " ".repeat(indent_unit));
+                return match0.replace(jslint_rgx_tab, "");
             });
             return;
         case "use_tabs":
