@@ -4489,7 +4489,7 @@ function jslint_phase2_lex(state) {
 // ["0x", "read_digits", "expected_digits_after_a", "0x", 2]
 // ["0x_", "read_digits", "expected_digits_after_a", "0x", 2]
 
-            warn_at("expected_digits_after_a", line, column, snippet);
+            warn_au("expected_digits_after_a", line, column - 1, snippet);
         }
 
 // PR-390 - Add numeric-separator check.
