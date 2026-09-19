@@ -1406,10 +1406,10 @@ function jslint(
 
         let the_warning;
         the_token = the_token || state.token_nxt;
-        the_warning = warn_at(
+        the_warning = warn_au(
             code,
             the_token.line,
-            jslint_fudge + (the_token.from || 0),
+            the_token.from,
             a || artifact(the_token),
             b,
             c,
@@ -1798,7 +1798,7 @@ function jslint(
         return warning;
     }
 
-    function warn_au(code, line, column0, a, b, c, d) { //jslint-ignore-line
+    function warn_au(code, line, column0, a, b, c, d) {
 
 // Report an error at some line and column of the program. The warning object
 // resembles an exception.
@@ -10094,7 +10094,7 @@ function jslint_phase5_whitage(state) {
 
 // Fudge column numbers in warning message.
 
-            at + jslint_fudge,
+            jslint_fudge + at,
             right.from + jslint_fudge
         );
     }
