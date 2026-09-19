@@ -1798,7 +1798,7 @@ function jslint(
         return warning;
     }
 
-    function warn_au(code, line, column, a, b, c, d) { //jslint-ignore-line
+    function warn_au(code, line, column0, a, b, c, d) { //jslint-ignore-line
 
 // Report an error at some line and column of the program. The warning object
 // resembles an exception.
@@ -1820,7 +1820,7 @@ function jslint(
 // Fudge column numbers in warning message.
 
             jslint_fudge +
-            Math.max(0, Math.min(column || 0, warning.line_source.length))
+            Math.max(0, Math.min(column0 || 0, warning.line_source.length))
         );
         test_cause(code, b || a, warning.column);
         switch (code) {
@@ -4594,7 +4594,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*jslint tab*/\n\t 0", "read_line", "use_tabs", "", 2]
 
-            warn_at("use_tabs", line, line_source.indexOf(" ") + 1);
+            warn_au("use_tabs", line, line_source.indexOf(" "));
         }
         if (!option_dict.white && line_source.endsWith(" ")) {
 
