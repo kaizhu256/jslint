@@ -408,6 +408,7 @@
     versions,
     warn,
     warn_at,
+    warn_au,
     warning,
     warning_list,
     warnings,
@@ -1380,7 +1381,7 @@ function jslint(
                 JSON.stringify([
                     String(new Error().stack)
                         .replace(
-                            (/^    at (?:file|stop|stop_at|test_cause|warn|warn_at)\b.*?\n/gm),
+                            (/^    at (?:file|stop|stop_at|test_cause|warn|warn_at|warn_au)\b.*?\n/gm),
                             ""
                         )
                         .match(/\n    at ((?:Object\.\w+?_)?\w+?) /)[1]
@@ -1797,7 +1798,7 @@ function jslint(
         return warning;
     }
 
-    function warn_at2(code, line, column, a, b, c, d) { //jslint-ignore-line
+    function warn_au(code, line, column, a, b, c, d) { //jslint-ignore-line
 
 // Report an error at some line and column of the program. The warning object
 // resembles an exception.
@@ -2210,6 +2211,7 @@ function jslint(
                 token_nxt: token_global,
                 warn,
                 warn_at,
+                warn_au,
                 warning_list
             }
         );
@@ -3144,7 +3146,8 @@ function jslint_phase2_lex(state) {
         token_global,
         token_list,
         warn,
-        warn_at
+        warn_at,
+        warn_au
     } = state;
     const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
@@ -4598,7 +4601,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // [" ", "read_line", "unexpected_trailing_space", "", 1]
 
-            warn_at("unexpected_trailing_space", line, line_source.length - 1);
+            warn_au("unexpected_trailing_space", line, line_source.length - 1);
         }
         return line_source;
     }
