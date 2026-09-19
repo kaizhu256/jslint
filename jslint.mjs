@@ -3948,6 +3948,27 @@ function jslint_phase2_lex(state) {
                     line_source[0]
                 );
             }
+            if (
+                match[2] &&
+                !option_dict.white &&
+
+// PR-xxx - Allow tab indent.
+
+                !option_dict.tab &&
+                line_source.indexOf("\t") >= 0
+            ) {
+
+// test_cause:
+// [" \t", "lex_token", "use_spaces", "", 2]
+// ["0\t", "lex_token", "use_spaces", "", 2]
+// ["\t", "lex_token", "use_spaces", "", 1]
+// ["\t0", "lex_token", "use_spaces", "", 1]
+
+                warn_at(
+                    "use_spaces",
+                    line, column + 1 + line_source.indexOf("\t")
+                );
+            }
             snippet = match[1];
             column += snippet.length;
             line_source = match[5];
@@ -4225,20 +4246,6 @@ function jslint_phase2_lex(state) {
 // ["/*jslint tab*/\n\t 0", "read_line", "use_tabs", "", 2]
 
             warn_at("use_tabs", line, line_source.indexOf(" ") + 1);
-        }
-        if (
-            !option_dict.white &&
-
-// PR-xxx - Allow tab indent.
-
-            !option_dict.tab &&
-            line_source.indexOf("\t") >= 0
-        ) {
-
-// test_cause:
-// ["\t", "read_line", "use_spaces", "", 1]
-
-            warn_at("use_spaces", line, line_source.indexOf("\t") + 1);
         }
         if (!option_dict.white && line_source.endsWith(" ")) {
 
