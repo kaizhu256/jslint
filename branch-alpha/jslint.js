@@ -4207,7 +4207,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["''", "lex_string", "use_double", "", 1]
 
-            warn_at("use_double", line, column0);
+            warn_au("use_double", line, column0 - 1);
         }
         snippet = "";
         char_after();
