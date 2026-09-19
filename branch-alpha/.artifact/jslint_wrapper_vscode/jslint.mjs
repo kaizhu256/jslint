@@ -1902,7 +1902,7 @@ function jslint(
             jslint_assert(undefined, "test_internal_error");
         }
         if (option_dict.test_unknown_warning_code) {
-            warn_at("test_unknown_warning_code");
+            warn_at("test_unknown_warning_code", jslint_fudge, jslint_fudge);
         }
     } catch (err) {
         mode_stop = true;
@@ -3949,7 +3949,7 @@ function jslint_phase2_lex(state) {
                 warn_at(
                     "use_spaces",
                     line,
-                    jslint_fudge + column + line_source.indexOf("\t")
+                    column + line_source.indexOf("\t") + 1
                 );
             }
             snippet = match[1];
