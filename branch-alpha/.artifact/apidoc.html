@@ -1032,7 +1032,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 </span>    return;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-                warn_at,
+                warn_au,
                 warning_list
             }
         );
@@ -1073,7 +1073,8 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         token_global,
         token_list,
         warn,
-        warn_at
+        warn_at,
+        warn_au
     } = state;
     const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
@@ -1100,7 +1101,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     let token_prv_expr = token_global;  // The previous token excluding
                                         // ... comments.
 
-// Most tokens, including the identifiers, operators, and ...
+// Most tokens, including the identifiers...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
