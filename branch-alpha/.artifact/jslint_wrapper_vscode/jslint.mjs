@@ -1406,10 +1406,10 @@ function jslint(
 
         let the_warning;
         the_token = the_token || state.token_nxt;
-        the_warning = warn_at(
+        the_warning = warn_au(
             code,
             the_token.line,
-            jslint_fudge + (the_token.from || 0),
+            the_token.from,
             a || artifact(the_token),
             b,
             c,
@@ -1798,7 +1798,7 @@ function jslint(
         return warning;
     }
 
-    function warn_au(code, line, column0, a, b, c, d) { //jslint-ignore-line
+    function warn_au(code, line, column0, a, b, c, d) {
 
 // Report an error at some line and column of the program. The warning object
 // resembles an exception.
@@ -1820,7 +1820,7 @@ function jslint(
 // Fudge column numbers in warning message.
 
             jslint_fudge +
-            Math.max(0, Math.min(column0 || 0, warning.line_source.length))
+            Math.max(0, Math.min(column0 || 0, warning.line_source.length - 1))
         );
         test_cause(code, b || a, warning.column);
         switch (code) {
@@ -4501,10 +4501,10 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\u{1_2}\"", "read_digits", "illegal_num_separator", "", 6]
 
-            warn_at(
+            warn_au(
                 "illegal_num_separator",
                 line,
-                column + digits.indexOf("_") + 1
+                column + digits.indexOf("_")
             );
         }
         column += digits.length;
@@ -4814,7 +4814,7 @@ function jslint_phase3_parse(state) {
         token_global,
         token_list,
         warn,
-        warn_at
+        warn_au
     } = state;
     let anon = "anonymous";     // The guessed name for anonymous functions.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -7184,10 +7184,10 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["0", "semicolon", "expected_a_b", "(end)", 1]
 
-            warn_at(
+            warn_au(
                 "expected_a_b",
                 token_now.line,
-                token_now.thru + 1,
+                token_now.thru,
                 ";",
                 artifact()
             );
@@ -10094,7 +10094,7 @@ function jslint_phase5_whitage(state) {
 
 // Fudge column numbers in warning message.
 
-            at + jslint_fudge,
+            jslint_fudge + at,
             right.from + jslint_fudge
         );
     }
