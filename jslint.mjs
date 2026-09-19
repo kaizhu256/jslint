@@ -1820,7 +1820,7 @@ function jslint(
 // Fudge column numbers in warning message.
 
             jslint_fudge +
-            Math.max(0, Math.min(column0 || 0, warning.line_source.length))
+            Math.max(0, Math.min(column0 || 0, warning.line_source.length - 1))
         );
         test_cause(code, b || a, warning.column);
         switch (code) {
@@ -4814,7 +4814,7 @@ function jslint_phase3_parse(state) {
         token_global,
         token_list,
         warn,
-        warn_at
+        warn_au
     } = state;
     let anon = "anonymous";     // The guessed name for anonymous functions.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -7184,10 +7184,10 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["0", "semicolon", "expected_a_b", "(end)", 1]
 
-            warn_at(
+            warn_au(
                 "expected_a_b",
                 token_now.line,
-                token_now.thru + 1,
+                token_now.thru,
                 ";",
                 artifact()
             );
