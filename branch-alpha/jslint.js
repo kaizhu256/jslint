@@ -3200,9 +3200,9 @@ function jslint_phase2_lex(state) {
             );
         }
         char = line_source.slice(0, 1);
-        line_source = line_source.slice(1);
         snippet += char || " ";
         column += 1;
+        line_source = line_source.slice(1);
         return char;
     }
 
@@ -3547,8 +3547,8 @@ function jslint_phase2_lex(state) {
 // a } token is made.
 
                 column += 2;
-                token_create("${");
                 line_source = line_source.slice(2);
+                token_create("${");
 
 // Lex/loop through each token inside megastring-expression `${...}`.
 
@@ -3568,8 +3568,8 @@ function jslint_phase2_lex(state) {
                 break;
             case "\\":
                 snippet += line_source.slice(0, 2);
-                line_source = line_source.slice(2);
                 column += 2;
+                line_source = line_source.slice(2);
                 break;
             case "`":
 
@@ -3581,8 +3581,8 @@ function jslint_phase2_lex(state) {
 
 // Terminate megastring with `.
 
-                line_source = line_source.slice(1);
                 column += 1;
+                line_source = line_source.slice(1);
                 mode_mega = false;
                 return token_create("`");
             default:
@@ -4185,9 +4185,9 @@ function jslint_phase2_lex(state) {
             return lex_regexp();
         }
         if (line_source[0] === "=") {
+            snippet = "/=";
             column += 1;
             line_source = line_source.slice(1);
-            snippet = "/=";
             warn_at("unexpected_a", line, column, "/=");
         }
         return token_create(snippet);
@@ -4320,7 +4320,7 @@ function jslint_phase2_lex(state) {
             }
             snippet = match[1];
             column += snippet.length;
-            line_source = match[5];
+            line_source = line_source.slice(snippet.length);
             if (!match[2]) {
                 break;
             }
@@ -4507,9 +4507,9 @@ function jslint_phase2_lex(state) {
                 column + digits.indexOf("_")
             );
         }
+        snippet += digits;
         column += digits.length;
         line_source = line_source.slice(digits.length);
-        snippet += digits;
         char_after();
         return digits.length;
     }
