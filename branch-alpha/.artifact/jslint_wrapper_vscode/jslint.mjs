@@ -4188,7 +4188,11 @@ function jslint_phase2_lex(state) {
             snippet = "/=";
             column0 += 1;
             line_source = line_source.slice(1);
-            warn_at("unexpected_a", line, column0, "/=");
+
+// test_cause:
+// ["0/=0", "lex_slash_or_regexp", "unexpected_a", "/=", 2]
+
+            warn_au("unexpected_a", line, column0 - 2, "/=");
         }
         return token_create(snippet);
     }
