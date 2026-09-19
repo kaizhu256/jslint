@@ -10095,7 +10095,7 @@ function jslint_phase5_whitage(state) {
 // Fudge column numbers in warning message.
 
             jslint_fudge + at,
-            right.from + jslint_fudge
+            right.from
         );
     }
 
