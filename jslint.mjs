@@ -4501,10 +4501,10 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\u{1_2}\"", "read_digits", "illegal_num_separator", "", 6]
 
-            warn_at(
+            warn_au(
                 "illegal_num_separator",
                 line,
-                column + digits.indexOf("_") + 1
+                column + digits.indexOf("_")
             );
         }
         column += digits.length;
