@@ -3434,7 +3434,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["0\n/*global aa*/", "lex_comment", "misplaced_directive_a", "global", 1]
 
-            warn_at("misplaced_directive_a", line, from, the_comment.directive);
+            warn_au("misplaced_directive_a", line, from, the_comment.directive);
             return the_comment;
         }
 
@@ -4312,10 +4312,10 @@ function jslint_phase2_lex(state) {
 // ["\t", "lex_token", "use_spaces", "", 1]
 // ["\t0", "lex_token", "use_spaces", "", 1]
 
-                warn_at(
+                warn_au(
                     "use_spaces",
                     line,
-                    column + line_source.indexOf("\t") + 1
+                    column + line_source.indexOf("\t")
                 );
             }
             snippet = match[1];
