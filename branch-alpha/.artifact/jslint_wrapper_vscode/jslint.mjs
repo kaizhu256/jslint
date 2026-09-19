@@ -1862,6 +1862,9 @@ function jslint(
         case "expected_a":
             mm = `Expected '${a}'.`;
             break;
+        case "expected_a_after_b":
+            mm = `Expected '${a}' after ${b}.`;
+            break;
         case "expected_a_at_b_c":
             mm = `Expected '${a}' at column ${b}, not column ${c}.`;
             break;
@@ -3190,12 +3193,18 @@ function jslint_phase2_lex(state) {
         if (match !== undefined && char !== match) {
 
 // test_cause:
-// ["aa=/[", "char_after", "expected_a", "]", 5]
+// ["aa=/[", "char_after", "expected_a_after_b", "[", 5]
 // ["aa=/aa{/", "char_after", "expected_a_b", "/", 8]
 
             return (
                 char === ""
-                ? stop_at("expected_a", line, column0 - 1, match)
+                ? stop_at(
+                    "expected_a_after_b",
+                    line,
+                    column0 - 1,
+                    match,
+                    line_list[line].line_source.slice(-1)
+                )
                 : stop_at("expected_a_b", line, column0 - 1, match, char)
             );
         }
@@ -3263,7 +3272,7 @@ function jslint_phase2_lex(state) {
                     return stop_at(
                         "expected_a_before_b",
                         line,
-                        column0,
+                        column0 - 1,
                         "}",
                         char
                     );
@@ -3385,7 +3394,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*", "lex_comment", "unclosed_comment", "", 1]
 
-                    return stop_at("unclosed_comment", line, column0);
+                    return stop_at("unclosed_comment", line, column0 - 1);
                 }
             }
             jj = line_source.slice(0, ii).search(
@@ -3509,7 +3518,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["`${`", "lex_megastring", "expected_a_b", "`", 4]
 
-            return stop_at("expected_a_b", line, column0, "}", "`");
+            return stop_at("expected_a_b", line, column0 - 1, "}", "`");
         }
         from_mega = from;
         line_mega = line;
@@ -3559,7 +3568,12 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["`${{", "lex_megastring", "expected_a_b", "{", 4]
 
-                        return stop_at("expected_a_b", line, column0, "}", "{");
+                        return stop_at(
+                            "expected_a_b",
+                            line, column0 - 1,
+                            "}",
+                            "{"
+                        );
                     }
                     if (id === "}") {
                         break;
@@ -3593,7 +3607,7 @@ function jslint_phase2_lex(state) {
                 if (read_line() === undefined) {
 
 // test_cause:
-// ["`", "lex_megastring", "unclosed_mega", "", 1]
+// [";`0", "lex_megastring", "unclosed_mega", "", 2]
 
                     return stop_at("unclosed_mega", line_mega, from_mega);
                 }
@@ -3643,12 +3657,12 @@ function jslint_phase2_lex(state) {
         ) {
 
 // test_cause:
-// ["0a", "lex_number", "unexpected_a_after_b", "0", 2]
+// [";0a", "lex_number", "unexpected_a_after_b", "0", 3]
 
             return stop_at(
                 "unexpected_a_after_b",
                 line,
-                column0,
+                column0 - 1,
                 snippet.slice(-1),
                 snippet.slice(0, -1)
             );
