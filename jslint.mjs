@@ -1369,7 +1369,7 @@ function jslint(
 
 // Same as warn_at, except that it stops the analysis.
 
-        throw warn_at(code, line, column, a, b, c, d);
+        throw warn_au(code, line, column, a, b, c, d);
     }
 
     function test_cause(code, aa, column) {
@@ -3196,7 +3196,7 @@ function jslint_phase2_lex(state) {
             return (
                 char === ""
                 ? stop_at("expected_a", line, column0 - 1, match)
-                : stop_at("expected_a_b", line, column0, match, char)
+                : stop_at("expected_a_b", line, column0 - 1, match, char)
             );
         }
         char = line_source.slice(0, 1);
@@ -4071,9 +4071,9 @@ function jslint_phase2_lex(state) {
         if (char === "/" || char === "*") {
 
 // test_cause:
-// ["aa=/.//", "lex_regexp", "unexpected_a", "/", 3]
+// ["aa=/.//", "lex_regexp", "unexpected_a", "/", 7]
 
-            return stop_at("unexpected_a", line, from, char);
+            return stop_at("unexpected_a", line, column0, char);
         }
         result = token_create("(regexp)", char);
         result.flag = flag;
