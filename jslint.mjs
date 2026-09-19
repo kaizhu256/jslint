@@ -2375,7 +2375,10 @@ async function jslint_cli({
             const result_embedded = jslint_from_file({
                 code: match1,
                 file: file + suffix_file,
-                line_offset: string_line_count(code.slice(0, ii)) + 1,
+                line_offset: (
+                    jslint_fudge +
+                    code.slice(0, ii).split(jslint_rgx_crlf).length
+                ),
                 mode_conditional,
                 option
             });
@@ -2536,27 +2539,6 @@ async function jslint_cli({
                 suffix_file: ".<node -e>.js"
             })
         };
-    }
-
-    function string_line_count(code) {
-
-// This function will count number of newlines in <code>.
-
-        let count;
-        let ii;
-
-// https://jsperf.com/regexp-counting-2/8
-
-        count = 0;
-        ii = 0;
-        while (true) {
-            ii = code.indexOf("\n", ii) + 1;
-            if (ii === 0) {
-                break;
-            }
-            count += 1;
-        }
-        return count;
     }
 
 // PR-396 - window.jslint
