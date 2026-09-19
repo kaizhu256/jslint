@@ -1408,7 +1408,7 @@ function jslint(
         the_warning = warn_at(
             code,
             the_token.line,
-            (the_token.from || 0) + jslint_fudge,
+            jslint_fudge + (the_token.from || 0),
             a || artifact(the_token),
             b,
             c,
@@ -1447,7 +1447,7 @@ function jslint(
 
 // Fudge column numbers in warning message.
 
-            column: column || jslint_fudge,
+            column: column || 0,
             d,
             line,
             line_source: "",
@@ -1455,8 +1455,8 @@ function jslint(
             ...line_list[line]
         };
         warning.column = Math.max(
-            Math.min(warning.column, warning.line_source.length),
-            jslint_fudge
+            jslint_fudge,
+            Math.min(warning.column, warning.line_source.length)
         );
         test_cause(code, b || a, warning.column);
         switch (code) {
@@ -3966,7 +3966,8 @@ function jslint_phase2_lex(state) {
 
                 warn_at(
                     "use_spaces",
-                    line, column + 1 + line_source.indexOf("\t")
+                    line,
+                    jslint_fudge + column + line_source.indexOf("\t")
                 );
             }
             snippet = match[1];
