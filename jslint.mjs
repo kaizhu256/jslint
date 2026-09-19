@@ -2267,7 +2267,7 @@ function jslint(
             jslint_assert(undefined, "test_internal_error");
         }
         if (option_dict.test_unknown_warning_code) {
-            warn_at("test_unknown_warning_code", jslint_fudge, jslint_fudge);
+            warn_au("test_unknown_warning_code", jslint_fudge, 0);
         }
     } catch (err) {
         mode_stop = true;
@@ -4532,7 +4532,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/////////////////////////////////////////////////////////////////////////////////", "read_line", "too_long", "", 1] //jslint-ignore-line
 
-            warn_at("too_long", line);
+            warn_au("too_long", line, 0);
         }
         column = 0;
         line += 1;
