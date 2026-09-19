@@ -3217,7 +3217,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\", "char_after_escape", "unclosed_string", "", 2]
 
-            return stop_at("unclosed_string", line, column0);
+            return stop_at("unclosed_string", line, column0 - 1);
         case "/":
             return char_after();
         case "\\":
