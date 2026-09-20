@@ -10109,10 +10109,7 @@ function jslint_phase5_whitage(state) {
             "expected_a_at_b_c",
             right,
             artifact(right),
-
-// Fudge column numbers in warning message.
-
-            jslint_fudge + at,
+            at,
             right.from
         );
     }
@@ -10699,12 +10696,12 @@ function jslint_phase6_autofix(state) {
                     line,
                     1,
                     line_source.slice(0, ii).replace((/ +$/), ""),
-                    indent_char.repeat(b - 1) + line_source.slice(ii)
+                    indent_char.repeat(b) + line_source.slice(ii)
                 );
                 return;
             }
             line_list[line] = (
-                indent_char.repeat(b - 1) + line_source.trimStart()
+                indent_char.repeat(b) + line_source.trimStart()
             );
             return;
         case "expected_line_break_a_b":
