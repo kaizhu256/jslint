@@ -1442,10 +1442,6 @@ function jslint(
             b,
             c,
             code,
-
-// Fudge column numbers in warning message.
-
-            column: column || jslint_fudge,
             d,
             line,
             line_source: "",
@@ -1453,8 +1449,11 @@ function jslint(
             ...line_list[line]
         };
         warning.column = Math.max(
-            Math.min(warning.column, warning.line_source.length),
-            jslint_fudge
+
+// Fudge column numbers in warning message.
+
+            jslint_fudge,
+            Math.min(column || 0, warning.line_source.length)
         );
         test_cause(code, b || a, warning.column);
         switch (code) {
