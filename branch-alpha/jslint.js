@@ -408,7 +408,6 @@
     versions,
     warn,
     warn_at,
-    warn_au,
     warning,
     warning_list,
     warnings,
@@ -1406,10 +1405,10 @@ function jslint(
 
         let the_warning;
         the_token = the_token || state.token_nxt;
-        the_warning = warn_au(
+        the_warning = warn_at(
             code,
             the_token.line,
-            the_token.from,
+            jslint_fudge + the_token.from,
             a || artifact(the_token),
             b,
             c,
@@ -1445,10 +1444,6 @@ function jslint(
             b,
             c,
             code,
-
-// Fudge column numbers in warning message.
-
-            column: column || 0,
             d,
             line,
             line_source: "",
@@ -1456,8 +1451,11 @@ function jslint(
             ...line_list[line]
         };
         warning.column = Math.max(
+
+// Fudge column numbers in warning message.
+
             jslint_fudge,
-            Math.min(warning.column, warning.line_source.length)
+            Math.min(column || 0, warning.line_source.length)
         );
         test_cause(code, b || a, warning.column);
         switch (code) {
