@@ -29,73 +29,73 @@
     textLength="768"
     x="10"
     y="98"
->- jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-lin\</tspan>
+>- jslint-directive - Add new directive 'tab' to support tab-indent.                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="120"
->  e, except dot-operators '.', '?.'.                                                             </tspan>
+>- jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-lin\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="142"
->- jslint-ecma - Add ES2015-feature iterators.                                                    </tspan>
+>  e, except dot-operators '.', '?.'.                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="164"
->- jslint - Audit token-property '.free'.                                                         </tspan>
+>- jslint-ecma - Add ES2015-feature iterators.                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="186"
->- jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.                    </tspan>
+>- jslint - Audit token-property '.free'.                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="208"
->- jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.   </tspan>
+>- jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="230"
->- jslint - Add html and css linting back into jslint.                                            </tspan>
+>- jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="252"
->- jslint - Add new warning requiring paren around plus-separated concatenations.                 </tspan>
+>- jslint - Add html and css linting back into jslint.                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="274"
->- jslint - Try to improve parser to be able to parse jquery.js without stopping.                 </tspan>
+>- jslint - Add new warning requiring paren around plus-separated concatenations.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="296"
->                                                                                                 </tspan>
+>- jslint - Try to improve parser to be able to parse jquery.js without stopping.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="318"
-># v2026.9.29                                                                                     </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="340"
->- jslint-directive - Add new directive 'tab' to support tab-indent.                              </tspan>
+># v2026.9.29                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

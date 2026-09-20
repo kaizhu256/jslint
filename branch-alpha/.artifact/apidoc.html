@@ -474,21 +474,21 @@ jstestIt((
     return argList[0];
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-    if (consoleError === Object) {
-        consoleError = console.error;
+        if (consoleError === Object) {
+            consoleError = console.error;
+        }
+        return argList[0];
     }
-    return argList[0];
-}
-return debug;
+    return debug;
 }());
 <span class="apidocCodeKeywordSpan">debugInline</span>(); // coverage-hack
 const jslint_autofix_warning_list = [ //jslint-ignore-line
-"expected_a_at_b_c",
-"expected_line_break_a_b",
-"expected_space_a_b",
-"unexpected_space_a_b",
-"use_spaces",
-"use_tabs"
+    "expected_a_at_b_c",
+    "expected_line_break_a_b",
+    "expected_space_a_b",
+    "unexpected_space_a_b"
+];
+const jslint_charset_ascii = (
 ...</pre></li>
 
 <li>
@@ -968,10 +968,7 @@ ${String(message).slice(0, 2000)}`
             const result_embedded = jslint_from_file({
                 code: match1,
                 file: file + suffix_file,
-                line_offset: (
-                    jslint_fudge +
-                    code.slice(0, ii).split(jslint_rgx_crlf).length
-                ),
+                line_offset: string_line_count(code.slice(0, ii)) + 1,
                 mode_conditional,
                 option
             });
@@ -997,7 +994,11 @@ ${String(message).slice(0, 2000)}`
         );
     }
 
-    function jsl...
+    function jslint_from_file({
+        code,
+        file,
+        line_offset = 0,
+        mode_...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1077,9 +1078,9 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     } = state;
     const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
-    let column0 = 0;            // The column number of the next character.
-    let from;                   // The starting column0 number of the token.
-    let from_mega;              // The starting column0 of megastring.
+    let column = 0;             // The column number of the next character.
+    let from;                   // The starting column number of the token.
+    let from_mega;              // The starting column of megastring.
     let line = 0;               // The line number of the next character.
     let line_disable;           // The starting line of "/*jslint-disable*/".
     let line_mega;              // The starting line of megastring.
@@ -1100,7 +1101,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     let token_prv_expr = token_global;  // The previous token excluding
                                         // ... comments.
 
-// Most tokens, including the identifiers, operators, an...
+// Most tokens, including the identifiers, operators, and ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1367,14 +1368,9 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
     let margin = 0;
     let mode_indent = (
 
-// PR-xxx - Allow tab indent.
-
-        option_dict.tab
-        ? 1
-
 // PR-330 - Allow 2-space indent.
 
-        : option_dict.indent2
+        option_dict.indent2
         ? 2
         : 4
     );
@@ -1418,7 +1414,9 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
 
                 test_cause("id");
                 if (!name.used) {
-...
+
+// test_cause:
+// ["function aa(bb){return;}", "delve", "unused_a", "...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1450,12 +1448,7 @@ if (mode_autofix) {
 <span class="apidocCodeCommentSpan">
 // PHASE 6. Autofix whitespace-warnings in &lt;source&gt;, and return the result.
 
-</span>    const indent_char = (
-        state.option_dict.tab
-        ? "\t"
-        : " "
-    );
-    const line_crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
+</span>    const crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
     const line_list = state.line_list.map(function ({
         line_source
     }) {
@@ -1502,7 +1495,8 @@ if (mode_autofix) {
 
 // A MID-LINE token cannot be re-indented, but it does not need to be skipped:
 // at_margin fires for tokens that belong AT a margin and therefore on their
-// OWN line. So split first and inde...
+// OWN line. So split first and indent the remainder, which also lands a
+// trailing closer correctly, and is what line-breaks a sing...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
