@@ -969,7 +969,7 @@ ${String(message).slice(0, 2000)}`
             const result_embedded = jslint_from_file({
                 code: match1,
                 file: file + suffix_file,
-                line_offset: string_line_count(code.slice(0, ii)) + 1,
+                line_offset: code.slice(0, ii).split(jslint_rgx_crlf).length,
                 mode_conditional,
                 option
             });
@@ -998,7 +998,7 @@ ${String(message).slice(0, 2000)}`
     function jslint_from_file({
         code,
         file,
-        line_of...
+        ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

@@ -1436,8 +1436,7 @@ function jslint(
 // Report an error at some line and column of the program. The warning object
 // resembles an exception.
 
-        let mm;
-        let warning = {
+        const warning = {
             a,
             b,
             c,
@@ -1448,6 +1447,8 @@ function jslint(
             name: "JSLintError",
             ...line_list[line]
         };
+        let mm;
+        jslint_assert(typeof column === "number", `column=${column}`);
         warning.column = Math.max(
 
 // Fudge column numbers in warning message.
@@ -1916,7 +1917,7 @@ function jslint(
             jslint_assert(undefined, "test_internal_error");
         }
         if (option_dict.test_unknown_warning_code) {
-            warn_at("test_unknown_warning_code");
+            warn_at("test_unknown_warning_code", jslint_fudge, 0);
         }
     } catch (err) {
         mode_stop = true;
@@ -2390,7 +2391,7 @@ async function jslint_cli({
             const result_embedded = jslint_from_file({
                 code: match1,
                 file: file + suffix_file,
-                line_offset: string_line_count(code.slice(0, ii)) + 1,
+                line_offset: code.slice(0, ii).split(jslint_rgx_crlf).length,
                 mode_conditional,
                 option
             });
@@ -2551,27 +2552,6 @@ async function jslint_cli({
                 suffix_file: ".<node -e>.js"
             })
         };
-    }
-
-    function string_line_count(code) {
-
-// This function will count number of newlines in <code>.
-
-        let count;
-        let ii;
-
-// https://jsperf.com/regexp-counting-2/8
-
-        count = 0;
-        ii = 0;
-        while (true) {
-            ii = code.indexOf("\n", ii) + 1;
-            if (ii === 0) {
-                break;
-            }
-            count += 1;
-        }
-        return count;
     }
 
 // PR-396 - window.jslint
@@ -3945,7 +3925,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*jslint-disable*/", "lex_token", "unclosed_disable", "", 1]
 
-                        ? stop_at("unclosed_disable", line_disable)
+                        ? stop_at("unclosed_disable", line_disable, 0)
                         : token_create("(end)")
                     );
                 }
@@ -4184,7 +4164,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/////////////////////////////////////////////////////////////////////////////////", "read_line", "too_long", "", 1] //jslint-ignore-line
 
-            warn_at("too_long", line);
+            warn_at("too_long", line, 0);
         }
         column = 0;
         line += 1;
