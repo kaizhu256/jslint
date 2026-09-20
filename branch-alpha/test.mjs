@@ -525,7 +525,7 @@ jstestDescribe((
             result.warnings.some(function ({
                 message
             }) {
-                return message.startsWith("[autofix discarded] ");
+                return message.startsWith("[autofix discarded");
             }),
             JSON.stringify(result.warnings.map(function ({
                 message
@@ -806,47 +806,6 @@ jstestDescribe((
             ],
             process_exit: processExit1
         });
-
-// A DIRECTORY rides the same walk as a plain lint of one, and every file whose
-// lint returns <autofixed> is written back; a clean file is left alone.
-
-        await fsWriteFileWithParents(
-            ".tmp/autofix_dir/aa.mjs",
-            "String( 0);\n"
-        );
-        await fsWriteFileWithParents(
-            ".tmp/autofix_dir/bb.mjs",
-            "String(0);\n"
-        );
-        await jslint.jslint_cli({
-            // suppress error
-            console_error: noop,
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_autofix=.tmp/autofix_dir"
-            ],
-            process_exit: processExit0
-        });
-        assertOrThrow(
-            (
-                await moduleFs.promises.readFile(
-                    ".tmp/autofix_dir/aa.mjs",
-                    "utf8"
-                )
-            ) === "String(0);\n",
-            ".tmp/autofix_dir/aa.mjs"
-        );
-        assertOrThrow(
-            (
-                await moduleFs.promises.readFile(
-                    ".tmp/autofix_dir/bb.mjs",
-                    "utf8"
-                )
-            ) === "String(0);\n",
-            ".tmp/autofix_dir/bb.mjs"
-        );
     });
     jstestIt((
         "test autofix-report handling-behavior"
@@ -1053,6 +1012,27 @@ jstestDescribe((
                 "jslint.mjs"
             ],
             process_exit: processExit0
+        });
+    });
+    jstestIt((
+        "test cli-report-embedded handling-behavior"
+    ), async function () {
+
+// A container-file returns no single lint-result, so jslint_report refuses it
+// with exit 1 instead of crashing on the missing <warnings>.
+
+        await fsWriteFileWithParents(".tmp/jslint_report.md", "# aa\n");
+        await jslint.jslint_cli({
+            // suppress error
+            console_error: noop,
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_report=.tmp/jslint_report_embedded.html",
+                ".tmp/jslint_report.md"
+            ],
+            process_exit: processExit1
         });
     });
     jstestIt((

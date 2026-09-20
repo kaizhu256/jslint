@@ -940,7 +940,6 @@ ${String(message).slice(0, 2000)}`
 </span>    let command;
     let data;
     let exit_code = 0;
-    let mode_autofix;
     let mode_report;
     let mode_wrapper_vim;
     let result;
@@ -969,7 +968,14 @@ ${String(message).slice(0, 2000)}`
             const result_embedded = jslint_from_file({
                 code: match1,
                 file: file + suffix_file,
-                line_offset: code.slice(0, ii).split(jslint_rgx_crlf).length,
+
+
+// Count line-terminators the way &lt;jslint_rgx_crlf&gt; splits them, without
+// materialising every preceding line.
+
+                line_offset: (
+                    code.slice(0, ii).match(/\n|\r\n?/g)?.length || 0
+                ) + 1,
                 mode_conditional,
                 option
             });
@@ -989,16 +995,7 @@ ${String(message).slice(0, 2000)}`
             );
         });
         return (
-            code_fixed === code
-            ? undefined
-            : code_fixed
-        );
-    }
-
-    function jslint_from_file({
-        code,
-        file,
-        ...
+            code_fixed...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

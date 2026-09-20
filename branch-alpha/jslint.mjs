@@ -1907,7 +1907,10 @@ function jslint(
                     if (warning.mode_stop) {
                         warning_list.push({
                             ...warning,
-                            message: "[autofix discarded] " + warning.message
+                            message: (
+                                "[autofix discarded - line and column refer"
+                                + " to the autofixed text] " + warning.message
+                            )
                         });
                     }
                 });
@@ -2362,7 +2365,6 @@ async function jslint_cli({
     let command;
     let data;
     let exit_code = 0;
-    let mode_autofix;
     let mode_report;
     let mode_wrapper_vim;
     let result;
@@ -2391,7 +2393,14 @@ async function jslint_cli({
             const result_embedded = jslint_from_file({
                 code: match1,
                 file: file + suffix_file,
-                line_offset: code.slice(0, ii).split(jslint_rgx_crlf).length,
+
+
+// Count line-terminators the way <jslint_rgx_crlf> splits them, without
+// materialising every preceding line.
+
+                line_offset: (
+                    code.slice(0, ii).match(/\n|\r\n?/g)?.length || 0
+                ) + 1,
                 mode_conditional,
                 option
             });
@@ -2629,18 +2638,28 @@ async function jslint_cli({
 // PR-509 - Add command jslint_autofix.
 
     case "jslint_autofix":
-
-// Ride the generic file-or-directory path below, like jslint_report does. It
-// owns the readFile try/catch, the cwd-normalization and the directory walk;
-// the only autofix-specific step is the write-back, gated on <autofixed>.
-
         file = command[1];
-        mode_autofix = true;
-        option = {
-            ...option,
-            autofix: true
-        };
-        break;
+        try {
+            data = await moduleFs.promises.readFile(file, "utf8");
+        } catch (err) {
+            console_error(err);
+            exit_code = 1;
+            process_exit(exit_code);
+            return exit_code;
+        }
+        result = jslint_from_file({
+            code: data,
+            file,
+            option: {
+                ...option,
+                autofix: true
+            }
+        });
+        if (result.autofixed !== undefined) {
+            await fsWriteFileWithParents(file, result.autofixed);
+        }
+        process_exit(exit_code);
+        return exit_code;
 
 // PR-363 - Add command jslint_report.
 
@@ -2699,7 +2718,6 @@ async function jslint_cli({
         if (data) {
             await Promise.all(data.map(async function (file2) {
                 let code;
-                let result_dir;
                 let time_start = Date.now();
                 file2 = file + "/" + file2;
                 switch ((
@@ -2729,14 +2747,11 @@ async function jslint_cli({
                 ) {
                     return;
                 }
-                result_dir = jslint_from_file({
+                jslint_from_file({
                     code,
                     file: file2,
                     option
                 });
-                if (mode_autofix && result_dir.autofixed !== undefined) {
-                    await fsWriteFileWithParents(file2, result_dir.autofixed);
-                }
                 console_error(
                     "jslint - " + (Date.now() - time_start) + "ms - " + file2
                 );
@@ -2761,10 +2776,20 @@ async function jslint_cli({
         file,
         option
     });
-    if (mode_autofix && result.autofixed !== undefined) {
-        await fsWriteFileWithParents(file, result.autofixed);
-    }
     if (mode_report) {
+
+// A container-file - .html, .md, .sh - lints its embedded blocks one by one
+// and returns no single lint-result, so there is nothing to report on.
+
+        if (result.warnings === undefined) {
+            console_error(
+                "jslint_report - " + file
+                + " - only a javascript file can be reported"
+            );
+            exit_code = 1;
+            process_exit(exit_code);
+            return exit_code;
+        }
         result = jslint.jslint_report(result);
         result = `<body class="JSLINT_ JSLINT_REPORT_">\n${result}</body>\n`;
         await fsWriteFileWithParents(mode_report, result);
