@@ -750,6 +750,21 @@ jstestDescribe((
                 "    0\n  + 0\n);\n'\n"
             )
         });
+
+// A missing file exits 1 with the error printed, like a plain lint - not an
+// unhandled rejection that never reaches process_exit.
+
+        await jslint.jslint_cli({
+            // suppress error
+            console_error: noop,
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_missing.mjs"
+            ],
+            process_exit: processExit1
+        });
     });
     jstestIt((
         "test autofix-api handling-behavior"
@@ -847,6 +862,20 @@ jstestDescribe((
         ].forEach(function (source_degenerate) {
             assertAutofix(undefined, source_degenerate);
         });
+
+// A STOP in a later pass can only be the fixer's own doing - pass 0 parsed to
+// the end - so the fix is DISCARDED, never written. test_internal_error throws
+// AFTER phase 6, so pass 0 fixes, pass 1 stops on it, and <autofixed> must come
+// back undefined instead of carrying pass 0's text.
+
+        result = jslint.jslint("String( 0);\n", {
+            autofix: true,
+            test_internal_error: true
+        });
+        assertOrThrow(
+            result.stop && result.autofixed === undefined,
+            JSON.stringify([result.stop, result.autofixed])
+        );
 
 // A ONE-LINE source carries NO terminator at all, so jslint_rgx_crlf.exec()
 // returns null and the rejoin falls back to "\n". The result has no trailing

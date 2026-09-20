@@ -946,7 +946,7 @@ ${String(message).slice(0, 2000)}`
 
 // PR-509 - Add command jslint_autofix.
 
-    function autofix_embeded({
+    function autofix_embedded({
         code,
         file,
         mode_conditional,
@@ -998,7 +998,7 @@ ${String(message).slice(0, 2000)}`
         code,
         file,
         line_offset = 0,
-        mode_...
+        mode...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1449,12 +1449,8 @@ if (mode_autofix) {
 // PHASE 6. Autofix whitespace-warnings in &lt;source&gt;, and return the result.
 
 </span>    const crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
-    const line_list = state.line_list.map(function ({
-        line_source
-    }) {
-        return line_source;
-    });
     const warning_list = state.warning_list;
+    let line_list;
     if (warning_list.length === 0) {
         return;
     }
@@ -1463,6 +1459,15 @@ if (mode_autofix) {
             return;
         }
     }
+
+// Copy the line-model only once the pass is known to fix something - the
+// converged pass and the blocked pass both leave above.
+
+    line_list = state.line_list.map(function ({
+        line_source
+    }) {
+        return line_source;
+    });
 
 // Apply each fix RIGHT-TO-LEFT within a line, so an earlier fix cannot
 // invalidate a later fix's column, and BOTTOM-UP across lines, so every line
@@ -1494,9 +1499,7 @@ if (mode_autofix) {
             indentage_at = line_source.length - line_source.trimStart().length;
 
 // A MID-LINE token cannot be re-indented, but it does not need to be skipped:
-// at_margin fires for tokens that belong AT a margin and therefore on their
-// OWN line. So split first and indent the remainder, which also lands a
-// trailing closer correctly, and is what line-breaks a sing...
+// at_margin fires for tokens that belong AT a margin and theref...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1509,12 +1512,12 @@ if (mode_autofix) {
         if (mode_autofix) {
             autofixed = <span class="apidocCodeKeywordSpan">jslint_phase6_autofix</span>(state) || state.source;
             if (autofixed !== state.source) {
-                return {
-autofixed,
 
 // Recurse jslint.
 
-...jslint(
+result_autofix = jslint(
+    autofixed,
+    {
 ...</pre></li>
 
 <li>
@@ -1558,7 +1561,7 @@ autofixed,
 </span>    const autofix_blocked = autofix &amp;&amp; warnings.some(function ({
         code
     }) {
-        return !jslint.jslint_autofix_warning_list.includes(code);
+        return !jslint_autofix_warning_list.includes(code);
     });
     let html = "";
     let length_80 = 1111;
@@ -1601,7 +1604,7 @@ autofixed,
 AAAAAAAAAAAAAAAABmAAgiQINAmcDBEICuc41DEBNgIkA4R2C4I+AAQgBYkuByAMgScfYUIF\
 7NgjsHGAbcDVFkXZ5Jwd+P96IGPc9rl9ETBEaCzCJkvY2UpziRZ7zftZWk8052U9+NqX6vXL\
 KDflSQnlJ0bP+QnPQAy744n9mup6H9PaCDFwM5zjf8exB89bZ1cdrYOP0NgnuRDRWlk9u/fE\
-llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqe...
+llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

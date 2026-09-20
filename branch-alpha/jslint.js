@@ -1154,6 +1154,7 @@ function jslint(
     const warning_list = [];    // The array collecting all generated warnings.
     let autofixed;              // The <source> after one autofix pass.
     let mode_stop = false;      // true if JSLint cannot finish.
+    let result_autofix;         // The re-lint of <autofixed>.
 
 // Error reportage functions:
 
@@ -1876,20 +1877,28 @@ function jslint(
         if (mode_autofix) {
             autofixed = jslint_phase6_autofix(state) || state.source;
             if (autofixed !== state.source) {
-                return {
-                    autofixed,
 
 // Recurse jslint.
 
-                    ...jslint(
+                result_autofix = jslint(
+                    autofixed,
+                    {
+                        ...option_dict,
+                        autofix: mode_autofix - 1
+                    },
+                    global_list
+                );
+
+// A stop in the re-lint can only be the fix's own doing - this pass parsed to
+// the end, or phase 6 would have had a non-whitespace warning to block on - so
+// discard the fix and report on <source> as-is, unfixed.
+
+                if (!result_autofix.stop) {
+                    return {
                         autofixed,
-                        {
-                            ...option_dict,
-                            autofix: mode_autofix - 1
-                        },
-                        global_list
-                    )
-                };
+                        ...result_autofix
+                    };
+                }
             }
         }
         if (option_dict.test_internal_error) {
@@ -2347,7 +2356,7 @@ async function jslint_cli({
 
 // PR-509 - Add command jslint_autofix.
 
-    function autofix_embeded({
+    function autofix_embedded({
         code,
         file,
         mode_conditional,
@@ -2423,7 +2432,7 @@ async function jslint_cli({
 // Recursively jslint embedded "<script>\n...\n</script>".
 
             return {
-                autofixed: autofix_embeded({
+                autofixed: autofix_embedded({
                     code,
                     file,
                     option: {
@@ -2511,7 +2520,7 @@ async function jslint_cli({
         option = empty()
     }) {
         return {
-            autofixed: autofix_embeded({
+            autofixed: autofix_embedded({
                 code,
                 file,
                 mode_conditional,
@@ -2629,7 +2638,14 @@ async function jslint_cli({
 
     case "jslint_autofix":
         file = command[1];
-        data = await moduleFs.promises.readFile(file, "utf8");
+        try {
+            data = await moduleFs.promises.readFile(file, "utf8");
+        } catch (err) {
+            console_error(err);
+            exit_code = 1;
+            process_exit(exit_code);
+            return exit_code;
+        }
         result = jslint_from_file({
             code: data,
             file,
@@ -10240,12 +10256,8 @@ function jslint_phase6_autofix(state) {
 // PHASE 6. Autofix whitespace-warnings in <source>, and return the result.
 
     const crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
-    const line_list = state.line_list.map(function ({
-        line_source
-    }) {
-        return line_source;
-    });
     const warning_list = state.warning_list;
+    let line_list;
     if (warning_list.length === 0) {
         return;
     }
@@ -10254,6 +10266,15 @@ function jslint_phase6_autofix(state) {
             return;
         }
     }
+
+// Copy the line-model only once the pass is known to fix something - the
+// converged pass and the blocked pass both leave above.
+
+    line_list = state.line_list.map(function ({
+        line_source
+    }) {
+        return line_source;
+    });
 
 // Apply each fix RIGHT-TO-LEFT within a line, so an earlier fix cannot
 // invalidate a later fix's column, and BOTTOM-UP across lines, so every line
@@ -10368,7 +10389,7 @@ function jslint_report({
     const autofix_blocked = autofix && warnings.some(function ({
         code
     }) {
-        return !jslint.jslint_autofix_warning_list.includes(code);
+        return !jslint_autofix_warning_list.includes(code);
     });
     let html = "";
     let length_80 = 1111;
