@@ -970,6 +970,7 @@ ${String(message).slice(0, 2000)}`
                 code: match1,
                 file: file + suffix_file,
                 line_offset: (
+                    jslint_fudge +
 
 // Count line-terminators the way &lt;jslint_rgx_crlf&gt; splits them, without
 // materialising every preceding line.
@@ -979,7 +980,7 @@ ${String(message).slice(0, 2000)}`
                         .match(new RegExp(jslint_rgx_crlf, "g"))
                         ?.length ||
                     0
-                ) + 1,
+                ),
                 mode_conditional,
                 option
             });
@@ -992,8 +993,7 @@ ${String(message).slice(0, 2000)}`
             return (
                 match0.slice(
                     0,
-                    match0.length - match1.length - suffix.length
-                ...
+                    match0.length - match1.length -...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

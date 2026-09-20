@@ -2395,6 +2395,7 @@ async function jslint_cli({
                 code: match1,
                 file: file + suffix_file,
                 line_offset: (
+                    jslint_fudge +
 
 // Count line-terminators the way <jslint_rgx_crlf> splits them, without
 // materialising every preceding line.
@@ -2404,7 +2405,7 @@ async function jslint_cli({
                         .match(new RegExp(jslint_rgx_crlf, "g"))
                         ?.length ||
                     0
-                ) + 1,
+                ),
                 mode_conditional,
                 option
             });
@@ -2707,7 +2708,7 @@ async function jslint_cli({
         if (data) {
             await Promise.all(data.map(async function (file2) {
                 let code;
-                let result_autofix;
+                let result_dir;
                 let time_start = Date.now();
                 file2 = file + "/" + file2;
                 switch ((
@@ -2737,16 +2738,13 @@ async function jslint_cli({
                 ) {
                     return;
                 }
-                result_autofix = jslint_from_file({
+                result_dir = jslint_from_file({
                     code,
                     file: file2,
                     option
                 });
-                if (mode_autofix && result_autofix.autofixed !== undefined) {
-                    await fsWriteFileWithParents(
-                        file2,
-                        result_autofix.autofixed
-                    );
+                if (mode_autofix && result_dir.autofixed !== undefined) {
+                    await fsWriteFileWithParents(file2, result_dir.autofixed);
                 }
                 console_error(
                     "jslint - " + (Date.now() - time_start) + "ms - " + file2
