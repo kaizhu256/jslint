@@ -3836,14 +3836,14 @@ function jslint_phase2_lex(state) {
             return lex_regexp();
         }
         if (line_source[0] === "=") {
-            snippet = "/=";
-            column += 1;
-            line_source = line_source.slice(1);
 
 // test_cause:
 // ["0/=0", "lex_slash_or_regexp", "unexpected_a", "/=", 2]
 
-            warn_at("unexpected_a", line, column - 1, "/=");
+            warn_at("unexpected_a", line, column, "/=");
+            snippet = "/=";
+            column += 1;
+            line_source = line_source.slice(1);
         }
         return token_create(snippet);
     }
