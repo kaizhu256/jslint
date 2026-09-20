@@ -1185,29 +1185,25 @@ shGithubPrCreate() {(set -e
         )"
         PR_XXX="$(curl -fs --ssl-no-revoke \
 "https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
-        )" || true
+        )"
         PR_XXX="$(
             printf "%s" "$PR_XXX" | sed -En -e 's/.*"number": ([0-9]+).*/\1/p'
         )"
-        # a failed lookup skips the update, it does not abort the pr
-        if [ "$PR_XXX" ]
+        if [ ! "$PR_XXX" ]
         then
-            PR_XXX="PR-$((PR_XXX + 1))"
-            FILE_LIST="$(
-git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
-            )"
-            for FILE in $FILE_LIST
-            do
-                sed -Ei.bak \
-                    -e "s/^ *?(\/\/|#) pr-xxx - /\1 $PR_XXX - /gi" \
-                    "$FILE" && \
-                    rm -f "$FILE".bak
-            done
-        else
-            printf "%s\n" \
-                "shGithubPrCreate - PR-xxx lookup failed, placeholder unchanged" \
-                >&2
+            return
         fi
+        PR_XXX="PR-$((PR_XXX + 1))"
+        FILE_LIST="$(
+git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
+        )"
+        for FILE in $FILE_LIST
+        do
+            sed -Ei.bak \
+                -e "s/^ *?(\/\/|#) pr-xxx - /\1 $PR_XXX - /gi" \
+                "$FILE" && \
+                rm -f "$FILE".bak
+        done
     fi
     node --input-type=module --eval '
 // init debugInline
