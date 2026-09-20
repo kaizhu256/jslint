@@ -1803,8 +1803,7 @@ function jslint(
 // Report an error at some line and column of the program. The warning object
 // resembles an exception.
 
-        let mm;
-        let warning = {
+        const warning = {
             a,
             b,
             c,
@@ -1815,12 +1814,14 @@ function jslint(
             name: "JSLintError",
             ...line_list[line]
         };
+        let mm;
+        jslint_assert(typeof column0 === "number", column0);
         warning.column = (
 
 // Fudge column numbers in warning message.
 
             jslint_fudge +
-            Math.max(0, Math.min(column0 || 0, warning.line_source.length - 1))
+            Math.max(0, Math.min(column0, warning.line_source.length - 1))
         );
         test_cause(code, b || a, warning.column);
         switch (code) {
