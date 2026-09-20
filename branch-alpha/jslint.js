@@ -3743,9 +3743,9 @@ function jslint_phase2_lex(state) {
         if (char === "/" || char === "*") {
 
 // test_cause:
-// ["aa=/.//", "lex_regexp", "unexpected_a", "/", 3]
+// ["aa=/.//", "lex_regexp", "unexpected_a", "/", 7]
 
-            return stop_at("unexpected_a", line, from, char);
+            return stop_at("unexpected_a", line, column + 1, char);
         }
         result = token_create("(regexp)", char);
         result.flag = flag;
