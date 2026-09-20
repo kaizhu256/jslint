@@ -49,6 +49,14 @@ await (async function init() {
     );
 }());
 
+function processExit0(exitCode) {
+    assertOrThrow(exitCode === 0, exitCode);
+}
+
+function processExit1(exitCode) {
+    assertOrThrow(exitCode === 1, exitCode);
+}
+
 jstestDescribe((
     "test fsXxx handling-behavior"
 ), function testBehaviorFsXxx() {
@@ -397,12 +405,6 @@ jstestDescribe((
 jstestDescribe((
     "test jslint's autofix handling-behavior"
 ), function testBehaviorJslintAutofix() {
-    function processExit0(exitCode) {
-        assertOrThrow(exitCode === 0, exitCode);
-    }
-    function processExit1(exitCode) {
-        assertOrThrow(exitCode === 1, exitCode);
-    }
     jstestIt((
         "test autofix-api handling-behavior"
     ), function () {
@@ -512,6 +514,24 @@ jstestDescribe((
         assertOrThrow(
             result.stop && result.autofixed === undefined,
             JSON.stringify([result.stop, result.autofixed])
+        );
+
+// And the discard is NAMED in this pass's own warnings, so a fixer defect
+// cannot pass for an ordinary blocked file. This is also what separates
+// "guard fired" from "no fix was ever attempted" - both leave <autofixed>
+// undefined.
+
+        assertOrThrow(
+            result.warnings.some(function ({
+                message
+            }) {
+                return message.startsWith("[autofix discarded] ");
+            }),
+            JSON.stringify(result.warnings.map(function ({
+                message
+            }) {
+                return message;
+            }))
         );
 
 // A ONE-LINE source carries NO terminator at all, so jslint_rgx_crlf.exec()
@@ -786,6 +806,47 @@ jstestDescribe((
             ],
             process_exit: processExit1
         });
+
+// A DIRECTORY rides the same walk as a plain lint of one, and every file whose
+// lint returns <autofixed> is written back; a clean file is left alone.
+
+        await fsWriteFileWithParents(
+            ".tmp/autofix_dir/aa.mjs",
+            "String( 0);\n"
+        );
+        await fsWriteFileWithParents(
+            ".tmp/autofix_dir/bb.mjs",
+            "String(0);\n"
+        );
+        await jslint.jslint_cli({
+            // suppress error
+            console_error: noop,
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_dir"
+            ],
+            process_exit: processExit0
+        });
+        assertOrThrow(
+            (
+                await moduleFs.promises.readFile(
+                    ".tmp/autofix_dir/aa.mjs",
+                    "utf8"
+                )
+            ) === "String(0);\n",
+            ".tmp/autofix_dir/aa.mjs"
+        );
+        assertOrThrow(
+            (
+                await moduleFs.promises.readFile(
+                    ".tmp/autofix_dir/bb.mjs",
+                    "utf8"
+                )
+            ) === "String(0);\n",
+            ".tmp/autofix_dir/bb.mjs"
+        );
     });
     jstestIt((
         "test autofix-report handling-behavior"
@@ -862,12 +923,6 @@ jstestDescribe((
 jstestDescribe((
     "test jslint's cli handling-behavior"
 ), function testBehaviorJslintCli() {
-    function processExit0(exitCode) {
-        assertOrThrow(exitCode === 0, exitCode);
-    }
-    function processExit1(exitCode) {
-        assertOrThrow(exitCode === 1, exitCode);
-    }
     jstestIt((
         "test cli-null-case handling-behavior"
     ), function () {

@@ -940,6 +940,7 @@ ${String(message).slice(0, 2000)}`
 </span>    let command;
     let data;
     let exit_code = 0;
+    let mode_autofix;
     let mode_report;
     let mode_wrapper_vim;
     let result;
@@ -997,8 +998,7 @@ ${String(message).slice(0, 2000)}`
     function jslint_from_file({
         code,
         file,
-        line_offset = 0,
-        mode...
+        line_of...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

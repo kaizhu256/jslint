@@ -1203,6 +1203,10 @@ git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
                     "$FILE" && \
                     rm -f "$FILE".bak
             done
+        else
+            printf "%s\n" \
+                "shGithubPrCreate - PR-xxx lookup failed, placeholder unchanged" \
+                >&2
         fi
     fi
     node --input-type=module --eval '
