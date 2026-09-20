@@ -3150,7 +3150,6 @@ function jslint_phase2_lex(state) {
         token_global,
         token_list,
         warn,
-        warn_at,
         warn_au
     } = state;
     const opener_stack = [];    // Stack of opener tokens: (, [.
@@ -3256,14 +3255,14 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["[\"\\u{12345}\"]", "char_after_escape", "unexpected_a", "{", 5]
 
-                    warn_at("unexpected_a", line, column0, char);
+                    warn_au("unexpected_a", line, column0 - 1, char);
                 }
                 if (read_digits("x", undefined) > 5) {
 
 // test_cause:
 // ["\"\\u{123456}\"", "char_after_escape", "too_many_digits", "", 11]
 
-                    warn_at("too_many_digits", line, column0);
+                    warn_au("too_many_digits", line, column0 - 1);
                 }
                 if (char !== "}") {
 
@@ -3286,7 +3285,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\u0\"", "char_after_escape", "expected_four_digits", "", 5]
 
-                warn_at("expected_four_digits", line, column0);
+                warn_au("expected_four_digits", line, column0 - 1);
             }
             return;
         default:
@@ -3297,7 +3296,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\0\"", "char_after_escape", "unexpected_a_before_b", "0", 3]
 
-            warn_at("unexpected_a_before_b", line, column0, "\\", char);
+            warn_au("unexpected_a_before_b", line, column0 - 1, "\\", char);
         }
     }
 
@@ -3331,7 +3330,7 @@ function jslint_phase2_lex(state) {
 // ["aa=1_2__3", "check_numeric_separator", "illegal_num_separator", "", 7]
 // ["aa=1_2_n", "check_numeric_separator", "illegal_num_separator", "", 7]
 
-            warn_at("illegal_num_separator", line, column0 + ii + 1);
+            warn_au("illegal_num_separator", line, column0 - 0 + ii);
             return "";
         });
     }
@@ -3368,7 +3367,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*/", "lex_comment", "unexpected_a", "/", 2]
 
-                warn_at("unexpected_a", line, column0 + ii, "/");
+                warn_au("unexpected_a", line, column0 - 1 + ii, "/");
             }
 
 // Lex/loop through each line until "*/".
@@ -3386,7 +3385,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*/*", "lex_comment", "nested_comment", "", 2]
 
-                    warn_at("nested_comment", line, column0 + ii);
+                    warn_au("nested_comment", line, column0 - 1 + ii);
                 }
                 snippet.push(line_source);
                 line_source = read_line();
@@ -3406,7 +3405,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*/**/", "lex_comment", "nested_comment", "", 2]
 
-                warn_at("nested_comment", line, column0 + jj);
+                warn_au("nested_comment", line, column0 - 1 + jj);
             }
             snippet.push(line_source.slice(0, ii));
             snippet = snippet.join(" ");
@@ -3712,7 +3711,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/[0-]/", "lex_regexp_bracketed", "unexpected_a", "-", 7]
 
-                        warn_at("unexpected_a", line, column0 - 1, "-");
+                        warn_au("unexpected_a", line, column0 - 2, "-");
                     }
                     return char_after("]");
 
@@ -3738,7 +3737,13 @@ function jslint_phase2_lex(state) {
 // ["aa=/[\\\\/]/", "lex_regexp_bracketed", "expected_a_before_b", "/", 8]
 // ["aa=/[\\\\[]/", "lex_regexp_bracketed", "expected_a_before_b", "[", 8]
 
-                    warn_at("expected_a_before_b", line, column0, "\\", char);
+                    warn_au(
+                        "expected_a_before_b",
+                        line,
+                        column0 - 1,
+                        "\\",
+                        char
+                    );
                     break;
                 case "\\":
                     char_after_escape("BbDdSsWw-[]^");
@@ -3750,7 +3755,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["`${/[`]/}`", "lex_regexp_bracketed", "unexpected_a", "`", 6]
 
-                        warn_at("unexpected_a", line, column0, "`");
+                        warn_au("unexpected_a", line, column0 - 1, "`");
                     }
                     break;
                 }
@@ -3774,10 +3779,10 @@ function jslint_phase2_lex(state) {
 
             switch (char) {
             case "":
-                warn_at("expected_regexp_factor_a", line, column0, char);
+                warn_au("expected_regexp_factor_a", line, column0 - 1, char);
                 break;
             case ")":
-                warn_at("expected_regexp_factor_a", line, column0, char);
+                warn_au("expected_regexp_factor_a", line, column0 - 1, char);
                 break;
             case "]":
 
@@ -3786,7 +3791,7 @@ function jslint_phase2_lex(state) {
 // ["aa=/)", "lex_regexp_group", "expected_regexp_factor_a", ")", 5]
 // ["aa=/]", "lex_regexp_group", "expected_regexp_factor_a", "]", 5]
 
-                warn_at("expected_regexp_factor_a", line, column0, char);
+                warn_au("expected_regexp_factor_a", line, column0 - 1, char);
                 break;
             }
             while (true) {
@@ -3827,7 +3832,13 @@ function jslint_phase2_lex(state) {
 // ["aa=/(:)/", "lex_regexp_group", "expected_a_before_b", ":", 6]
 // ["aa=/?/", "lex_regexp_group", "expected_a_before_b", "?", 5]
 
-                        warn_at("expected_a_before_b", line, column0, "?", ":");
+                        warn_au(
+                            "expected_a_before_b",
+                            line,
+                            column0 - 1,
+                            "?",
+                            ":"
+                        );
                         break;
                     case "?":
                         char_after("?");
@@ -3906,7 +3917,12 @@ function jslint_phase2_lex(state) {
 // ["aa=/{/", "lex_regexp_group", "expected_a_before_b", "{", 5]
 // ["aa=/}/", "lex_regexp_group", "expected_a_before_b", "}", 5]
 
-                    warn_at("expected_a_before_b", line, column0, "\\", char);
+                    warn_au(
+                        "expected_a_before_b",
+                        line, column0 - 1,
+                        "\\",
+                        char
+                    );
                     char_after();
                     break;
                 case "[":
@@ -3935,7 +3951,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["`${/`/}`", "lex_regexp_group", "unexpected_a", "`", 5]
 
-                        warn_at("unexpected_a", line, column0, "`");
+                        warn_au("unexpected_a", line, column0 - 1, "`");
                     }
                     char_after();
                     break;
@@ -3965,7 +3981,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/.??/", "lex_regexp_group", "unexpected_a", "?", 7]
 
-                        warn_at("unexpected_a", line, column0, char);
+                        warn_au("unexpected_a", line, column0 - 1, char);
                         char_after("?");
                     }
                     break;
@@ -3975,7 +3991,13 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/aa{/", "lex_regexp_group", "expected_a_before_b", ",", 8]
 
-                        warn_at("expected_a_before_b", line, column0, "0", ",");
+                        warn_au(
+                            "expected_a_before_b",
+                            line,
+                            column0 - 1,
+                            "0",
+                            ","
+                        );
                     }
                     if (char === ",") {
 
@@ -3990,7 +4012,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/.{0}?/", "lex_regexp_group", "unexpected_a", "?", 9]
 
-                        warn_at("unexpected_a", line, column0, char);
+                        warn_au("unexpected_a", line, column0 - 1, char);
                         char_after("?");
                     }
                     break;
@@ -4009,7 +4031,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/=/", "lex_regexp", "expected_a_before_b", "=", 5]
 
-            warn_at("expected_a_before_b", line, column0, "\\", "=");
+            warn_au("expected_a_before_b", line, column0 - 1, "\\", "=");
         }
         lex_regexp_group();
 
@@ -4077,7 +4099,7 @@ function jslint_phase2_lex(state) {
 // ["aa=/./gg", "lex_regexp", "unexpected_a", "g", 8]
 // ["aa=/./z", "lex_regexp", "unexpected_a", "z", 7]
 
-                warn_at("unexpected_a", line, column0, char);
+                warn_au("unexpected_a", line, column0 - 1, char);
             }
             flag[char] = true;
             char_after();
@@ -4098,7 +4120,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/$^/", "lex_regexp", "missing_m", "", 7]
 
-            warn_at("missing_m", line, column0);
+            warn_au("missing_m", line, column0 - 1);
         }
         return result;
     }
@@ -4246,7 +4268,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["`${\"`\"}`", "lex_string", "unexpected_a", "`", 5]
 
-                    warn_at("unexpected_a", line, column0, "`");
+                    warn_au("unexpected_a", line, column0 - 1, "`");
                 }
                 char_after("`");
                 break;
