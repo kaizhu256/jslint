@@ -4058,12 +4058,12 @@ function jslint_phase2_lex(state) {
             option_dict[key] = value;
             break;
 
-// PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
+// PR-404 - Alias "evil" to sub-directive "eval" for backwards-compat.
 
         case "evil":
             return option_set_item("eval", value);
 
-// PR-404 - Alias "nomen" to jslint-directive "name" for backwards-compat.
+// PR-404 - Alias "nomen" to sub-directive "name" for backwards-compat.
 
         case "name":
             return option_set_item("nomen", value);
@@ -4216,7 +4216,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*jslint-enable*/", "read_line", "unopened_enable", "", 1]
 
-                return stop_at("unopened_enable", line);
+                return stop_at("unopened_enable", line, column);
             }
             line_disable = undefined;
         } else if (
@@ -5238,7 +5238,7 @@ function jslint_phase3_parse(state) {
         if (the_subscript.id === "(string)" || the_subscript.id === "`") {
             name = survey(the_subscript);
 
-// PR-404 - Add new directive "subscript" to play nice with Google Closure.
+// PR-404 - Add new sub-directive "subscript" to play nice with Google Closure.
 
             if (!option_dict.subscript && jslint_rgx_identifier.test(name)) {
 
