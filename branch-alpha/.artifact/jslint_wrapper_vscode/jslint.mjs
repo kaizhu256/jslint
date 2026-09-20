@@ -3970,7 +3970,7 @@ function jslint_phase2_lex(state) {
             }
             snippet = match[1];
             column += snippet.length;
-            line_source = match[5];
+            line_source = line_source.slice(snippet.length);
             if (!match[2]) {
                 break;
             }
