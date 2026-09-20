@@ -968,11 +968,6 @@ ${String(message).slice(0, 2000)}`
             const result_embedded = jslint_from_file({
                 code: match1,
                 file: file + suffix_file,
-
-
-// Count line-terminators the way &lt;jslint_rgx_crlf&gt; splits them, without
-// materialising every preceding line.
-
                 line_offset: (
                     code.slice(0, ii).match(/\n|\r\n?/g)?.length || 0
                 ) + 1,
@@ -995,7 +990,14 @@ ${String(message).slice(0, 2000)}`
             );
         });
         return (
-            code_fixed...
+            code_fixed === code
+            ? undefined
+            : code_fixed
+        );
+    }
+
+    function jslint_from_file({
+        code...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

@@ -2393,11 +2393,6 @@ async function jslint_cli({
             const result_embedded = jslint_from_file({
                 code: match1,
                 file: file + suffix_file,
-
-
-// Count line-terminators the way <jslint_rgx_crlf> splits them, without
-// materialising every preceding line.
-
                 line_offset: (
                     code.slice(0, ii).match(/\n|\r\n?/g)?.length || 0
                 ) + 1,
