@@ -1905,7 +1905,7 @@ function jslint(
             jslint_assert(undefined, "test_internal_error");
         }
         if (option_dict.test_unknown_warning_code) {
-            warn_at("test_unknown_warning_code", jslint_fudge, 0);
+            warn_at("test_unknown_warning_code", jslint_fudge, jslint_fudge);
         }
     } catch (err) {
         mode_stop = true;
