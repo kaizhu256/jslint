@@ -4619,7 +4619,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // [" ", "read_line", "unexpected_trailing_space", "", 1]
 
-            warn_au("unexpected_trailing_space", line, line_source.length - 1);
+            warn_at("unexpected_trailing_space", line, line_source.length);
         }
         return line_source;
     }
@@ -4832,7 +4832,7 @@ function jslint_phase3_parse(state) {
         token_global,
         token_list,
         warn,
-        warn_au
+        warn_at
     } = state;
     let anon = "anonymous";     // The guessed name for anonymous functions.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -7202,10 +7202,10 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["0", "semicolon", "expected_a_b", "(end)", 1]
 
-            warn_au(
+            warn_at(
                 "expected_a_b",
                 token_now.line,
-                token_now.thru,
+                jslint_fudge + token_now.thru,
                 ";",
                 artifact()
             );
