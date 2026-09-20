@@ -1815,7 +1815,7 @@ function jslint(
             ...line_list[line]
         };
         let mm;
-        jslint_assert(typeof column0 === "number", column0);
+        jslint_assert(typeof column0 === "number", `column0=${column0}`);
         warning.column = (
 
 // Fudge column numbers in warning message.
