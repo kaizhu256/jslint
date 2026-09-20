@@ -2642,11 +2642,6 @@ async function jslint_cli({
 // PR-509 - Add command jslint_autofix.
 
     case "jslint_autofix":
-
-// Ride the generic file-or-directory path below, like jslint_report does. It
-// owns the readFile try/catch, the cwd-normalization and the directory walk;
-// the only autofix-specific step is the write-back, gated on <autofixed>.
-
         file = command[1];
         mode_autofix = true;
         option = {
@@ -2712,7 +2707,7 @@ async function jslint_cli({
         if (data) {
             await Promise.all(data.map(async function (file2) {
                 let code;
-                let result_dir;
+                let result_autofix;
                 let time_start = Date.now();
                 file2 = file + "/" + file2;
                 switch ((
@@ -2742,13 +2737,16 @@ async function jslint_cli({
                 ) {
                     return;
                 }
-                result_dir = jslint_from_file({
+                result_autofix = jslint_from_file({
                     code,
                     file: file2,
                     option
                 });
-                if (mode_autofix && result_dir.autofixed !== undefined) {
-                    await fsWriteFileWithParents(file2, result_dir.autofixed);
+                if (mode_autofix && result_autofix.autofixed !== undefined) {
+                    await fsWriteFileWithParents(
+                        file2,
+                        result_autofix.autofixed
+                    );
                 }
                 console_error(
                     "jslint - " + (Date.now() - time_start) + "ms - " + file2
