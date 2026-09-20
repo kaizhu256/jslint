@@ -2214,7 +2214,6 @@ function jslint(
                 token_nxt: token_global,
                 warn,
                 warn_at,
-                warn_au,
                 warning_list
             }
         );
@@ -2270,7 +2269,7 @@ function jslint(
             jslint_assert(undefined, "test_internal_error");
         }
         if (option_dict.test_unknown_warning_code) {
-            warn_au("test_unknown_warning_code", jslint_fudge, 0);
+            warn_at("test_unknown_warning_code", jslint_fudge, jslint_fudge);
         }
     } catch (err) {
         mode_stop = true;
@@ -3149,8 +3148,7 @@ function jslint_phase2_lex(state) {
         token_global,
         token_list,
         warn,
-        warn_at,
-        warn_au
+        warn_at
     } = state;
     const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
@@ -3443,7 +3441,12 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["0\n/*global aa*/", "lex_comment", "misplaced_directive_a", "global", 1]
 
-            warn_au("misplaced_directive_a", line, from, the_comment.directive);
+            warn_at(
+                "misplaced_directive_a",
+                line,
+                jslint_fudge + from,
+                the_comment.directive
+            );
             return the_comment;
         }
 
