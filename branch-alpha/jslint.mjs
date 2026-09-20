@@ -2365,6 +2365,7 @@ async function jslint_cli({
     let command;
     let data;
     let exit_code = 0;
+    let mode_autofix;
     let mode_report;
     let mode_wrapper_vim;
     let result;
@@ -2394,7 +2395,15 @@ async function jslint_cli({
                 code: match1,
                 file: file + suffix_file,
                 line_offset: (
-                    code.slice(0, ii).match(/\n|\r\n?/g)?.length || 0
+
+// Count line-terminators the way <jslint_rgx_crlf> splits them, without
+// materialising every preceding line.
+
+                    code
+                        .slice(0, ii)
+                        .match(new RegExp(jslint_rgx_crlf, "g"))
+                        ?.length ||
+                    0
                 ) + 1,
                 mode_conditional,
                 option
@@ -2633,28 +2642,18 @@ async function jslint_cli({
 // PR-509 - Add command jslint_autofix.
 
     case "jslint_autofix":
+
+// Ride the generic file-or-directory path below, like jslint_report does. It
+// owns the readFile try/catch, the cwd-normalization and the directory walk;
+// the only autofix-specific step is the write-back, gated on <autofixed>.
+
         file = command[1];
-        try {
-            data = await moduleFs.promises.readFile(file, "utf8");
-        } catch (err) {
-            console_error(err);
-            exit_code = 1;
-            process_exit(exit_code);
-            return exit_code;
-        }
-        result = jslint_from_file({
-            code: data,
-            file,
-            option: {
-                ...option,
-                autofix: true
-            }
-        });
-        if (result.autofixed !== undefined) {
-            await fsWriteFileWithParents(file, result.autofixed);
-        }
-        process_exit(exit_code);
-        return exit_code;
+        mode_autofix = true;
+        option = {
+            ...option,
+            autofix: true
+        };
+        break;
 
 // PR-363 - Add command jslint_report.
 
@@ -2713,6 +2712,7 @@ async function jslint_cli({
         if (data) {
             await Promise.all(data.map(async function (file2) {
                 let code;
+                let result_dir;
                 let time_start = Date.now();
                 file2 = file + "/" + file2;
                 switch ((
@@ -2742,11 +2742,14 @@ async function jslint_cli({
                 ) {
                     return;
                 }
-                jslint_from_file({
+                result_dir = jslint_from_file({
                     code,
                     file: file2,
                     option
                 });
+                if (mode_autofix && result_dir.autofixed !== undefined) {
+                    await fsWriteFileWithParents(file2, result_dir.autofixed);
+                }
                 console_error(
                     "jslint - " + (Date.now() - time_start) + "ms - " + file2
                 );
@@ -2771,6 +2774,9 @@ async function jslint_cli({
         file,
         option
     });
+    if (mode_autofix && result.autofixed !== undefined) {
+        await fsWriteFileWithParents(file, result.autofixed);
+    }
     if (mode_report) {
 
 // A container-file - .html, .md, .sh - lints its embedded blocks one by one

@@ -806,6 +806,47 @@ jstestDescribe((
             ],
             process_exit: processExit1
         });
+
+// A DIRECTORY rides the same walk as a plain lint of one, and every file whose
+// lint returns <autofixed> is written back; a clean file is left alone.
+
+        await fsWriteFileWithParents(
+            ".tmp/autofix_dir/aa.mjs",
+            "String( 0);\n"
+        );
+        await fsWriteFileWithParents(
+            ".tmp/autofix_dir/bb.mjs",
+            "String(0);\n"
+        );
+        await jslint.jslint_cli({
+            // suppress error
+            console_error: noop,
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_autofix=.tmp/autofix_dir"
+            ],
+            process_exit: processExit0
+        });
+        assertOrThrow(
+            (
+                await moduleFs.promises.readFile(
+                    ".tmp/autofix_dir/aa.mjs",
+                    "utf8"
+                )
+            ) === "String(0);\n",
+            ".tmp/autofix_dir/aa.mjs"
+        );
+        assertOrThrow(
+            (
+                await moduleFs.promises.readFile(
+                    ".tmp/autofix_dir/bb.mjs",
+                    "utf8"
+                )
+            ) === "String(0);\n",
+            ".tmp/autofix_dir/bb.mjs"
+        );
     });
     jstestIt((
         "test autofix-report handling-behavior"
