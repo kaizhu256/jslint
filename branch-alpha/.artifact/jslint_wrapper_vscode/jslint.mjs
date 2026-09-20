@@ -408,6 +408,7 @@
     versions,
     warn,
     warn_at,
+    warn_au,
     warning,
     warning_list,
     warnings,
@@ -1405,10 +1406,10 @@ function jslint(
 
         let the_warning;
         the_token = the_token || state.token_nxt;
-        the_warning = warn_at(
+        the_warning = warn_au(
             code,
             the_token.line,
-            jslint_fudge + the_token.from,
+            the_token.from,
             a || artifact(the_token),
             b,
             c,
@@ -1444,6 +1445,10 @@ function jslint(
             b,
             c,
             code,
+
+// Fudge column numbers in warning message.
+
+            column: column || 0,
             d,
             line,
             line_source: "",
@@ -1451,11 +1456,8 @@ function jslint(
             ...line_list[line]
         };
         warning.column = Math.max(
-
-// Fudge column numbers in warning message.
-
             jslint_fudge,
-            Math.min(column || 0, warning.line_source.length)
+            Math.min(warning.column, warning.line_source.length)
         );
         test_cause(code, b || a, warning.column);
         switch (code) {
@@ -2212,6 +2214,7 @@ function jslint(
                 token_nxt: token_global,
                 warn,
                 warn_at,
+                warn_au,
                 warning_list
             }
         );
@@ -2267,7 +2270,7 @@ function jslint(
             jslint_assert(undefined, "test_internal_error");
         }
         if (option_dict.test_unknown_warning_code) {
-            warn_at("test_unknown_warning_code", jslint_fudge, jslint_fudge);
+            warn_au("test_unknown_warning_code", jslint_fudge, 0);
         }
     } catch (err) {
         mode_stop = true;
@@ -3146,7 +3149,8 @@ function jslint_phase2_lex(state) {
         token_global,
         token_list,
         warn,
-        warn_at
+        warn_at,
+        warn_au
     } = state;
     const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
@@ -3439,12 +3443,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["0\n/*global aa*/", "lex_comment", "misplaced_directive_a", "global", 1]
 
-            warn_at(
-                "misplaced_directive_a",
-                line,
-                jslint_fudge + from,
-                the_comment.directive
-            );
+            warn_au("misplaced_directive_a", line, from, the_comment.directive);
             return the_comment;
         }
 
@@ -3874,7 +3873,7 @@ function jslint_phase2_lex(state) {
                                     return stop_at(
                                         "unexpected_a_after_b",
                                         line,
-                                        column0,
+                                        column0 - 0,
                                         snippet.slice(-1),
                                         snippet.slice(0, -1)
                                     );
@@ -4088,7 +4087,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/.//", "lex_regexp", "unexpected_a", "/", 7]
 
-            return stop_at("unexpected_a", line, column0, char);
+            return stop_at("unexpected_a", line, column0 - 0, char);
         }
         result = token_create("(regexp)", char);
         result.flag = flag;
@@ -4207,7 +4206,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["0/=0", "lex_slash_or_regexp", "unexpected_a", "/=", 2]
 
-            warn_at("unexpected_a", line, jslint_fudge + column0 - 2, "/=");
+            warn_au("unexpected_a", line, column0 - 2, "/=");
         }
         return token_create(snippet);
     }
@@ -4222,7 +4221,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["''", "lex_string", "use_double", "", 1]
 
-            warn_at("use_double", line, column0);
+            warn_au("use_double", line, column0 - 1);
         }
         snippet = "";
         char_after();
@@ -4236,7 +4235,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"", "lex_string", "unclosed_string", "", 1]
 
-                return stop_at("unclosed_string", line, column0);
+                return stop_at("unclosed_string", line, column0 - 1);
             case "\\":
                 char_after_escape(quote);
                 break;
@@ -4289,7 +4288,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*jslint-disable*/", "lex_token", "unclosed_disable", "", 1]
 
-                        ? stop_at("unclosed_disable", line_disable)
+                        ? stop_at("unclosed_disable", line_disable, column0 - 1)
                         : token_create("(end)")
                     );
                 }
@@ -4311,7 +4310,7 @@ function jslint_phase2_lex(state) {
                 return stop_at(
                     "unexpected_char_a",
                     line,
-                    column0,
+                    column0 - 1,
                     line_source[0]
                 );
             }
@@ -4331,10 +4330,10 @@ function jslint_phase2_lex(state) {
 // ["\t", "lex_token", "use_spaces", "", 1]
 // ["\t0", "lex_token", "use_spaces", "", 1]
 
-                warn_at(
+                warn_au(
                     "use_spaces",
                     line,
-                    jslint_fudge + column0 + line_source.indexOf("\t")
+                    column0 + line_source.indexOf("\t")
                 );
             }
             snippet = match[1];
@@ -4508,7 +4507,7 @@ function jslint_phase2_lex(state) {
 // ["0x", "read_digits", "expected_digits_after_a", "0x", 2]
 // ["0x_", "read_digits", "expected_digits_after_a", "0x", 2]
 
-            warn_at("expected_digits_after_a", line, column0, snippet);
+            warn_au("expected_digits_after_a", line, column0 - 1, snippet);
         }
 
 // PR-390 - Add numeric-separator check.
@@ -4520,10 +4519,10 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\u{1_2}\"", "read_digits", "illegal_num_separator", "", 6]
 
-            warn_at(
+            warn_au(
                 "illegal_num_separator",
                 line,
-                jslint_fudge + column0 + digits.indexOf("_")
+                column0 + digits.indexOf("_")
             );
         }
         snippet += digits;
@@ -4551,7 +4550,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/////////////////////////////////////////////////////////////////////////////////", "read_line", "too_long", "", 1] //jslint-ignore-line
 
-            warn_at("too_long", line, jslint_fudge);
+            warn_au("too_long", line, 0);
         }
         column0 = 0;
         line += 1;
@@ -4582,7 +4581,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*jslint-enable*/", "read_line", "unopened_enable", "", 1]
 
-                return stop_at("unopened_enable", line);
+                return stop_at("unopened_enable", line, column0 - 1);
             }
             line_disable = undefined;
         } else if (
@@ -4613,14 +4612,14 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*jslint tab*/\n\t 0", "read_line", "use_tabs", "", 2]
 
-            warn_at("use_tabs", line, jslint_fudge + line_source.indexOf(" "));
+            warn_au("use_tabs", line, line_source.indexOf(" "));
         }
         if (!option_dict.white && line_source.endsWith(" ")) {
 
 // test_cause:
 // [" ", "read_line", "unexpected_trailing_space", "", 1]
 
-            warn_at("unexpected_trailing_space", line, line_source.length);
+            warn_au("unexpected_trailing_space", line, line_source.length - 1);
         }
         return line_source;
     }
@@ -4833,7 +4832,7 @@ function jslint_phase3_parse(state) {
         token_global,
         token_list,
         warn,
-        warn_at
+        warn_au
     } = state;
     let anon = "anonymous";     // The guessed name for anonymous functions.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -7203,10 +7202,10 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["0", "semicolon", "expected_a_b", "(end)", 1]
 
-            warn_at(
+            warn_au(
                 "expected_a_b",
                 token_now.line,
-                jslint_fudge + token_now.thru,
+                token_now.thru,
                 ";",
                 artifact()
             );
