@@ -1454,7 +1454,7 @@ function jslint(
 // Fudge column numbers in warning message.
 
             jslint_fudge,
-            Math.min(column || 0, warning.line_source.length)
+            Math.min(column, warning.line_source.length)
         );
         test_cause(code, b || a, warning.column);
         switch (code) {
@@ -1556,7 +1556,7 @@ function jslint(
 // PR-390 - Add numeric-separator check.
 
         case "illegal_num_separator":
-            mm = `Illegal numeric separator '_' at column ${column}.`;
+            mm = `Illegal numeric separator '_' at column ${warning.column}.`;
             break;
         case "infix_in":
             mm = (
@@ -3294,7 +3294,7 @@ function jslint_phase2_lex(state) {
         ) {
 
 // test_cause:
-// ["0a", "lex_number", "unexpected_a_after_b", "0", 2]
+// [";0a", "lex_number", "unexpected_a_after_b", "0", 3]
 
             return stop_at(
                 "unexpected_a_after_b",
@@ -4014,7 +4014,7 @@ function jslint_phase2_lex(state) {
         case "ecma":            // Assume ECMAScript environment.
         case "eval":            // Allow eval().
         case "fart":            // Allow complex fat-arrow.
-        case "for":             // Allow for-statement.
+        case "for":             // Allow for-statement (deprecated).
         case "getset":          // Allow get() and set().
         case "indent2":         // Use 2-space indent.
         case "long":            // Allow long lines.
@@ -4032,7 +4032,7 @@ function jslint_phase2_lex(state) {
         case "unordered":       // Allow unordered cases, params, properties,
                                 // ... variables, and exports.
         case "variable":        // Allow unordered const and let declarations
-                                // ... not at top of scope_function.
+                                // ... not at top of function-scope.
         case "white":           // Allow messy whitespace.
             option_dict[key] = value;
             break;
@@ -10248,9 +10248,13 @@ function jslint_phase6_autofix(state) {
 
 // PHASE 6. Autofix whitespace-warnings in <source>, and return the result.
 
-    const crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
+    const line_crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
+    const line_list = state.line_list.map(function ({
+        line_source
+    }) {
+        return line_source;
+    });
     const warning_list = state.warning_list;
-    let line_list;
     if (warning_list.length === 0) {
         return;
     }
@@ -10259,15 +10263,6 @@ function jslint_phase6_autofix(state) {
             return;
         }
     }
-
-// Copy the line-model only once the pass is known to fix something - the
-// converged pass and the blocked pass both leave above.
-
-    line_list = state.line_list.map(function ({
-        line_source
-    }) {
-        return line_source;
-    });
 
 // Apply each fix RIGHT-TO-LEFT within a line, so an earlier fix cannot
 // invalidate a later fix's column, and BOTTOM-UP across lines, so every line
@@ -10356,7 +10351,7 @@ function jslint_phase6_autofix(state) {
             line_source.slice(ii)
         );
     });
-    return line_list.slice(jslint_fudge).join(crlf);
+    return line_list.slice(jslint_fudge).join(line_crlf);
 }
 
 function jslint_report({

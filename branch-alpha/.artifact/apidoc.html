@@ -1448,9 +1448,13 @@ if (mode_autofix) {
 <span class="apidocCodeCommentSpan">
 // PHASE 6. Autofix whitespace-warnings in &lt;source&gt;, and return the result.
 
-</span>    const crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
+</span>    const line_crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
+    const line_list = state.line_list.map(function ({
+        line_source
+    }) {
+        return line_source;
+    });
     const warning_list = state.warning_list;
-    let line_list;
     if (warning_list.length === 0) {
         return;
     }
@@ -1459,15 +1463,6 @@ if (mode_autofix) {
             return;
         }
     }
-
-// Copy the line-model only once the pass is known to fix something - the
-// converged pass and the blocked pass both leave above.
-
-    line_list = state.line_list.map(function ({
-        line_source
-    }) {
-        return line_source;
-    });
 
 // Apply each fix RIGHT-TO-LEFT within a line, so an earlier fix cannot
 // invalidate a later fix's column, and BOTTOM-UP across lines, so every line
@@ -1499,7 +1494,9 @@ if (mode_autofix) {
             indentage_at = line_source.length - line_source.trimStart().length;
 
 // A MID-LINE token cannot be re-indented, but it does not need to be skipped:
-// at_margin fires for tokens that belong AT a margin and theref...
+// at_margin fires for tokens that belong AT a margin and therefore on their
+// OWN line. So split first and indent the remainder, which also lands a
+// trailing closer correctly, and is what line-breaks a...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
