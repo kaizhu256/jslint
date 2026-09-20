@@ -1,7 +1,7 @@
 # Changelog
 
 # Todo
-- jslint-vscode - add extra contextmenu command "JSLint - Autofix Whitespace"
+- jslint-vscode - add extra contextmenu command "JSLint - Autofix Whitespace".
 - jslint-directive - Add new directive 'tab' to support tab-indent.
 - jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.'.
 - jslint-ecma - Add ES2015-feature iterators.
