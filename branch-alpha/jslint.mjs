@@ -3860,7 +3860,11 @@ function jslint_phase2_lex(state) {
             snippet = "/=";
             column += 1;
             line_source = line_source.slice(1);
-            warn_at("unexpected_a", line, column, "/=");
+
+// test_cause:
+// ["0/=0", "lex_slash_or_regexp", "unexpected_a", "/=", 2]
+
+            warn_at("unexpected_a", line, column - 1, "/=");
         }
         return token_create(snippet);
     }
