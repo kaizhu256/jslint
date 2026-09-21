@@ -940,13 +940,14 @@ ${String(message).slice(0, 2000)}`
 </span>    let command;
     let data;
     let exit_code = 0;
+    let mode_autofix;
     let mode_report;
     let mode_wrapper_vim;
     let result;
 
 // PR-509 - Add command jslint_autofix.
 
-    function autofix_embeded({
+    function autofix_embedded({
         code,
         file,
         mode_conditional,
@@ -968,7 +969,20 @@ ${String(message).slice(0, 2000)}`
             const result_embedded = jslint_from_file({
                 code: match1,
                 file: file + suffix_file,
-                line_offset: string_line_count(code.slice(0, ii)) + 1,
+                line_offset: (
+                    jslint_fudge +
+
+// Count line-terminators the way &lt;jslint_rgx_crlf&gt; splits them, without
+// materialising every preceding line.
+
+                    (
+                        code
+                            .slice(0, ii)
+                            .match(new RegExp(jslint_rgx_crlf, "g"))
+                            ?.length ||
+                        0
+                    )
+                ),
                 mode_conditional,
                 option
             });
@@ -980,25 +994,7 @@ ${String(message).slice(0, 2000)}`
             }
             return (
                 match0.slice(
-                    0,
-                    match0.length - match1.length - suffix.length
-                ) +
-                result_embedded.autofixed +
-                suffix
-            );
-        });
-        return (
-            code_fixed === code
-            ? undefined
-            : code_fixed
-        );
-    }
-
-    function jslint_from_file({
-        code,
-        file,
-        line_offset = 0,
-        mode_...
+          ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1448,7 +1444,7 @@ if (mode_autofix) {
 <span class="apidocCodeCommentSpan">
 // PHASE 6. Autofix whitespace-warnings in &lt;source&gt;, and return the result.
 
-</span>    const crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
+</span>    const line_crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
     const line_list = state.line_list.map(function ({
         line_source
     }) {
@@ -1496,7 +1492,7 @@ if (mode_autofix) {
 // A MID-LINE token cannot be re-indented, but it does not need to be skipped:
 // at_margin fires for tokens that belong AT a margin and therefore on their
 // OWN line. So split first and indent the remainder, which also lands a
-// trailing closer correctly, and is what line-breaks a sing...
+// trailing closer correctly, and is what line-breaks a...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1509,12 +1505,12 @@ if (mode_autofix) {
         if (mode_autofix) {
             autofixed = <span class="apidocCodeKeywordSpan">jslint_phase6_autofix</span>(state) || state.source;
             if (autofixed !== state.source) {
-                return {
-autofixed,
 
 // Recurse jslint.
 
-...jslint(
+result_autofix = jslint(
+    autofixed,
+    {
 ...</pre></li>
 
 <li>
@@ -1558,7 +1554,7 @@ autofixed,
 </span>    const autofix_blocked = autofix &amp;&amp; warnings.some(function ({
         code
     }) {
-        return !jslint.jslint_autofix_warning_list.includes(code);
+        return !jslint_autofix_warning_list.includes(code);
     });
     let html = "";
     let length_80 = 1111;
@@ -1601,7 +1597,7 @@ autofixed,
 AAAAAAAAAAAAAAAABmAAgiQINAmcDBEICuc41DEBNgIkA4R2C4I+AAQgBYkuByAMgScfYUIF\
 7NgjsHGAbcDVFkXZ5Jwd+P96IGPc9rl9ETBEaCzCJkvY2UpziRZ7zftZWk8052U9+NqX6vXL\
 KDflSQnlJ0bP+QnPQAy744n9mup6H9PaCDFwM5zjf8exB89bZ1cdrYOP0NgnuRDRWlk9u/fE\
-llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqe...
+llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
