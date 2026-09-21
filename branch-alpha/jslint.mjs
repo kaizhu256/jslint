@@ -4626,7 +4626,6 @@ function jslint_phase3_parse(state) {
                 match === undefined
 
 // test_cause:
-// ["try", "advance", "expected_a_b", "(end)", 3]
 // ["{0:0}", "advance", "expected_a_b", "0", 2]
 
                 ? stop("expected_a_b", token_nxt, id, artifact())
@@ -7937,14 +7936,20 @@ function jslint_phase3_parse(state) {
         }
         scope_function.try += 1;
 
-// A braceless body is legal for if/while/for/do, so block() only WARNS and
-// does not advance - but then <the_block> is <token_now>, which here is still
-// <the_try>, and walk_statement recursed on thing.block forever. "try"
-// REQUIRES braces in js, so demand them: advance("{") stops with
-// <expected_a_b>, and block("naked") is then what block() would have built.
+// A braceless body is legal js for if/while/for/do, and block() serves those
+// by only WARNING and NOT advancing - but <the_block> is then <token_now>,
+// which for "try" was still <the_try>, so walk_statement recursed on
+// thing.block forever. ALL THREE of try/catch/finally REQUIRE braces in js,
+// so each demands one below. Guarding here rather than in block() keeps
+// <ignored> working for catch - "naked" and "ignore" cannot both be passed.
 
-        advance("{");
-        the_try.block = block("naked");
+// test_cause:
+// ["try", "stmt_try", "expected_a_b", "(end)", 3]
+
+        if (token_nxt.id !== "{") {
+            return stop("expected_a_b", token_nxt, "{", artifact());
+        }
+        the_try.block = block();
         the_disrupt = the_try.block.disrupt;
         if (token_nxt.id === "catch") {
             ignored = "ignore";
@@ -7990,6 +7995,13 @@ function jslint_phase3_parse(state) {
                 advance();
                 advance(")");
             }
+
+// test_cause:
+// ["try{}catch(aa);", "stmt_try", "expected_a_b", ";", 15]
+
+            if (token_nxt.id !== "{") {
+                return stop("expected_a_b", token_nxt, "{", artifact());
+            }
             the_catch.block = block(ignored);
             if (the_catch.block.disrupt !== true) {
                 the_disrupt = false;
@@ -8012,6 +8024,13 @@ function jslint_phase3_parse(state) {
         if (token_nxt.id === "finally") {
             scope_function.finally += 1;
             advance("finally");
+
+// test_cause:
+// ["try{}finally;", "stmt_try", "expected_a_b", ";", 13]
+
+            if (token_nxt.id !== "{") {
+                return stop("expected_a_b", token_nxt, "{", artifact());
+            }
             the_try.else = block();
             the_disrupt = the_try.else.disrupt;
             scope_function.finally -= 1;
