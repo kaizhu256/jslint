@@ -5568,6 +5568,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["let aa;(function aa(){})", "name_declare", "scope_current", "aa", 0]
 // ["let aa;function aa(){}", "name_declare", "scope_current", "aa", 0]
+// ["let aa;let aa", "name_declare", "redefinition_a_b", "1", 12]
 // ["let aa;let aa", "name_declare", "scope_current", "aa", 0]
 
             test_cause("scope_current", id);
@@ -7869,10 +7870,7 @@ function jslint_phase3_parse(state) {
             } else {
 
 // test_cause:
-// ["
-// function aa(){switch(0){case 0:aa();}}
-// aa();
-// ", "stmt_switch", "expected_a_before_b", "}", 37]
+// ["switch(0){case 0:;}", "stmt_switch", "expected_a_before_b", "}", 19]
 
                 warn("expected_a_before_b", token_nxt, "break;", artifact());
             }
@@ -8926,6 +8924,10 @@ function jslint_phase4_walk(state) {
         switch (thing.id) {
         case "(":
         case "=>":
+
+// Tagged-template is infix at same binding-power as "(" and is a call,
+// not binary-operator.
+
         case "`":
             break;
         case "+":
