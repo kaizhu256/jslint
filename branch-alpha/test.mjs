@@ -969,12 +969,15 @@ jstestDescribe((
     jstestIt((
         "test cli-cjs-and-invalid-file handling-behavior"
     ), async function () {
-        await moduleFs.promises.mkdir(".tmp/dir/dir.js", {recursive: true});
+        await moduleFs.promises.mkdir(
+            ".tmp/invalid_file/invalid_file.js",
+            {recursive: true}
+        );
         [
-            ".",            // test dir handling-behavior
-            ".tmp/dir",     // test dir-file-undefined handling-behavior
-            "jslint.mjs",   // test file handling-behavior
-            undefined       // test file-undefined handling-behavior
+            ".",                // test dir handling-behavior
+            ".tmp/invalid_file",// test invalid-file handling-behavior
+            "jslint.mjs",       // test file handling-behavior
+            undefined           // test file-undefined handling-behavior
         ].forEach(function (file) {
             jslint.jslint_cli({
                 file,
