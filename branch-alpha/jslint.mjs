@@ -6989,14 +6989,19 @@ function jslint_phase3_parse(state) {
             advance(";");
         } else {
 
+// <thru> is EXCLUSIVE - one past the token's last char - so it marked the
+// character AFTER <b>. At end of line the clamp pulled it back onto <b> and
+// hid that; off end of line it did not. <expected_a_after_b> exists so the
+// message names the character the marker covers, so mark <b> itself.
+
 // test_cause:
-// [" 0//c", "semicolon", "expected_a_after_b", "0", 3]
+// [" 0//c", "semicolon", "expected_a_after_b", "0", 2]
 // ["0", "semicolon", "expected_a_after_b", "0", 1]
 
             warn_at(
                 "expected_a_after_b",
                 token_now.line,
-                token_now.thru,
+                token_now.thru - 1,
                 ";",
                 artifact(token_now)
             );
