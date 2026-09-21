@@ -8274,7 +8274,7 @@ function jslint_phase3_parse(state) {
 // Like a non-identifier string-key, it is not tallied for /*property*/.
 
 // test_cause:
-// ["let aa={0:0}", "survey", "unexpected_a", "0", 9]
+// ["String({0:0})", "survey", "unexpected_a", "0", 9]
 
             warn("unexpected_a", name);
             return name.value;
@@ -8296,7 +8296,7 @@ function jslint_phase3_parse(state) {
             if (!name.identifier) {
 
 // test_cause:
-// ["let aa={+:0}", "survey", "expected_identifier_a", "+", 9]
+// ["String({+:0})", "survey", "expected_identifier_a", "+", 9]
 
                 return stop("expected_identifier_a", name);
             }
