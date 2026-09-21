@@ -4061,7 +4061,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*jslint-disable*/", "lex_token", "unclosed_disable", "", 1]
 
-                        ? stop_at("unclosed_disable", line_disable, 0)
+                        ? stop_at("unclosed_disable", line_disable, column - 0)
                         : token_create("(end)")
                     );
                 }
