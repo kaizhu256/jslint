@@ -729,9 +729,9 @@ const jslint_rgx_numeric_separator_illegal = (
 const jslint_rgx_slash_star_or_slash = (
     /\/\*|\/$/
 );
-const jslint_rgx_tab = (
-    /\t/g
-);
+//!! const jslint_rgx_tab = (
+    //!! /\t/g
+//!! );
 const jslint_rgx_todo = (
     /\b(?:todo|TO\s?DO|HACK)\b/
 );
@@ -3981,7 +3981,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*jslint-disable*/", "lex_token", "unclosed_disable", "", 1]
 
-                        ? stop_at("unclosed_disable", line_disable, 0)
+                        ? stop_at("unclosed_disable", line_disable, column - 1)
                         : token_create("(end)")
                     );
                 }
@@ -4005,6 +4005,24 @@ function jslint_phase2_lex(state) {
                     line,
                     column - 1,
                     line_source[0]
+                );
+            }
+            if (
+                !option_dict.white &&
+                match[2] &&
+                line_source.indexOf("\t") >= 0
+            ) {
+
+// test_cause:
+// [" \t", "lex_token", "use_spaces", "", 2]
+// ["0\t", "lex_token", "use_spaces", "", 2]
+// ["\t", "lex_token", "use_spaces", "", 1]
+// ["\t0", "lex_token", "use_spaces", "", 1]
+
+                warn_at(
+                    "use_spaces",
+                    line,
+                    column + line_source.indexOf("\t")
                 );
             }
             snippet = match[1];
@@ -4273,17 +4291,17 @@ function jslint_phase2_lex(state) {
             test_cause("line_disable");
             line_source = "";
         }
-        // jslint_rgx_tab
-        if (line_source.indexOf("\t") >= 0) {
-            if (!option_dict.white) {
+        //!! // jslint_rgx_tab
+        //!! if (line_source.indexOf("\t") >= 0) {
+            //!! if (!option_dict.white) {
 
-// test_cause:
-// ["\t", "read_line", "use_spaces", "", 1]
+//!! // test_cause:
+//!! // ["\t", "read_line", "use_spaces", "", 1]
 
-                warn_at("use_spaces", line, line_source.indexOf("\t"));
-            }
-            line_source = line_source.replace(jslint_rgx_tab, " ");
-        }
+                //!! warn_at("use_spaces", line, line_source.indexOf("\t"));
+            //!! }
+            //!! line_source = line_source.replace(jslint_rgx_tab, " ");
+        //!! }
         if (!option_dict.white && line_source.endsWith(" ")) {
 
 // test_cause:
