@@ -2780,8 +2780,8 @@ async function jslint_cli({
 
         if (result.warnings === undefined) {
             console_error(
-                "jslint_report - " + file
-                + " - only a javascript file can be reported"
+                `jslint_report - ${file} - ` +
+                "only a javascript file can be reported"
             );
             exit_code = 1;
             process_exit(exit_code);
