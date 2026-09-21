@@ -393,11 +393,13 @@
     trimStart,
     try,
     type,
+    u,
     unlink,
     unordered,
     unshift,
     url,
     used,
+    v,
     v8CoverageListMerge,
     v8CoverageReportCreate,
     value,
@@ -2873,9 +2875,6 @@ function jslint_phase2_lex(state) {
 // ["aa=/[", "char_after", "expected_a_after_b", "[", 5]
 // ["aa=/aa{/", "char_after", "expected_a_b", "/", 8]
 
-// At end of line <snippet> may have been reset or trimmed, so name the last
-// character of the whole line as <b>.
-
             return (
                 char === ""
                 ? stop_at(
@@ -2883,6 +2882,10 @@ function jslint_phase2_lex(state) {
                     line,
                     column - 1,
                     match,
+
+// At end of line <snippet> may have been reset or trimmed, so name the last
+// character of the whole line as <b>.
+
                     line_list[line].line_source.slice(-1)
                 )
                 : stop_at("expected_a_b", line, column - 1, match, char)
@@ -3460,6 +3463,12 @@ function jslint_phase2_lex(state) {
 // RegExp
 // Lex sequence of characters in regexp.
 
+// <flag_seen> collects a modifier-group's flag characters, "-" included. v8
+// rejects any repeat, so "(?ii:", "(?i-i:" and "(?i-m-s:" are all SyntaxError.
+// Reset on entry to each group's flags, not here - one call lexes a whole
+// sequence, so "(?i-m:a)(?s-i:b)" reaches that branch twice.
+
+            let flag_seen = "";
             switch (char) {
             case "":
                 warn_at("expected_regexp_factor_a", line, column - 0, char);
@@ -3547,9 +3556,13 @@ function jslint_phase2_lex(state) {
                         case "i":
                         case "m":
                         case "s":
+                            flag_seen = char;
                             char_after();
                             while (true) {
-                                if (char === ":" && snippet.slice(-1) !== "-") {
+
+// A lone "-" adds and removes nothing, which v8 rejects - unlike "(?i-:".
+
+                                if (char === ":" && flag_seen !== "-") {
                                     char_after();
                                     break;
                                 }
@@ -3558,6 +3571,21 @@ function jslint_phase2_lex(state) {
                                 case "i":
                                 case "m":
                                 case "s":
+
+// test_cause:
+// ["aa=/(?--:x)/", "lex_regexp_group", "unexpected_a_after_b", "(?-", 8]
+// ["aa=/(?ii:x)/", "lex_regexp_group", "unexpected_a_after_b", "(?i", 8]
+
+                                    if (flag_seen.includes(char)) {
+                                        return stop_at(
+                                            "unexpected_a_after_b",
+                                            line,
+                                            column - 1,
+                                            snippet.slice(-1),
+                                            snippet.slice(0, -1)
+                                        );
+                                    }
+                                    flag_seen += char;
                                     char_after();
                                     break;
                                 default:
@@ -3571,6 +3599,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/(?-.", "lex_regexp_group", "unexpected_a_after_b", "(?-", 8]
 // ["aa=/(?-.)/", "lex_regexp_group", "unexpected_a_after_b", "(?-", 8]
+// ["aa=/(?-:x)/", "lex_regexp_group", "unexpected_a_after_b", "(?-", 8]
 
                                     return stop_at(
                                         "unexpected_a_after_b",
@@ -3770,11 +3799,27 @@ function jslint_phase2_lex(state) {
             case "s":
                 break;
             case "u":
+
+// test_cause:
+// ["aa=/./vu", "lex_regexp", "unexpected_a", "u", 8]
+
+                if (flag.v) {
+                    warn_at("unexpected_a", line, column - 1, char);
+                }
                 break;
 
 // PR-499 - Add ES2024-feature RegExp v flag with set-notation + str-properties.
 
             case "v":
+
+// "u" and "v" select different grammars, so v8 rejects the pair.
+
+// test_cause:
+// ["aa=/./uv", "lex_regexp", "unexpected_a", "v", 8]
+
+                if (flag.u) {
+                    warn_at("unexpected_a", line, column - 1, char);
+                }
                 break;
             case "y":
 

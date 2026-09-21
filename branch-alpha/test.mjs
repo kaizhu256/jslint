@@ -1610,8 +1610,9 @@ aa();
             regexp: [
                 `RegExp.escape("");`,
                 `String(/(?!.)(?:.)(?=.)/);`,
-                `String(/(?ims-ims:.)/);`,
-                `String(/./dgimsuvy);`,
+                `String(/(?im-s:.)/);`,
+                `String(/./dgimsuy);`,
+                `String(/./dgimsvy);`,
                 `String(/[\\--\\-]/);`,
                 `function aa() {\n    return /./;\n}\naa();`
             ],
