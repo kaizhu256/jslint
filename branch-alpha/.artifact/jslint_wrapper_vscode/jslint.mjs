@@ -8945,7 +8945,12 @@ function jslint_phase4_walk(state) {
                 warn("weird_relation_a", thing);
             }
         }
-        if (thing.id === "+") {
+        switch (thing.id) {
+        case "(":
+        case "=>":
+        case "`":
+            break;
+        case "+":
             if (!option_dict.convert) {
                 if (thing.expression[0].value === "") {
 
@@ -8961,7 +8966,23 @@ function jslint_phase4_walk(state) {
                     warn("expected_a_b", thing, "String(...)", "+ \"\"");
                 }
             }
-        } else if (thing.id === "[") {
+            break;
+        case ".":
+        case "?.":
+            if (thing.expression.id === "RegExp") {
+
+// PR-499 - Relax warning for ES2025-feature RegExp.escape().
+
+                if (!thing.name || thing.name.id !== "escape") {
+
+// test_cause:
+// ["aa=RegExp.aa", "post_b_binary", "weird_expression_a", ".", 10]
+
+                    warn("weird_expression_a", thing);
+                }
+            }
+            break;
+        case "[":
             if (thing.expression[0].id === "window") {
 
 // test_cause:
@@ -8976,28 +8997,8 @@ function jslint_phase4_walk(state) {
 
                 warn("weird_expression_a", thing, "self[...]");
             }
-        } else if (thing.id === "." || thing.id === "?.") {
-            if (thing.expression.id === "RegExp") {
-
-// PR-499 - Relax warning for ES2025-feature RegExp.escape().
-
-                if (!thing.name || thing.name.id !== "escape") {
-
-// test_cause:
-// ["aa=RegExp.aa", "post_b_binary", "weird_expression_a", ".", 10]
-
-                    warn("weird_expression_a", thing);
-                }
-            }
-
-// A tagged-template is infix at the same bp as "(" and is a CALL, not a
-// two-operand operation - <expression> holds only the tag, so <right> is
-// undefined. A non-constant tag merely short-circuited the test below; a
-// constant one reached <right.constant> and threw.
-
-        } else if (
-            thing.id !== "=>" && thing.id !== "(" && thing.id !== "`"
-        ) {
+            break;
+        default:
             right = thing.expression[1];
             if (
                 (thing.id === "+" || thing.id === "-")
