@@ -183,7 +183,6 @@
     for_of,
     for_semicolon,
     formatted_message,
-    free,
     freeze,
     from,
     froms,
@@ -1440,16 +1439,15 @@ function jslint(
             line,
             line_source: "",
             name: "JSLintError",
-            ...line_list[line]
+            ...line_list[Math.min(line, line_list.length - 1)]
         };
         let mm;
         jslint_assert(typeof column === "number", `column=${column}`);
+        if (line >= line_list.length) {
 
 // Handle premature EOF.
 
-        if (line >= line_list.length) {
             warning.line = line_list.length - 1;
-            warning.line_source = line_list[warning.line].line_source;
             column = warning.line_source.length - 1;
         }
         warning.column = (
@@ -2721,10 +2719,14 @@ async function jslint_cli({
                 let code;
                 let result_dir;
                 let time_start = Date.now();
+
+// Skip dotfile (e.g. .foo.js) when reading directory.
+
+                if ((/^\./).test(file2)) {
+                    return;
+                }
                 file2 = file + "/" + file2;
-                switch ((
-                    /\.\w+?$|$/m
-                ).exec(file2)[0]) {
+                switch ((/\.\w+?$|$/m).exec(file2)[0]) {
                 case ".cjs":
                 case ".html":
                 case ".js":
@@ -2742,9 +2744,7 @@ async function jslint_cli({
                     return;
                 }
                 if (
-                    (
-                        /(?:\b|_)(?:lock|min|raw|rollup)(?:\b|_)/
-                    ).test(file2)
+                    (/(?:\b|_)(?:lock|min|raw|rollup)(?:\b|_)/).test(file2)
                     || !(code && code.length < 1048576)
                 ) {
                     return;
@@ -3051,9 +3051,10 @@ function jslint_phase2_lex(state) {
             if (line_source[0] === "/") {
 
 // test_cause:
-// ["/*/", "lex_comment", "unexpected_a", "/", 2]
+// ["/*/", "lex_comment", "unexpected_a", "/", 3]
+// ["/*/*", "lex_comment", "unexpected_a", "/", 3]
 
-                warn_at("unexpected_a", line, column - 1 + ii, "/");
+                warn_at("unexpected_a", line, column - 0, "/");
             }
 
 // Lex/loop through each line until "*/".
@@ -3069,9 +3070,9 @@ function jslint_phase2_lex(state) {
                 if (ii >= 0) {
 
 // test_cause:
-// ["/*/*", "lex_comment", "nested_comment", "", 2]
+// ["/*/*", "lex_comment", "nested_comment", "", 3]
 
-                    warn_at("nested_comment", line, column - 1 + ii);
+                    warn_at("nested_comment", line, column - 0 + ii);
                 }
                 snippet.push(line_source);
                 line_source = read_line();
@@ -3089,9 +3090,9 @@ function jslint_phase2_lex(state) {
             if (jj >= 0) {
 
 // test_cause:
-// ["/*/**/", "lex_comment", "nested_comment", "", 2]
+// ["/*/**/", "lex_comment", "nested_comment", "", 3]
 
-                warn_at("nested_comment", line, column - 1 + jj);
+                warn_at("nested_comment", line, column - 0 + jj);
             }
             snippet.push(line_source.slice(0, ii));
             snippet = snippet.join(" ");
@@ -5028,7 +5029,6 @@ function jslint_phase3_parse(state) {
 // ["while(){}", "condition", "", "", 0]
 
         test_cause("");
-        the_paren.free = true;
         advance("(");
         the_value = parse_expression(0);
         advance(")");
@@ -5428,12 +5428,6 @@ function jslint_phase3_parse(state) {
         }
         advance(")", the_paren);
         if (the_paren.expression.length === 2) {
-
-// test_cause:
-// ["aa(0)", "infix_lparen", "free", "", 0]
-
-            test_cause("free");
-            the_paren.free = true;
             if (
                 the_argument.wrapped === true
 
@@ -5450,14 +5444,6 @@ function jslint_phase3_parse(state) {
             if (the_argument.id === "(") {
                 the_argument.wrapped = true;
             }
-        } else {
-
-// test_cause:
-// ["aa()", "infix_lparen", "not_free", "", 0]
-// ["aa(0,0)", "infix_lparen", "not_free", "", 0]
-
-            test_cause("not_free");
-            the_paren.free = false;
         }
         return the_paren;
     }
@@ -6528,7 +6514,6 @@ function jslint_phase3_parse(state) {
                 true                    // assigned
             );
         } else {
-            token_now.free = false;
             if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
 
 // PR-500 - Unify ES2015-destructure-logic. - function ([aa]) {...}
@@ -6895,7 +6880,6 @@ function jslint_phase3_parse(state) {
 // ["(0)", "prefix_lparen", "expr", "", 0]
 
         test_cause("expr");
-        the_paren.free = true;
         the_value = parse_expression(0);
         if (the_value.wrapped === true) {
 
@@ -7303,7 +7287,6 @@ function jslint_phase3_parse(state) {
             advance("await");
         }
         advance("(");
-        the_for.free = true;
         if (the_for.for_semicolon) {
             switch (token_nxt.id) {
             case ";":
@@ -7338,6 +7321,19 @@ function jslint_phase3_parse(state) {
             }
             token_nxt.for_init = true;
             the_for.for_semicolon[0] = parse_statement_single();
+
+// PR-xxx - jquery - Tolerate comma-expression in for_init `for(ii=0,jj=0;;)`.
+
+            while (token_nxt.id === ",") {
+
+// test_cause:
+// ["for(aa=0,bb=0;;){}", "stmt_for", "for_init_comma", "", 0]
+
+                test_cause("for_init_comma");
+                advance(",");
+                parse_expression(0);
+                semicolon();
+            }
             token_nxt.for_init = true;
             if (token_nxt.id === ";") {
 
@@ -7791,7 +7787,6 @@ function jslint_phase3_parse(state) {
         }
         scope_function.switch += 1;
         advance("(");
-        token_now.free = true;
         the_switch.expression = parse_expression(0);
         the_switch.block = the_cases;
         advance(")");
@@ -8270,6 +8265,16 @@ function jslint_phase3_parse(state) {
 // to the identifier rules.
 
         switch (id) {
+        case "(number)":
+
+// PR-xxx - jquery - Tolerate numeric object-key `{0: 200}` - warn, do not stop.
+// Like a non-identifier string-key, it is not tallied for /*property*/.
+
+// test_cause:
+// ["String({0:0})", "survey", "unexpected_a", "0", 9]
+
+            warn("unexpected_a", name);
+            return name.value;
         case "(string)":
             id = name.value;
             if (!jslint_rgx_identifier.test(id)) {
@@ -8288,7 +8293,7 @@ function jslint_phase3_parse(state) {
             if (!name.identifier) {
 
 // test_cause:
-// ["let aa={0:0}", "survey", "expected_identifier_a", "0", 9]
+// ["String({+:0})", "survey", "expected_identifier_a", "+", 9]
 
                 return stop("expected_identifier_a", name);
             }
@@ -9832,28 +9837,6 @@ function jslint_phase5_whitage(state) {
     const indent_stack = [];
     let closer = "(end)";
     let dot_depth = 0;
-
-// free = false
-
-// cause:
-// "()=>0"
-// "aa()"
-// "aa(0,0)"
-// "function(){}"
-
-// free = true
-
-// cause:
-// "(0)"
-// "(aa)"
-// "aa(0)"
-// "do{}while()"
-// "for(){}"
-// "if(){}"
-// "switch(){}"
-// "while(){}"
-
-    let free = false;
     let indentage;
     let left = token_global;
     let margin = 0;
@@ -10011,7 +9994,6 @@ function jslint_phase5_whitage(state) {
 
         indentage = indent_stack.pop();
         closer = indentage.closer;
-        free = indentage.free;
         margin = indentage.margin;
         open = indentage.open;
         opening = indentage.opening;
@@ -10111,10 +10093,7 @@ function jslint_phase5_whitage(state) {
         if (left.id === ",") {
             if (
                 !open
-                || (
-                    (free || closer === "]")
-                    && left.line === right.line
-                )
+                || (closer === "]" && left.line === right.line)
             ) {
 
 // test_cause:
@@ -10150,29 +10129,6 @@ function jslint_phase5_whitage(state) {
 
             test_cause("(0?0:0", right.id);
             warn("use_open", right);
-            return;
-        }
-        if (
-            right.arity === "binary"
-            && right.id === "("
-            && free
-        ) {
-
-// test_cause:
-// ["String(\nString()\n);", "whitage_default", "aa(0", "(", 0]
-
-            test_cause("aa(0", right.id);
-
-// Commit 3903449a - Inline internal-function no_space() into whitage_default().
-
-            if (right.from < margin) {
-
-// test_cause:
-// ["String(\nString\n()\n);", "whitage_default", "expected_at(margin)", "(", 0]
-
-                test_cause("expected_at(margin)", right.id);
-                expected_at(margin);
-            }
             return;
         }
         if (
@@ -10316,7 +10272,6 @@ function jslint_phase5_whitage(state) {
         indentage = {
             closer,
             dot_depth,
-            free,
             margin,
             open,
             opening
@@ -10355,7 +10310,6 @@ function jslint_phase5_whitage(state) {
 // ["String(\n0);", "whitage_opener", "(\n0)", "0", 0]
 
             test_cause("(\n0)", right.value);
-            free = closer === ")" && left.free;
             open = true;
             margin += mode_indent;
             if (right.role === "label") {
@@ -10393,7 +10347,6 @@ function jslint_phase5_whitage(state) {
                 artifact(right)
             );
         }
-        free = false;
         open = false;
 
 // test_cause:
@@ -10448,7 +10401,6 @@ function jslint_phase5_whitage(state) {
         delete left.alive;
         delete left.assigned;
         delete left.calls;
-        delete left.free;
         delete left.open;
         delete left.used;
         left = right;
