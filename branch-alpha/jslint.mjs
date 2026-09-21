@@ -94,7 +94,6 @@
 /*property
     JSLINT_BETA,
     NODE_V8_COVERAGE,
-    a,
     alive,
     all,
     argv,
@@ -109,14 +108,12 @@
     async,
     autofix,
     autofixed,
-    b,
     beta,
     bitwise,
     block,
     block_list,
     block_stack,
     browser,
-    c,
     calls,
     catch,
     causes,
@@ -138,7 +135,6 @@
     coverageDir,
     create,
     cwd,
-    d,
     debugInline,
     default,
     delta,
@@ -1436,11 +1432,11 @@ function jslint(
 // resembles an exception.
 
         const warning = {
-            a,
-            b,
-            c,
+            a, //jslint-ignore-line
+            b, //jslint-ignore-line
+            c, //jslint-ignore-line
             code,
-            d,
+            d, //jslint-ignore-line
             line,
             line_source: "",
             name: "JSLintError",
