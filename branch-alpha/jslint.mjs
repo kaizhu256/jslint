@@ -2868,8 +2868,13 @@ function jslint_phase2_lex(state) {
         if (match !== undefined && char !== match) {
 
 // test_cause:
+// ["aa=/", "char_after", "expected_a_after_b", "/", 4]
+// ["aa=/(?-", "char_after", "expected_a_after_b", "-", 7]
 // ["aa=/[", "char_after", "expected_a_after_b", "[", 5]
 // ["aa=/aa{/", "char_after", "expected_a_b", "/", 8]
+
+// At end of line <snippet> may have been reset or trimmed, so name the last
+// character of the whole line as <b>.
 
             return (
                 char === ""
@@ -2878,7 +2883,7 @@ function jslint_phase2_lex(state) {
                     line,
                     column - 1,
                     match,
-                    snippet.slice(-1)
+                    line_list[line].line_source.slice(-1)
                 )
                 : stop_at("expected_a_b", line, column - 1, match, char)
             );
@@ -3556,6 +3561,12 @@ function jslint_phase2_lex(state) {
                                     char_after();
                                     break;
                                 default:
+
+// End of line inside (?flags - report the missing ":" the way char_after does.
+
+                                    if (char === "") {
+                                        return char_after(":");
+                                    }
 
 // test_cause:
 // ["aa=/(?-.", "lex_regexp_group", "unexpected_a_after_b", "(?-", 8]
