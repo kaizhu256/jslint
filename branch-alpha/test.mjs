@@ -968,7 +968,8 @@ jstestDescribe((
     });
     jstestIt((
         "test cli-cjs-and-invalid-file handling-behavior"
-    ), function () {
+    ), async function () {
+        await moduleFs.promises.mkdir(".tmp/test_dir", {recursive: true});
         [
             ".",            // test dir handling-behavior
             "jslint.mjs",   // test file handling-behavior
