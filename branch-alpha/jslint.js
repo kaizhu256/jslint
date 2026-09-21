@@ -2719,6 +2719,15 @@ async function jslint_cli({
                 let code;
                 let result_dir;
                 let time_start = Date.now();
+
+// Skip dotfiles - `.jquery-4.0.0.js`, `.a00.mjs`, an editor's swapfile.
+// A dotfile named explicitly on the command-line is still linted.
+
+                if ((
+                    /^\./
+                ).test(file2)) {
+                    return;
+                }
                 file2 = file + "/" + file2;
                 switch ((
                     /\.\w+?$|$/m

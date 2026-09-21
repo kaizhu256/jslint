@@ -969,7 +969,15 @@ jstestDescribe((
     jstestIt((
         "test cli-cjs-and-invalid-file handling-behavior"
     ), async function () {
-        await fsWriteFileWithParents(".test_dir.cjs/touch.txt", "");
+// temp_dir.cjs is a directory named like a file - the directory-lint must
+// survive its readFile failing. Not dot-prefixed, because dotfiles are skipped
+// before readFile; .gitignore's `temp*` hides it.
+
+        await fsWriteFileWithParents("temp_dir.cjs/touch.txt", "");
+
+// A dotfile that would fail to parse - the directory-lint must skip it.
+
+        await fsWriteFileWithParents(".test_dotfile_skip.js", "syntax error(");
         [
             ".",            // test dir handling-behavior
             "jslint.mjs",   // test file handling-behavior
