@@ -2720,7 +2720,7 @@ async function jslint_cli({
                 let result_dir;
                 let time_start = Date.now();
 
-// Skip dotfile (e.g. .dotfile.js) when reading directory.
+// Skip dotfile (e.g. .foo.js) when reading directory.
 
                 if ((/^\./).test(file2)) {
                     return;
@@ -7322,10 +7322,7 @@ function jslint_phase3_parse(state) {
             token_nxt.for_init = true;
             the_for.for_semicolon[0] = parse_statement_single();
 
-// jquery.js - Tolerate comma-expression in for-init `for (i = 0, l = n;;)`.
-// semicolon() has already warned expected_a_after_b at the comma and did NOT
-// advance, so token_nxt is still the comma; parse the rest instead of
-// stopping in parse_expression().
+// PR-xxx - jquery - Allow comma-expression in for_init `for(ii=0,jj=0;;)`.
 
             while (token_nxt.id === ",") {
 
