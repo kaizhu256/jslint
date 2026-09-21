@@ -7487,7 +7487,7 @@ body {
 <pre><span class="lineno"><a href="#line_7322" id="line_7322"> 7322.</a></span><span class="count                ">     18</span><span>            token_nxt.for_init = true;</span></pre>
 <pre><span class="lineno"><a href="#line_7323" id="line_7323"> 7323.</a></span><span class="count                ">     18</span><span>            the_for.for_semicolon[0] = parse_statement_single();</span></pre>
 <pre><span class="lineno"><a href="#line_7324" id="line_7324"> 7324.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7325" id="line_7325"> 7325.</a></span><span class="count                ">     18</span><span>// PR-xxx - jquery - Allow comma-expression in for_init `for(ii=0,jj=0;;)`.</span></pre>
+<pre><span class="lineno"><a href="#line_7325" id="line_7325"> 7325.</a></span><span class="count                ">     18</span><span>// PR-xxx - jquery - Tolerate comma-expression in for_init `for(ii=0,jj=0;;)`.</span></pre>
 <pre><span class="lineno"><a href="#line_7326" id="line_7326"> 7326.</a></span><span class="count                ">     18</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7327" id="line_7327"> 7327.</a></span><span class="count                ">     18</span><span>            while (token_nxt.id === ",") {</span></pre>
 <pre><span class="lineno"><a href="#line_7328" id="line_7328"> 7328.</a></span><span class="count                ">     18</span><span></span></pre>
@@ -8432,7 +8432,7 @@ body {
 <pre><span class="lineno"><a href="#line_8267" id="line_8267"> 8267.</a></span><span class="count                ">  14932</span><span>        switch (id) {</span></pre>
 <pre><span class="lineno"><a href="#line_8268" id="line_8268"> 8268.</a></span><span class="count                ">      1</span><span>        case "(number)":</span></pre>
 <pre><span class="lineno"><a href="#line_8269" id="line_8269"> 8269.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8270" id="line_8270"> 8270.</a></span><span class="count                ">      1</span><span>// jquery.js - Tolerate numeric object-key `{0: 200}` - warn, do not stop.</span></pre>
+<pre><span class="lineno"><a href="#line_8270" id="line_8270"> 8270.</a></span><span class="count                ">      1</span><span>// PR-xxx - jquery - Tolerate numeric object-key `{0: 200}` - warn, do not stop.</span></pre>
 <pre><span class="lineno"><a href="#line_8271" id="line_8271"> 8271.</a></span><span class="count                ">      1</span><span>// Like a non-identifier string-key, it is not tallied for /*property*/.</span></pre>
 <pre><span class="lineno"><a href="#line_8272" id="line_8272"> 8272.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8273" id="line_8273"> 8273.</a></span><span class="count                ">      1</span><span>// test_cause:</span></pre>

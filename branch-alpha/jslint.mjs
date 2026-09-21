@@ -7322,7 +7322,7 @@ function jslint_phase3_parse(state) {
             token_nxt.for_init = true;
             the_for.for_semicolon[0] = parse_statement_single();
 
-// PR-xxx - jquery - Allow comma-expression in for_init `for(ii=0,jj=0;;)`.
+// PR-xxx - jquery - Tolerate comma-expression in for_init `for(ii=0,jj=0;;)`.
 
             while (token_nxt.id === ",") {
 
@@ -8267,7 +8267,7 @@ function jslint_phase3_parse(state) {
         switch (id) {
         case "(number)":
 
-// jquery.js - Tolerate numeric object-key `{0: 200}` - warn, do not stop.
+// PR-xxx - jquery - Tolerate numeric object-key `{0: 200}` - warn, do not stop.
 // Like a non-identifier string-key, it is not tallied for /*property*/.
 
 // test_cause:
