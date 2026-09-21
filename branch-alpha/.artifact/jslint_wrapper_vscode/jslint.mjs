@@ -4085,9 +4085,6 @@ function jslint_phase2_lex(state) {
 
             if (!match) {
 
-// <line_source[0]> is NOT consumed, so <column> already indexes it. The "#"
-// fixture below cannot see a shift here - it clamps to column 1 either way.
-
 // test_cause:
 // ["#", "lex_token", "unexpected_char_a", "#", 1]
 // ["aa=#0", "lex_token", "unexpected_char_a", "#", 4]
@@ -4095,6 +4092,9 @@ function jslint_phase2_lex(state) {
                 return stop_at(
                     "unexpected_char_a",
                     line,
+
+// <line_source[0]> is NOT consumed, so <column> already indexes it.
+
                     column - 0,
                     line_source[0]
                 );
@@ -4340,15 +4340,10 @@ function jslint_phase2_lex(state) {
         } else if (line_source === "/*jslint-enable*/") {
             if (line_disable === undefined) {
 
-// <read_line> set <column> to 0 above and nothing was consumed, so the old
-// <column - 1> passed -1 and only LOOKED right because Math.max(0, ...) floors
-// it. The directive must be the whole line, so no col >= 2 fixture can exist
-// to catch this - the masked arithmetic is all there is to review.
-
 // test_cause:
 // ["/*jslint-enable*/", "read_line", "unopened_enable", "", 1]
 
-                return stop_at("unopened_enable", line, column - 0);
+                return stop_at("unopened_enable", line, 0);
             }
             line_disable = undefined;
         } else if (
@@ -6989,11 +6984,6 @@ function jslint_phase3_parse(state) {
             advance(";");
         } else {
 
-// <thru> is EXCLUSIVE - one past the token's last char - so it marked the
-// character AFTER <b>. At end of line the clamp pulled it back onto <b> and
-// hid that; off end of line it did not. <expected_a_after_b> exists so the
-// message names the character the marker covers, so mark <b> itself.
-
 // test_cause:
 // [" 0//c", "semicolon", "expected_a_after_b", "0", 2]
 // ["0", "semicolon", "expected_a_after_b", "0", 1]
@@ -7001,6 +6991,12 @@ function jslint_phase3_parse(state) {
             warn_at(
                 "expected_a_after_b",
                 token_now.line,
+
+// <thru> is EXCLUSIVE - one past the token's last char - so it marked the
+// character AFTER <b>. At end of line the clamp pulled it back onto <b> and
+// hid that; off end of line it did not. <expected_a_after_b> exists so the
+// message names the character the marker covers, so mark <b> itself.
+
                 token_now.thru - 1,
                 ";",
                 artifact(token_now)
@@ -7990,18 +7986,11 @@ function jslint_phase3_parse(state) {
             warn("unexpected_a", the_try);
         }
         scope_function.try += 1;
-
-// A braceless body is legal js for if/while/for/do, and block() serves those
-// by only WARNING and NOT advancing - but <the_block> is then <token_now>,
-// which for "try" was still <the_try>, so walk_statement recursed on
-// thing.block forever. ALL THREE of try/catch/finally REQUIRE braces in js,
-// so each demands one below. Guarding here rather than in block() keeps
-// <ignored> working for catch - "naked" and "ignore" cannot both be passed.
+        if (token_nxt.id !== "{") {
 
 // test_cause:
 // ["try", "stmt_try", "expected_a_b", "(end)", 3]
 
-        if (token_nxt.id !== "{") {
             return stop("expected_a_b", token_nxt, "{", artifact());
         }
         the_try.block = block();
