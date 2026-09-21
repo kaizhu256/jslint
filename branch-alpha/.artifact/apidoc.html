@@ -975,11 +975,13 @@ ${String(message).slice(0, 2000)}`
 // Count line-terminators the way &lt;jslint_rgx_crlf&gt; splits them, without
 // materialising every preceding line.
 
-                    code
-                        .slice(0, ii)
-                        .match(new RegExp(jslint_rgx_crlf, "g"))
-                        ?.length ||
-                    0
+                    (
+                        code
+                            .slice(0, ii)
+                            .match(new RegExp(jslint_rgx_crlf, "g"))
+                            ?.length ||
+                        0
+                    )
                 ),
                 mode_conditional,
                 option
@@ -992,8 +994,7 @@ ${String(message).slice(0, 2000)}`
             }
             return (
                 match0.slice(
-                    0,
-                    match0.length - match1.length -...
+          ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

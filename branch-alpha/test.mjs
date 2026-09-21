@@ -1077,6 +1077,39 @@ jstestDescribe((
         });
     });
     jstestIt((
+        "test cli-embedded-line-offset handling-behavior"
+    ), async function () {
+
+// An embedded block whose opening tag is LINE 1 of its container has no line
+// terminator before it, so the offset arithmetic must still yield 1 - a
+// precedence slip once made it 0, and every warning in the block reported one
+// line too high. <foo> sits on file-line 3 and must be reported there.
+
+        const stderr_list = [];
+        await fsWriteFileWithParents(
+            ".tmp/embedded_line1.html",
+            "<script>\n/*jslint browser*/\nfoo;\n</script>\n"
+        );
+        await jslint.jslint_cli({
+            console_error: function (msg) {
+                stderr_list.push(String(msg));
+            },
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                ".tmp/embedded_line1.html"
+            ],
+            process_exit: processExit1
+        });
+        assertOrThrow(
+            stderr_list.some(function (msg) {
+                return msg.includes("line 3, column 1");
+            }),
+            JSON.stringify(stderr_list)
+        );
+    });
+    jstestIt((
         "test cli-report-error handling-behavior"
     ), function () {
         jslint.jslint_cli({

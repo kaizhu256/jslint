@@ -2400,11 +2400,13 @@ async function jslint_cli({
 // Count line-terminators the way <jslint_rgx_crlf> splits them, without
 // materialising every preceding line.
 
-                    code
-                        .slice(0, ii)
-                        .match(new RegExp(jslint_rgx_crlf, "g"))
-                        ?.length ||
-                    0
+                    (
+                        code
+                            .slice(0, ii)
+                            .match(new RegExp(jslint_rgx_crlf, "g"))
+                            ?.length ||
+                        0
+                    )
                 ),
                 mode_conditional,
                 option
