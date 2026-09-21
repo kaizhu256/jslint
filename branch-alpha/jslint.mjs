@@ -1449,10 +1449,7 @@ function jslint(
         let mm;
         jslint_assert(typeof column === "number", `column=${column}`);
 
-// An (end) token sits one line PAST the last - <read_line> does line += 1 and
-// returns early - so <line_list> has no entry, <line_source> stays "" and the
-// clamp below would discard <column> and report column 1 of a line the file
-// does not have. Re-point it at the last character of the last real line.
+// Handle premature EOF.
 
         if (line >= line_list.length) {
             warning.line = line_list.length - 1;
