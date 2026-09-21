@@ -2779,10 +2779,7 @@ async function jslint_cli({
 // and returns no single lint-result, so there is nothing to report on.
 
         if (result.warnings === undefined) {
-            console_error(
-                `jslint_report - ${file} - ` +
-                "only a javascript file can be reported"
-            );
+            console_error(`jslint_report - ${file} - not javascript file`);
             exit_code = 1;
             process_exit(exit_code);
             return exit_code;
