@@ -10,9 +10,9 @@
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add html and css linting back into jslint.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
-- jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.9.29
+- jslint - Improve parser to parse jquery.js without stopping - for-init comma, numeric object-key.
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
