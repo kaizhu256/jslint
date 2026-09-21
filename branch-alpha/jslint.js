@@ -261,7 +261,6 @@
     log,
     long,
     loop,
-    m,
     map,
     margin,
     match,
@@ -393,13 +392,11 @@
     trimStart,
     try,
     type,
-    u,
     unlink,
     unordered,
     unshift,
     url,
     used,
-    v,
     v8CoverageListMerge,
     v8CoverageReportCreate,
     value,
@@ -3814,7 +3811,9 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/./vu", "lex_regexp", "unexpected_a", "u", 8]
 
-                if (flag.v) {
+                if (
+                    flag.v //jslint-ignore-line
+                ) {
                     warn_at("unexpected_a", line, column - 1, char);
                 }
                 break;
@@ -3828,7 +3827,9 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/./uv", "lex_regexp", "unexpected_a", "v", 8]
 
-                if (flag.u) {
+                if (
+                    flag.u //jslint-ignore-line
+                ) {
                     warn_at("unexpected_a", line, column - 1, char);
                 }
                 break;
@@ -3861,7 +3862,10 @@ function jslint_phase2_lex(state) {
         result = token_create("(regexp)", char);
         result.flag = flag;
         result.value = value;
-        if (mode_regexp_multiline && !flag.m) {
+        if (
+            mode_regexp_multiline &&
+            !flag.m //jslint-ignore-line
+        ) {
 
 // test_cause:
 // ["aa=/$^/", "lex_regexp", "missing_m", "", 7]
