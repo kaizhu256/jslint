@@ -1454,7 +1454,7 @@ function jslint(
 // clamp below would discard <column> and report column 1 of a line the file
 // does not have. Re-point it at the last character of the last real line.
 
-        if (line_list[line] === undefined) {
+        if (line >= line_list.length) {
             warning.line = line_list.length - 1;
             warning.line_source = line_list[warning.line].line_source;
             column = warning.line_source.length - 1;
