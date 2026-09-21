@@ -1451,6 +1451,17 @@ function jslint(
         };
         let mm;
         jslint_assert(typeof column === "number", `column=${column}`);
+
+// An (end) token sits one line PAST the last - <read_line> does line += 1 and
+// returns early - so <line_list> has no entry, <line_source> stays "" and the
+// clamp below would discard <column> and report column 1 of a line the file
+// does not have. Re-point it at the last character of the last real line.
+
+        if (line_list[line] === undefined) {
+            warning.line = line_list.length - 1;
+            warning.line_source = line_list[warning.line].line_source;
+            column = warning.line_source.length - 1;
+        }
         warning.column = (
 
 // Fudge column numbers in warning message.
@@ -3075,7 +3086,7 @@ function jslint_phase2_lex(state) {
                 if (line_source === undefined) {
 
 // test_cause:
-// ["/*", "lex_comment", "unclosed_comment", "", 1]
+// ["/*", "lex_comment", "unclosed_comment", "", 2]
 
                     return stop_at("unclosed_comment", line, column - 0);
                 }
@@ -4062,13 +4073,17 @@ function jslint_phase2_lex(state) {
 
             if (!match) {
 
+// <line_source[0]> is NOT consumed, so <column> already indexes it. The "#"
+// fixture below cannot see a shift here - it clamps to column 1 either way.
+
 // test_cause:
 // ["#", "lex_token", "unexpected_char_a", "#", 1]
+// ["aa=#0", "lex_token", "unexpected_char_a", "#", 4]
 
                 return stop_at(
                     "unexpected_char_a",
                     line,
-                    column - 1,
+                    column - 0,
                     line_source[0]
                 );
             }
@@ -4607,12 +4622,13 @@ function jslint_phase3_parse(state) {
                 match === undefined
 
 // test_cause:
+// ["try", "advance", "expected_a_b", "(end)", 3]
 // ["{0:0}", "advance", "expected_a_b", "0", 2]
 
                 ? stop("expected_a_b", token_nxt, id, artifact())
 
 // test_cause:
-// ["{\"aa\":0", "advance", "expected_a_b_from_c_d", "{", 1]
+// ["{\"aa\":0", "advance", "expected_a_b_from_c_d", "{", 7]
 
                 : stop(
                     "expected_a_b_from_c_d",
@@ -5128,7 +5144,7 @@ function jslint_phase3_parse(state) {
 // ["
 // /*jslint eval*/
 // Function
-// ", "constant_Function", "expected_a_before_b", "(end)", 1]
+// ", "constant_Function", "expected_a_before_b", "(end)", 8]
 
             warn("expected_a_before_b", token_nxt, "(", artifact());
         }
@@ -5154,7 +5170,7 @@ function jslint_phase3_parse(state) {
         } else if (token_nxt.id !== "(") {
 
 // test_cause:
-// ["/*jslint eval*/\neval", "constant_eval", "expected_a_before_b", "(end)", 1]
+// ["/*jslint eval*/\neval", "constant_eval", "expected_a_before_b", "(end)", 4]
 
             warn("expected_a_before_b", token_nxt, "(", artifact());
         }
@@ -6879,7 +6895,7 @@ function jslint_phase3_parse(state) {
         if (token_nxt.id !== "(") {
 
 // test_cause:
-// ["new aa", "prefix_new", "expected_a_before_b", "(end)", 1]
+// ["new aa", "prefix_new", "expected_a_before_b", "(end)", 6]
 
             warn("expected_a_before_b", token_nxt, "()", artifact());
         }
@@ -7207,7 +7223,7 @@ function jslint_phase3_parse(state) {
             } else {
 
 // test_cause:
-// ["export", "stmt_export", "unexpected_a", "(end)", 1]
+// ["export", "stmt_export", "unexpected_a", "(end)", 6]
 
                 return stop("unexpected_a");
             }
@@ -7482,7 +7498,7 @@ function jslint_phase3_parse(state) {
                 if (!token_nxt.identifier) {
 
 // test_cause:
-// ["import * as", "stmt_import", "expected_identifier_a", "(end)", 1]
+// ["import * as", "stmt_import", "expected_identifier_a", "(end)", 11]
 
                     return stop("expected_identifier_a", token_nxt);
                 }
@@ -7518,7 +7534,7 @@ function jslint_phase3_parse(state) {
                         if (!token_nxt.identifier) {
 
 // test_cause:
-// ["import {", "stmt_import", "expected_identifier_a", "(end)", 1]
+// ["import {", "stmt_import", "expected_identifier_a", "(end)", 8]
 
                             return stop("expected_identifier_a", token_nxt);
                         }
@@ -7916,7 +7932,15 @@ function jslint_phase3_parse(state) {
             warn("unexpected_a", the_try);
         }
         scope_function.try += 1;
-        the_try.block = block();
+
+// A braceless body is legal for if/while/for/do, so block() only WARNS and
+// does not advance - but then <the_block> is <token_now>, which here is still
+// <the_try>, and walk_statement recursed on thing.block forever. "try"
+// REQUIRES braces in js, so demand them: advance("{") stops with
+// <expected_a_b>, and block("naked") is then what block() would have built.
+
+        advance("{");
+        the_try.block = block("naked");
         the_disrupt = the_try.block.disrupt;
         if (token_nxt.id === "catch") {
             ignored = "ignore";
@@ -8882,7 +8906,15 @@ function jslint_phase4_walk(state) {
                     warn("weird_expression_a", thing);
                 }
             }
-        } else if (thing.id !== "=>" && thing.id !== "(") {
+
+// A tagged-template is infix at the same bp as "(" and is a CALL, not a
+// two-operand operation - <expression> holds only the tag, so <right> is
+// undefined. A non-constant tag merely short-circuited the test below; a
+// constant one reached <right.constant> and threw.
+
+        } else if (
+            thing.id !== "=>" && thing.id !== "(" && thing.id !== "`"
+        ) {
             right = thing.expression[1];
             if (
                 (thing.id === "+" || thing.id === "-")
