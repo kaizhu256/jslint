@@ -7882,6 +7882,13 @@ function jslint_phase3_parse(state) {
                     the_disrupt = false;
                 }
             } else {
+
+// test_cause:
+// ["
+// function aa(){switch(0){case 0:aa();}}
+// aa();
+// ", "stmt_switch", "expected_a_before_b", "}", 37]
+
                 warn("expected_a_before_b", token_nxt, "break;", artifact());
             }
             if (token_nxt.id !== "case") {
