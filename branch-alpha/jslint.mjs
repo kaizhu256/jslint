@@ -3237,7 +3237,8 @@ function jslint_phase2_lex(state) {
 
                         return stop_at(
                             "expected_a_b",
-                            line, column - 1,
+                            line,
+                            column - 1,
                             "}",
                             "{"
                         );
@@ -3275,6 +3276,7 @@ function jslint_phase2_lex(state) {
 
 // test_cause:
 // [";`0", "lex_megastring", "unclosed_mega", "", 2]
+// ["`", "lex_megastring", "unclosed_mega", "", 1]
 
                     return stop_at("unclosed_mega", line_mega, from_mega);
                 }
