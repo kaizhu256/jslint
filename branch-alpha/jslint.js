@@ -1440,16 +1440,15 @@ function jslint(
             line,
             line_source: "",
             name: "JSLintError",
-            ...line_list[line]
+            ...line_list[Math.min(line, line_list.length - 1)]
         };
         let mm;
         jslint_assert(typeof column === "number", `column=${column}`);
+        if (line >= line_list.length) {
 
 // Handle premature EOF.
 
-        if (line >= line_list.length) {
             warning.line = line_list.length - 1;
-            warning.line_source = line_list[warning.line].line_source;
             column = warning.line_source.length - 1;
         }
         warning.column = (
@@ -3051,9 +3050,10 @@ function jslint_phase2_lex(state) {
             if (line_source[0] === "/") {
 
 // test_cause:
-// ["/*/", "lex_comment", "unexpected_a", "/", 2]
+// ["/*/", "lex_comment", "unexpected_a", "/", 3]
+// ["/*/*", "lex_comment", "unexpected_a", "/", 3]
 
-                warn_at("unexpected_a", line, column - 1 + ii, "/");
+                warn_at("unexpected_a", line, column - 0, "/");
             }
 
 // Lex/loop through each line until "*/".
@@ -3069,9 +3069,9 @@ function jslint_phase2_lex(state) {
                 if (ii >= 0) {
 
 // test_cause:
-// ["/*/*", "lex_comment", "nested_comment", "", 2]
+// ["/*/*", "lex_comment", "nested_comment", "", 3]
 
-                    warn_at("nested_comment", line, column - 1 + ii);
+                    warn_at("nested_comment", line, column - 0 + ii);
                 }
                 snippet.push(line_source);
                 line_source = read_line();
@@ -3089,9 +3089,9 @@ function jslint_phase2_lex(state) {
             if (jj >= 0) {
 
 // test_cause:
-// ["/*/**/", "lex_comment", "nested_comment", "", 2]
+// ["/*/**/", "lex_comment", "nested_comment", "", 3]
 
-                warn_at("nested_comment", line, column - 1 + jj);
+                warn_at("nested_comment", line, column - 0 + jj);
             }
             snippet.push(line_source.slice(0, ii));
             snippet = snippet.join(" ");
