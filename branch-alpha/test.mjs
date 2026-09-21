@@ -968,8 +968,7 @@ jstestDescribe((
     });
     jstestIt((
         "test cli-cjs-and-invalid-file handling-behavior"
-    ), async function () {
-        await fsWriteFileWithParents(".test_dir.cjs/touch.txt", "");
+    ), function () {
         [
             ".",            // test dir handling-behavior
             "jslint.mjs",   // test file handling-behavior
