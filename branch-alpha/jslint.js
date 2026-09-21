@@ -2720,7 +2720,7 @@ async function jslint_cli({
                 let result_dir;
                 let time_start = Date.now();
 
-// Skip dotfile (e.g. .foo.js) when reading directory.
+// PR-xxx - Skip dotfile (e.g. .foo.js) when reading directory.
 
                 if ((/^\./).test(file2)) {
                     return;
