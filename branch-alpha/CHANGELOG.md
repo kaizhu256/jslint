@@ -13,11 +13,11 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.9.29
-- jslint - Remove dead token-property 'free' from parser and whitage.
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
-- jslint - Move column-fudging into warn_at(); callers pass 0-based column.
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
+- jslint - Move column-fudging into warn_at(); callers pass 0-based column.
+- jslint - Remove dead token-property 'free' from parser and whitage.
 - jslint-ci - Merge ci-shell-function shGithubPrUpdatePrxxx() into shGithubPrCreate().
 
 # v2026.8.31

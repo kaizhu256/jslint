@@ -107,37 +107,37 @@
     textLength="768"
     x="10"
     y="384"
->- jslint - Remove dead token-property 'free' from parser and whitage.                            </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="406"
 >- jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add fu\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="428"
+    y="406"
 >  nction jslint_phase6_autofix().                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="450"
->- jslint - Move column-fudging into warn_at(); callers pass 0-based column.                      </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="472"
+    y="428"
 >- jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="494"
+    y="450"
 >- jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.                      </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="472"
+>- jslint - Move column-fudging into warn_at(); callers pass 0-based column.                      </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="494"
+>- jslint - Remove dead token-property 'free' from parser and whitage.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
