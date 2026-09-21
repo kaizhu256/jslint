@@ -886,9 +886,9 @@ ${String(message).slice(0, 2000)}`
     throw error;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
+        delete left.alive;
         delete left.assigned;
         delete left.calls;
-        delete left.free;
         delete left.open;
         delete left.used;
         left = right;
@@ -1337,28 +1337,6 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
     const indent_stack = [];
     let closer = "(end)";
     let dot_depth = 0;
-
-// free = false
-
-// cause:
-// "()=&gt;0"
-// "aa()"
-// "aa(0,0)"
-// "function(){}"
-
-// free = true
-
-// cause:
-// "(0)"
-// "(aa)"
-// "aa(0)"
-// "do{}while()"
-// "for(){}"
-// "if(){}"
-// "switch(){}"
-// "while(){}"
-
-    let free = false;
     let indentage;
     let left = token_global;
     let margin = 0;
@@ -1412,7 +1390,15 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
                 if (!name.used) {
 
 // test_cause:
-// ["function aa(bb){return;}", "delve", "unused_a", "...
+// ["function aa(bb){return;}", "delve", "unused_a", "bb", 13]
+// ["let aa;", "delve", "unused_a", "aa", 5]
+// ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]
+
+                    warn("unused_a", name);
+                } else if (!name.assigned) {
+
+// test_cause:
+//...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

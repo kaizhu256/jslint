@@ -65,49 +65,49 @@
     textLength="768"
     x="10"
     y="230"
->- jslint - Audit token-property '.free'.                                                         </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="252"
 >- jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="274"
+    y="252"
 >- jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="296"
+    y="274"
 >- jslint - Add html and css linting back into jslint.                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="318"
+    y="296"
 >- jslint - Add new warning requiring paren around plus-separated concatenations.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="340"
+    y="318"
 >- jslint - Try to improve parser to be able to parse jquery.js without stopping.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="362"
+    y="340"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="384"
+    y="362"
 ># v2026.9.29                                                                                     </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="384"
+>- jslint - Remove dead token-property 'free' from parser and whitage.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
