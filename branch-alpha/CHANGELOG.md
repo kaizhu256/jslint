@@ -1,7 +1,7 @@
 # Changelog
 
 # Todo
-- jslint- Review binding-power of operators.
+- jslint - Review binding-power of operators.
 - jslint-vscode - Add extra contextmenu command "JSLint - Autofix Whitespace".
 - jslint-directive - Add new directive 'tab' to support tab-indent.
 - jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.'.
@@ -15,6 +15,7 @@
 
 # v2026.9.29
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
+- jslint - Move column-fudging into warn_at(); callers pass 0-based column.
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
 - jslint-ci - Merge ci-shell-function shGithubPrUpdatePrxxx() into shGithubPrCreate().
