@@ -2885,8 +2885,7 @@ function jslint_phase2_lex(state) {
                     column - 1,
                     match,
 
-// At end of line <snippet> may have been reset or trimmed, so name the last
-// character of the whole line as <b>.
+// At EOL, <snippet> may have been reset or trimmed, so use <line_list[line]>.
 
                     line_list[line].line_source.slice(-1)
                 )
@@ -4085,9 +4084,6 @@ function jslint_phase2_lex(state) {
                 return stop_at(
                     "unexpected_char_a",
                     line,
-
-// <line_source[0]> is NOT consumed, so <column> already indexes it.
-
                     column - 0,
                     line_source[0]
                 );
@@ -4336,7 +4332,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*jslint-enable*/", "read_line", "unopened_enable", "", 1]
 
-                return stop_at("unopened_enable", line, 0);
+                return stop_at("unopened_enable", line, column - 0);
             }
             line_disable = undefined;
         } else if (
