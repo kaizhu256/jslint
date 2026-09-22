@@ -2720,7 +2720,7 @@ async function jslint_cli({
                 let result_dir;
                 let time_start = Date.now();
 
-// PR-xxx - Skip dotfile (e.g. .foo.js) when reading directory.
+// PR-409 - Skip dotfile (e.g. .foo.js) when reading directory.
 
                 if ((/^\./).test(file2)) {
                     return;
@@ -7322,7 +7322,7 @@ function jslint_phase3_parse(state) {
             token_nxt.for_init = true;
             the_for.for_semicolon[0] = parse_statement_single();
 
-// PR-xxx - jquery - Tolerate comma-expression in for_init `for(ii=0,jj=0;;)`.
+// PR-409 - jquery - Tolerate comma-expression in for_init `for(ii=0,jj=0;;)`.
 
             while (token_nxt.id === ",") {
 
@@ -8267,7 +8267,7 @@ function jslint_phase3_parse(state) {
         switch (id) {
         case "(number)":
 
-// PR-xxx - jquery - Tolerate numeric object-key `{0: 200}` - warn, do not stop.
+// PR-409 - jquery - Tolerate numeric object-key `{0: 200}` - warn, do not stop.
 // Like a non-identifier string-key, it is not tallied for /*property*/.
 
 // test_cause:
