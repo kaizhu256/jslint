@@ -1010,19 +1010,19 @@ body {
 <pre><span class="lineno"><a href="#line_845" id="line_845">  845.</a></span><span class="count                ">     81</span><span>// Try writing to pathname.</span></pre>
 <pre><span class="lineno"><a href="#line_846" id="line_846">  846.</a></span><span class="count                ">     81</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_847" id="line_847">  847.</a></span><span class="count                ">     81</span><span>    try {</span></pre>
-<pre><span class="lineno"><a href="#line_848" id="line_848">  848.</a></span><span class="count                ">     68</span><span>        await moduleFs.promises.writeFile(pathname, data);</span></pre>
-<pre><span class="lineno"><a href="#line_849" id="line_849">  849.</a></span><span class="count                ">     68</span><span>    } catch (ignore) {</span></pre>
-<pre><span class="lineno"><a href="#line_850" id="line_850">  850.</a></span><span class="count                ">     13</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_851" id="line_851">  851.</a></span><span class="count                ">     13</span><span>// Lazy mkdirp.</span></pre>
-<pre><span class="lineno"><a href="#line_852" id="line_852">  852.</a></span><span class="count                ">     13</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_853" id="line_853">  853.</a></span><span class="count                ">     13</span><span>        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {</span></pre>
-<pre><span class="lineno"><a href="#line_854" id="line_854">  854.</a></span><span class="count                ">     13</span><span>            recursive: true</span></pre>
-<pre><span class="lineno"><a href="#line_855" id="line_855">  855.</a></span><span class="count                ">     13</span><span>        });</span></pre>
-<pre><span class="lineno"><a href="#line_856" id="line_856">  856.</a></span><span class="count                ">     13</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_857" id="line_857">  857.</a></span><span class="count                ">     13</span><span>// Retry writing to pathname.</span></pre>
-<pre><span class="lineno"><a href="#line_858" id="line_858">  858.</a></span><span class="count                ">     13</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_859" id="line_859">  859.</a></span><span class="count                ">     13</span><span>        await moduleFs.promises.writeFile(pathname, data);</span></pre>
-<pre><span class="lineno"><a href="#line_860" id="line_860">  860.</a></span><span class="count                ">     13</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_848" id="line_848">  848.</a></span><span class="count                ">     60</span><span>        await moduleFs.promises.writeFile(pathname, data);</span></pre>
+<pre><span class="lineno"><a href="#line_849" id="line_849">  849.</a></span><span class="count                ">     60</span><span>    } catch (ignore) {</span></pre>
+<pre><span class="lineno"><a href="#line_850" id="line_850">  850.</a></span><span class="count                ">     21</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_851" id="line_851">  851.</a></span><span class="count                ">     21</span><span>// Lazy mkdirp.</span></pre>
+<pre><span class="lineno"><a href="#line_852" id="line_852">  852.</a></span><span class="count                ">     21</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_853" id="line_853">  853.</a></span><span class="count                ">     21</span><span>        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {</span></pre>
+<pre><span class="lineno"><a href="#line_854" id="line_854">  854.</a></span><span class="count                ">     21</span><span>            recursive: true</span></pre>
+<pre><span class="lineno"><a href="#line_855" id="line_855">  855.</a></span><span class="count                ">     21</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_856" id="line_856">  856.</a></span><span class="count                ">     21</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_857" id="line_857">  857.</a></span><span class="count                ">     21</span><span>// Retry writing to pathname.</span></pre>
+<pre><span class="lineno"><a href="#line_858" id="line_858">  858.</a></span><span class="count                ">     21</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_859" id="line_859">  859.</a></span><span class="count                ">     21</span><span>        await moduleFs.promises.writeFile(pathname, data);</span></pre>
+<pre><span class="lineno"><a href="#line_860" id="line_860">  860.</a></span><span class="count                ">     21</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_861" id="line_861">  861.</a></span><span class="count                ">     81</span><span>    console.error("wrote file " + pathname);</span></pre>
 <pre><span class="lineno"><a href="#line_862" id="line_862">  862.</a></span><span class="count                ">     81</span><span>}</span></pre>
 <pre><span class="lineno"><a href="#line_863" id="line_863">  863.</a></span><span class="count                ">      1</span><span></span></pre>
@@ -2885,7 +2885,7 @@ body {
 <pre><span class="lineno"><a href="#line_2720" id="line_2720"> 2720.</a></span><span class="count                ">     36</span><span>                let result_dir;</span></pre>
 <pre><span class="lineno"><a href="#line_2721" id="line_2721"> 2721.</a></span><span class="count                ">     36</span><span>                let time_start = Date.now();</span></pre>
 <pre><span class="lineno"><a href="#line_2722" id="line_2722"> 2722.</a></span><span class="count                ">     36</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2723" id="line_2723"> 2723.</a></span><span class="count                ">     36</span><span>// Skip dotfile (e.g. .foo.js) when reading directory.</span></pre>
+<pre><span class="lineno"><a href="#line_2723" id="line_2723"> 2723.</a></span><span class="count                ">     36</span><span>// PR-409 - Skip dotfile (e.g. .foo.js) when reading directory.</span></pre>
 <pre><span class="lineno"><a href="#line_2724" id="line_2724"> 2724.</a></span><span class="count                ">     36</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2725" id="line_2725"> 2725.</a></span><span class="count                ">     19</span><span>                if ((/^\./).test(file2)) {</span></pre>
 <pre><span class="lineno"><a href="#line_2726" id="line_2726"> 2726.</a></span><span class="count                ">     19</span><span>                    return;</span></pre>
@@ -7487,7 +7487,7 @@ body {
 <pre><span class="lineno"><a href="#line_7322" id="line_7322"> 7322.</a></span><span class="count                ">     18</span><span>            token_nxt.for_init = true;</span></pre>
 <pre><span class="lineno"><a href="#line_7323" id="line_7323"> 7323.</a></span><span class="count                ">     18</span><span>            the_for.for_semicolon[0] = parse_statement_single();</span></pre>
 <pre><span class="lineno"><a href="#line_7324" id="line_7324"> 7324.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7325" id="line_7325"> 7325.</a></span><span class="count                ">     18</span><span>// PR-xxx - jquery - Tolerate comma-expression in for_init `for(ii=0,jj=0;;)`.</span></pre>
+<pre><span class="lineno"><a href="#line_7325" id="line_7325"> 7325.</a></span><span class="count                ">     18</span><span>// PR-409 - jquery - Tolerate comma-expression in for_init `for(ii=0,jj=0;;)`.</span></pre>
 <pre><span class="lineno"><a href="#line_7326" id="line_7326"> 7326.</a></span><span class="count                ">     18</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7327" id="line_7327"> 7327.</a></span><span class="count                ">     18</span><span>            while (token_nxt.id === ",") {</span></pre>
 <pre><span class="lineno"><a href="#line_7328" id="line_7328"> 7328.</a></span><span class="count                ">     18</span><span></span></pre>
@@ -8432,7 +8432,7 @@ body {
 <pre><span class="lineno"><a href="#line_8267" id="line_8267"> 8267.</a></span><span class="count                ">  14932</span><span>        switch (id) {</span></pre>
 <pre><span class="lineno"><a href="#line_8268" id="line_8268"> 8268.</a></span><span class="count                ">      1</span><span>        case "(number)":</span></pre>
 <pre><span class="lineno"><a href="#line_8269" id="line_8269"> 8269.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8270" id="line_8270"> 8270.</a></span><span class="count                ">      1</span><span>// PR-xxx - jquery - Tolerate numeric object-key `{0: 200}` - warn, do not stop.</span></pre>
+<pre><span class="lineno"><a href="#line_8270" id="line_8270"> 8270.</a></span><span class="count                ">      1</span><span>// PR-409 - jquery - Tolerate numeric object-key `{0: 200}` - warn, do not stop.</span></pre>
 <pre><span class="lineno"><a href="#line_8271" id="line_8271"> 8271.</a></span><span class="count                ">      1</span><span>// Like a non-identifier string-key, it is not tallied for /*property*/.</span></pre>
 <pre><span class="lineno"><a href="#line_8272" id="line_8272"> 8272.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8273" id="line_8273"> 8273.</a></span><span class="count                ">      1</span><span>// test_cause:</span></pre>
