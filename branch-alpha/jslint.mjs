@@ -1203,9 +1203,8 @@ function jslint(
         }
 
 // PR-xxx - deadcode-confirmed - If <aa> is not an array then <bb> is not one
-// either, so the branch above already took every array. Arrays only reach
-// <is_equal> from case "`" below, and only when <aa>.id === <bb>.id, so it
-// always recurses on <value> and <expression> of two backticks at once.
+// either. Arrays only reach <is_equal> from case "`" below, and only when
+// <aa>.id === <bb>.id, so they arrive in pairs and the branch above takes both.
 //
 // deadcode-revive - recurse on a slot that holds an array for some token ids
 // and a single token for others, or let the backtick case run when only one
@@ -9950,10 +9949,9 @@ function jslint_phase5_whitage(state) {
 
     function expected_at(at) {
 
-// PR-xxx - deadcode-confirmed - <right> is always assigned first. Phase 5 runs
-// the whitage walk from one place, the <token_list>.forEach at the end of this
-// function, whose first statement is <right> = <the_token>. It calls
-// <whitage_default>, and every route to <expected_at> runs inside that call.
+// PR-xxx - deadcode-confirmed - <right> is always assigned first. The whitage
+// walk starts in one place, the <token_list>.forEach whose first statement is
+// <right> = <the_token>, and every route to <expected_at> runs inside it.
 //
 // deadcode-revive - call <expected_at>, or anything that reaches it, from
 // outside that forEach. A pre-pass or post-pass indent check would do it, and
@@ -12420,9 +12418,15 @@ body {
                     }) {
                         if (inHole !== isHole) {
                             lineHtml += htmlEscape(chunk);
+                            lineHtml += (
+                                (isHole && ignoreLine)
+                                ? "</span><span class=\"ignore\">"
+                                : isHole
+                                ? "</span><span class=\"uncovered\">"
 
-// PR-xxx - NOT deadcode - a hole ending BEFORE end-of-line re-enters with
-// isHole undefined, and that bare span is what CLOSES the hole, e.g.:
+// PR-xxx - deadcode-false - the arm below is live: a hole ending before
+// end-of-line re-enters the transition above with <isHole> undefined, and that
+// bare span closes it. Line coverage hides this, the test running either way:
 //
 // function aa(bb) {
 //     return bb && bb.cc;
@@ -12430,11 +12434,6 @@ body {
 // }
 // aa(0);
 
-                            lineHtml += (
-                                (isHole && ignoreLine)
-                                ? "</span><span class=\"ignore\">"
-                                : isHole
-                                ? "</span><span class=\"uncovered\">"
                                 : "</span><span>"
                             );
                             chunk = "";
