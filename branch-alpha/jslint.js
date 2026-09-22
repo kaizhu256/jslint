@@ -12426,8 +12426,8 @@ body {
                                 ? "</span><span class=\"uncovered\">"
 
 // PR-xxx - deadcode-dispelled - the arm below is live: a hole ending before
-// end-of-line re-enters the transition above with <isHole> undefined, and that
-// bare span closes it. Line coverage hides this, the test running either way:
+// end-of-line re-enters with <isHole> undefined, and that bare span closes it.
+// Line coverage hides this, the condition above running either way:
 //
 // function aa(bb) {
 //     return bb && bb.cc;

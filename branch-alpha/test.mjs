@@ -2269,6 +2269,39 @@ jstestDescribe((
         });
     });
     jstestIt((
+        "test coverage-hole-closing-midline handling-behavior"
+    ), async function () {
+
+// Pin the deadcode-dispelled arm in <v8CoverageReportCreate>: a hole ending
+// before end-of-line re-enters with <isHole> undefined and must close with a
+// bare span. Line coverage cannot catch its deletion, so this asserts the
+// output. With bb=0, "&& bb.cc" is the hole and the ";" after it is covered.
+
+        const dir = ".tmp/coverage_hole/";
+        const file = dir + "coverage_hole.js";
+        await fsWriteFileWithParents(file, (
+            "function aa(bb) {\n"
+            + "    return bb && bb.cc;\n"
+            + "}\n"
+            + "aa(0);\n"
+        ));
+        await jslint.jslint_cli({
+            console_error: noop, // comment to debug
+            mode_cli: true,
+            process_argv: [
+                "node", "jslint.mjs",
+                "v8_coverage_report=" + dir,
+                "node",
+                file
+            ]
+        });
+        assertOrThrow((
+            await moduleFs.promises.readFile(dir + file + ".html", "utf8")
+        ).includes(
+            "<span class=\"uncovered\">&amp;&amp; bb.cc</span><span>;</span>"
+        ), "expected a hole closing mid-line in " + dir + file + ".html");
+    });
+    jstestIt((
         "test coverage-ignore handling-behavior"
     ), function () {
         switch (noop() && noop()) { //coverage-ignore-line
