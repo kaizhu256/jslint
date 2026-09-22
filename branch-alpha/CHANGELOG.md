@@ -21,6 +21,13 @@
 - jslint-cli - Skip dotfiles when linting a directory.
 - jslint-ci - Merge ci-shell-function shGithubPrUpdatePrxxx() into shGithubPrCreate().
 - jslint - bugfix - Fix is_equal() mis-comparing tagged-templates - crash, or false weird_condition_a.
+- deadcode - delete proven-unreachable guard in function is_equal() - `if (aa.arity === "function" || aa.arity === "regexp") {...}`.
+- deadcode - delete proven-unreachable guard in function name_lookup() - `if (thing.arity !== "variable") {...}`.
+- deadcode - delete proven-unreachable guard in function expected_at() - `if (right === undefined) {...}`.
+- deadcode - delete proven-unreachable guard in function v8CoverageListMerge() - `if (scriptCovs.length === 0) {...}`.
+- deadcode - delete proven-unreachable guard in function v8CoverageListMerge() - `if (funcCovs.length === 0) {...}`.
+- test - Add test pinning the isHole span-transition in v8CoverageReportCreate(), which 100% line-coverage cannot flag.
+- jslint - bugfix - Fix false-warning 'unassigned_var_a' on nested destructuring-assignment ';[[aa]]=0;' and ';[{aa}]=0;'.
 
 # v2026.8.31
 - jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.
