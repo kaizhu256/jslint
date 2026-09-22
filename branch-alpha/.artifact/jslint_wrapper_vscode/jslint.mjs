@@ -26,7 +26,6 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-
 // jslint(source, option_dict, global_list) is a function that takes 3
 // arguments. The second two arguments are optional.
 
@@ -8712,7 +8711,6 @@ function jslint_phase4_walk(state) {
 // if (thing.arity !== "variable") {
 //     return;
 // }
-
 
 // Look up the variable, from current-scope, moving up the scope-chain.
 
