@@ -1336,15 +1336,15 @@ body {
 <pre><span class="lineno"><a href="#line_1171" id="line_1171"> 1171.</a></span><span class="count                ">  33390</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1172" id="line_1172"> 1172.</a></span><span class="count                ">  33390</span><span>        test_cause("");</span></pre>
 <pre><span class="lineno"><a href="#line_1173" id="line_1173"> 1173.</a></span><span class="count                ">  33390</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1174" id="line_1174"> 1174.</a></span><span class="count                ">  33390</span><span>// PR-xxx - confirmed-deadcode - aa and bb are never the same object. Each call</span></pre>
-<pre><span class="lineno"><a href="#line_1175" id="line_1175"> 1175.</a></span><span class="count                ">  33390</span><span>// below pairs a slot of aa with the same slot of bb, and the only slot that</span></pre>
-<pre><span class="lineno"><a href="#line_1176" id="line_1176"> 1176.</a></span><span class="count                ">  33390</span><span>// can be undefined on both sides is expression[1] of a binary token. Case "`"</span></pre>
-<pre><span class="lineno"><a href="#line_1177" id="line_1177"> 1177.</a></span><span class="count                ">  33390</span><span>// returns before reaching that branch, and aa.id !== "(" skips it.</span></pre>
+<pre><span class="lineno"><a href="#line_1174" id="line_1174"> 1174.</a></span><span class="count                ">  33390</span><span>// PR-xxx - confirmed-deadcode - &lt;aa&gt; and &lt;bb&gt; are never the same object. Each</span></pre>
+<pre><span class="lineno"><a href="#line_1175" id="line_1175"> 1175.</a></span><span class="count                ">  33390</span><span>// call below pairs a slot of &lt;aa&gt; with the same slot of &lt;bb&gt;, and the only</span></pre>
+<pre><span class="lineno"><a href="#line_1176" id="line_1176"> 1176.</a></span><span class="count                ">  33390</span><span>// slot that can be undefined on both sides is &lt;expression&gt;[1] of a binary</span></pre>
+<pre><span class="lineno"><a href="#line_1177" id="line_1177"> 1177.</a></span><span class="count                ">  33390</span><span>// token. Case "`" returns before that branch, and &lt;aa&gt;.id !== "(" skips it.</span></pre>
 <pre><span class="lineno"><a href="#line_1178" id="line_1178"> 1178.</a></span><span class="count                ">  33390</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_1179" id="line_1179"> 1179.</a></span><span class="count                ">  33390</span><span>// Revive: delete case "`" below and a tagged template with no substitution</span></pre>
-<pre><span class="lineno"><a href="#line_1180" id="line_1180"> 1180.</a></span><span class="count                ">  33390</span><span>// falls through to the binary branch again. Its arity is "binary" but its</span></pre>
-<pre><span class="lineno"><a href="#line_1181" id="line_1181"> 1181.</a></span><span class="count                ">  33390</span><span>// expression holds one element, so both sides read expression[1] as undefined.</span></pre>
-<pre><span class="lineno"><a href="#line_1182" id="line_1182"> 1182.</a></span><span class="count                ">  33390</span><span>// Any token with fewer expression slots than its arity implies will do this.</span></pre>
+<pre><span class="lineno"><a href="#line_1180" id="line_1180"> 1180.</a></span><span class="count                ">  33390</span><span>// falls through to the binary branch again. Its &lt;arity&gt; is "binary" but its</span></pre>
+<pre><span class="lineno"><a href="#line_1181" id="line_1181"> 1181.</a></span><span class="count                ">  33390</span><span>// &lt;expression&gt; holds one element, so both sides read &lt;expression&gt;[1] as</span></pre>
+<pre><span class="lineno"><a href="#line_1182" id="line_1182"> 1182.</a></span><span class="count                ">  33390</span><span>// undefined. Any token with fewer slots than its &lt;arity&gt; implies does this.</span></pre>
 <pre><span class="lineno"><a href="#line_1183" id="line_1183"> 1183.</a></span><span class="count                ">  33390</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_1184" id="line_1184"> 1184.</a></span><span class="count                ">  33390</span><span>// if (aa === bb) {</span></pre>
 <pre><span class="lineno"><a href="#line_1185" id="line_1185"> 1185.</a></span><span class="count                ">  33390</span><span>//     return true;</span></pre>
@@ -1367,10 +1367,10 @@ body {
 <pre><span class="lineno"><a href="#line_1202" id="line_1202"> 1202.</a></span><span class="count                ">     29</span><span>            );</span></pre>
 <pre><span class="lineno"><a href="#line_1203" id="line_1203"> 1203.</a></span><span class="count                ">  33361</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_1204" id="line_1204"> 1204.</a></span><span class="count                ">  33361</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1205" id="line_1205"> 1205.</a></span><span class="count                ">  33361</span><span>// PR-xxx - confirmed-deadcode - If aa is not an array then bb is not one</span></pre>
-<pre><span class="lineno"><a href="#line_1206" id="line_1206"> 1206.</a></span><span class="count                ">  33361</span><span>// either, so the branch above already took every array. Arrays only get here</span></pre>
-<pre><span class="lineno"><a href="#line_1207" id="line_1207"> 1207.</a></span><span class="count                ">  33361</span><span>// from case "`" below, which pairs aa.value with bb.value and aa.expression</span></pre>
-<pre><span class="lineno"><a href="#line_1208" id="line_1208"> 1208.</a></span><span class="count                ">  33361</span><span>// with bb.expression, and aa.id === bb.id means both sides are backticks.</span></pre>
+<pre><span class="lineno"><a href="#line_1205" id="line_1205"> 1205.</a></span><span class="count                ">  33361</span><span>// PR-xxx - confirmed-deadcode - If &lt;aa&gt; is not an array then &lt;bb&gt; is not one</span></pre>
+<pre><span class="lineno"><a href="#line_1206" id="line_1206"> 1206.</a></span><span class="count                ">  33361</span><span>// either, so the branch above already took every array. Arrays only reach</span></pre>
+<pre><span class="lineno"><a href="#line_1207" id="line_1207"> 1207.</a></span><span class="count                ">  33361</span><span>// &lt;is_equal&gt; from case "`" below, and only when &lt;aa&gt;.id === &lt;bb&gt;.id, so it</span></pre>
+<pre><span class="lineno"><a href="#line_1208" id="line_1208"> 1208.</a></span><span class="count                ">  33361</span><span>// always recurses on &lt;value&gt; and &lt;expression&gt; of two backticks at once.</span></pre>
 <pre><span class="lineno"><a href="#line_1209" id="line_1209"> 1209.</a></span><span class="count                ">  33361</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_1210" id="line_1210"> 1210.</a></span><span class="count                ">  33361</span><span>// Revive: recurse on a slot that holds an array for some token ids and a</span></pre>
 <pre><span class="lineno"><a href="#line_1211" id="line_1211"> 1211.</a></span><span class="count                ">  33361</span><span>// single token for others, or let the backtick case run when only one side is</span></pre>
@@ -1457,14 +1457,14 @@ body {
 <pre><span class="lineno"><a href="#line_1292" id="line_1292"> 1292.</a></span><span class="count                ">   2010</span><span>                );</span></pre>
 <pre><span class="lineno"><a href="#line_1293" id="line_1293"> 1293.</a></span><span class="count                ">   2010</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_1294" id="line_1294"> 1294.</a></span><span class="count                ">   2010</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1295" id="line_1295"> 1295.</a></span><span class="count                ">   2010</span><span>// PR-xxx - confirmed-deadcode - Nothing in this file sets arity "regexp", and</span></pre>
-<pre><span class="lineno"><a href="#line_1296" id="line_1296"> 1296.</a></span><span class="count                ">   2010</span><span>// arity "function" is set in one place, on the "(" that opens a parameter list</span></pre>
-<pre><span class="lineno"><a href="#line_1297" id="line_1297"> 1297.</a></span><span class="count                ">   2010</span><span>// in prefix_function. That token is never stored in an expression, name or</span></pre>
-<pre><span class="lineno"><a href="#line_1298" id="line_1298"> 1298.</a></span><span class="count                ">   2010</span><span>// value slot, so is_equal never sees it.</span></pre>
+<pre><span class="lineno"><a href="#line_1295" id="line_1295"> 1295.</a></span><span class="count                ">   2010</span><span>// PR-xxx - confirmed-deadcode - Nothing in this file sets &lt;arity&gt; to "regexp",</span></pre>
+<pre><span class="lineno"><a href="#line_1296" id="line_1296"> 1296.</a></span><span class="count                ">   2010</span><span>// and &lt;arity&gt; "function" is set in one place, on the "(" that opens a</span></pre>
+<pre><span class="lineno"><a href="#line_1297" id="line_1297"> 1297.</a></span><span class="count                ">   2010</span><span>// parameter list in &lt;prefix_function&gt;. That token is never stored in an</span></pre>
+<pre><span class="lineno"><a href="#line_1298" id="line_1298"> 1298.</a></span><span class="count                ">   2010</span><span>// &lt;expression&gt;, &lt;name&gt; or &lt;value&gt; slot, so &lt;is_equal&gt; never sees it.</span></pre>
 <pre><span class="lineno"><a href="#line_1299" id="line_1299"> 1299.</a></span><span class="count                ">   2010</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_1300" id="line_1300"> 1300.</a></span><span class="count                ">   2010</span><span>// Revive: compare two function expressions by recursing into their parameter</span></pre>
-<pre><span class="lineno"><a href="#line_1301" id="line_1301"> 1301.</a></span><span class="count                ">   2010</span><span>// lists, which puts that "(" on both sides. Giving any token arity "regexp"</span></pre>
-<pre><span class="lineno"><a href="#line_1302" id="line_1302"> 1302.</a></span><span class="count                ">   2010</span><span>// would also do it.</span></pre>
+<pre><span class="lineno"><a href="#line_1301" id="line_1301"> 1301.</a></span><span class="count                ">   2010</span><span>// lists, which puts that "(" on both sides. Giving any token &lt;arity&gt;</span></pre>
+<pre><span class="lineno"><a href="#line_1302" id="line_1302"> 1302.</a></span><span class="count                ">   2010</span><span>// "regexp" would also do it.</span></pre>
 <pre><span class="lineno"><a href="#line_1303" id="line_1303"> 1303.</a></span><span class="count                ">   2010</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_1304" id="line_1304"> 1304.</a></span><span class="count                ">   2010</span><span>// if (aa.arity === "function" || aa.arity === "regexp") {</span></pre>
 <pre><span class="lineno"><a href="#line_1305" id="line_1305"> 1305.</a></span><span class="count                ">   2010</span><span>//     return false;</span></pre>
@@ -8898,14 +8898,14 @@ body {
 <pre><span class="lineno"><a href="#line_8733" id="line_8733"> 8733.</a></span><span class="count                ">  33591</span><span>        let the_variable;</span></pre>
 <pre><span class="lineno"><a href="#line_8734" id="line_8734"> 8734.</a></span><span class="count                ">  33591</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8735" id="line_8735"> 8735.</a></span><span class="count                ">  33591</span><span>// PR-xxx - confirmed-deadcode - Both callers pass a token already known to be</span></pre>
-<pre><span class="lineno"><a href="#line_8736" id="line_8736"> 8736.</a></span><span class="count                ">  33591</span><span>// a variable. pre_v_var is registered preaction("variable", "(all)"), and</span></pre>
-<pre><span class="lineno"><a href="#line_8737" id="line_8737"> 8737.</a></span><span class="count                ">  33591</span><span>// post_a_assignment walks an assignment token's name_list, which only</span></pre>
-<pre><span class="lineno"><a href="#line_8738" id="line_8738"> 8738.</a></span><span class="count                ">  33591</span><span>// name_declare calls with role "variable" fill. That role is what sets arity.</span></pre>
+<pre><span class="lineno"><a href="#line_8736" id="line_8736"> 8736.</a></span><span class="count                ">  33591</span><span>// a variable. &lt;pre_v_var&gt; is registered as a preaction on arity "variable",</span></pre>
+<pre><span class="lineno"><a href="#line_8737" id="line_8737"> 8737.</a></span><span class="count                ">  33591</span><span>// and &lt;post_a_assignment&gt; walks an assignment token's &lt;name_list&gt;, which only</span></pre>
+<pre><span class="lineno"><a href="#line_8738" id="line_8738"> 8738.</a></span><span class="count                ">  33591</span><span>// &lt;name_declare&gt; calls with role "variable" fill. That role sets &lt;arity&gt;.</span></pre>
 <pre><span class="lineno"><a href="#line_8739" id="line_8739"> 8739.</a></span><span class="count                ">  33591</span><span>//</span></pre>
-<pre><span class="lineno"><a href="#line_8740" id="line_8740"> 8740.</a></span><span class="count                ">  33591</span><span>// Revive: name_declare pushes into the list it is given before it checks the</span></pre>
-<pre><span class="lineno"><a href="#line_8741" id="line_8741"> 8741.</a></span><span class="count                ">  33591</span><span>// role, so a list built under another role holds names with no arity.</span></pre>
-<pre><span class="lineno"><a href="#line_8742" id="line_8742"> 8742.</a></span><span class="count                ">  33591</span><span>// the_function.name_list collects "parameter" names that way. Pass one of</span></pre>
-<pre><span class="lineno"><a href="#line_8743" id="line_8743"> 8743.</a></span><span class="count                ">  33591</span><span>// those here and the lookup below resolves the wrong name, with no error.</span></pre>
+<pre><span class="lineno"><a href="#line_8740" id="line_8740"> 8740.</a></span><span class="count                ">  33591</span><span>// Revive: &lt;name_declare&gt; pushes into the list it is given before it checks</span></pre>
+<pre><span class="lineno"><a href="#line_8741" id="line_8741"> 8741.</a></span><span class="count                ">  33591</span><span>// the role, so a list built under another role holds names with no &lt;arity&gt;.</span></pre>
+<pre><span class="lineno"><a href="#line_8742" id="line_8742"> 8742.</a></span><span class="count                ">  33591</span><span>// &lt;the_function&gt;.name_list collects "parameter" names that way. Pass one here</span></pre>
+<pre><span class="lineno"><a href="#line_8743" id="line_8743"> 8743.</a></span><span class="count                ">  33591</span><span>// and the lookup below resolves the wrong name, with no error.</span></pre>
 <pre><span class="lineno"><a href="#line_8744" id="line_8744"> 8744.</a></span><span class="count                ">  33591</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_8745" id="line_8745"> 8745.</a></span><span class="count                ">  33591</span><span>// if (thing.arity !== "variable") {</span></pre>
 <pre><span class="lineno"><a href="#line_8746" id="line_8746"> 8746.</a></span><span class="count                ">  33591</span><span>//     return;</span></pre>
@@ -10115,14 +10115,14 @@ body {
 <pre><span class="lineno"><a href="#line_9950" id="line_9950"> 9950.</a></span><span class="count                ">    238</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9951" id="line_9951"> 9951.</a></span><span class="count                ">     40</span><span>    function expected_at(at) {</span></pre>
 <pre><span class="lineno"><a href="#line_9952" id="line_9952"> 9952.</a></span><span class="count                ">     40</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9953" id="line_9953"> 9953.</a></span><span class="count                ">     40</span><span>// PR-xxx - confirmed-deadcode - right is always assigned first. Phase 5 runs</span></pre>
-<pre><span class="lineno"><a href="#line_9954" id="line_9954"> 9954.</a></span><span class="count                ">     40</span><span>// the whitage walk from one place, the token_list.forEach at the end of this</span></pre>
-<pre><span class="lineno"><a href="#line_9955" id="line_9955"> 9955.</a></span><span class="count                ">     40</span><span>// function, whose first statement is right = the_token. It calls</span></pre>
-<pre><span class="lineno"><a href="#line_9956" id="line_9956"> 9956.</a></span><span class="count                ">     40</span><span>// whitage_default, and every route to expected_at runs inside that call.</span></pre>
+<pre><span class="lineno"><a href="#line_9953" id="line_9953"> 9953.</a></span><span class="count                ">     40</span><span>// PR-xxx - confirmed-deadcode - &lt;right&gt; is always assigned first. Phase 5 runs</span></pre>
+<pre><span class="lineno"><a href="#line_9954" id="line_9954"> 9954.</a></span><span class="count                ">     40</span><span>// the whitage walk from one place, the &lt;token_list&gt;.forEach at the end of this</span></pre>
+<pre><span class="lineno"><a href="#line_9955" id="line_9955"> 9955.</a></span><span class="count                ">     40</span><span>// function, whose first statement is &lt;right&gt; = &lt;the_token&gt;. It calls</span></pre>
+<pre><span class="lineno"><a href="#line_9956" id="line_9956"> 9956.</a></span><span class="count                ">     40</span><span>// &lt;whitage_default&gt;, and every route to &lt;expected_at&gt; runs inside that call.</span></pre>
 <pre><span class="lineno"><a href="#line_9957" id="line_9957"> 9957.</a></span><span class="count                ">     40</span><span>//</span></pre>
-<pre><span class="lineno"><a href="#line_9958" id="line_9958"> 9958.</a></span><span class="count                ">     40</span><span>// Revive: call expected_at, or anything that reaches it, from outside that</span></pre>
-<pre><span class="lineno"><a href="#line_9959" id="line_9959"> 9959.</a></span><span class="count                ">     40</span><span>// forEach. A pre-pass or post-pass indent check would do it, and right would</span></pre>
-<pre><span class="lineno"><a href="#line_9960" id="line_9960"> 9960.</a></span><span class="count                ">     40</span><span>// hold whatever the last token left there, or undefined if the loop never ran.</span></pre>
+<pre><span class="lineno"><a href="#line_9958" id="line_9958"> 9958.</a></span><span class="count                ">     40</span><span>// Revive: call &lt;expected_at&gt;, or anything that reaches it, from outside that</span></pre>
+<pre><span class="lineno"><a href="#line_9959" id="line_9959"> 9959.</a></span><span class="count                ">     40</span><span>// forEach. A pre-pass or post-pass indent check would do it, and &lt;right&gt;</span></pre>
+<pre><span class="lineno"><a href="#line_9960" id="line_9960"> 9960.</a></span><span class="count                ">     40</span><span>// would hold whatever the last token left there, or undefined.</span></pre>
 <pre><span class="lineno"><a href="#line_9961" id="line_9961"> 9961.</a></span><span class="count                ">     40</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_9962" id="line_9962"> 9962.</a></span><span class="count                ">     40</span><span>// if (right === undefined) {</span></pre>
 <pre><span class="lineno"><a href="#line_9963" id="line_9963"> 9963.</a></span><span class="count                ">     40</span><span>//     right = token_nxt;</span></pre>
@@ -12038,13 +12038,13 @@ body {
 <pre><span class="lineno"><a href="#line_11873" id="line_11873">11873.</a></span><span class="count                ">    129</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_11874" id="line_11874">11874.</a></span><span class="count                ">    129</span><span>        let rangeToFuncDict = new Map();</span></pre>
 <pre><span class="lineno"><a href="#line_11875" id="line_11875">11875.</a></span><span class="count                ">    129</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_11876" id="line_11876">11876.</a></span><span class="count                ">    129</span><span>// PR-xxx - confirmed-deadcode - Every list in urlToScriptDict has at least one</span></pre>
-<pre><span class="lineno"><a href="#line_11877" id="line_11877">11877.</a></span><span class="count                ">    129</span><span>// element. dictKeyValueAppend is the only writer and pushes in the same call</span></pre>
-<pre><span class="lineno"><a href="#line_11878" id="line_11878">11878.</a></span><span class="count                ">    129</span><span>// that creates the list, and nothing pops, splices or filters it.</span></pre>
+<pre><span class="lineno"><a href="#line_11876" id="line_11876">11876.</a></span><span class="count                ">    129</span><span>// PR-xxx - confirmed-deadcode - Every list in &lt;urlToScriptDict&gt; has at least</span></pre>
+<pre><span class="lineno"><a href="#line_11877" id="line_11877">11877.</a></span><span class="count                ">    129</span><span>// one element. &lt;dictKeyValueAppend&gt; is the only writer and pushes in the same</span></pre>
+<pre><span class="lineno"><a href="#line_11878" id="line_11878">11878.</a></span><span class="count                ">    129</span><span>// call that creates the list, and nothing pops, splices or filters it.</span></pre>
 <pre><span class="lineno"><a href="#line_11879" id="line_11879">11879.</a></span><span class="count                ">    129</span><span>//</span></pre>
-<pre><span class="lineno"><a href="#line_11880" id="line_11880">11880.</a></span><span class="count                ">    129</span><span>// Revive: restore mergeScriptList, whose signature is commented out above. It</span></pre>
-<pre><span class="lineno"><a href="#line_11881" id="line_11881">11881.</a></span><span class="count                ">    129</span><span>// took its list from any caller, which is why it needed this guard. Adding a</span></pre>
-<pre><span class="lineno"><a href="#line_11882" id="line_11882">11882.</a></span><span class="count                ">    129</span><span>// second writer or a filter to the map would also do it.</span></pre>
+<pre><span class="lineno"><a href="#line_11880" id="line_11880">11880.</a></span><span class="count                ">    129</span><span>// Revive: restore &lt;mergeScriptList&gt;, whose signature is commented out above.</span></pre>
+<pre><span class="lineno"><a href="#line_11881" id="line_11881">11881.</a></span><span class="count                ">    129</span><span>// It took its list from any caller, which is why it needed this guard. Adding</span></pre>
+<pre><span class="lineno"><a href="#line_11882" id="line_11882">11882.</a></span><span class="count                ">    129</span><span>// a second writer or a filter to the map would also do it.</span></pre>
 <pre><span class="lineno"><a href="#line_11883" id="line_11883">11883.</a></span><span class="count                ">    129</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_11884" id="line_11884">11884.</a></span><span class="count                ">    129</span><span>// if (scriptCovs.length === 0) {</span></pre>
 <pre><span class="lineno"><a href="#line_11885" id="line_11885">11885.</a></span><span class="count                ">    129</span><span>//     return undefined;</span></pre>
@@ -12098,12 +12098,12 @@ body {
 <pre><span class="lineno"><a href="#line_11933" id="line_11933">11933.</a></span><span class="count                ">    112</span><span>            let ranges;</span></pre>
 <pre><span class="lineno"><a href="#line_11934" id="line_11934">11934.</a></span><span class="count                ">    112</span><span>            let trees = [];</span></pre>
 <pre><span class="lineno"><a href="#line_11935" id="line_11935">11935.</a></span><span class="count                ">    112</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_11936" id="line_11936">11936.</a></span><span class="count                ">    112</span><span>// PR-xxx - confirmed-deadcode - Same as scriptCovs above, with rangeToFuncDict</span></pre>
-<pre><span class="lineno"><a href="#line_11937" id="line_11937">11937.</a></span><span class="count                ">    112</span><span>// instead of urlToScriptDict. dictKeyValueAppend is its only writer and pushes</span></pre>
-<pre><span class="lineno"><a href="#line_11938" id="line_11938">11938.</a></span><span class="count                ">    112</span><span>// as it creates each list.</span></pre>
+<pre><span class="lineno"><a href="#line_11936" id="line_11936">11936.</a></span><span class="count                ">    112</span><span>// PR-xxx - confirmed-deadcode - Same as &lt;scriptCovs&gt; above, but with</span></pre>
+<pre><span class="lineno"><a href="#line_11937" id="line_11937">11937.</a></span><span class="count                ">    112</span><span>// &lt;rangeToFuncDict&gt;. &lt;dictKeyValueAppend&gt; is its only writer and pushes as it</span></pre>
+<pre><span class="lineno"><a href="#line_11938" id="line_11938">11938.</a></span><span class="count                ">    112</span><span>// creates each list.</span></pre>
 <pre><span class="lineno"><a href="#line_11939" id="line_11939">11939.</a></span><span class="count                ">    112</span><span>//</span></pre>
-<pre><span class="lineno"><a href="#line_11940" id="line_11940">11940.</a></span><span class="count                ">    112</span><span>// Revive: restore mergeFuncList, commented out above, or give the map a second</span></pre>
-<pre><span class="lineno"><a href="#line_11941" id="line_11941">11941.</a></span><span class="count                ">    112</span><span>// writer.</span></pre>
+<pre><span class="lineno"><a href="#line_11940" id="line_11940">11940.</a></span><span class="count                ">    112</span><span>// Revive: restore &lt;mergeFuncList&gt;, commented out above, or give the map a</span></pre>
+<pre><span class="lineno"><a href="#line_11941" id="line_11941">11941.</a></span><span class="count                ">    112</span><span>// second writer.</span></pre>
 <pre><span class="lineno"><a href="#line_11942" id="line_11942">11942.</a></span><span class="count                ">    112</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_11943" id="line_11943">11943.</a></span><span class="count                ">    112</span><span>// if (funcCovs.length === 0) {</span></pre>
 <pre><span class="lineno"><a href="#line_11944" id="line_11944">11944.</a></span><span class="count                ">    112</span><span>//     return undefined;</span></pre>
