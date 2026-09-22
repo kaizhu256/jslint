@@ -20,6 +20,7 @@
 - jslint - Improve parser to parse jquery.js without stopping - for-init comma, numeric object-key.
 - jslint-cli - Skip dotfiles when linting a directory.
 - jslint-ci - Merge ci-shell-function shGithubPrUpdatePrxxx() into shGithubPrCreate().
+- jslint - bugfix - Fix is_equal() mis-comparing tagged-templates - crash, or false weird_condition_a.
 
 # v2026.8.31
 - jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.
