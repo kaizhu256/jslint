@@ -1171,18 +1171,16 @@ function jslint(
 
         test_cause("");
 
-// Deadcode - PROVEN [2026-09-21], BUT IT WAS REACHABLE FOR ONE COMMIT AND
-// THAT HISTORY IS THE POINT - do NOT re-derive it. A tagged template is arity
-// "binary" with a ONE-element expression (the tag), so the binary branch below
-// used to recurse on expression[1], undefined on BOTH sides, and
-// undefined === undefined made `aa``&&aa``` an internal-error from post_b_and,
-// post_b_or and stmt_switch's is_dup. Restoring this guard as live code HID
-// that crash and nothing more: the actual defect was case "`" falling through
-// to the binary branch at all, which ALSO mis-compared every tagged template
-// differing from its second substitution on. Fixing it there - the Bugfix
-// below - removed the only reachable path here. So this assert is dead ONLY
-// while that case "`" returns; delete that return and the crash comes back.
+// Deadcode [2026-09-21] - dead ONLY while case "`" below returns. Before it, a
+// tagged-template with no substitution had a ONE-element expression, so the
+// binary branch compared undefined with undefined and `aa``&&aa``` became an
+// internal-error. Delete that return and the crash comes back.
 
+// if (aa === bb) {
+//     return true;
+// }
+
+        jslint_assert(!(aa === bb), `Expected !(aa === bb).`);
         if (Array.isArray(aa)) {
             return (
                 Array.isArray(bb)
@@ -1199,15 +1197,11 @@ function jslint(
             );
         }
 
-// Deadcode - PROVEN BY ENUMERATION, NOT BY FUZZ [2026-09-21, fable arm]. An
-// array reaches is_equal ONLY as a "`" token's .value or .expression, and
-// prefix_tick sets BOTH unconditionally, so a "`" on one side means a "`" on
-// the other (the case "`" below keys on aa.id === bb.id) and the two arrive
-// TOGETHER - which the Array.isArray(aa) branch above then consumes. Every
-// other argument pair is an expression-slot, a .name, or a .value of
-// (number)/(string): all tokens. A missing slot yields undefined, never an
-// array. THE ASSERT STAYS ARMED ANYWAY: this guard's twin above carried an
-// identical "unfalsified" note and was falsified the same day.
+// Deadcode [2026-09-21] - an array reaches is_equal only as a "`" token's
+// .value/.expression, which prefix_tick sets BOTH of, so they arrive in PAIRS
+// and the Array.isArray(aa) branch above consumes them; every other argument
+// is a token. Assert stays armed - its twin above looked just as dead.
+
 // if (Array.isArray(bb)) {
 //     return false;
 // }
@@ -1222,16 +1216,8 @@ function jslint(
 // Fix jslint falsely believing megastring literals `0` and `1` are similar.
 
 // PR-xxx - Bugfix
-// A TAGGED TEMPLATE IS arity "binary", so falling through to the binary
-// branch compared expression[0] (the tag) and expression[1] (the FIRST
-// substitution) and NOTHING ELSE - so two tagged templates differing only
-// from their SECOND substitution on were judged equal, and
-// `bb`${cc}${dd}`&&bb`${cc}${ee}`` drew a false weird_condition_a (likewise
-// weird_relation_a, a false duplicate-case, and unexpected_a on a ternary).
-// Comparing BOTH arrays here settles every arity in one place and makes a
-// tagged template use the same rule as an untagged one, which was already
-// correct via the unary branch. A tag is part of .expression, so a tagged and
-// an untagged megastring differ by array length.
+// Fix jslint judging two tagged-templates equal when they first differ at
+// their SECOND substitution; the binary branch compared only tag and [1].
 
 // test_cause:
 // ["aa=bb`${cc}${dd}`&&bb`${cc}${ee}`", "is_equal", "recurse_tick", "", 0]
@@ -1297,11 +1283,13 @@ function jslint(
                 );
             }
 
-// Deadcode - PROVEN [2026-09-21]. NOTHING in this file ever assigns arity
-// "regexp"; arity "function" has exactly ONE producer, the parameter-list
-// "(" in prefix_function, which never lands in a compared expression-slot.
-// Deleted guard - `if (aa.arity === "function" || aa.arity === "regexp")`
-// returning false. Do NOT re-add it.
+// Deadcode [2026-09-21] - nothing here assigns arity "regexp", and arity
+// "function" has ONE producer, the parameter-list "(" in prefix_function,
+// which never lands in a compared expression-slot. Guard kept commented.
+
+// if (aa.arity === "function" || aa.arity === "regexp") {
+//     return false;
+// }
 
             jslint_assert(
                 !(aa.arity === "function" || aa.arity === "regexp"),
@@ -8730,12 +8718,13 @@ function jslint_phase4_walk(state) {
         const id = thing.id;
         let the_variable;
 
-// PR-504 - Deadcode - PROVEN [2026-09-21]. Both callers are typed: pre_v_var
-// is registered preaction("variable", ...), and post_a_assignment walks a
-// name_list that name_declare only fills under role "variable", which is
-// where it sets name.arity = "variable".
-// Deleted guard - `if (thing.arity !== "variable")` returning early.
-// Do NOT re-add it.
+// PR-504 - Deadcode [2026-09-21] - both callers are typed: pre_v_var is
+// registered preaction("variable", ...), and post_a_assignment walks a
+// name_list name_declare fills only under role "variable". Guard commented.
+
+// if (thing.arity !== "variable") {
+//     return;
+// }
 
         jslint_assert(
             thing.arity === "variable",
@@ -9941,11 +9930,13 @@ function jslint_phase5_whitage(state) {
 
     function expected_at(at) {
 
-// Deadcode - PROVEN [2026-09-21]. expected_at has no caller outside
-// whitage_default and whitage_opener, both reached only from the
-// token_list.forEach whose FIRST statement is "right = the_token".
-// Deleted guard - `if (right === undefined) { right = token_nxt; }`.
-// Do NOT re-add it.
+// Deadcode [2026-09-21] - expected_at has no caller outside whitage_default
+// and whitage_opener, both reached only from the token_list.forEach whose
+// FIRST statement is "right = the_token". Guard kept commented.
+
+// if (right === undefined) {
+//     right = token_nxt;
+// }
 
         jslint_assert(
             !(right === undefined),
@@ -11857,11 +11848,14 @@ function v8CoverageListMerge(processCovs) {
 
         let rangeToFuncDict = new Map();
 
-// Deadcode - PROVEN [2026-09-21]. dictKeyValueAppend is the SOLE writer to
-// urlToScriptDict and pushes unconditionally in the same call that creates
-// the list, and nothing ever pops or splices it, so length >= 1 always.
-// Deleted guard - `if (scriptCovs.length === 0)` returning undefined, which
-// upstream needed only because it took the list from an arbitrary caller.
+// Deadcode [2026-09-21] - dictKeyValueAppend is the SOLE writer to
+// urlToScriptDict and pushes in the same call that creates the list; nothing
+// pops or splices it, so length >= 1. Guard kept commented - upstream took
+// its list from an arbitrary caller.
+
+// if (scriptCovs.length === 0) {
+//     return undefined;
+// }
 
         if (scriptCovs.length === 1) {
             resultMerged.push(sortScript(scriptCovs[0]));
@@ -11911,11 +11905,12 @@ function v8CoverageListMerge(processCovs) {
             let ranges;
             let trees = [];
 
-// Deadcode - PROVEN [2026-09-21]. Same shape as scriptCovs above -
-// dictKeyValueAppend is the SOLE writer to rangeToFuncDict and pushes
-// unconditionally, so length >= 1 always.
-// Deleted guard - `if (funcCovs.length === 0)` returning undefined, same
-// upstream-only reason.
+// Deadcode [2026-09-21] - same shape as scriptCovs above; rangeToFuncDict has
+// the same sole writer, so length >= 1. Guard kept commented.
+
+// if (funcCovs.length === 0) {
+//     return undefined;
+// }
 
             if (funcCovs.length === 1) {
                 functions.push(sortFunc(funcCovs[0]));
@@ -12394,10 +12389,9 @@ body {
                         if (inHole !== isHole) {
                             lineHtml += htmlEscape(chunk);
 
-// The UNCLASSED arm is LIVE, not deadcode: a hole ending BEFORE end-of-line
-// re-enters here with isHole undefined, and that bare span is what CLOSES the
-// hole. Pinned by test coverage-hole-closing-midline, because 100% LINE
-// coverage cannot see a never-taken arm.
+// The unclassed arm is LIVE: a hole ending BEFORE end-of-line re-enters with
+// isHole undefined, and that bare span CLOSES the hole. 100% LINE coverage
+// cannot see a never-taken arm - test coverage-hole-closing-midline pins it.
 
                             lineHtml += (
                                 (isHole && ignoreLine)

@@ -20,14 +20,8 @@
 - jslint - Improve parser to parse jquery.js without stopping - for-init comma, numeric object-key.
 - jslint-cli - Skip dotfiles when linting a directory.
 - jslint-ci - Merge ci-shell-function shGithubPrUpdatePrxxx() into shGithubPrCreate().
+- jslint - Reviewed probable-deadcode-sections and confirmed 7 of 8 were real-deadcode.
 - jslint - bugfix - Fix is_equal() mis-comparing tagged-templates - crash, or false weird_condition_a.
-- deadcode - delete proven-unreachable guard in function is_equal() - `if (aa.arity === "function" || aa.arity === "regexp") {...}`.
-- deadcode - delete proven-unreachable guard in function name_lookup() - `if (thing.arity !== "variable") {...}`.
-- deadcode - delete proven-unreachable guard in function expected_at() - `if (right === undefined) {...}`.
-- deadcode - delete proven-unreachable guard in function v8CoverageListMerge() - `if (scriptCovs.length === 0) {...}`.
-- deadcode - delete proven-unreachable guard in function v8CoverageListMerge() - `if (funcCovs.length === 0) {...}`.
-- test - Add test pinning the isHole span-transition in v8CoverageReportCreate(), which 100% line-coverage cannot flag.
-- jslint - bugfix - Fix false-warning 'unassigned_var_a' on nested destructuring-assignment ';[[aa]]=0;' and ';[{aa}]=0;'.
 - coverage - Restore the span-class ternary in v8CoverageReportCreate(), removing an ugly-hack that hid a live branch from line-coverage.
 
 # v2026.8.31
