@@ -1228,7 +1228,8 @@ function jslint(
             return (
 
 // PR-394 - Bugfix
-// Fix jslint falsely believing megastring literals `0` and `1` are similar.
+// Fix jslint falsely believing megastrings bb`0` and bb`1` are similar. The
+// untagged form no longer shows it: post_b_and warns on any constant operand.
 
                 is_equal(aa.value, bb.value)
 
@@ -6170,7 +6171,7 @@ function jslint_phase3_parse(state) {
         the_await.expression = parse_expression(150);
         if (the_await.arity === "statement") {
 
-// PR-405 - Bugfix - fix expression after "await" mis-identified as statement.
+// PR-405 - Bugfix - Fix expression after "await" mis-identified as statement.
 
             semicolon();
         }
@@ -9689,7 +9690,7 @@ function jslint_phase4_walk(state) {
                 preamble(thing);
                 walk_expression(thing.expression);
 
-// PR-414 - Bugfix - fix fart-body not being walked.
+// PR-414 - Bugfix - Fix fart-body not being walked.
 
                 if (thing.id === "function" || thing.id === "=>") {
 
@@ -11100,7 +11101,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     html += "<div>\n";
     if (json) {
 
-// Bugfix - fix website crashing when linting pure json-object.
+// Bugfix - Fix website crashing when linting pure json-object.
 // return (
 
         html += (
