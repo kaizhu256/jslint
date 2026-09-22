@@ -1392,13 +1392,13 @@ body {
 <pre><span class="lineno"><a href="#line_1227" id="line_1227"> 1227.</a></span><span class="count                ">     16</span><span>            test_cause("recurse_mega");</span></pre>
 <pre><span class="lineno"><a href="#line_1228" id="line_1228"> 1228.</a></span><span class="count                ">     16</span><span>            return (</span></pre>
 <pre><span class="lineno"><a href="#line_1229" id="line_1229"> 1229.</a></span><span class="count                ">     16</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1230" id="line_1230"> 1230.</a></span><span class="count                ">     16</span><span>// PR-394 - Bugfix - Fix jslint judging megastrings bb`0` and bb`1` similar.</span></pre>
-<pre><span class="lineno"><a href="#line_1231" id="line_1231"> 1231.</a></span><span class="count                ">     16</span><span>// The untagged form warns either way: post_b_and fires on any constant.</span></pre>
+<pre><span class="lineno"><a href="#line_1230" id="line_1230"> 1230.</a></span><span class="count                ">     16</span><span>// PR-394 - Bugfix - Fix jslint treating megastrings bb`0` and bb`1` as equal.</span></pre>
+<pre><span class="lineno"><a href="#line_1231" id="line_1231"> 1231.</a></span><span class="count                ">     16</span><span>// The untagged form always warns, because post_b_and fires on any constant.</span></pre>
 <pre><span class="lineno"><a href="#line_1232" id="line_1232"> 1232.</a></span><span class="count                ">     16</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1233" id="line_1233"> 1233.</a></span><span class="count                ">     16</span><span>                is_equal(aa.value, bb.value)</span></pre>
 <pre><span class="lineno"><a href="#line_1234" id="line_1234"> 1234.</a></span><span class="count                ">     16</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1235" id="line_1235"> 1235.</a></span><span class="count                ">     16</span><span>// PR-xxx - Bugfix - Fix jslint judging tagged-templates equal when they first</span></pre>
-<pre><span class="lineno"><a href="#line_1236" id="line_1236"> 1236.</a></span><span class="count                ">     16</span><span>// differ at their SECOND substitution; the binary branch saw only tag and [1].</span></pre>
+<pre><span class="lineno"><a href="#line_1235" id="line_1235"> 1235.</a></span><span class="count                ">     16</span><span>// PR-xxx - Bugfix - Fix jslint treating tagged templates as equal when they</span></pre>
+<pre><span class="lineno"><a href="#line_1236" id="line_1236"> 1236.</a></span><span class="count                ">     16</span><span>// differ past the first substitution, which is all the binary branch compared.</span></pre>
 <pre><span class="lineno"><a href="#line_1237" id="line_1237"> 1237.</a></span><span class="count                ">     16</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1238" id="line_1238"> 1238.</a></span><span class="count                ">     16</span><span>                &amp;&amp; is_equal(aa.expression, bb.expression)</span></pre>
 <pre><span class="lineno"><a href="#line_1239" id="line_1239"> 1239.</a></span><span class="count                ">     16</span><span>            );</span></pre>
