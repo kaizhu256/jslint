@@ -1170,6 +1170,12 @@ function jslint(
 // ["0&&0", "is_equal", "", "", 0]
 
         test_cause("");
+
+// PR-xxx - Confirmed deadcode.
+// if (aa === bb) {
+//     return true;
+// }
+
         if (Array.isArray(aa)) {
             return (
                 Array.isArray(bb)
@@ -1185,6 +1191,12 @@ function jslint(
                 })
             );
         }
+
+// PR-xxx - Confirmed deadcode.
+// if (Array.isArray(bb)) {
+//     return false;
+// }
+
         switch (aa.id === bb.id && aa.id) {
         case "(number)":
         case "(string)":
@@ -1268,6 +1280,11 @@ function jslint(
                     && is_equal(aa.expression[2], bb.expression[2])
                 );
             }
+
+// PR-xxx - Confirmed deadcode.
+// if (aa.arity === "function" || aa.arity === "regexp") {
+//     return false;
+// }
 
 // test_cause:
 // ["undefined&&undefined", "is_equal", "true", "", 0]
@@ -8691,6 +8708,12 @@ function jslint_phase4_walk(state) {
         const id = thing.id;
         let the_variable;
 
+// PR-xxx - Confirmed deadcode.
+// if (thing.arity !== "variable") {
+//     return;
+// }
+
+
 // Look up the variable, from current-scope, moving up the scope-chain.
 
         block_stack.some(function (scope_block, ii) {
@@ -9889,6 +9912,12 @@ function jslint_phase5_whitage(state) {
     }
 
     function expected_at(at) {
+
+// PR-xxx - Confirmed deadcode.
+// if (right === undefined) {
+//     right = token_nxt;
+// }
+
         warn(
             "expected_a_at_b_c",
             right,
@@ -11794,6 +11823,12 @@ function v8CoverageListMerge(processCovs) {
 // Map funcCovRoot.startOffset:funcCovRoot.endOffset to funcCov.
 
         let rangeToFuncDict = new Map();
+
+// PR-xxx - Confirmed deadcode.
+// if (scriptCovs.length === 0) {
+//     return undefined;
+// }
+
         if (scriptCovs.length === 1) {
             resultMerged.push(sortScript(scriptCovs[0]));
             return;
@@ -11841,6 +11876,12 @@ function v8CoverageListMerge(processCovs) {
             let merged;
             let ranges;
             let trees = [];
+
+// PR-xxx - Confirmed deadcode.
+// if (funcCovs.length === 0) {
+//     return undefined;
+// }
+
             if (funcCovs.length === 1) {
                 functions.push(sortFunc(funcCovs[0]));
                 return;
