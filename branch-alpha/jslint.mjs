@@ -8713,6 +8713,14 @@ function jslint_phase4_walk(state) {
 //     return;
 // }
 
+// Assert kept: this is the one confirmed-deadcode guard whose premise, if a
+// later edit adds an untyped caller, would fail SILENTLY as a wrong lookup.
+
+        jslint_assert(
+            thing.arity === "variable",
+            `Expected thing.arity === "variable".`
+        );
+
 // Look up the variable, from current-scope, moving up the scope-chain.
 
         block_stack.some(function (scope_block, ii) {
@@ -11825,7 +11833,7 @@ function v8CoverageListMerge(processCovs) {
 
         let rangeToFuncDict = new Map();
 
-// PR-xxx - confirmed-deadcode - DictKeyValueAppend is urlToScriptDict's sole
+// PR-xxx - confirmed-deadcode - dictKeyValueAppend is urlToScriptDict's sole
 // writer and pushes as it creates the list, so length >= 1 always.
 
 // if (scriptCovs.length === 0) {
