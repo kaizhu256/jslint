@@ -1227,15 +1227,13 @@ function jslint(
             test_cause("recurse_mega");
             return (
 
-// PR-394 - Bugfix
-// Fix jslint falsely believing megastrings bb`0` and bb`1` are similar. The
-// untagged form no longer shows it: post_b_and warns on any constant operand.
+// PR-394 - Bugfix - Fix jslint judging megastrings bb`0` and bb`1` similar.
+// The untagged form warns either way: post_b_and fires on any constant.
 
                 is_equal(aa.value, bb.value)
 
-// PR-xxx - Bugfix
-// Fix jslint judging two tagged-templates equal when they first differ at
-// their SECOND substitution; the binary branch compared only tag and [1].
+// PR-xxx - Bugfix - Fix jslint judging tagged-templates equal when they first
+// differ at their SECOND substitution; the binary branch saw only tag and [1].
 
                 && is_equal(aa.expression, bb.expression)
             );
