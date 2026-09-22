@@ -12589,7 +12589,7 @@ body {
 <pre><span class="lineno"><a href="#line_12424" id="line_12424">12424.</a></span><span class="count                ">  11987</span><span>                                : isHole</span></pre>
 <pre><span class="lineno"><a href="#line_12425" id="line_12425">12425.</a></span><span class="count                ">  11987</span><span>                                ? "&lt;/span&gt;&lt;span class=\"uncovered\"&gt;"</span></pre>
 <pre><span class="lineno"><a href="#line_12426" id="line_12426">12426.</a></span><span class="count                ">  11987</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12427" id="line_12427">12427.</a></span><span class="count                ">  11987</span><span>// PR-xxx - deadcode-false - the arm below is live: a hole ending before</span></pre>
+<pre><span class="lineno"><a href="#line_12427" id="line_12427">12427.</a></span><span class="count                ">  11987</span><span>// PR-xxx - deadcode-dispelled - the arm below is live: a hole ending before</span></pre>
 <pre><span class="lineno"><a href="#line_12428" id="line_12428">12428.</a></span><span class="count                ">  11987</span><span>// end-of-line re-enters the transition above with &lt;isHole&gt; undefined, and that</span></pre>
 <pre><span class="lineno"><a href="#line_12429" id="line_12429">12429.</a></span><span class="count                ">  11987</span><span>// bare span closes it. Line coverage hides this, the test running either way:</span></pre>
 <pre><span class="lineno"><a href="#line_12430" id="line_12430">12430.</a></span><span class="count                ">  11987</span><span>//</span></pre>

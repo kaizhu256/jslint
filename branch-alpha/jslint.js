@@ -12424,7 +12424,7 @@ body {
                                 : isHole
                                 ? "</span><span class=\"uncovered\">"
 
-// PR-xxx - deadcode-false - the arm below is live: a hole ending before
+// PR-xxx - deadcode-dispelled - the arm below is live: a hole ending before
 // end-of-line re-enters the transition above with <isHole> undefined, and that
 // bare span closes it. Line coverage hides this, the test running either way:
 //
