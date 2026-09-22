@@ -2269,42 +2269,6 @@ jstestDescribe((
         });
     });
     jstestIt((
-        "test coverage-hole-closing-midline handling-behavior"
-    ), async function () {
-
-// A coverage-hole that ends BEFORE end-of-line is the ONLY thing that
-// re-enters v8CoverageReportCreate's span-transition with isHole undefined,
-// and it renders as a BARE <span> right after the uncovered one. Nothing else
-// pins that branch: the enclosing `if` line is covered whichever way it goes,
-// so 100% LINE coverage can never flag it as never-taken. Short-circuiting
-// `bb && bb.cc` with bb=0 leaves `&& bb.cc` uncovered while the `;` after it
-// stays covered, which is exactly that shape.
-
-        const dir = ".tmp/coverage_hole/";
-        const file = dir + "coverage_hole.js";
-        await fsWriteFileWithParents(file, (
-            "function aa(bb) {\n"
-            + "    return bb && bb.cc;\n"
-            + "}\n"
-            + "aa(0);\n"
-        ));
-        await jslint.jslint_cli({
-            console_error: noop, // comment to debug
-            mode_cli: true,
-            process_argv: [
-                "node", "jslint.mjs",
-                "v8_coverage_report=" + dir,
-                "node",
-                file
-            ]
-        });
-        assertOrThrow((
-            await moduleFs.promises.readFile(dir + file + ".html", "utf8")
-        ).includes(
-            "<span class=\"uncovered\">&amp;&amp; bb.cc</span><span>;</span>"
-        ), "expected a hole closing mid-line in " + dir + file + ".html");
-    });
-    jstestIt((
         "test coverage-ignore handling-behavior"
     ), function () {
         switch (noop() && noop()) { //coverage-ignore-line

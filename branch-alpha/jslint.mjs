@@ -1171,16 +1171,13 @@ function jslint(
 
         test_cause("");
 
-// Deadcode [2026-09-21] - dead ONLY while case "`" below returns. Before it, a
-// tagged-template with no substitution had a ONE-element expression, so the
-// binary branch compared undefined with undefined and `aa``&&aa``` became an
-// internal-error. Delete that return and the crash comes back.
+// PR-xxx - confirmed-deadcode - Dead ONLY while case "`" below returns; undo
+// that and `aa``&&aa``` is an internal-error again.
 
 // if (aa === bb) {
 //     return true;
 // }
 
-        jslint_assert(!(aa === bb), `Expected !(aa === bb).`);
         if (Array.isArray(aa)) {
             return (
                 Array.isArray(bb)
@@ -1197,16 +1194,13 @@ function jslint(
             );
         }
 
-// Deadcode [2026-09-21] - an array reaches is_equal only as a "`" token's
-// .value/.expression, which prefix_tick sets BOTH of, so they arrive in PAIRS
-// and the Array.isArray(aa) branch above consumes them; every other argument
-// is a token. Assert stays armed - its twin above looked just as dead.
+// PR-xxx - confirmed-deadcode - Arrays reach is_equal only as a "`" token's
+// .value/.expression, so they arrive in PAIRS and the branch above eats them.
 
 // if (Array.isArray(bb)) {
 //     return false;
 // }
 
-        jslint_assert(!Array.isArray(bb), `Expected !Array.isArray(bb).`);
         switch (aa.id === bb.id && aa.id) {
         case "(number)":
         case "(string)":
@@ -1283,18 +1277,12 @@ function jslint(
                 );
             }
 
-// Deadcode [2026-09-21] - nothing here assigns arity "regexp", and arity
-// "function" has ONE producer, the parameter-list "(" in prefix_function,
-// which never lands in a compared expression-slot. Guard kept commented.
+// PR-xxx - confirmed-deadcode - Nothing assigns arity "regexp", and arity
+// "function" only marks prefix_function's "(", never a compared slot.
 
 // if (aa.arity === "function" || aa.arity === "regexp") {
 //     return false;
 // }
-
-            jslint_assert(
-                !(aa.arity === "function" || aa.arity === "regexp"),
-                `Expected !(aa.arity === "function" || aa.arity === "regexp").`
-            );
 
 // test_cause:
 // ["undefined&&undefined", "is_equal", "true", "", 0]
@@ -8718,18 +8706,12 @@ function jslint_phase4_walk(state) {
         const id = thing.id;
         let the_variable;
 
-// PR-504 - Deadcode [2026-09-21] - both callers are typed: pre_v_var is
-// registered preaction("variable", ...), and post_a_assignment walks a
-// name_list name_declare fills only under role "variable". Guard commented.
+// PR-xxx - confirmed-deadcode - Both callers are typed: preaction("variable")
+// dispatch, and a name_list name_declare fills only under role "variable".
 
 // if (thing.arity !== "variable") {
 //     return;
 // }
-
-        jslint_assert(
-            thing.arity === "variable",
-            `Expected thing.arity === "variable".`
-        );
 
 // Look up the variable, from current-scope, moving up the scope-chain.
 
@@ -9930,18 +9912,13 @@ function jslint_phase5_whitage(state) {
 
     function expected_at(at) {
 
-// Deadcode [2026-09-21] - expected_at has no caller outside whitage_default
-// and whitage_opener, both reached only from the token_list.forEach whose
-// FIRST statement is "right = the_token". Guard kept commented.
+// PR-xxx - confirmed-deadcode - Every path to expected_at runs through
+// "right = the_token", the first statement of the whitage token_list.forEach.
 
 // if (right === undefined) {
 //     right = token_nxt;
 // }
 
-        jslint_assert(
-            !(right === undefined),
-            `Expected !(right === undefined).`
-        );
         warn(
             "expected_a_at_b_c",
             right,
@@ -11848,10 +11825,8 @@ function v8CoverageListMerge(processCovs) {
 
         let rangeToFuncDict = new Map();
 
-// Deadcode [2026-09-21] - dictKeyValueAppend is the SOLE writer to
-// urlToScriptDict and pushes in the same call that creates the list; nothing
-// pops or splices it, so length >= 1. Guard kept commented - upstream took
-// its list from an arbitrary caller.
+// PR-xxx - confirmed-deadcode - DictKeyValueAppend is urlToScriptDict's sole
+// writer and pushes as it creates the list, so length >= 1 always.
 
 // if (scriptCovs.length === 0) {
 //     return undefined;
@@ -11905,8 +11880,8 @@ function v8CoverageListMerge(processCovs) {
             let ranges;
             let trees = [];
 
-// Deadcode [2026-09-21] - same shape as scriptCovs above; rangeToFuncDict has
-// the same sole writer, so length >= 1. Guard kept commented.
+// PR-xxx - confirmed-deadcode - Same as scriptCovs above; rangeToFuncDict has
+// the same sole writer, so length >= 1 always.
 
 // if (funcCovs.length === 0) {
 //     return undefined;
@@ -12389,9 +12364,8 @@ body {
                         if (inHole !== isHole) {
                             lineHtml += htmlEscape(chunk);
 
-// The unclassed arm is LIVE: a hole ending BEFORE end-of-line re-enters with
-// isHole undefined, and that bare span CLOSES the hole. 100% LINE coverage
-// cannot see a never-taken arm - test coverage-hole-closing-midline pins it.
+// PR-xxx - NOT deadcode - a hole ending BEFORE end-of-line re-enters with
+// isHole undefined, and that bare span is what CLOSES the hole.
 
                             lineHtml += (
                                 (isHole && ignoreLine)

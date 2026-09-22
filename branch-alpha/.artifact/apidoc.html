@@ -438,21 +438,20 @@ jstestIt((
     }
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-        process_argv: [
-            "node", "jslint.mjs",
-            "v8_coverage_report=" + dir,
-            "node",
-            file
-        ]
+            assertJsonEqual(1, 2, "undefined");
+        });
+        await assertErrorThrownAsync(function () {
+            assertJsonEqual(1, 2, {});
+        });
+        // test assertOrThrow error handling-behavior
+        await assertErrorThrownAsync(function () {
+            <span class="apidocCodeKeywordSpan">assertOrThrow</span>(undefined, "undefined");
+        });
+        await assertErrorThrownAsync(function () {
+            assertOrThrow(undefined, new Error());
+        });
     });
-    <span class="apidocCodeKeywordSpan">assertOrThrow</span>((
-        await moduleFs.promises.readFile(dir + file + ".html", "utf8")
-    ).includes(
-        "&lt;span class=\"uncovered\"&gt;&amp;amp;&amp;amp; bb.cc&lt;/span&gt;&lt;span&gt;;&lt;/span&gt;"
-    ), "expected a hole closing mid-line in " + dir + file + ".html");
 });
-jstestIt((
-    "test coverage-ignore handling-behavior"
 ...</pre></li>
 
 <li>
@@ -1858,9 +1857,9 @@ await moduleFs.promises.rm(".tmp", {
 </span>    return value;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-).includes(
-    "&lt;span class=\"uncovered\"&gt;&amp;amp;&amp;amp; bb.cc&lt;/span&gt;&lt;span&gt;;&lt;/span&gt;"
-), "expected a hole closing mid-line in " + dir + file + ".html");
+        ]
+    });
+});
     });
     jstestIt((
 "test coverage-ignore handling-behavior"
