@@ -22,7 +22,7 @@
 - jslint-ci - Merge ci-shell-function shGithubPrUpdatePrxxx() into shGithubPrCreate().
 - jslint - Reviewed probable-deadcode-sections and confirmed 7 of 8 were real-deadcode.
 - jslint - inline-document each deadcode-guard with its proof and revive-note.
-- jslint - bugfix - Fix is_equal() mis-comparing tagged-templates - crash, or false weird_condition_a.
+- jslint - bugfix - Fix jslint treating tagged templates as equal.
 - coverage - Restore the span-class ternary in v8CoverageReportCreate(), removing an ugly-hack that hid a live branch from line-coverage.
 
 # v2026.8.31
