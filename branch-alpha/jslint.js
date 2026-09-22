@@ -1219,21 +1219,23 @@ function jslint(
         case "(number)":
         case "(string)":
             return aa.value === bb.value;
+        case "`":
+
+// test_cause:
+// ["aa=bb`${cc}${dd}`&&bb`${cc}${ee}`", "is_equal", "recurse_mega", "", 0]
+
+            test_cause("recurse_mega");
+            return (
 
 // PR-394 - Bugfix
 // Fix jslint falsely believing megastring literals `0` and `1` are similar.
+
+                is_equal(aa.value, bb.value)
 
 // PR-xxx - Bugfix
 // Fix jslint judging two tagged-templates equal when they first differ at
 // their SECOND substitution; the binary branch compared only tag and [1].
 
-// test_cause:
-// ["aa=bb`${cc}${dd}`&&bb`${cc}${ee}`", "is_equal", "recurse_tick", "", 0]
-
-        case "`":
-            test_cause("recurse_tick");
-            return (
-                is_equal(aa.value, bb.value)
                 && is_equal(aa.expression, bb.expression)
             );
         }
