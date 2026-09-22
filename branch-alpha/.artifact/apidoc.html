@@ -1465,9 +1465,9 @@ if (mode_autofix) {
         switch (code) {
         case "expected_a_at_b_c":
 
-// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FIVE
-// callers, not one: at_margin and two expected_at(margin) warn a token that
-// already belongs at a margin, so the target column belongs to the warned
+// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FOUR
+// callers, not one: at_margin and one_space's expected_at(margin) warn a token
+// that already belongs at a margin, so the target column belongs to the warned
 // line itself. The two expected_at(0) are LABEL placement and DO warn a
 // mid-line token - unreachable here only because a label always co-raises
 // weird_loop or unused_a, which blocks the pass. So do NOT read "always at a
@@ -1478,7 +1478,7 @@ if (mode_autofix) {
 // A MID-LINE token cannot be re-indented, but it does not need to be skipped:
 // at_margin fires for tokens that belong AT a margin and therefore on their
 // OWN line. So split first and indent the remainder, which also lands a
-// trailing closer correctly, and is what line-breaks a...
+// trailing closer correctly, and is what line-...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

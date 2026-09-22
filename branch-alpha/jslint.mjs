@@ -1171,8 +1171,18 @@ function jslint(
 
         test_cause("");
 
-// PR-xxx - confirmed-deadcode - Dead only while case "`" below returns; undo
-// that and a tagged template recurses on expression[1], undefined both sides.
+// PR-xxx - confirmed-deadcode - Two operands reaching here are never the same
+// object. Each recursive call below pairs a slot of aa with the matching slot
+// of bb, and the only slot that can hold undefined on both sides at once is
+// expression[1] of a binary token, which case "`" returns before reaching and
+// which the aa.id !== "(" test excludes.
+//
+// It was briefly live, and that is worth remembering: a tagged template with
+// no substitution has arity "binary" but a one-element expression, so it fell
+// through to the binary branch and compared undefined === undefined.
+//
+// Revive: let a token whose expression is shorter than its arity implies reach
+// the binary or ternary branch - deleting case "`" below does exactly that.
 //
 // if (aa === bb) {
 //     return true;
@@ -1195,8 +1205,17 @@ function jslint(
             );
         }
 
-// PR-xxx - confirmed-deadcode - prefix_tick sets both .value and .expression,
-// so arrays arrive in pairs and the Array.isArray(aa) branch returns first.
+// PR-xxx - confirmed-deadcode - Reaching here means aa is not an array, and bb
+// cannot be one either. Arrays enter is_equal only from case "`" below, which
+// recurses on aa.value with bb.value and on aa.expression with bb.expression;
+// prefix_tick sets all four unconditionally, and the switch subject
+// aa.id === bb.id guarantees both operands are backtick tokens. So arrays
+// always arrive as a pair, and the Array.isArray(aa) branch above returns for
+// every one of them.
+//
+// Revive: recurse on a slot that is an array for some token ids and a single
+// token for others, or let the backtick case run when only one side is a
+// backtick.
 //
 // if (Array.isArray(bb)) {
 //     return false;
@@ -1279,8 +1298,17 @@ function jslint(
                 );
             }
 
-// PR-xxx - confirmed-deadcode - No token is given arity "regexp", and arity
-// "function" marks only prefix_function's param-list "(", never an operand.
+// PR-xxx - confirmed-deadcode - Neither arity can appear on an operand here.
+// No token anywhere in this file is given arity "regexp". Arity "function" has
+// exactly one producer - prefix_function stamps it on the "(" that opens a
+// parameter list - and that token is never stored in an expression, name or
+// value slot, so is_equal never receives it. Reaching this line would also
+// need BOTH operands to carry that arity, the enclosing test being
+// aa.arity === bb.arity.
+//
+// Revive: compare two function expressions structurally by recursing into
+// their parameter lists, which would put that "(" on both sides; or introduce
+// a token with arity "regexp".
 //
 // if (aa.arity === "function" || aa.arity === "regexp") {
 //     return false;
@@ -8713,8 +8741,20 @@ function jslint_phase4_walk(state) {
         const id = thing.id;
         let the_variable;
 
-// PR-xxx - confirmed-deadcode - Both callers are typed: pre_v_var registered
-// preaction("variable"), and post_a_assignment's name_declare-filled list.
+// PR-xxx - confirmed-deadcode - Both callers hand it a token already known to
+// be a variable. pre_v_var is registered preaction("variable", "(all)"), so
+// the walker only ever dispatches it to arity "variable". post_a_assignment is
+// registered postaction("assignment", "(all)") and walks thing.name_list; an
+// assignment token's name_list is filled only by the two name_declare calls
+// passing role "variable", and name_declare sets name.arity = "variable"
+// exactly under that role.
+//
+// Revive: name_declare pushes into the list it is handed BEFORE it tests the
+// role, so a list built under any other role holds names with no arity at all
+// - the_function.name_list collects "parameter" names that way. Feed such a
+// list to name_lookup, or register a caller on another arity, and the token
+// walks into the scope-chain lookup below and quietly resolves against it:
+// wrong answer, no error. That silence is why the assert below is kept.
 //
 // if (thing.arity !== "variable") {
 //     return;
@@ -9924,8 +9964,16 @@ function jslint_phase5_whitage(state) {
 
     function expected_at(at) {
 
-// PR-xxx - confirmed-deadcode - Its only callers, whitage_default and
-// whitage_opener, run inside the forEach whose first line assigns right.
+// PR-xxx - confirmed-deadcode - right is assigned before any path can get
+// here. Phase 5 enters the whitage walk at exactly one place, the
+// token_list.forEach near the end of this function, whose first statement is
+// "right = the_token"; it calls whitage_default, and every route to
+// expected_at - directly, or through at_margin, one_space, whitage_opener and
+// whitage_closer - runs inside that call.
+//
+// Revive: call expected_at, or anything reaching it, from outside that forEach
+// - a pre-pass or post-pass indent check would do it - since right holds
+// whatever the last token left there, or undefined if the loop never ran.
 //
 // if (right === undefined) {
 //     right = token_nxt;
@@ -10470,9 +10518,9 @@ function jslint_phase6_autofix(state) {
         switch (code) {
         case "expected_a_at_b_c":
 
-// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FIVE
-// callers, not one: at_margin and two expected_at(margin) warn a token that
-// already belongs at a margin, so the target column belongs to the warned
+// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FOUR
+// callers, not one: at_margin and one_space's expected_at(margin) warn a token
+// that already belongs at a margin, so the target column belongs to the warned
 // line itself. The two expected_at(0) are LABEL placement and DO warn a
 // mid-line token - unreachable here only because a label always co-raises
 // weird_loop or unused_a, which blocks the pass. So do NOT read "always at a
@@ -11841,8 +11889,14 @@ function v8CoverageListMerge(processCovs) {
 
         let rangeToFuncDict = new Map();
 
-// PR-xxx - confirmed-deadcode - dictKeyValueAppend is urlToScriptDict's sole
-// writer, pushes as it creates each list, and nothing pops; so length >= 1.
+// PR-xxx - confirmed-deadcode - Every list in urlToScriptDict has at least one
+// element. dictKeyValueAppend is the map's only writer and pushes in the same
+// call that creates the list, and nothing pops, splices or filters it, so a
+// value handed to this forEach is never empty.
+//
+// Revive: re-extract the mergeScriptList function whose signature is commented
+// out just above - it took its list from an arbitrary caller, which is why
+// upstream needed this guard - or add a second writer or a filter to the map.
 //
 // if (scriptCovs.length === 0) {
 //     return undefined;
@@ -11896,8 +11950,12 @@ function v8CoverageListMerge(processCovs) {
             let ranges;
             let trees = [];
 
-// PR-xxx - confirmed-deadcode - Same proof as scriptCovs above, reading
-// rangeToFuncDict for urlToScriptDict; so length >= 1 here too.
+// PR-xxx - confirmed-deadcode - Same proof as scriptCovs above, with
+// rangeToFuncDict in place of urlToScriptDict: dictKeyValueAppend is its only
+// writer and pushes as it creates each list, so length is never 0.
+//
+// Revive: the same two ways - re-extract mergeFuncList, commented out just
+// above, or give the map a second writer.
 //
 // if (funcCovs.length === 0) {
 //     return undefined;
