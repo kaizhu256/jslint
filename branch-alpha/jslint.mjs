@@ -10503,12 +10503,12 @@ function jslint_phase6_autofix(state) {
         case "expected_a_at_b_c":
 
 // expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FOUR
-// callers, not one: at_margin and one_space's expected_at(margin) warn a token
-// that already belongs at a margin, so the target column belongs to the warned
-// line itself. The two expected_at(0) are LABEL placement and DO warn a
-// mid-line token - unreachable here only because a label always co-raises
-// weird_loop or unused_a, which blocks the pass. So do NOT read "always at a
-// margin" as licence to drop the mid-line branch below.
+// callers, not one: at_margin and one_space warn a token that already belongs
+// at a margin, so the target column belongs to the warned line itself. The
+// other two pass 0, are LABEL placement, and DO warn a mid-line token -
+// unreachable here only because a label always co-raises weird_loop or
+// unused_a, which blocks the pass. So do NOT read "always at a margin" as
+// licence to drop the mid-line branch below.
 
             indentage_at = line_source.length - line_source.trimStart().length;
 
