@@ -1171,8 +1171,8 @@ function jslint(
 
         test_cause("");
 
-// PR-xxx - confirmed-deadcode - Dead ONLY while case "`" below returns. Undo
-// that and `aa``&&aa``` is an internal-error again.
+// PR-xxx - confirmed-deadcode - Dead only while case "`" below returns; undo
+// that and a tagged template recurses on expression[1], undefined both sides.
 //
 // if (aa === bb) {
 //     return true;
@@ -1195,8 +1195,8 @@ function jslint(
             );
         }
 
-// PR-xxx - confirmed-deadcode - Arrays reach is_equal only as a "`" token's
-// .value/.expression, so they arrive in PAIRS and the branch above eats them.
+// PR-xxx - confirmed-deadcode - prefix_tick sets both .value and .expression,
+// so arrays arrive in pairs and the Array.isArray(aa) branch returns first.
 //
 // if (Array.isArray(bb)) {
 //     return false;
@@ -1279,8 +1279,8 @@ function jslint(
                 );
             }
 
-// PR-xxx - confirmed-deadcode - Nothing assigns arity "regexp", and arity
-// "function" only marks prefix_function's "(", never a compared slot.
+// PR-xxx - confirmed-deadcode - No token is given arity "regexp", and arity
+// "function" marks only prefix_function's param-list "(", never an operand.
 //
 // if (aa.arity === "function" || aa.arity === "regexp") {
 //     return false;
@@ -8713,8 +8713,8 @@ function jslint_phase4_walk(state) {
         const id = thing.id;
         let the_variable;
 
-// PR-xxx - confirmed-deadcode - Both callers are typed: preaction("variable")
-// dispatch, and a name_list name_declare fills only under role "variable".
+// PR-xxx - confirmed-deadcode - Both callers are typed: pre_v_var registered
+// preaction("variable"), and post_a_assignment's name_declare-filled list.
 //
 // if (thing.arity !== "variable") {
 //     return;
@@ -9924,8 +9924,8 @@ function jslint_phase5_whitage(state) {
 
     function expected_at(at) {
 
-// PR-xxx - confirmed-deadcode - Every path to expected_at runs through
-// "right = the_token", the first statement of the whitage token_list.forEach.
+// PR-xxx - confirmed-deadcode - Its only callers, whitage_default and
+// whitage_opener, run inside the forEach whose first line assigns right.
 //
 // if (right === undefined) {
 //     right = token_nxt;
@@ -11842,7 +11842,7 @@ function v8CoverageListMerge(processCovs) {
         let rangeToFuncDict = new Map();
 
 // PR-xxx - confirmed-deadcode - dictKeyValueAppend is urlToScriptDict's sole
-// writer and pushes as it creates the list, so length >= 1 always.
+// writer, pushes as it creates each list, and nothing pops; so length >= 1.
 //
 // if (scriptCovs.length === 0) {
 //     return undefined;
@@ -11896,8 +11896,8 @@ function v8CoverageListMerge(processCovs) {
             let ranges;
             let trees = [];
 
-// PR-xxx - confirmed-deadcode - Same as scriptCovs above; rangeToFuncDict has
-// the same sole writer, so length >= 1 always.
+// PR-xxx - confirmed-deadcode - Same proof as scriptCovs above, reading
+// rangeToFuncDict for urlToScriptDict; so length >= 1 here too.
 //
 // if (funcCovs.length === 0) {
 //     return undefined;

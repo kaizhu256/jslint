@@ -1336,8 +1336,8 @@ body {
 <pre><span class="lineno"><a href="#line_1171" id="line_1171"> 1171.</a></span><span class="count                ">  33390</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1172" id="line_1172"> 1172.</a></span><span class="count                ">  33390</span><span>        test_cause("");</span></pre>
 <pre><span class="lineno"><a href="#line_1173" id="line_1173"> 1173.</a></span><span class="count                ">  33390</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1174" id="line_1174"> 1174.</a></span><span class="count                ">  33390</span><span>// PR-xxx - confirmed-deadcode - Dead ONLY while case "`" below returns. Undo</span></pre>
-<pre><span class="lineno"><a href="#line_1175" id="line_1175"> 1175.</a></span><span class="count                ">  33390</span><span>// that and `aa``&amp;&amp;aa``` is an internal-error again.</span></pre>
+<pre><span class="lineno"><a href="#line_1174" id="line_1174"> 1174.</a></span><span class="count                ">  33390</span><span>// PR-xxx - confirmed-deadcode - Dead only while case "`" below returns; undo</span></pre>
+<pre><span class="lineno"><a href="#line_1175" id="line_1175"> 1175.</a></span><span class="count                ">  33390</span><span>// that and a tagged template recurses on expression[1], undefined both sides.</span></pre>
 <pre><span class="lineno"><a href="#line_1176" id="line_1176"> 1176.</a></span><span class="count                ">  33390</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_1177" id="line_1177"> 1177.</a></span><span class="count                ">  33390</span><span>// if (aa === bb) {</span></pre>
 <pre><span class="lineno"><a href="#line_1178" id="line_1178"> 1178.</a></span><span class="count                ">  33390</span><span>//     return true;</span></pre>
@@ -1360,8 +1360,8 @@ body {
 <pre><span class="lineno"><a href="#line_1195" id="line_1195"> 1195.</a></span><span class="count                ">     29</span><span>            );</span></pre>
 <pre><span class="lineno"><a href="#line_1196" id="line_1196"> 1196.</a></span><span class="count                ">  33361</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_1197" id="line_1197"> 1197.</a></span><span class="count                ">  33361</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1198" id="line_1198"> 1198.</a></span><span class="count                ">  33361</span><span>// PR-xxx - confirmed-deadcode - Arrays reach is_equal only as a "`" token's</span></pre>
-<pre><span class="lineno"><a href="#line_1199" id="line_1199"> 1199.</a></span><span class="count                ">  33361</span><span>// .value/.expression, so they arrive in PAIRS and the branch above eats them.</span></pre>
+<pre><span class="lineno"><a href="#line_1198" id="line_1198"> 1198.</a></span><span class="count                ">  33361</span><span>// PR-xxx - confirmed-deadcode - prefix_tick sets both .value and .expression,</span></pre>
+<pre><span class="lineno"><a href="#line_1199" id="line_1199"> 1199.</a></span><span class="count                ">  33361</span><span>// so arrays arrive in pairs and the Array.isArray(aa) branch returns first.</span></pre>
 <pre><span class="lineno"><a href="#line_1200" id="line_1200"> 1200.</a></span><span class="count                ">  33361</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_1201" id="line_1201"> 1201.</a></span><span class="count                ">  33361</span><span>// if (Array.isArray(bb)) {</span></pre>
 <pre><span class="lineno"><a href="#line_1202" id="line_1202"> 1202.</a></span><span class="count                ">  33361</span><span>//     return false;</span></pre>
@@ -1444,8 +1444,8 @@ body {
 <pre><span class="lineno"><a href="#line_1279" id="line_1279"> 1279.</a></span><span class="count                ">   2010</span><span>                );</span></pre>
 <pre><span class="lineno"><a href="#line_1280" id="line_1280"> 1280.</a></span><span class="count                ">   2010</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_1281" id="line_1281"> 1281.</a></span><span class="count                ">   2010</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1282" id="line_1282"> 1282.</a></span><span class="count                ">   2010</span><span>// PR-xxx - confirmed-deadcode - Nothing assigns arity "regexp", and arity</span></pre>
-<pre><span class="lineno"><a href="#line_1283" id="line_1283"> 1283.</a></span><span class="count                ">   2010</span><span>// "function" only marks prefix_function's "(", never a compared slot.</span></pre>
+<pre><span class="lineno"><a href="#line_1282" id="line_1282"> 1282.</a></span><span class="count                ">   2010</span><span>// PR-xxx - confirmed-deadcode - No token is given arity "regexp", and arity</span></pre>
+<pre><span class="lineno"><a href="#line_1283" id="line_1283"> 1283.</a></span><span class="count                ">   2010</span><span>// "function" marks only prefix_function's param-list "(", never an operand.</span></pre>
 <pre><span class="lineno"><a href="#line_1284" id="line_1284"> 1284.</a></span><span class="count                ">   2010</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_1285" id="line_1285"> 1285.</a></span><span class="count                ">   2010</span><span>// if (aa.arity === "function" || aa.arity === "regexp") {</span></pre>
 <pre><span class="lineno"><a href="#line_1286" id="line_1286"> 1286.</a></span><span class="count                ">   2010</span><span>//     return false;</span></pre>
@@ -8878,8 +8878,8 @@ body {
 <pre><span class="lineno"><a href="#line_8713" id="line_8713"> 8713.</a></span><span class="count                ">  33591</span><span>        const id = thing.id;</span></pre>
 <pre><span class="lineno"><a href="#line_8714" id="line_8714"> 8714.</a></span><span class="count                ">  33591</span><span>        let the_variable;</span></pre>
 <pre><span class="lineno"><a href="#line_8715" id="line_8715"> 8715.</a></span><span class="count                ">  33591</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8716" id="line_8716"> 8716.</a></span><span class="count                ">  33591</span><span>// PR-xxx - confirmed-deadcode - Both callers are typed: preaction("variable")</span></pre>
-<pre><span class="lineno"><a href="#line_8717" id="line_8717"> 8717.</a></span><span class="count                ">  33591</span><span>// dispatch, and a name_list name_declare fills only under role "variable".</span></pre>
+<pre><span class="lineno"><a href="#line_8716" id="line_8716"> 8716.</a></span><span class="count                ">  33591</span><span>// PR-xxx - confirmed-deadcode - Both callers are typed: pre_v_var registered</span></pre>
+<pre><span class="lineno"><a href="#line_8717" id="line_8717"> 8717.</a></span><span class="count                ">  33591</span><span>// preaction("variable"), and post_a_assignment's name_declare-filled list.</span></pre>
 <pre><span class="lineno"><a href="#line_8718" id="line_8718"> 8718.</a></span><span class="count                ">  33591</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_8719" id="line_8719"> 8719.</a></span><span class="count                ">  33591</span><span>// if (thing.arity !== "variable") {</span></pre>
 <pre><span class="lineno"><a href="#line_8720" id="line_8720"> 8720.</a></span><span class="count                ">  33591</span><span>//     return;</span></pre>
@@ -10089,8 +10089,8 @@ body {
 <pre><span class="lineno"><a href="#line_9924" id="line_9924"> 9924.</a></span><span class="count                ">    238</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9925" id="line_9925"> 9925.</a></span><span class="count                ">     40</span><span>    function expected_at(at) {</span></pre>
 <pre><span class="lineno"><a href="#line_9926" id="line_9926"> 9926.</a></span><span class="count                ">     40</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9927" id="line_9927"> 9927.</a></span><span class="count                ">     40</span><span>// PR-xxx - confirmed-deadcode - Every path to expected_at runs through</span></pre>
-<pre><span class="lineno"><a href="#line_9928" id="line_9928"> 9928.</a></span><span class="count                ">     40</span><span>// "right = the_token", the first statement of the whitage token_list.forEach.</span></pre>
+<pre><span class="lineno"><a href="#line_9927" id="line_9927"> 9927.</a></span><span class="count                ">     40</span><span>// PR-xxx - confirmed-deadcode - Its only callers, whitage_default and</span></pre>
+<pre><span class="lineno"><a href="#line_9928" id="line_9928"> 9928.</a></span><span class="count                ">     40</span><span>// whitage_opener, run inside the forEach whose first line assigns right.</span></pre>
 <pre><span class="lineno"><a href="#line_9929" id="line_9929"> 9929.</a></span><span class="count                ">     40</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_9930" id="line_9930"> 9930.</a></span><span class="count                ">     40</span><span>// if (right === undefined) {</span></pre>
 <pre><span class="lineno"><a href="#line_9931" id="line_9931"> 9931.</a></span><span class="count                ">     40</span><span>//     right = token_nxt;</span></pre>
@@ -12007,7 +12007,7 @@ body {
 <pre><span class="lineno"><a href="#line_11842" id="line_11842">11842.</a></span><span class="count                ">    129</span><span>        let rangeToFuncDict = new Map();</span></pre>
 <pre><span class="lineno"><a href="#line_11843" id="line_11843">11843.</a></span><span class="count                ">    129</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_11844" id="line_11844">11844.</a></span><span class="count                ">    129</span><span>// PR-xxx - confirmed-deadcode - dictKeyValueAppend is urlToScriptDict's sole</span></pre>
-<pre><span class="lineno"><a href="#line_11845" id="line_11845">11845.</a></span><span class="count                ">    129</span><span>// writer and pushes as it creates the list, so length &gt;= 1 always.</span></pre>
+<pre><span class="lineno"><a href="#line_11845" id="line_11845">11845.</a></span><span class="count                ">    129</span><span>// writer, pushes as it creates each list, and nothing pops; so length &gt;= 1.</span></pre>
 <pre><span class="lineno"><a href="#line_11846" id="line_11846">11846.</a></span><span class="count                ">    129</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_11847" id="line_11847">11847.</a></span><span class="count                ">    129</span><span>// if (scriptCovs.length === 0) {</span></pre>
 <pre><span class="lineno"><a href="#line_11848" id="line_11848">11848.</a></span><span class="count                ">    129</span><span>//     return undefined;</span></pre>
@@ -12061,8 +12061,8 @@ body {
 <pre><span class="lineno"><a href="#line_11896" id="line_11896">11896.</a></span><span class="count                ">    112</span><span>            let ranges;</span></pre>
 <pre><span class="lineno"><a href="#line_11897" id="line_11897">11897.</a></span><span class="count                ">    112</span><span>            let trees = [];</span></pre>
 <pre><span class="lineno"><a href="#line_11898" id="line_11898">11898.</a></span><span class="count                ">    112</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_11899" id="line_11899">11899.</a></span><span class="count                ">    112</span><span>// PR-xxx - confirmed-deadcode - Same as scriptCovs above; rangeToFuncDict has</span></pre>
-<pre><span class="lineno"><a href="#line_11900" id="line_11900">11900.</a></span><span class="count                ">    112</span><span>// the same sole writer, so length &gt;= 1 always.</span></pre>
+<pre><span class="lineno"><a href="#line_11899" id="line_11899">11899.</a></span><span class="count                ">    112</span><span>// PR-xxx - confirmed-deadcode - Same proof as scriptCovs above, reading</span></pre>
+<pre><span class="lineno"><a href="#line_11900" id="line_11900">11900.</a></span><span class="count                ">    112</span><span>// rangeToFuncDict for urlToScriptDict; so length &gt;= 1 here too.</span></pre>
 <pre><span class="lineno"><a href="#line_11901" id="line_11901">11901.</a></span><span class="count                ">    112</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_11902" id="line_11902">11902.</a></span><span class="count                ">    112</span><span>// if (funcCovs.length === 0) {</span></pre>
 <pre><span class="lineno"><a href="#line_11903" id="line_11903">11903.</a></span><span class="count                ">    112</span><span>//     return undefined;</span></pre>
