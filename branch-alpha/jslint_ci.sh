@@ -2861,7 +2861,6 @@ function v8CoverageListMerge(processCovs) {
 
   let functions = [];
   let rangeToFuncDict = new Map();
-
   if (scriptCovs.length === 1) {
    resultMerged.push(sortScript(scriptCovs[0]));
    return;
@@ -2887,7 +2886,6 @@ function v8CoverageListMerge(processCovs) {
    let merged;
    let ranges;
    let trees = [];
-
    if (funcCovs.length === 1) {
     functions.push(sortFunc(funcCovs[0]));
     return;

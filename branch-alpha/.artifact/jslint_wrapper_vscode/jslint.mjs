@@ -1171,13 +1171,14 @@ function jslint(
 
         test_cause("");
 
-// PR-xxx - confirmed-deadcode - Dead ONLY while case "`" below returns; undo
+// PR-xxx - confirmed-deadcode - Dead ONLY while case "`" below returns. Undo
 // that and `aa``&&aa``` is an internal-error again.
-
+//
 // if (aa === bb) {
 //     return true;
 // }
 
+        jslint_assert(!(aa === bb), `Expected !(aa === bb).`);
         if (Array.isArray(aa)) {
             return (
                 Array.isArray(bb)
@@ -1196,11 +1197,12 @@ function jslint(
 
 // PR-xxx - confirmed-deadcode - Arrays reach is_equal only as a "`" token's
 // .value/.expression, so they arrive in PAIRS and the branch above eats them.
-
+//
 // if (Array.isArray(bb)) {
 //     return false;
 // }
 
+        jslint_assert(!Array.isArray(bb), `Expected !Array.isArray(bb).`);
         switch (aa.id === bb.id && aa.id) {
         case "(number)":
         case "(string)":
@@ -1279,10 +1281,15 @@ function jslint(
 
 // PR-xxx - confirmed-deadcode - Nothing assigns arity "regexp", and arity
 // "function" only marks prefix_function's "(", never a compared slot.
-
+//
 // if (aa.arity === "function" || aa.arity === "regexp") {
 //     return false;
 // }
+
+            jslint_assert(
+                !(aa.arity === "function" || aa.arity === "regexp"),
+                `Expected !(aa.arity === "function" || aa.arity === "regexp").`
+            );
 
 // test_cause:
 // ["undefined&&undefined", "is_equal", "true", "", 0]
@@ -8708,17 +8715,14 @@ function jslint_phase4_walk(state) {
 
 // PR-xxx - confirmed-deadcode - Both callers are typed: preaction("variable")
 // dispatch, and a name_list name_declare fills only under role "variable".
-
+//
 // if (thing.arity !== "variable") {
 //     return;
 // }
 
-// Assert kept: this is the one confirmed-deadcode guard whose premise, if a
-// later edit adds an untyped caller, would fail SILENTLY as a wrong lookup.
-
         jslint_assert(
-            thing.arity === "variable",
-            `Expected thing.arity === "variable".`
+            !(thing.arity !== "variable"),
+            `Expected !(thing.arity !== "variable").`
         );
 
 // Look up the variable, from current-scope, moving up the scope-chain.
@@ -9922,11 +9926,15 @@ function jslint_phase5_whitage(state) {
 
 // PR-xxx - confirmed-deadcode - Every path to expected_at runs through
 // "right = the_token", the first statement of the whitage token_list.forEach.
-
+//
 // if (right === undefined) {
 //     right = token_nxt;
 // }
 
+        jslint_assert(
+            !(right === undefined),
+            `Expected !(right === undefined).`
+        );
         warn(
             "expected_a_at_b_c",
             right,
@@ -11835,7 +11843,7 @@ function v8CoverageListMerge(processCovs) {
 
 // PR-xxx - confirmed-deadcode - dictKeyValueAppend is urlToScriptDict's sole
 // writer and pushes as it creates the list, so length >= 1 always.
-
+//
 // if (scriptCovs.length === 0) {
 //     return undefined;
 // }
@@ -11890,7 +11898,7 @@ function v8CoverageListMerge(processCovs) {
 
 // PR-xxx - confirmed-deadcode - Same as scriptCovs above; rangeToFuncDict has
 // the same sole writer, so length >= 1 always.
-
+//
 // if (funcCovs.length === 0) {
 //     return undefined;
 // }
@@ -12373,7 +12381,12 @@ body {
                             lineHtml += htmlEscape(chunk);
 
 // PR-xxx - NOT deadcode - a hole ending BEFORE end-of-line re-enters with
-// isHole undefined, and that bare span is what CLOSES the hole.
+// isHole undefined, and that bare span is what CLOSES the hole, e.g.:
+//
+// function aa(bb) {
+//     return bb && bb.cc;
+// }
+// aa(0);
 
                             lineHtml += (
                                 (isHole && ignoreLine)
