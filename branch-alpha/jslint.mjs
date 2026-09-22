@@ -8940,6 +8940,7 @@ function jslint_phase4_walk(state) {
 // ["aa=0&&0", "post_b_and", "weird_condition_a", "&&", 5]
 // ["aa=[]&&[]", "post_b_and", "weird_condition_a", "&&", 6]
 // ["aa=`${0}`&&`${0}`", "post_b_and", "weird_condition_a", "&&", 10]
+// ["aa=bb``&&bb``", "post_b_and", "weird_condition_a", "&&", 8]
 // ["
 // aa=function aa(){}&&function aa(){}
 // ", "post_b_and", "weird_condition_a", "&&", 19]
@@ -12425,7 +12426,7 @@ body {
                                 : isHole
                                 ? "</span><span class=\"uncovered\">"
 
-// PR-xxx - deadcode-dispelled - the arm below is live: a hole ending before
+// PR-xxx - deadcode-dispelled - the branch below is live: a hole ending before
 // end-of-line re-enters with <isHole> undefined, and that bare span closes it.
 // Line coverage hides this, the condition above running either way:
 //
