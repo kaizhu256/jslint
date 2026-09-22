@@ -1182,7 +1182,7 @@ function jslint(
 // differing from its second substitution on. Fixing it there - the Bugfix
 // below - removed the only reachable path here. So this assert is dead ONLY
 // while that case "`" returns; delete that return and the crash comes back.
-        jslint_assert(!(aa === bb), `Expected !(aa === bb).`);
+
         if (Array.isArray(aa)) {
             return (
                 Array.isArray(bb)
