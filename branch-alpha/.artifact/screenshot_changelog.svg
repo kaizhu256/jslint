@@ -167,31 +167,31 @@
     textLength="768"
     x="10"
     y="604"
->- jslint - bugfix - Fix is_equal() mis-comparing tagged-templates - crash, or false weird_condit\</tspan>
+>- jslint - inline-document each deadcode-guard with its proof and revive-note.                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="626"
->  ion_a.                                                                                         </tspan>
+>- jslint - bugfix - Fix is_equal() mis-comparing tagged-templates - crash, or false weird_condit\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="648"
->- coverage - Restore the span-class ternary in v8CoverageReportCreate(), removing an ugly-hack t\</tspan>
+>  ion_a.                                                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="670"
->  hat hid a live branch from line-coverage.                                                      </tspan>
+>- coverage - Restore the span-class ternary in v8CoverageReportCreate(), removing an ugly-hack t\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="692"
->- jslint - inline-document each deadcode-guard with its proof and revive-note.                   </tspan>
+>  hat hid a live branch from line-coverage.                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

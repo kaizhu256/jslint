@@ -21,9 +21,9 @@
 - jslint-cli - Skip dotfiles when linting a directory.
 - jslint-ci - Merge ci-shell-function shGithubPrUpdatePrxxx() into shGithubPrCreate().
 - jslint - Reviewed probable-deadcode-sections and confirmed 7 of 8 were real-deadcode.
+- jslint - inline-document each deadcode-guard with its proof and revive-note.
 - jslint - bugfix - Fix is_equal() mis-comparing tagged-templates - crash, or false weird_condition_a.
 - coverage - Restore the span-class ternary in v8CoverageReportCreate(), removing an ugly-hack that hid a live branch from line-coverage.
-- jslint - inline-document each deadcode-guard with its proof and revive-note.
 
 # v2026.8.31
 - jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.
