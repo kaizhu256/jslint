@@ -1228,7 +1228,7 @@ function jslint(
             return (
 
 // PR-394 - Bugfix - Fix jslint treating megastrings bb`0` and bb`1` as equal.
-// The untagged form always warns, because post_b_and fires on any constant.
+// The untagged form always warns, because <post_b_and> fires on any constant.
 
                 is_equal(aa.value, bb.value)
 
