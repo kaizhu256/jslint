@@ -12393,21 +12393,19 @@ body {
                     }) {
                         if (inHole !== isHole) {
                             lineHtml += htmlEscape(chunk);
-                            lineHtml += "</span><span";
 
-// NOT deadcode, and isHole is NOT always true [measured 2026-09-21]. A hole
-// ending BEFORE end-of-line re-enters here with isHole undefined, emitting a
-// bare span that closes the hole; test.mjs's own coverage-ignore-line does
-// exactly that today. Dropping the guard would class the rest of the line.
+// The UNCLASSED arm is LIVE, not deadcode: a hole ending BEFORE end-of-line
+// re-enters here with isHole undefined, and that bare span is what CLOSES the
+// hole. Pinned by test coverage-hole-closing-midline, because 100% LINE
+// coverage cannot see a never-taken arm.
 
-                            if (isHole) {
-                                lineHtml += (
-                                    ignoreLine
-                                    ? " class=\"ignore\""
-                                    : " class=\"uncovered\""
-                                );
-                            }
-                            lineHtml += ">";
+                            lineHtml += (
+                                (isHole && ignoreLine)
+                                ? "</span><span class=\"ignore\">"
+                                : isHole
+                                ? "</span><span class=\"uncovered\">"
+                                : "</span><span>"
+                            );
                             chunk = "";
                             inHole = isHole;
                         }

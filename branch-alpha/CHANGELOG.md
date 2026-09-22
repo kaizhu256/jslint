@@ -28,6 +28,7 @@
 - deadcode - delete proven-unreachable guard in function v8CoverageListMerge() - `if (funcCovs.length === 0) {...}`.
 - test - Add test pinning the isHole span-transition in v8CoverageReportCreate(), which 100% line-coverage cannot flag.
 - jslint - bugfix - Fix false-warning 'unassigned_var_a' on nested destructuring-assignment ';[[aa]]=0;' and ';[{aa}]=0;'.
+- coverage - Restore the span-class ternary in v8CoverageReportCreate(), removing an ugly-hack that hid a live branch from line-coverage.
 
 # v2026.8.31
 - jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.

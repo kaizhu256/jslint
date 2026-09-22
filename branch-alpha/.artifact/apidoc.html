@@ -661,8 +661,8 @@ await jslint.jslint_cli({
         .replace((/&gt;/g), "&amp;gt;");
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-                            }
-                            lineHtml += "&gt;";
+                                : "&lt;/span&gt;&lt;span&gt;"
+                            );
                             chunk = "";
                             inHole = isHole;
                         }
