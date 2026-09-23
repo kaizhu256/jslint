@@ -435,8 +435,6 @@ const jslint_autofix_warning_list = [ //jslint-ignore-line
     "expected_space_a_b",
     "unexpected_space_a_b",
 
-// These warning codes are not fixed, but included so they won't block autofix.
-
 // PR-xxx - Update autofix to no longer be blocked by warning 'too_long'.
 
     "too_long"
@@ -10588,7 +10586,7 @@ function jslint_phase6_autofix(state) {
         case "expected_a_at_end":
 
 // PR-xxx - Move the line-leading operator to just after its left operand, which
-// ends at line <c>, column <d> - before any trailing comment there.
+// ends at line <c>, column <d>, and before any trailing comment there.
 
             line_list[c] = (
                 line_list[c].slice(0, d) + " " + a +
@@ -10648,7 +10646,7 @@ function jslint_phase6_autofix(state) {
         );
     });
 
-// PR-xxx - If EOF is missing <line_crlf>, then append it.
+// PR-xxx - If EOF is not <line_crlf>, then append it.
 
     if (line_list[line_list.length - 1] !== "") {
         line_list.push("");
