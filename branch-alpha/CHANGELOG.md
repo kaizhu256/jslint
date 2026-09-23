@@ -15,6 +15,7 @@
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
+- jslint - Add beta-warning 'expected_a_at_end', and allow to be autofixed in jslint_phase6_autofix().
 - jslint - Move column-fudging into warn_at(); callers pass 0-based column.
 - jslint - Remove dead token-property 'free' from parser and whitage.
 - jslint - Improve parser to parse jquery.js without stopping - for-init comma, numeric object-key.
@@ -23,7 +24,6 @@
 - jslint - Reviewed probable-deadcode-sections and confirmed 7 of 8 were real-deadcode.
 - jslint - inline-document each deadcode-guard with its proof and revive-note.
 - jslint - bugfix - Fix jslint treating tagged templates as equal.
-- coverage - Restore the span-class ternary in v8CoverageReportCreate(), removing an ugly-hack that hid a live branch from line-coverage.
 
 # v2026.8.31
 - jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.

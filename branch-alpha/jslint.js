@@ -1541,7 +1541,7 @@ function jslint(
             );
             break;
         case "expected_a_at_end":
-            mm = `Expected '${a}' at the end of the previous line.`;
+            mm = `Expected '${a}' at the end of its left operand's line.`;
             break;
         case "expected_a_b":
             mm = `Expected '${a}' and instead saw '${b}'.`;
