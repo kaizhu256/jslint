@@ -10650,8 +10650,7 @@ function jslint_phase6_autofix(state) {
         );
     });
 
-// PR-xxx - Append <line_crlf> to the fixed code if it is missing one. A source
-// ending in a terminator already splits to a last line of "".
+// PR-xxx - Append <line_crlf> to the fixed code if it is missing one.
 
     if (line_list[line_list.length - 1] !== "") {
         line_list.push("");
