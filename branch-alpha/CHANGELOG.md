@@ -1,10 +1,10 @@
 # Changelog
 
 # Todo
+- jslint - Revisit autofix of top-level whitespace, e.g. warning expected_space_a_b on line break inside closed-form expression.
 - jslint - Review binding-power of operators.
 - jslint-vscode - Add extra contextmenu command "JSLint - Autofix Whitespace".
 - jslint-directive - Add new directive 'tab' to support tab-indent.
-- jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.'.
 - jslint-ecma - Add ES2015-feature iterators.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
@@ -15,7 +15,7 @@
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
-- jslint - Add beta-warning 'expected_a_at_end', and allow to be autofixed in jslint_phase6_autofix().
+- jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.', and update function jslint_phase6_autofix() to autofix it.
 - jslint - Move column-fudging into warn_at(); callers pass 0-based column.
 - jslint - Remove dead token-property 'free' from parser and whitage.
 - jslint - Improve parser to parse jquery.js without stopping - for-init comma, numeric object-key.
