@@ -10458,7 +10458,7 @@ function jslint_phase5_whitage(state) {
 
         if (left.line !== right.line) {
 
-// PR-511 - Binary operators at end-of-line.
+// PR-xxx - Binary operators at end-of-line.
 
 // A tagged template is a binary "`" whose right side is the template itself.
 // Moving its backtick up would put the line break INSIDE the template and
