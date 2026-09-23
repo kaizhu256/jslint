@@ -484,12 +484,12 @@ return debug;
 }());
 <span class="apidocCodeKeywordSpan">debugInline</span>(); // coverage-hack
 
-// The warning codes that do not block autofix: the whitespace codes phase 6
-// fixes, plus too_long, which is never fixed, only reported.
+// The warning codes that do not block autofix. All but too_long are the
+// whitespace codes phase 6 fixes. too_long is never fixed, only reported -
+// &lt;read_line&gt; skips it during autofix, and the final re-lint reports it.
 
 const jslint_autofix_warning_list = [ //jslint-ignore-line
 "expected_a_at_b_c",
-"expected_a_at_end",
 ...</pre></li>
 
 <li>

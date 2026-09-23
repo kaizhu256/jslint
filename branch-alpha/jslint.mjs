@@ -428,8 +428,9 @@ const debugInline = (function () {
 }());
 debugInline(); // coverage-hack
 
-// The warning codes that do not block autofix: the whitespace codes phase 6
-// fixes, plus too_long, which is never fixed, only reported.
+// The warning codes that do not block autofix. All but too_long are the
+// whitespace codes phase 6 fixes. too_long is never fixed, only reported -
+// <read_line> skips it during autofix, and the final re-lint reports it.
 
 const jslint_autofix_warning_list = [ //jslint-ignore-line
     "expected_a_at_b_c",
@@ -1212,8 +1213,9 @@ function jslint(
 // either. Arrays only reach <is_equal> from case "`" below, and only when
 // <aa>.id === <bb>.id, so they arrive in pairs and the branch above takes both.
 //
-// deadcode-revive - recurse on a slot holding an array for some token ids and
-// a single token for others, or run the backtick case with one side a backtick.
+// deadcode-revive - Recurse on a slot that holds an array for some token ids
+// and a single token for others, or let the backtick case run when only one
+// side is a backtick.
 //
 // if (Array.isArray(bb)) {
 //     return false;
@@ -1302,8 +1304,9 @@ function jslint(
 // parameter list in <prefix_function>. That token is never stored in an
 // <expression>, <name> or <value> slot, so <is_equal> never sees it.
 //
-// deadcode-revive - recurse into two function expressions' parameter lists,
-// putting that "(" on both sides - or give any token <arity> "regexp".
+// deadcode-revive - Compare two function expressions by recursing into their
+// parameter lists, which puts that "(" on both sides. Giving any token
+// <arity> "regexp" would also do it.
 //
 // if (aa.arity === "function" || aa.arity === "regexp") {
 //     return false;
@@ -3276,8 +3279,9 @@ function jslint_phase2_lex(state) {
         token_create("`");
         from += 1;
 
-// Then loop, building up a string, possibly from many lines, until seeing the
-// end of file, a closing `, or a ${ indicting an expression within the string.
+// Then loop, building up a string, possibly from many lines, until seeing
+// the end of file, a closing `, or a ${ indicting an expression within the
+// string.
 
         while (true) {
             match = line_source.match(jslint_rgx_mega) || {
@@ -9975,7 +9979,7 @@ function jslint_phase5_whitage(state) {
 // walk starts in one place, the <token_list>.forEach whose first statement is
 // <right> = <the_token>, and every route to <expected_at> runs inside it.
 //
-// deadcode-revive - call <expected_at>, or anything that reaches it, from
+// deadcode-revive - Call <expected_at>, or anything that reaches it, from
 // outside that forEach. A pre-pass or post-pass indent check would do it, and
 // <right> would hold whatever the last token left there, or undefined.
 //
@@ -10629,8 +10633,9 @@ function jslint_phase6_autofix(state) {
             jj -= 1;
         }
 
-// A run reaching column 0 is INDENTATION or a line-join, not a gap between two
-// tokens on one line. Leave it to a future jslint_autofix_warning_list entry.
+// A run reaching column 0 is INDENTATION or a line-join, not a gap between
+// two tokens on one line. Leave it to a future jslint_autofix_warning_list
+// entry.
 
         if (jj === 0) {
             return;
@@ -11958,7 +11963,7 @@ function v8CoverageListMerge(processCovs) {
 // one element. <dictKeyValueAppend> is the only writer and pushes in the same
 // call that creates the list, and nothing pops, splices or filters it.
 //
-// deadcode-revive - restore <mergeScriptList>, whose signature is commented
+// deadcode-revive - Restore <mergeScriptList>, whose signature is commented
 // out above. It took its list from any caller, which is why it needed this
 // guard. Adding a second writer or a filter to the map would also do it.
 //
@@ -12014,10 +12019,11 @@ function v8CoverageListMerge(processCovs) {
             let ranges;
             let trees = [];
 
-// PR-510 - deadcode-confirmed - As <scriptCovs> above, for <rangeToFuncDict>:
-// its only writer <dictKeyValueAppend> pushes as it creates each list.
+// PR-510 - deadcode-confirmed - Same as <scriptCovs> above, but with
+// <rangeToFuncDict>. <dictKeyValueAppend> is its only writer and pushes as it
+// creates each list.
 //
-// deadcode-revive - restore <mergeFuncList>, commented out above, or give the
+// deadcode-revive - Restore <mergeFuncList>, commented out above, or give the
 // map a second writer.
 //
 // if (funcCovs.length === 0) {
@@ -12078,8 +12084,9 @@ function v8CoverageListMerge(processCovs) {
         }));
     });
 
-// Sorts the scripts alphabetically by `url`. Reassigns script ids: the script
-// at index `0` receives `"0"`, the script at index `1` receives `"1"` etc.
+// Sorts the scripts alphabetically by `url`.
+// Reassigns script ids: the script at index `0` receives `"0"`, the script at
+// index `1` receives `"1"` etc.
 
     Object.entries(resultMerged.sort(function (aa, bb) {
         return (
