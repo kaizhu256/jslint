@@ -122,7 +122,7 @@
 - ci - Upgrade nodejs used in ci to v22.
 - ubuntu-ci - bugfix - Fix out-of-date apt-list when installing graphicsmagick.
 - jslint - Cleanup ci-shell-function shRollupFetch().
-- jslint - Update ci-shell-function shDirHttplinkValidate() with pragma <\!!--novalidate--\>.
+- jslint - Update ci-shell-function shDirHttplinkValidate() with pragma \<\!!--novalidate--\>.
 - ci - Upgrade python used in ci to v3.12.
 - ci - Auto-create asset_image_logo_256.png from asset_image_logo_256.html.
 - ci - Fix shell-function shRollupFetch() from making excessive github-api-request.
@@ -271,7 +271,7 @@
 - ci - update shell-function shRunWithCoverage() to reduce size of string/argument passed to nodejs by using 2-space-indent
 - cli - add cli-command jslint_plugin_vim
 - cli - add cli-command v8_coverage_report
-- cli - change cli-option `--mode-report` to cli-command `jslint_report=<filename>`
+- cli - change cli-option `--mode-report` to cli-command `jslint_report=\<filename>`
 - coverage - relax requirement for coverageDir to be in cwd
 - deprecated - cli - add cli-option `--mode-report`
 - doc - add api-documentation
