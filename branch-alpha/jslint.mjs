@@ -428,17 +428,16 @@ const debugInline = (function () {
 }());
 debugInline(); // coverage-hack
 
-// The warning codes that do not block autofix. All but too_long are the
-// whitespace codes phase 6 fixes. too_long is never fixed, only reported -
-// <read_line> skips it during autofix, and the final re-lint reports it.
-
 const jslint_autofix_warning_list = [ //jslint-ignore-line
     "expected_a_at_b_c",
     "expected_a_at_end",
     "expected_line_break_a_b",
     "expected_space_a_b",
-    "too_long",
-    "unexpected_space_a_b"
+    "unexpected_space_a_b",
+
+// These warning codes are not fixed, but included so they won't block autofix.
+
+    "too_long"
 ];
 const jslint_charset_ascii = (
     "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007" +
@@ -1924,13 +1923,9 @@ function jslint(
                 code
             }) {
                 return (
-
-// PR-xxx - Run phase 5 only if no warning blocks it. Every warning blocks a
-// plain lint; under autofix, only codes outside jslint_autofix_warning_list
-// do, so a too_long cannot hide the whitespace warnings after it.
-
-                    !mode_autofix ||
-                    !jslint_autofix_warning_list.includes(code)
+                    mode_autofix
+                    ? !jslint_autofix_warning_list.includes(code)
+                    : true
                 );
             })
         ) {
@@ -10649,7 +10644,7 @@ function jslint_phase6_autofix(state) {
         );
     });
 
-// PR-xxx - Append <line_crlf> to the fixed code if it is missing one.
+// PR-xxx - If EOF is missing <line_crlf>, then append it.
 
     if (line_list[line_list.length - 1] !== "") {
         line_list.push("");
