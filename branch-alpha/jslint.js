@@ -10445,7 +10445,6 @@ function jslint_phase5_whitage(state) {
 
 // PR-xxx - Binary operators at end-of-line.
 
-
 // A tagged template is a binary "`" whose right side is the template itself.
 // Moving its backtick up would put the line break INSIDE the template and
 // change its value, so it is excluded.
