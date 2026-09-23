@@ -1171,7 +1171,7 @@ function jslint(
 
         test_cause("");
 
-// PR-xxx - deadcode-confirmed - <aa> and <bb> are never the same object. Each
+// PR-510 - deadcode-confirmed - <aa> and <bb> are never the same object. Each
 // call below pairs a slot of <aa> with the same slot of <bb>, and the only
 // slot that can be undefined on both sides is <expression>[1] of a binary
 // token. Case "`" returns before that branch, and <aa>.id !== "(" skips it.
@@ -1202,7 +1202,7 @@ function jslint(
             );
         }
 
-// PR-xxx - deadcode-confirmed - If <aa> is not an array then <bb> is not one
+// PR-510 - deadcode-confirmed - If <aa> is not an array then <bb> is not one
 // either. Arrays only reach <is_equal> from case "`" below, and only when
 // <aa>.id === <bb>.id, so they arrive in pairs and the branch above takes both.
 //
@@ -1232,7 +1232,7 @@ function jslint(
 
                 is_equal(aa.value, bb.value)
 
-// PR-xxx - Bugfix - Fix jslint treating tagged templates as equal when they
+// PR-510 - Bugfix - Fix jslint treating tagged templates as equal when they
 // differ past the first substitution, which is all the binary branch compared.
 
                 && is_equal(aa.expression, bb.expression)
@@ -1292,7 +1292,7 @@ function jslint(
                 );
             }
 
-// PR-xxx - deadcode-confirmed - Nothing in this file sets <arity> to "regexp",
+// PR-510 - deadcode-confirmed - Nothing in this file sets <arity> to "regexp",
 // and <arity> "function" is set in one place, on the "(" that opens a
 // parameter list in <prefix_function>. That token is never stored in an
 // <expression>, <name> or <value> slot, so <is_equal> never sees it.
@@ -8732,7 +8732,7 @@ function jslint_phase4_walk(state) {
         const id = thing.id;
         let the_variable;
 
-// PR-xxx - deadcode-confirmed - Both callers pass a token already known to be
+// PR-510 - deadcode-confirmed - Both callers pass a token already known to be
 // a variable. <pre_v_var> is registered as a preaction on arity "variable",
 // and <post_a_assignment> walks an assignment token's <name_list>, which only
 // <name_declare> calls with role "variable" fill. That role sets <arity>.
@@ -9951,7 +9951,7 @@ function jslint_phase5_whitage(state) {
 
     function expected_at(at) {
 
-// PR-xxx - deadcode-confirmed - <right> is always assigned first. The whitage
+// PR-510 - deadcode-confirmed - <right> is always assigned first. The whitage
 // walk starts in one place, the <token_list>.forEach whose first statement is
 // <right> = <the_token>, and every route to <expected_at> runs inside it.
 //
@@ -11873,7 +11873,7 @@ function v8CoverageListMerge(processCovs) {
 
         let rangeToFuncDict = new Map();
 
-// PR-xxx - deadcode-confirmed - Every list in <urlToScriptDict> has at least
+// PR-510 - deadcode-confirmed - Every list in <urlToScriptDict> has at least
 // one element. <dictKeyValueAppend> is the only writer and pushes in the same
 // call that creates the list, and nothing pops, splices or filters it.
 //
@@ -11933,7 +11933,7 @@ function v8CoverageListMerge(processCovs) {
             let ranges;
             let trees = [];
 
-// PR-xxx - deadcode-confirmed - Same as <scriptCovs> above, but with
+// PR-510 - deadcode-confirmed - Same as <scriptCovs> above, but with
 // <rangeToFuncDict>. <dictKeyValueAppend> is its only writer and pushes as it
 // creates each list.
 //
@@ -12426,7 +12426,7 @@ body {
                                 : isHole
                                 ? "</span><span class=\"uncovered\">"
 
-// PR-xxx - deadcode-dispelled - the branch below is live: a hole ending before
+// PR-510 - deadcode-dispelled - the branch below is live: a hole ending before
 // end-of-line re-enters with <isHole> undefined, and that bare span closes it.
 // Line coverage hides this, the condition above running either way:
 //

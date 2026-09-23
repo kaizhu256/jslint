@@ -1662,7 +1662,7 @@ String(
     : \`1\`
 );
 
-// PR-xxx - Bugfix - Fix jslint treating tagged templates as equal.
+// PR-510 - Bugfix - Fix jslint treating tagged templates as equal.
 
 String(
     String()
