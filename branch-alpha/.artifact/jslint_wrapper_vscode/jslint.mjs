@@ -1920,16 +1920,17 @@ function jslint(
 
         if (
             !state.mode_json &&
-            warning_list.every(function ({
+            !warning_list.some(function ({
                 code
             }) {
                 return (
 
-// PR-xxx - Under autofix, a non-blocking warning like too_long does not gate
-// phase 5 either, or it would hide every whitespace warning after it.
+// PR-xxx - Run phase 5 only if no warning blocks it. Every warning blocks a
+// plain lint; under autofix, only codes outside jslint_autofix_warning_list
+// do, so a too_long cannot hide the whitespace warnings after it.
 
-                    mode_autofix &&
-                    jslint_autofix_warning_list.includes(code)
+                    !mode_autofix ||
+                    !jslint_autofix_warning_list.includes(code)
                 );
             })
         ) {

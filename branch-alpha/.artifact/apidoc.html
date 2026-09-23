@@ -1312,7 +1312,7 @@ if (!state.mode_json) {
 
 if (
     !state.mode_json &amp;&amp;
-    warning_list.every(function ({
+    !warning_list.some(function ({
 ...</pre></li>
 
 <li>
@@ -1403,10 +1403,10 @@ if (
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-// phase 5 either, or it would hide every whitespace warning after it.
+// do, so a too_long cannot hide the whitespace warnings after it.
 
-            mode_autofix &amp;&amp;
-            jslint_autofix_warning_list.includes(code)
+            !mode_autofix ||
+            !jslint_autofix_warning_list.includes(code)
         );
     })
 ) {
