@@ -10642,6 +10642,13 @@ function jslint_phase6_autofix(state) {
             line_source.slice(ii)
         );
     });
+
+// PR-xxx - Append <line_crlf> to the fixed code if it is missing one. A source
+// ending in a terminator already splits to a last line of "".
+
+    if (line_list[line_list.length - 1] !== "") {
+        line_list.push("");
+    }
     return line_list.slice(jslint_fudge).join(line_crlf);
 }
 

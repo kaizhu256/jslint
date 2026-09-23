@@ -567,14 +567,19 @@ jstestDescribe((
         );
 
 // A ONE-LINE source carries NO terminator at all, so jslint_rgx_crlf.exec()
-// returns null and the rejoin falls back to "\n". The result has no trailing
-// newline either - the fixer adds terminators BETWEEN lines, never after the
-// last one.
+// returns null and the rejoin falls back to "\n" - which is also appended,
+// since the fixed code is missing a trailing one.
 
         result = assertAutofix((
-            "function aa(bb) {\n    return bb;\n}\naa();"
+            "function aa(bb) {\n    return bb;\n}\naa();\n"
         ), "function aa(bb) { return bb; } aa();");
         assertOrThrow(result.ok, JSON.stringify(result.warnings));
+
+// The appended terminator is the file's own, here "\r\n".
+
+        assertAutofix((
+            "function aa(bb) {\r\n    return bb;\r\n}\r\naa();\r\n"
+        ), "function aa(bb) { return bb; }\r\naa();");
 
 // A whitespace-run reaching column 0 is INDENTATION or a line-join, not a gap
 // between two tokens on one line, so the fix is DECLINED and the warning is
@@ -595,15 +600,18 @@ jstestDescribe((
 // A too_long ALREADY in the source does not block autofix - the fix is made,
 // and too_long is still reported.
 
-        result = assertAutofix(String(`
+        result = assertAutofix(
+            String(`
 function aa(bb) {
     return bb;
 }
 aa("${"a".repeat(80)}");
-        `).trim() + "\n", String(`
+            `).trim() + "\n",
+            String(`
 function aa(bb) { return bb; }
 aa("${"a".repeat(80)}");
-        `).trim() + "\n");
+            `).trim() + "\n"
+        );
         assertOrThrow(
             result.warnings.length === 1 &&
             result.warnings[0].code === "too_long",
