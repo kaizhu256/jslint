@@ -10644,7 +10644,7 @@ function jslint_phase6_autofix(state) {
         );
     });
 
-// PR-xxx - If EOF is missing <line_crlf>, then append it.
+// PR-xxx - Append <line_crlf> to the fixed code if it is missing one.
 
     if (line_list[line_list.length - 1] !== "") {
         line_list.push("");
