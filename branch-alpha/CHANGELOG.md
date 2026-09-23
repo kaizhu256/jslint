@@ -1,6 +1,7 @@
 # Changelog
 
 # Todo
+- jslint - Fix autofix leaving later fixes undone when a join passes 80 columns - either do over-80 joins last, or ignore too_long during autofix and re-lint after.
 - jslint - Warn on line break before arrow '=>', which is a SyntaxError that jslint currently accepts.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Revisit autofix of top-level whitespace, e.g. warning expected_space_a_b on line break inside closed-form expression.
