@@ -427,11 +427,17 @@ const debugInline = (function () {
     return debug;
 }());
 debugInline(); // coverage-hack
+
+// The warning codes that do not block autofix. All but too_long are the
+// whitespace codes phase 6 fixes. too_long is never fixed, only reported -
+// <read_line> skips it during autofix, and the final re-lint reports it.
+
 const jslint_autofix_warning_list = [ //jslint-ignore-line
     "expected_a_at_b_c",
     "expected_a_at_end",
     "expected_line_break_a_b",
     "expected_space_a_b",
+    "too_long",
     "unexpected_space_a_b"
 ];
 const jslint_charset_ascii = (
@@ -10667,16 +10673,10 @@ function jslint_report({
 //  let result = jslint("console.log('hello world')");
 //  let html = jslint_report(result);
 
-// PR-xxx - Do not report autofix blocked on too_long, which no longer blocks
-// autofix - the fixes are made and too_long is only reported.
-
     const autofix_blocked = autofix && warnings.some(function ({
         code
     }) {
-        return (
-            code !== "too_long" &&
-            !jslint_autofix_warning_list.includes(code)
-        );
+        return !jslint_autofix_warning_list.includes(code);
     });
     let html = "";
     let length_80 = 1111;
