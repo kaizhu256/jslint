@@ -435,7 +435,7 @@ const jslint_autofix_warning_list = [ //jslint-ignore-line
     "expected_space_a_b",
     "unexpected_space_a_b",
 
-// PR-xxx - Update autofix so that warning 'too_long' does not block it.
+// PR-xxx - jslint-autofix - Warning 'too_long' no longer blocks autofix.
 
     "too_long"
 ];
@@ -1925,7 +1925,7 @@ function jslint(
                 return (
                     mode_autofix
 
-// PR-xxx - Update autofix so that warning 'too_long' does not block it.
+// PR-xxx - jslint-autofix - Warning 'too_long' no longer blocks autofix.
 
                     ? !jslint_autofix_warning_list.includes(code)
                     : true
@@ -10646,7 +10646,7 @@ function jslint_phase6_autofix(state) {
         );
     });
 
-// PR-xxx - If EOF is not <line_crlf>, then append it.
+// PR-xxx - jslint-autofix - If EOF is not <line_crlf>, then append it.
 
     if (line_list[line_list.length - 1] !== "") {
         line_list.push("");
