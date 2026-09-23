@@ -457,38 +457,6 @@ jstestDescribe((
         ));
         assertOrThrow(!result.ok, "expected warnings");
 
-// Under beta, expected_a_at_end moves a line-leading operator to just after
-// its left operand - past a template's `// x` line, before a trailing
-// comment - and an operator alone on its line takes the line with it.
-
-        result = jslint.jslint((
-            "const aa = [\n    `\n// x`\n    + 1 // c\n    +\n    2\n];\n" +
-            "export default Object.freeze(aa);\n"
-        ), {
-            autofix: true,
-            beta: true
-        });
-        assertOrThrow(result.autofixed === (
-            "const aa = [\n    `\n// x` +\n    1 + // c\n    2\n];\n" +
-            "export default Object.freeze(aa);\n"
-        ), result.autofixed);
-
-// A tagged template's backtick is NOT an operator to move - moving it would
-// put the line break inside the template and change its value.
-
-        source = (
-            "function aa() {\n    return String.raw\n    `x${0}`;\n}\n" +
-            "export default Object.freeze(aa);\n"
-        );
-        result = jslint.jslint(source, {
-            autofix: true,
-            beta: true
-        });
-        assertOrThrow(
-            result.autofixed === undefined && result.ok,
-            JSON.stringify([result.autofixed, result.warnings])
-        );
-
 // THE FIXER'S LINE MODEL MUST BE THE LINTER'S (jslint_rgx_crlf). A CRLF file
 // must come back CRLF - line_list carries NO terminators and the rejoin uses
 // the file's OWN first one - and a lone \r, which the linter counts as a line
@@ -756,7 +724,7 @@ jstestDescribe((
 
         await autofixFile({
             expect: (
-                "shAa() {\n    node --eval '\nconsole.log(\n    0 +\n    0\n" +
+                "shAa() {\n    node --eval '\nconsole.log(\n    0\n    + 0\n" +
                 ");\n'\n}\n"
             ),
             name: "autofix_embedded.sh",
@@ -810,7 +778,7 @@ jstestDescribe((
         await autofixFile({
             expect: (
                 "# aa\n\nnode --eval '\n/*jslint node*/\nconsole.log(\n" +
-                "    0 +\n    0\n);\n'\n\nnode --eval '\nconsole.log(\n" +
+                "    0\n    + 0\n);\n'\n\nnode --eval '\nconsole.log(\n" +
                 "    0\n  + 0\n);\n'\n"
             ),
             name: "autofix_embedded.md",
@@ -904,11 +872,11 @@ jstestDescribe((
 
         function reportAutofixExpect(klass, body) {
             return (
-                "<fieldset\n    class=\"\n    " + klass + "\n    \"\n" +
-                "    id=\"JSLINT_REPORT_AUTOFIX\"\n>\n" +
-                "<legend>Report: Autofix</legend>\n" +
-                "<div class=\"center\">\n    " + body + "\n</div>\n" +
-                "</fieldset>\n"
+                "<fieldset\n    class=\"\n    " + klass + "\n    \"\n"
+                + "    id=\"JSLINT_REPORT_AUTOFIX\"\n>\n"
+                + "<legend>Report: Autofix</legend>\n"
+                + "<div class=\"center\">\n    " + body + "\n</div>\n"
+                + "</fieldset>\n"
             );
         }
 
@@ -1830,8 +1798,8 @@ function aa() {
             const elemNow = JSON.stringify([option_dict, source]);
             const warningsLength = (
                 (
-                    option_dict.test_internal_error ||
-                    option_dict.test_unknown_warning_code
+                    option_dict.test_internal_error
+                    || option_dict.test_unknown_warning_code
                 )
                 ? 1
                 : 0
@@ -1863,13 +1831,13 @@ function aa() {
                 );
                 // test jslint's directive handling-behavior
                 source = (
-                    "/*jslint " +
-                    JSON
+                    "/*jslint "
+                    + JSON
                         .stringify(option_dict)
                         .slice(1, -1)
-                        .replace((/"/g), "") +
-                    "*/\n" +
-                    source.replace((/^#!/), "//")
+                        .replace((/"/g), "")
+                    + "*/\n"
+                    + source.replace((/^#!/), "//")
                 );
                 warnings = jslint(source).warnings;
                 assertOrThrow(
@@ -1913,11 +1881,11 @@ jstestDescribe((
             ), "");
             tmp = causeList.split("\n").map(function (cause) {
                 return (
-                    "[" +
-                    JSON.parse(cause).map(function (elem) {
+                    "["
+                    + JSON.parse(cause).map(function (elem) {
                         return JSON.stringify(elem);
-                    }).join(", ") +
-                    "]"
+                    }).join(", ")
+                    + "]"
                 );
             }).sort().join("\n");
             assertOrThrow(
@@ -1941,16 +1909,16 @@ jstestDescribe((
                     }) {
                         return code !== undefined;
                     }),
-                    "\n" + JSON.stringify(cause[0]) + "\n\n" +
-                    JSON.stringify(tmp.warnings, undefined, 4)
+                    "\n" + JSON.stringify(cause[0]) + "\n\n"
+                    + JSON.stringify(tmp.warnings, undefined, 4)
                 );
                 tmp = tmp.causes;
                 // Validate cause.
                 assertOrThrow(
                     tmp[JSON.stringify(cause.slice(1))],
                     (
-                        "\n" + JSON.stringify(cause) + "\n\n" +
-                        Object.keys(tmp).sort().join("\n")
+                        "\n" + JSON.stringify(cause) + "\n\n"
+                        + Object.keys(tmp).sort().join("\n")
                     )
                 );
             });
@@ -2135,8 +2103,8 @@ jstestDescribe((
         });
     });
     jstestIt((
-        "accepts arrays with two identical items for" +
-        " `v8CoverageListMerge`"
+        "accepts arrays with two identical items for"
+        + " `v8CoverageListMerge`"
     ), function () {
         assertJsonEqual(v8CoverageListMerge([
             {
@@ -2256,37 +2224,37 @@ jstestDescribe((
     [
         [
             "v8CoverageReportCreate_high.js", (
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "}\n"
+                "switch(0){\n"
+                + "case 0:break;\n"
+                + "}\n"
             )
         ], [
             "v8CoverageReportCreate_ignore.js", (
-                "/*coverage-ignore-file*/\n" +
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "case 1:break;//coverage-ignore-line\n" +
-                "/*coverage-disable*/\n" +
-                "case 2:break;\n" +
-                "/*coverage-enable*/\n" +
-                "}\n"
+                "/*coverage-ignore-file*/\n"
+                + "switch(0){\n"
+                + "case 0:break;\n"
+                + "case 1:break;//coverage-ignore-line\n"
+                + "/*coverage-disable*/\n"
+                + "case 2:break;\n"
+                + "/*coverage-enable*/\n"
+                + "}\n"
             )
         ], [
             "v8CoverageReportCreate_low.js", (
-                "switch(0){\n" +
-                "case 1:break;\n" +
-                "case 2:break;\n" +
-                "case 3:break;\n" +
-                "case 4:break;\n" +
-                "}\n"
+                "switch(0){\n"
+                + "case 1:break;\n"
+                + "case 2:break;\n"
+                + "case 3:break;\n"
+                + "case 4:break;\n"
+                + "}\n"
             )
         ], [
             "v8CoverageReportCreate_medium.js", (
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "case 1:break;\n" +
-                "case 2:break;\n" +
-                "}\n"
+                "switch(0){\n"
+                + "case 0:break;\n"
+                + "case 1:break;\n"
+                + "case 2:break;\n"
+                + "}\n"
             )
         ]
     ].forEach(function ([
@@ -2320,14 +2288,14 @@ jstestDescribe((
         const dir = ".tmp/coverage_hole/";
         const file = dir + "coverage_hole.js";
         await fsWriteFileWithParents(file, (
-            "function aa(bb) {\n" +
-            "    return bb && bb.cc;\n" +
-            "}\n" +
-            "function dd(ee) {\n" +
-            "    return ee && ee.ff; //coverage-ignore-line\n" +
-            "}\n" +
-            "aa(0);\n" +
-            "dd(0);\n"
+            "function aa(bb) {\n"
+            + "    return bb && bb.cc;\n"
+            + "}\n"
+            + "function dd(ee) {\n"
+            + "    return ee && ee.ff; //coverage-ignore-line\n"
+            + "}\n"
+            + "aa(0);\n"
+            + "dd(0);\n"
         ));
         await jslint.jslint_cli({
             console_error: noop, // comment to debug

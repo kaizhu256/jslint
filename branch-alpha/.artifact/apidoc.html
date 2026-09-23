@@ -389,8 +389,8 @@ jstestIt((
     bb = JSON.stringify(objectDeepCopyWithKeysSorted(bb), undefined, 1);
     if (aa !== bb) {
         throw new Error(
-            "\n" + aa + "\n!==\n" + bb +
-            (
+            "\n" + aa + "\n!==\n" + bb
+            + (
                 typeof message === "string"
                 ? " - " + message
                 : message
@@ -485,11 +485,11 @@ assertOrThrow((
 <span class="apidocCodeKeywordSpan">debugInline</span>(); // coverage-hack
 const jslint_autofix_warning_list = [ //jslint-ignore-line
     "expected_a_at_b_c",
-    "expected_a_at_end",
     "expected_line_break_a_b",
     "expected_space_a_b",
     "unexpected_space_a_b"
 ];
+const jslint_charset_ascii = (
 ...</pre></li>
 
 <li>
@@ -584,10 +584,10 @@ await jslint.jslint_cli({
         ]) {
             list.join(separator).replace(rgx, function (match0, char) {
                 throw new Error(
-                    "Weird character " +
-                    JSON.stringify(char) +
-                    " found in " + name + " " +
-                    JSON.stringify(match0)
+                    "Weird character "
+                    + JSON.stringify(char)
+                    + " found in " + name + " "
+                    + JSON.stringify(match0)
                 );
             });
         });
@@ -831,9 +831,9 @@ ${name}
         example_list.some(function (example2) {
             example2.replace(
                 new RegExp((
-                    "((?:\\n.*?){8}(function )?)\\b" +
-                    key +
-                    "(\\((?:.*?\\n){8})"
+                    "((?:\\n.*?){8}(function )?)\\b"
+                    + key
+                    + "(\\((?:.*?\\n){8})"
                 ), "g"),
                 function (ignore, header, isDeclarati...
 }
@@ -1186,9 +1186,9 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 // Attempt to give helpful names to anonymous functions.
 
         if (
-            token_now.identifier &amp;&amp;
-            token_now.id !== "function" &amp;&amp;
-            token_now.id !== "async"
+            token_now.identifier
+            &amp;&amp; token_now.id !== "function"
+            &amp;&amp; token_now.id !== "async"
       ...
 }
 </pre></li>
@@ -1454,12 +1454,9 @@ if (mode_autofix) {
     warning_list.slice().sort(function (aa, bb) {
         return bb.line - aa.line || bb.column - aa.column;
     }).forEach(function ({
-        a,
         b,
-        c,
         code,
         column,
-        d,
         line
     }) {
         const ii = column - 1;
@@ -1482,7 +1479,7 @@ if (mode_autofix) {
 // A MID-LINE token cannot be re-indented, but it does not need to be skipped:
 // at_margin fires for tokens that belong AT a margin and therefore on their
 // OWN line. So split first and indent the remainder, which also lands a
-// trailing closer correctly, and is...
+// trailing closer correctly, and is what line-breaks a single-line t...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1651,17 +1648,17 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 // Print test results.
 
     message = (
-        "\n  " + (Date.now() - jstestTimeStart) + "ms" +
-        " - test describe - " + description + "\n" +
-        result.map(function ([
+        "\n  " + (Date.now() - jstestTimeStart) + "ms"
+        + " - test describe - " + description + "\n"
+        + result.map(function ([
             err, description, mode
         ]) {
             jstestItCount += 1;
             if (err) {
                 jstestCountFailed += 1;
                 err = (
-                    "    \u001b[31m\u2718 " + jstestItCount + ". test it - " +
-                    description + "\n" + err.stack + "\u001b[39m"
+                    "    \u001b[31m\u2718 " + jstestItCount + ". test it - "
+                    + description + "\n" + err.stack + "\u001b[39m"
                 );
                 if (mode === "pass") {
                     jstestCountFailed -= 1;
@@ -1669,8 +1666,8 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
                 }
             }
             return err || (
-                "    \u001b[32m\u2714 " + jstestItCount + ". test it - " +
-                description + "\u001b[39m"
+                "    \u001b[32m\u2714 " + jstestItCount + ". test it - "
+                + description + "\u001b[39m"
             );
         }).join("\n")
     );
@@ -1752,14 +1749,14 @@ jstestIt((
             (jstestCountFailed || mode === "testsFailed")
             ? "\n\u001b[31m"
             : "\n\u001b[32m"
-        ) +
-        "  tests total  - " + jstestCountTotal + "\n" +
-        "  tests failed - " + jstestCountFailed + "\n" +
-        "\n" +
-        "  time finished - " +
-        Number(Date.now() - jstestTimeStart).toLocaleString() +
-        " ms\n" +
-        "\u001b[39m"
+        )
+        + "  tests total  - " + jstestCountTotal + "\n"
+        + "  tests failed - " + jstestCountFailed + "\n"
+        + "\n"
+        + "  time finished - "
+        + Number(Date.now() - jstestTimeStart).toLocaleString()
+        + " ms\n"
+        + "\u001b[39m"
     );
     if (mode !== "testsFailed") {
         console.error(message);
