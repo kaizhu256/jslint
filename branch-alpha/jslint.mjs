@@ -435,7 +435,7 @@ const jslint_autofix_warning_list = [ //jslint-ignore-line
     "expected_space_a_b",
     "unexpected_space_a_b",
 
-// PR-xxx - Update autofix to no longer be blocked by warning 'too_long'.
+// PR-xxx - Update autofix so that warning 'too_long' does not block it.
 
     "too_long"
 ];
@@ -1925,7 +1925,7 @@ function jslint(
                 return (
                     mode_autofix
 
-// PR-xxx - Update autofix to no longer be blocked by warning 'too_long'.
+// PR-xxx - Update autofix so that warning 'too_long' does not block it.
 
                     ? !jslint_autofix_warning_list.includes(code)
                     : true

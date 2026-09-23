@@ -155,7 +155,7 @@
     textLength="768"
     x="10"
     y="560"
->- jslint - Update autofix to no longer be blocked by warning 'too_long'.                         </tspan>
+>- jslint - Update autofix so that warning 'too_long' does not block it.                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
