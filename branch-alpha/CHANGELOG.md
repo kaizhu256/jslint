@@ -270,7 +270,7 @@
 - ci - update shell-function shRunWithCoverage() to reduce size of string/argument passed to nodejs by using 2-space-indent
 - cli - add cli-command jslint_plugin_vim
 - cli - add cli-command v8_coverage_report
-- cli - change cli-option `--mode-report` to cli-command `jslint_report=\<filename>`
+- cli - change cli-option `--mode-report` to cli-command `jslint_report=<filename>`
 - coverage - relax requirement for coverageDir to be in cwd
 - deprecated - cli - add cli-option `--mode-report`
 - doc - add api-documentation

@@ -567,7 +567,7 @@ jstestDescribe((
         );
 
 // A ONE-LINE source carries NO terminator at all, so jslint_rgx_crlf.exec()
-// returns null and the rejoin falls back to "\n" - which is also appended,
+// returns null and the rejoin falls back to '\n' - which is also appended,
 // since the fixed code is missing a trailing one.
 
         result = assertAutofix((
@@ -575,7 +575,7 @@ jstestDescribe((
         ), "function aa(bb) { return bb; } aa();");
         assertOrThrow(result.ok, JSON.stringify(result.warnings));
 
-// The appended terminator is the file's own, here "\r\n".
+// The appended terminator is the file's own, here '\r\n'.
 
         assertAutofix((
             "function aa(bb) {\r\n    return bb;\r\n}\r\naa();\r\n"

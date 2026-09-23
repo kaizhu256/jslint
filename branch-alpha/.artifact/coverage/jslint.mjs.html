@@ -1347,7 +1347,7 @@ body {
 <pre><span class="lineno"><a href="#line_1182" id="line_1182"> 1182.</a></span><span class="count                ">  33915</span><span>// slot that can be undefined on both sides is &lt;expression&gt;[1] of a binary</span></pre>
 <pre><span class="lineno"><a href="#line_1183" id="line_1183"> 1183.</a></span><span class="count                ">  33915</span><span>// token. Case "`" returns before that branch, and &lt;aa&gt;.id !== "(" skips it.</span></pre>
 <pre><span class="lineno"><a href="#line_1184" id="line_1184"> 1184.</a></span><span class="count                ">  33915</span><span>//</span></pre>
-<pre><span class="lineno"><a href="#line_1185" id="line_1185"> 1185.</a></span><span class="count                ">  33915</span><span>// deadcode-revive - Delete case "`" below and a tagged template with no</span></pre>
+<pre><span class="lineno"><a href="#line_1185" id="line_1185"> 1185.</a></span><span class="count                ">  33915</span><span>// deadcode-revive - Delete case '`' below and a tagged template with no</span></pre>
 <pre><span class="lineno"><a href="#line_1186" id="line_1186"> 1186.</a></span><span class="count                ">  33915</span><span>// substitution falls through to the binary branch again. Its &lt;expression&gt;</span></pre>
 <pre><span class="lineno"><a href="#line_1187" id="line_1187"> 1187.</a></span><span class="count                ">  33915</span><span>// holds one element, so both sides read &lt;expression&gt;[1] as undefined. Any</span></pre>
 <pre><span class="lineno"><a href="#line_1188" id="line_1188"> 1188.</a></span><span class="count                ">  33915</span><span>// token with fewer slots than its &lt;arity&gt; implies does the same.</span></pre>
@@ -10627,7 +10627,7 @@ body {
 <pre><span class="lineno"><a href="#line_10462" id="line_10462">10462.</a></span><span class="count                "> 201253</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_10463" id="line_10463">10463.</a></span><span class="count                "> 201253</span><span>        if (left.line !== right.line) {</span></pre>
 <pre><span class="lineno"><a href="#line_10464" id="line_10464">10464.</a></span><span class="count                ">  41923</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_10465" id="line_10465">10465.</a></span><span class="count                ">  41923</span><span>// PR-xxx - Binary operators at end-of-line - A tagged template is a binary "`"</span></pre>
+<pre><span class="lineno"><a href="#line_10465" id="line_10465">10465.</a></span><span class="count                ">  41923</span><span>// PR-xxx - Binary operators at end-of-line - A tagged template is a binary '`'</span></pre>
 <pre><span class="lineno"><a href="#line_10466" id="line_10466">10466.</a></span><span class="count                ">  41923</span><span>// whose right side is the template. Moving its backtick up would put the line</span></pre>
 <pre><span class="lineno"><a href="#line_10467" id="line_10467">10467.</a></span><span class="count                ">  41923</span><span>// break INSIDE the template and change its value, so it is excluded.</span></pre>
 <pre><span class="lineno"><a href="#line_10468" id="line_10468">10468.</a></span><span class="count                ">  41923</span><span></span></pre>

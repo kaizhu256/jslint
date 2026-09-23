@@ -732,7 +732,7 @@ body {
 <pre><span class="lineno"><a href="#line_567" id="line_567">  567.</a></span><span class="count                ">      1</span><span>        );</span></pre>
 <pre><span class="lineno"><a href="#line_568" id="line_568">  568.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_569" id="line_569">  569.</a></span><span class="count                ">      1</span><span>// A ONE-LINE source carries NO terminator at all, so jslint_rgx_crlf.exec()</span></pre>
-<pre><span class="lineno"><a href="#line_570" id="line_570">  570.</a></span><span class="count                ">      1</span><span>// returns null and the rejoin falls back to "\n" - which is also appended,</span></pre>
+<pre><span class="lineno"><a href="#line_570" id="line_570">  570.</a></span><span class="count                ">      1</span><span>// returns null and the rejoin falls back to '\n' - which is also appended,</span></pre>
 <pre><span class="lineno"><a href="#line_571" id="line_571">  571.</a></span><span class="count                ">      1</span><span>// since the fixed code is missing a trailing one.</span></pre>
 <pre><span class="lineno"><a href="#line_572" id="line_572">  572.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_573" id="line_573">  573.</a></span><span class="count                ">      1</span><span>        result = assertAutofix((</span></pre>
@@ -740,7 +740,7 @@ body {
 <pre><span class="lineno"><a href="#line_575" id="line_575">  575.</a></span><span class="count                ">      1</span><span>        ), "function aa(bb) { return bb; } aa();");</span></pre>
 <pre><span class="lineno"><a href="#line_576" id="line_576">  576.</a></span><span class="count                ">      1</span><span>        assertOrThrow(result.ok, JSON.stringify(result.warnings));</span></pre>
 <pre><span class="lineno"><a href="#line_577" id="line_577">  577.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_578" id="line_578">  578.</a></span><span class="count                ">      1</span><span>// The appended terminator is the file's own, here "\r\n".</span></pre>
+<pre><span class="lineno"><a href="#line_578" id="line_578">  578.</a></span><span class="count                ">      1</span><span>// The appended terminator is the file's own, here '\r\n'.</span></pre>
 <pre><span class="lineno"><a href="#line_579" id="line_579">  579.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_580" id="line_580">  580.</a></span><span class="count                ">      1</span><span>        assertAutofix((</span></pre>
 <pre><span class="lineno"><a href="#line_581" id="line_581">  581.</a></span><span class="count                ">      1</span><span>            "function aa(bb) {\r\n    return bb;\r\n}\r\naa();\r\n"</span></pre>

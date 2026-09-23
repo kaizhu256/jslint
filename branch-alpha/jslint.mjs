@@ -1182,7 +1182,7 @@ function jslint(
 // slot that can be undefined on both sides is <expression>[1] of a binary
 // token. Case "`" returns before that branch, and <aa>.id !== "(" skips it.
 //
-// deadcode-revive - Delete case "`" below and a tagged template with no
+// deadcode-revive - Delete case '`' below and a tagged template with no
 // substitution falls through to the binary branch again. Its <expression>
 // holds one element, so both sides read <expression>[1] as undefined. Any
 // token with fewer slots than its <arity> implies does the same.
@@ -10462,7 +10462,7 @@ function jslint_phase5_whitage(state) {
 
         if (left.line !== right.line) {
 
-// PR-xxx - Binary operators at end-of-line - A tagged template is a binary "`"
+// PR-xxx - Binary operators at end-of-line - A tagged template is a binary '`'
 // whose right side is the template. Moving its backtick up would put the line
 // break INSIDE the template and change its value, so it is excluded.
 
