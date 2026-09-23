@@ -29,103 +29,103 @@
     textLength="768"
     x="10"
     y="98"
->- jslint - Fix autofix leaving later fixes undone when a join passes 80 columns - either do over\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="120"
->  -80 joins last, or ignore too_long during autofix and re-lint after.                           </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="142"
 >- jslint - Warn on line break before arrow '=&gt;', which is a SyntaxError that jslint currently ac\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="164"
+    y="120"
 >  cepts.                                                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="186"
+    y="142"
 >- jslint - Add new warning requiring paren around plus-separated concatenations.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="208"
+    y="164"
 >- jslint - Revisit autofix of top-level whitespace, e.g. warning expected_space_a_b on line brea\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="230"
+    y="186"
 >  k inside closed-form expression.                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="252"
+    y="208"
 >- jslint - Review binding-power of operators.                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="274"
+    y="230"
 >- jslint-vscode - Add extra contextmenu command "JSLint - Autofix Whitespace", with keybinding c\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="296"
+    y="252"
 >  trl+shift+j a if no collision.                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="318"
+    y="274"
 >- jslint-directive - Add new directive 'tab' to support tab-indent.                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="340"
+    y="296"
 >- jslint-ecma - Add ES2015-feature iterators.                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="362"
+    y="318"
 >- jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="384"
+    y="340"
 >- jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="406"
+    y="362"
 >- jslint - Add html and css linting back into jslint.                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="428"
+    y="384"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="450"
+    y="406"
 ># v2026.9.29                                                                                     </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="428"
+>- jslint - Fix autofix leaving later fixes undone when a fix passes 80 columns - ignore too_long\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="450"
+>   during autofix and re-lint after.                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

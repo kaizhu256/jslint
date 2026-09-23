@@ -1541,10 +1541,16 @@ result_autofix = jslint(
 //  let result = jslint("console.log('hello world')");
 //  let html = jslint_report(result);
 
-</span>    const autofix_blocked = autofix &amp;&amp; warnings.some(function ({
+</span>// PR-xxx - Do not report autofix blocked on too_long, which no longer blocks
+// autofix - the fixes are made and too_long is only reported.
+
+    const autofix_blocked = autofix &amp;&amp; warnings.some(function ({
         code
     }) {
-        return !jslint_autofix_warning_list.includes(code);
+        return (
+            code !== "too_long" &amp;&amp;
+            !jslint_autofix_warning_list.includes(code)
+        );
     });
     let html = "";
     let length_80 = 1111;
@@ -1585,9 +1591,7 @@ result_autofix = jslint(
     src: url(
 "data:font/woff2;base64,d09GMgABAAAAABy4AA4AAAAAThwAABxiAAEAAAAAAAAAAAAA\
 AAAAAAAAAAAAAAAABmAAgiQINAmcDBEICuc41DEBNgIkA4R2C4I+AAQgBYkuByAMgScfYUIF\
-7NgjsHGAbcDVFkXZ5Jwd+P96IGPc9rl9ETBEaCzCJkvY2UpziRZ7zftZWk8052U9+NqX6vXL\
-KDflSQnlJ0bP+QnPQAy744n9mup6H9PaCDFwM5zjf8exB89bZ1cdrYOP0NgnuRDRWlk9u/fE\
-llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
+7NgjsHGAbc...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

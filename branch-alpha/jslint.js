@@ -1958,6 +1958,20 @@ function jslint(
                         });
                     }
                 });
+            } else {
+
+// PR-xxx - Fix autofix leaving fixes undone behind any too_long, pre-existing
+// or surfaced by a fix. Every autofix pass skips too_long, so the pass with
+// nothing left to fix re-lints its text without autofix, too_long included.
+
+                return jslint(
+                    state.source,
+                    {
+                        ...option_dict,
+                        autofix: 0
+                    },
+                    global_list
+                );
             }
         }
         if (option_dict.test_internal_error) {
@@ -4327,6 +4341,7 @@ function jslint_phase2_lex(state) {
 // unsafe characters or is too damn long.
 
         if (
+            !option_dict.autofix &&
             !option_dict.long &&
             line_whole.length > 80 &&
             line_disable === undefined &&
@@ -10652,10 +10667,16 @@ function jslint_report({
 //  let result = jslint("console.log('hello world')");
 //  let html = jslint_report(result);
 
+// PR-xxx - Do not report autofix blocked on too_long, which no longer blocks
+// autofix - the fixes are made and too_long is only reported.
+
     const autofix_blocked = autofix && warnings.some(function ({
         code
     }) {
-        return !jslint_autofix_warning_list.includes(code);
+        return (
+            code !== "too_long" &&
+            !jslint_autofix_warning_list.includes(code)
+        );
     });
     let html = "";
     let length_80 = 1111;

@@ -591,6 +591,39 @@ jstestDescribe((
             result.warnings[0].column === 9,
             JSON.stringify(result.warnings)
         );
+
+// A too_long ALREADY in the source does not block autofix either - the fix is
+// made, and the re-lint still reports the long line.
+
+        result = assertAutofix(String(`
+function aa(bb) {
+    return bb;
+}
+aa("${"a".repeat(80)}");
+        `).trim() + "\n", String(`
+function aa(bb) { return bb; }
+aa("${"a".repeat(80)}");
+        `).trim() + "\n");
+        assertOrThrow(
+            result.warnings.length === 1 &&
+            result.warnings[0].code === "too_long",
+            JSON.stringify(result.warnings)
+        );
+
+// The same declined run BESIDE a fixable one: the later pass comes back still
+// warning, and the caller's own pass re-lints the fixed text and reports it.
+
+        result = assertAutofix((
+            "function aa(bb) {\n    return aa\n        (bb);\n}\naa(0);\n"
+        ), (
+            "function aa(bb) {\n    return aa\n        (bb);\n}\naa( 0);\n"
+        ));
+        assertOrThrow(
+            result.warnings.length === 1 &&
+            result.warnings[0].code === "unexpected_space_a_b" &&
+            result.warnings[0].line === 3,
+            JSON.stringify(result.warnings)
+        );
     });
     jstestIt((
         "test autofix-cli handling-behavior"
@@ -769,6 +802,24 @@ jstestDescribe((
             )
         });
 
+// An embedded block with a too_long ALREADY in it is still fixed, and the
+// residual too_long still exits nonzero.
+
+        source = String(`
+shAa() {
+    node --eval '
+console.log("${"a".repeat(80)}");
+console.log( 0);
+'
+}
+        `).trim() + "\n";
+        await autofixFile({
+            exit: processExit1,
+            expect: source.replace("( 0)", "(0)"),
+            name: "autofix_embedded_long.sh",
+            source
+        });
+
 // A fix that SURFACES a warning it cannot fix must KEEP its work, not throw
 // it away. Re-indenting this string to column 13 makes the line 82 columns,
 // so too_long blocks the next pass - and the indent must still be written.
@@ -785,6 +836,32 @@ jstestDescribe((
                 "\n            " + JSON.stringify("a".repeat(68))
             ),
             name: "autofix_long.mjs",
+            source
+        });
+
+// And the too_long a fix surfaces must not block the fixes AFTER it. The join
+// makes line 3 82 columns, and the closed-form block below still needs two
+// more passes - its split, then its re-indent.
+
+        source = String(`
+/*jslint beta*/
+function aa(bb, cc) {
+    return bb.${"a".repeat(66)}
+    + cc;
+}
+function dd(ee) { return ee; }
+aa(dd(0), 0);
+        `).trim() + "\n";
+        await autofixFile({
+            exit: processExit1,
+            expect: source.replace(
+                "\n    + cc;",
+                " +\n    cc;"
+            ).replace(
+                "{ return ee; }",
+                "{\n    return ee;\n}"
+            ),
+            name: "autofix_long_join.mjs",
             source
         });
 
@@ -929,6 +1006,19 @@ jstestDescribe((
         result = reportAutofix((
             "function aa(bb) {\n    return String( bb);\n}\naa();\n"
         ), true);
+        assertOrThrow(
+            result === reportAutofixExpect("", "Autofix successful."),
+            result
+        );
+
+// A residual too_long is not a blocker either - autofix fixes around it.
+
+        result = reportAutofix(String(`
+function aa(bb) {
+    return bb;
+}
+aa("${"a".repeat(80)}");
+        `).trim() + "\n", true);
         assertOrThrow(
             result === reportAutofixExpect("", "Autofix successful."),
             result
