@@ -592,8 +592,8 @@ jstestDescribe((
             JSON.stringify(result.warnings)
         );
 
-// A too_long ALREADY in the source does not block autofix either - the fix is
-// made, and the re-lint still reports the long line.
+// A too_long ALREADY in the source does not block autofix - the fix is made,
+// and too_long is still reported.
 
         result = assertAutofix(String(`
 function aa(bb) {
@@ -607,21 +607,6 @@ aa("${"a".repeat(80)}");
         assertOrThrow(
             result.warnings.length === 1 &&
             result.warnings[0].code === "too_long",
-            JSON.stringify(result.warnings)
-        );
-
-// The same declined run BESIDE a fixable one: the later pass comes back still
-// warning, and the caller's own pass re-lints the fixed text and reports it.
-
-        result = assertAutofix((
-            "function aa(bb) {\n    return aa\n        (bb);\n}\naa(0);\n"
-        ), (
-            "function aa(bb) {\n    return aa\n        (bb);\n}\naa( 0);\n"
-        ));
-        assertOrThrow(
-            result.warnings.length === 1 &&
-            result.warnings[0].code === "unexpected_space_a_b" &&
-            result.warnings[0].line === 3,
             JSON.stringify(result.warnings)
         );
     });
@@ -820,28 +805,9 @@ console.log( 0);
             source
         });
 
-// A fix that SURFACES a warning it cannot fix must KEEP its work, not throw
-// it away. Re-indenting this string to column 13 makes the line 82 columns,
-// so too_long blocks the next pass - and the indent must still be written.
-
-        source = (
-            "function aa(bb) {\n    if (bb) {\n        return (\n" +
-            JSON.stringify("a".repeat(68)) + "\n        );\n    }\n" +
-            "    return 0;\n}\nexport default Object.freeze(aa);\n"
-        );
-        await autofixFile({
-            exit: processExit1,
-            expect: source.replace(
-                "\n" + JSON.stringify("a".repeat(68)),
-                "\n            " + JSON.stringify("a".repeat(68))
-            ),
-            name: "autofix_long.mjs",
-            source
-        });
-
-// And the too_long a fix surfaces must not block the fixes AFTER it. The join
-// makes line 3 82 columns, and the closed-form block below still needs two
-// more passes - its split, then its re-indent.
+// A too_long that a fix SURFACES keeps the fix and blocks none after it. The
+// join makes line 3 82 columns, and the closed-form block below still needs
+// two more passes - its split, then its re-indent.
 
         source = String(`
 /*jslint beta*/

@@ -13,7 +13,7 @@
 - jslint - Add html and css linting back into jslint.
 
 # v2026.9.29
-- jslint - Fix autofix leaving later fixes undone when a fix passes 80 columns - ignore too_long during autofix and re-lint after.
+- jslint - Fix warning too_long blocking autofix, whether pre-existing or surfaced by a fix - add too_long to jslint_autofix_warning_list as non-blocking, and let it through the phase-5 gate during autofix.
 - jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.' and tagged-template backtick, and update function jslint_phase6_autofix() to autofix it.
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
