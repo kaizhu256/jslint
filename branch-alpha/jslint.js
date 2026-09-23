@@ -1918,7 +1918,14 @@ function jslint(
 
 // PHASE 5. Check whitespace between tokens in <token_list>.
 
-        if (!state.mode_json && warning_list.length === 0) {
+// PR-xxx - Under autofix, a non-blocking warning like too_long does not gate
+// phase 5 either, or it would hide every whitespace warning after it.
+
+        if (!state.mode_json && warning_list.every(function ({
+            code
+        }) {
+            return mode_autofix && jslint_autofix_warning_list.includes(code);
+        })) {
             jslint_phase5_whitage(state);
         }
 
@@ -1964,20 +1971,6 @@ function jslint(
                         });
                     }
                 });
-            } else {
-
-// PR-xxx - Fix autofix leaving fixes undone behind any too_long, pre-existing
-// or surfaced by a fix. Every autofix pass skips too_long, so the pass with
-// nothing left to fix re-lints its text without autofix, too_long included.
-
-                return jslint(
-                    state.source,
-                    {
-                        ...option_dict,
-                        autofix: 0
-                    },
-                    global_list
-                );
             }
         }
         if (option_dict.test_internal_error) {
@@ -4347,7 +4340,6 @@ function jslint_phase2_lex(state) {
 // unsafe characters or is too damn long.
 
         if (
-            !option_dict.autofix &&
             !option_dict.long &&
             line_whole.length > 80 &&
             line_disable === undefined &&
