@@ -600,7 +600,7 @@ body {
 <pre><span class="lineno"><a href="#line_435" id="line_435">  435.</a></span><span class="count                ">      1</span><span>    "expected_space_a_b",</span></pre>
 <pre><span class="lineno"><a href="#line_436" id="line_436">  436.</a></span><span class="count                ">      1</span><span>    "unexpected_space_a_b",</span></pre>
 <pre><span class="lineno"><a href="#line_437" id="line_437">  437.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_438" id="line_438">  438.</a></span><span class="count                ">      1</span><span>// PR-xxx - jslint-autofix - Warning 'too_long' no longer blocks autofix.</span></pre>
+<pre><span class="lineno"><a href="#line_438" id="line_438">  438.</a></span><span class="count                ">      1</span><span>// PR-511 - jslint-autofix - Warning 'too_long' no longer blocks autofix.</span></pre>
 <pre><span class="lineno"><a href="#line_439" id="line_439">  439.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_440" id="line_440">  440.</a></span><span class="count                ">      1</span><span>    "too_long"</span></pre>
 <pre><span class="lineno"><a href="#line_441" id="line_441">  441.</a></span><span class="count                ">      1</span><span>];</span></pre>
@@ -2090,7 +2090,7 @@ body {
 <pre><span class="lineno"><a href="#line_1925" id="line_1925"> 1925.</a></span><span class="count                ">    699</span><span>                return (</span></pre>
 <pre><span class="lineno"><a href="#line_1926" id="line_1926"> 1926.</a></span><span class="count                ">    699</span><span>                    mode_autofix</span></pre>
 <pre><span class="lineno"><a href="#line_1927" id="line_1927"> 1927.</a></span><span class="count                ">    699</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1928" id="line_1928"> 1928.</a></span><span class="count                ">    699</span><span>// PR-xxx - jslint-autofix - Warning 'too_long' no longer blocks autofix.</span></pre>
+<pre><span class="lineno"><a href="#line_1928" id="line_1928"> 1928.</a></span><span class="count                ">    699</span><span>// PR-511 - jslint-autofix - Warning 'too_long' no longer blocks autofix.</span></pre>
 <pre><span class="lineno"><a href="#line_1929" id="line_1929"> 1929.</a></span><span class="count                ">    699</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1930" id="line_1930"> 1930.</a></span><span class="count                ">    699</span><span>                    ? !jslint_autofix_warning_list.includes(code)</span></pre>
 <pre><span class="lineno"><a href="#line_1931" id="line_1931"> 1931.</a></span><span class="count                ">    699</span><span>                    : true</span></pre>
@@ -10627,7 +10627,7 @@ body {
 <pre><span class="lineno"><a href="#line_10462" id="line_10462">10462.</a></span><span class="count                "> 201253</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_10463" id="line_10463">10463.</a></span><span class="count                "> 201253</span><span>        if (left.line !== right.line) {</span></pre>
 <pre><span class="lineno"><a href="#line_10464" id="line_10464">10464.</a></span><span class="count                ">  41923</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_10465" id="line_10465">10465.</a></span><span class="count                ">  41923</span><span>// PR-xxx - Binary operators at end-of-line - A tagged template is a binary '`'</span></pre>
+<pre><span class="lineno"><a href="#line_10465" id="line_10465">10465.</a></span><span class="count                ">  41923</span><span>// PR-511 - Binary operators at end-of-line - A tagged template is a binary '`'</span></pre>
 <pre><span class="lineno"><a href="#line_10466" id="line_10466">10466.</a></span><span class="count                ">  41923</span><span>// whose right side is the template. Moving its backtick up would put the line</span></pre>
 <pre><span class="lineno"><a href="#line_10467" id="line_10467">10467.</a></span><span class="count                ">  41923</span><span>// break INSIDE the template and change its value, so it is excluded.</span></pre>
 <pre><span class="lineno"><a href="#line_10468" id="line_10468">10468.</a></span><span class="count                ">  41923</span><span></span></pre>
@@ -10750,7 +10750,7 @@ body {
 <pre><span class="lineno"><a href="#line_10585" id="line_10585">10585.</a></span><span class="count                ">     30</span><span>            return;</span></pre>
 <pre><span class="lineno"><a href="#line_10586" id="line_10586">10586.</a></span><span class="count                ">     30</span><span>        case "expected_a_at_end":</span></pre>
 <pre><span class="lineno"><a href="#line_10587" id="line_10587">10587.</a></span><span class="count                ">     30</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_10588" id="line_10588">10588.</a></span><span class="count                ">     30</span><span>// PR-xxx - Move the line-leading operator to just after its left operand, which</span></pre>
+<pre><span class="lineno"><a href="#line_10588" id="line_10588">10588.</a></span><span class="count                ">     30</span><span>// PR-511 - Move the line-leading operator to just after its left operand, which</span></pre>
 <pre><span class="lineno"><a href="#line_10589" id="line_10589">10589.</a></span><span class="count                ">     30</span><span>// ends at line &lt;c&gt;, column &lt;d&gt;, and before any trailing comment there.</span></pre>
 <pre><span class="lineno"><a href="#line_10590" id="line_10590">10590.</a></span><span class="count                ">     30</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_10591" id="line_10591">10591.</a></span><span class="count                ">     30</span><span>            line_list[c] = (</span></pre>
@@ -10811,7 +10811,7 @@ body {
 <pre><span class="lineno"><a href="#line_10646" id="line_10646">10646.</a></span><span class="count                ">     56</span><span>        );</span></pre>
 <pre><span class="lineno"><a href="#line_10647" id="line_10647">10647.</a></span><span class="count                ">     56</span><span>    });</span></pre>
 <pre><span class="lineno"><a href="#line_10648" id="line_10648">10648.</a></span><span class="count                ">     30</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_10649" id="line_10649">10649.</a></span><span class="count                ">     30</span><span>// PR-xxx - jslint-autofix - Append &lt;line_crlf&gt; to end of code, if missing.</span></pre>
+<pre><span class="lineno"><a href="#line_10649" id="line_10649">10649.</a></span><span class="count                ">     30</span><span>// PR-511 - jslint-autofix - Append &lt;line_crlf&gt; to end of code, if missing.</span></pre>
 <pre><span class="lineno"><a href="#line_10650" id="line_10650">10650.</a></span><span class="count                ">     30</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_10651" id="line_10651">10651.</a></span><span class="count                ">     30</span><span>    if (line_list[line_list.length - 1] !== "") {</span></pre>
 <pre><span class="lineno"><a href="#line_10652" id="line_10652">10652.</a></span><span class="count                ">      2</span><span>        line_list.push("");</span></pre>

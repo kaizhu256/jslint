@@ -435,7 +435,7 @@ const jslint_autofix_warning_list = [ //jslint-ignore-line
     "expected_space_a_b",
     "unexpected_space_a_b",
 
-// PR-xxx - jslint-autofix - Warning 'too_long' no longer blocks autofix.
+// PR-511 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
 
     "too_long"
 ];
@@ -1925,7 +1925,7 @@ function jslint(
                 return (
                     mode_autofix
 
-// PR-xxx - jslint-autofix - Warning 'too_long' no longer blocks autofix.
+// PR-511 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
 
                     ? !jslint_autofix_warning_list.includes(code)
                     : true
@@ -10462,7 +10462,7 @@ function jslint_phase5_whitage(state) {
 
         if (left.line !== right.line) {
 
-// PR-xxx - Binary operators at end-of-line - A tagged template is a binary '`'
+// PR-511 - Binary operators at end-of-line - A tagged template is a binary '`'
 // whose right side is the template. Moving its backtick up would put the line
 // break INSIDE the template and change its value, so it is excluded.
 
@@ -10585,7 +10585,7 @@ function jslint_phase6_autofix(state) {
             return;
         case "expected_a_at_end":
 
-// PR-xxx - Move the line-leading operator to just after its left operand, which
+// PR-511 - Move the line-leading operator to just after its left operand, which
 // ends at line <c>, column <d>, and before any trailing comment there.
 
             line_list[c] = (
@@ -10646,7 +10646,7 @@ function jslint_phase6_autofix(state) {
         );
     });
 
-// PR-xxx - jslint-autofix - Append <line_crlf> to end of code, if missing.
+// PR-511 - jslint-autofix - Append <line_crlf> to end of code, if missing.
 
     if (line_list[line_list.length - 1] !== "") {
         line_list.push("");
