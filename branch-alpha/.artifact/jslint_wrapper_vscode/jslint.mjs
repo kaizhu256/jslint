@@ -10464,10 +10464,9 @@ function jslint_phase5_whitage(state) {
 
         if (left.line !== right.line) {
 
-// PR-xxx - Binary operators at end-of-line - A tagged template is a binary
-// "`" whose right side is the template itself. Moving its backtick up would
-// put the line break INSIDE the template and change its value, so it is
-// excluded.
+// PR-xxx - Binary operators at end-of-line - A tagged template is a binary "`"
+// whose right side is the template. Moving its backtick up would put the line
+// break INSIDE the template and change its value, so it is excluded.
 
             if (
                 option_dict.beta &&
@@ -10588,10 +10587,9 @@ function jslint_phase6_autofix(state) {
             return;
         case "expected_a_at_end":
 
-// PR-xxx - Move the line-leading operator to just after its left operand,
-// which ends at line <c>, column <d> - before any trailing comment there. A
-// join past 80 columns is still made; its too_long is reported, not a reason
-// to discard.
+// PR-xxx - Move the line-leading operator to just after its left operand, which
+// ends at line <c>, column <d> - before any trailing comment there. A join past
+// 80 columns is still made, and its too_long is only reported.
 
             line_list[c] = (
                 line_list[c].slice(0, d) + " " + a +
