@@ -16,7 +16,7 @@
 - jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.' and tagged-template backtick, and update function jslint_phase6_autofix() to autofix it.
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
-- jslint - Fix warning too_long blocking autofix, whether pre-existing or surfaced by a fix - add too_long to jslint_autofix_warning_list as non-blocking, and let it through the phase-5 gate during autofix.
+- jslint - Update autofix to no longer be blocked by warning 'too_long'.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
 - jslint - Move column-fudging into warn_at(); callers pass 0-based column.
 - jslint - Remove dead token-property 'free' from parser and whitage.

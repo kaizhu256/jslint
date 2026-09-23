@@ -1403,8 +1403,8 @@ if (
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-        return (
-            mode_autofix
+// PR-xxx - Update autofix to no longer be blocked by warning 'too_long'.
+
             ? !jslint_autofix_warning_list.includes(code)
             : true
         );

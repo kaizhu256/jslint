@@ -437,6 +437,8 @@ const jslint_autofix_warning_list = [ //jslint-ignore-line
 
 // These warning codes are not fixed, but included so they won't block autofix.
 
+// PR-xxx - Update autofix to no longer be blocked by warning 'too_long'.
+
     "too_long"
 ];
 const jslint_charset_ascii = (
@@ -1924,6 +1926,9 @@ function jslint(
             }) {
                 return (
                     mode_autofix
+
+// PR-xxx - Update autofix to no longer be blocked by warning 'too_long'.
+
                     ? !jslint_autofix_warning_list.includes(code)
                     : true
                 );
@@ -10583,8 +10588,7 @@ function jslint_phase6_autofix(state) {
         case "expected_a_at_end":
 
 // PR-xxx - Move the line-leading operator to just after its left operand, which
-// ends at line <c>, column <d> - before any trailing comment there. A join past
-// 80 columns is still made, and its too_long is only reported.
+// ends at line <c>, column <d> - before any trailing comment there.
 
             line_list[c] = (
                 line_list[c].slice(0, d) + " " + a +
@@ -10644,7 +10648,7 @@ function jslint_phase6_autofix(state) {
         );
     });
 
-// PR-xxx - Append <line_crlf> to the fixed code if it is missing one.
+// PR-xxx - If EOF is missing <line_crlf>, then append it.
 
     if (line_list[line_list.length - 1] !== "") {
         line_list.push("");
