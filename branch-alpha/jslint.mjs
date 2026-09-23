@@ -1918,14 +1918,21 @@ function jslint(
 
 // PHASE 5. Check whitespace between tokens in <token_list>.
 
+        if (
+            !state.mode_json &&
+            warning_list.every(function ({
+                code
+            }) {
+                return (
+
 // PR-xxx - Under autofix, a non-blocking warning like too_long does not gate
 // phase 5 either, or it would hide every whitespace warning after it.
 
-        if (!state.mode_json && warning_list.every(function ({
-            code
-        }) {
-            return mode_autofix && jslint_autofix_warning_list.includes(code);
-        })) {
+                    mode_autofix &&
+                    jslint_autofix_warning_list.includes(code)
+                );
+            })
+        ) {
             jslint_phase5_whitage(state);
         }
 
@@ -10456,11 +10463,10 @@ function jslint_phase5_whitage(state) {
 
         if (left.line !== right.line) {
 
-// PR-xxx - Binary operators at end-of-line.
-
-// A tagged template is a binary "`" whose right side is the template itself.
-// Moving its backtick up would put the line break INSIDE the template and
-// change its value, so it is excluded.
+// PR-xxx - Binary operators at end-of-line - A tagged template is a binary
+// "`" whose right side is the template itself. Moving its backtick up would
+// put the line break INSIDE the template and change its value, so it is
+// excluded.
 
             if (
                 option_dict.beta &&
@@ -10581,9 +10587,10 @@ function jslint_phase6_autofix(state) {
             return;
         case "expected_a_at_end":
 
-// Move the line-leading operator to just after its left operand, which ends
-// at line <c>, column <d> - before any trailing comment there. A join past 80
-// columns is still made; its too_long is reported, not a reason to discard.
+// PR-xxx - Move the line-leading operator to just after its left operand,
+// which ends at line <c>, column <d> - before any trailing comment there. A
+// join past 80 columns is still made; its too_long is reported, not a reason
+// to discard.
 
             line_list[c] = (
                 line_list[c].slice(0, d) + " " + a +
