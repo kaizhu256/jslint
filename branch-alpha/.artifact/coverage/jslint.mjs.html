@@ -1348,7 +1348,7 @@ body {
 <pre><span class="lineno"><a href="#line_1183" id="line_1183"> 1183.</a></span><span class="count                ">  33910</span><span>// slot that can be undefined on both sides is &lt;expression&gt;[1] of a binary</span></pre>
 <pre><span class="lineno"><a href="#line_1184" id="line_1184"> 1184.</a></span><span class="count                ">  33910</span><span>// token. Case "`" returns before that branch, and &lt;aa&gt;.id !== "(" skips it.</span></pre>
 <pre><span class="lineno"><a href="#line_1185" id="line_1185"> 1185.</a></span><span class="count                ">  33910</span><span>//</span></pre>
-<pre><span class="lineno"><a href="#line_1186" id="line_1186"> 1186.</a></span><span class="count                ">  33910</span><span>// deadcode-revive - delete case "`" below and a tagged template with no</span></pre>
+<pre><span class="lineno"><a href="#line_1186" id="line_1186"> 1186.</a></span><span class="count                ">  33910</span><span>// deadcode-revive - Delete case "`" below and a tagged template with no</span></pre>
 <pre><span class="lineno"><a href="#line_1187" id="line_1187"> 1187.</a></span><span class="count                ">  33910</span><span>// substitution falls through to the binary branch again. Its &lt;expression&gt;</span></pre>
 <pre><span class="lineno"><a href="#line_1188" id="line_1188"> 1188.</a></span><span class="count                ">  33910</span><span>// holds one element, so both sides read &lt;expression&gt;[1] as undefined. Any</span></pre>
 <pre><span class="lineno"><a href="#line_1189" id="line_1189"> 1189.</a></span><span class="count                ">  33910</span><span>// token with fewer slots than its &lt;arity&gt; implies does the same.</span></pre>
@@ -10599,7 +10599,7 @@ body {
 <pre><span class="lineno"><a href="#line_10434" id="line_10434">10434.</a></span><span class="count                ">    254</span><span>// Delve into the functions looking for variables that were not assigned or</span></pre>
 <pre><span class="lineno"><a href="#line_10435" id="line_10435">10435.</a></span><span class="count                ">    254</span><span>// used. If the file imports or exports, then its global object is also delved.</span></pre>
 <pre><span class="lineno"><a href="#line_10436" id="line_10436">10436.</a></span><span class="count                ">    254</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_10437" id="line_10437">10437.</a></span><span class="count                ">    254</span><span>// PR-502 - tighten warning of unused variables to be always on.</span></pre>
+<pre><span class="lineno"><a href="#line_10437" id="line_10437">10437.</a></span><span class="count                ">    254</span><span>// PR-502 - Tighten warning of unused variables to be always on.</span></pre>
 <pre><span class="lineno"><a href="#line_10438" id="line_10438">10438.</a></span><span class="count                ">    254</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_10439" id="line_10439">10439.</a></span><span class="count                ">    254</span><span>    block_list.forEach(delve);</span></pre>
 <pre><span class="lineno"><a href="#line_10440" id="line_10440">10440.</a></span><span class="count                ">      3</span><span>    if (option_dict.white) {</span></pre>
@@ -12675,7 +12675,7 @@ body {
 <pre><span class="lineno"><a href="#line_12510" id="line_12510">12510.</a></span><span class="count                ">  12072</span><span>                                : isHole</span></pre>
 <pre><span class="lineno"><a href="#line_12511" id="line_12511">12511.</a></span><span class="count                ">  12072</span><span>                                ? "&lt;/span&gt;&lt;span class=\"uncovered\"&gt;"</span></pre>
 <pre><span class="lineno"><a href="#line_12512" id="line_12512">12512.</a></span><span class="count                ">  12072</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12513" id="line_12513">12513.</a></span><span class="count                ">  12072</span><span>// PR-510 - deadcode-dispelled - the branch below is live: a hole ending before</span></pre>
+<pre><span class="lineno"><a href="#line_12513" id="line_12513">12513.</a></span><span class="count                ">  12072</span><span>// PR-510 - deadcode-dispelled - The branch below is live: a hole ending before</span></pre>
 <pre><span class="lineno"><a href="#line_12514" id="line_12514">12514.</a></span><span class="count                ">  12072</span><span>// end-of-line re-enters with &lt;isHole&gt; undefined, and that bare span closes it.</span></pre>
 <pre><span class="lineno"><a href="#line_12515" id="line_12515">12515.</a></span><span class="count                ">  12072</span><span>// Line coverage hides this, the condition above running either way:</span></pre>
 <pre><span class="lineno"><a href="#line_12516" id="line_12516">12516.</a></span><span class="count                ">  12072</span><span>//</span></pre>

@@ -1183,7 +1183,7 @@ function jslint(
 // slot that can be undefined on both sides is <expression>[1] of a binary
 // token. Case "`" returns before that branch, and <aa>.id !== "(" skips it.
 //
-// deadcode-revive - delete case "`" below and a tagged template with no
+// deadcode-revive - Delete case "`" below and a tagged template with no
 // substitution falls through to the binary branch again. Its <expression>
 // holds one element, so both sides read <expression>[1] as undefined. Any
 // token with fewer slots than its <arity> implies does the same.
@@ -10434,7 +10434,7 @@ function jslint_phase5_whitage(state) {
 // Delve into the functions looking for variables that were not assigned or
 // used. If the file imports or exports, then its global object is also delved.
 
-// PR-502 - tighten warning of unused variables to be always on.
+// PR-502 - Tighten warning of unused variables to be always on.
 
     block_list.forEach(delve);
     if (option_dict.white) {
@@ -12510,7 +12510,7 @@ body {
                                 : isHole
                                 ? "</span><span class=\"uncovered\">"
 
-// PR-510 - deadcode-dispelled - the branch below is live: a hole ending before
+// PR-510 - deadcode-dispelled - The branch below is live: a hole ending before
 // end-of-line re-enters with <isHole> undefined, and that bare span closes it.
 // Line coverage hides this, the condition above running either way:
 //
