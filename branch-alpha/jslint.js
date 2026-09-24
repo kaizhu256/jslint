@@ -3070,7 +3070,8 @@ function jslint_phase2_lex(state) {
 // ["aa=1_2__3", "check_numeric_separator", "illegal_num_separator", "", 7]
 // ["aa=1_2_n", "check_numeric_separator", "illegal_num_separator", "", 7]
 
-            return stop_at("illegal_num_separator", line, column - 0 + ii);
+            warn_at("illegal_num_separator", line, column - 0 + ii);
+            return "";
         });
     }
 
@@ -3865,7 +3866,7 @@ function jslint_phase2_lex(state) {
                 if (
                     flag.v //jslint-ignore-line
                 ) {
-                    return stop_at("unexpected_a", line, column - 1, char);
+                    warn_at("unexpected_a", line, column - 1, char);
                 }
                 break;
 
@@ -3881,7 +3882,7 @@ function jslint_phase2_lex(state) {
                 if (
                     flag.u //jslint-ignore-line
                 ) {
-                    return stop_at("unexpected_a", line, column - 1, char);
+                    warn_at("unexpected_a", line, column - 1, char);
                 }
                 break;
             case "y":
@@ -3897,7 +3898,7 @@ function jslint_phase2_lex(state) {
 // ["aa=/./gg", "lex_regexp", "unexpected_a", "g", 8]
 // ["aa=/./z", "lex_regexp", "unexpected_a", "z", 7]
 
-                return stop_at("unexpected_a", line, column - 1, char);
+                warn_at("unexpected_a", line, column - 1, char);
             }
             flag[char] = true;
             char_after();
@@ -4324,7 +4325,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\u{1_2}\"", "read_digits", "illegal_num_separator", "", 6]
 
-            return stop_at(
+            warn_at(
                 "illegal_num_separator",
                 line,
                 column + digits.indexOf("_")
@@ -4531,7 +4532,7 @@ function jslint_phase2_lex(state) {
 
         case "=>":
 
-// PR-xxx - Stop on line break before '=>', which is a SyntaxError.
+// PR-511 - Stop on line-break before '=>', which is a SyntaxError.
 
             if (token_prv_expr.line !== the_token.line) {
 
@@ -4692,7 +4693,7 @@ function jslint_phase3_parse(state) {
                 match === undefined
 
 // test_cause:
-// ["{\"aa\"0}", "advance", "expected_a_b", "0", 6]
+// ["{0:0}", "advance", "expected_a_b", "0", 2]
 
                 ? stop("expected_a_b", token_nxt, id, artifact())
 
@@ -4729,7 +4730,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["[//]", "advance", "unexpected_a", "(comment)", 2]
 
-                return stop("unexpected_a");
+                warn("unexpected_a");
             }
         }
     }
@@ -5934,7 +5935,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["{0:0}", "parse_json", "unexpected_a", "0", 2]
 
-                        return stop(
+                        warn(
                             "unexpected_a",
                             token_nxt,
                             token_nxt.quote
@@ -7182,7 +7183,7 @@ function jslint_phase3_parse(state) {
 // export default 0;export default 0
 // ", "stmt_export", "duplicate_a", "default", 25]
 
-                return stop("duplicate_a");
+                warn("duplicate_a");
             }
             advance("default");
             the_thing = parse_expression(0);
@@ -7233,7 +7234,7 @@ function jslint_phase3_parse(state) {
 // let aa;export{aa};export function aa(){}
 // ", "stmt_export", "duplicate_a", "aa", 35]
 
-                    return stop("duplicate_a", the_name);
+                    warn("duplicate_a", the_name);
                 }
                 export_dict[the_id] = the_thing;
                 the_export.expression.push(the_thing);
@@ -7284,7 +7285,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["let aa;export{aa,aa}", "stmt_export", "duplicate_a", "aa", 18]
 
-                            return stop("duplicate_a");
+                            warn("duplicate_a");
                         }
                         export_dict[the_id] = the_name;
                     }
@@ -7344,7 +7345,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["()=>{for await(aa of aa){}}", "stmt_for", "unexpected_a", "await", 10]
 
-                return stop("unexpected_a", token_nxt);
+                warn("unexpected_a", token_nxt);
             }
             if (scope_function.async === 1) {
                 scope_function.async = 2;
@@ -9268,7 +9269,7 @@ function jslint_phase4_walk(state) {
 // if(0){import aa from "aa";}
 // ", "post_s_export_toplevel", "misplaced_a", "import", 7]
 
-            return stop("misplaced_a", the_thing);
+            warn("misplaced_a", the_thing);
         }
     }
 
@@ -9679,7 +9680,7 @@ function jslint_phase4_walk(state) {
 // aa={get aa(aa){}}
 // ", "pre_s_function", "bad_get", "function", 9]
 
-                return stop("bad_get", thing);
+                warn("bad_get", thing);
             }
         } else if (thing.extra === "set") {
             if (thing.parameter_count !== 1) {
@@ -9690,7 +9691,7 @@ function jslint_phase4_walk(state) {
 // aa={set aa(){}}
 // ", "pre_s_function", "bad_set", "function", 9]
 
-                return stop("bad_set", thing);
+                warn("bad_set", thing);
             }
         }
 
