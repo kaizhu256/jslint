@@ -1,8 +1,7 @@
 # Changelog
 
 # Todo
-- jslint - Warn on line break before arrow '=>', which is a SyntaxError that jslint currently accepts.
-- jslint - Add new warning requiring paren around plus-separated concatenations.
+- jslint - Add beta-warning requiring paren around plus-separated concatenations.
 - jslint - Revisit autofix of top-level whitespace, e.g. warning expected_space_a_b on line break inside closed-form expression.
 - jslint - Review binding-power of operators.
 - jslint-vscode - Add extra contextmenu command "JSLint - Autofix Whitespace", with keybinding ctrl+shift+j a if no collision.
@@ -14,6 +13,7 @@
 
 # v2026.9.29
 - jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.' and tagged-template backtick, and update function jslint_phase6_autofix() to autofix it.
+- jslint - Stop on line break before arrow '=>', which is a SyntaxError that jslint accepted.
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
