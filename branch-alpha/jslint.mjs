@@ -1922,14 +1922,13 @@ function jslint(
             !warning_list.some(function ({
                 code
             }) {
-                return (
-                    mode_autofix
+                if (mode_autofix) {
 
 // PR-511 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
 
-                    ? !jslint_autofix_warning_list.includes(code)
-                    : true
-                );
+                    return !jslint_autofix_warning_list.includes(code);
+                }
+                return true;
             })
         ) {
             jslint_phase5_whitage(state);

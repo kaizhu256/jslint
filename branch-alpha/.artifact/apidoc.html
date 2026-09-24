@@ -1405,9 +1405,9 @@ if (
 <li>Example usage:<pre class="apidocCodePre">...
 // PR-511 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
 
-            ? !jslint_autofix_warning_list.includes(code)
-            : true
-        );
+            return !jslint_autofix_warning_list.includes(code);
+        }
+        return true;
     })
 ) {
     <span class="apidocCodeKeywordSpan">jslint_phase5_whitage</span>(state);
