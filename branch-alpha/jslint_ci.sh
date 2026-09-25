@@ -192,6 +192,9 @@ import moduleOs from "os";
 import modulePath from "path";
 (async function () {
     let child;
+    let cwd = process.cwd().replace((
+        /\\/g
+    ), "/");
     let exitCode;
     let file;
     let timeStart;
@@ -199,15 +202,20 @@ import modulePath from "path";
     let url;
     timeStart = Date.now();
     url = process.argv[1];
+    file = new URL(url, "http://localhost").pathname;
     if (!(
         /^\w+?:/
     ).test(url)) {
         url = modulePath.resolve(url);
+        // a local path, "/"-joined: new URL() read win32 "C:" as a scheme,
+        // so the $PWD prefix never matched
+        file = url.replace((
+            /\\/g
+        ), "/");
     }
-    file = new URL(url, "http://localhost").pathname;
     // remove prefix $PWD from file
-    if (String(file + "/").startsWith(process.cwd() + "/")) {
-        file = file.replace(process.cwd(), "");
+    if (String(file + "/").startsWith(cwd + "/")) {
+        file = file.replace(cwd, "");
     }
     file = ".artifact/screenshot_browser_" + encodeURIComponent(file).replace((
         /%/g
@@ -289,9 +297,16 @@ shCiArtifactUpload() {(set -e
     git pull --unshallow origin "$GITHUB_BRANCH0"
     # init $UPSTREAM_XXX
     export UPSTREAM_REPOSITORY="$(sed -En \
-        -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
+        -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
         package.json
     )"
+    # an empty name makes every \b$UPSTREAM_REPOSITORY\b match everywhere
+    if [ ! "$UPSTREAM_REPOSITORY" ]
+    then
+        printf "%s - no github repo in package.json repository.url\n" \
+            "$0" >&2
+        exit 1
+    fi
     export UPSTREAM_GITHUB_IO="$(
         printf "%s" "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
@@ -651,9 +666,16 @@ shDirHttplinkValidate() {(set -e
     export GITHUB_BRANCH0="${GITHUB_BRANCH0:-alpha}"
     # init $UPSTREAM_XXX
     export UPSTREAM_REPOSITORY="$(sed -En \
-        -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
+        -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
         package.json
     )"
+    # an empty name makes every \b$UPSTREAM_REPOSITORY\b match everywhere
+    if [ ! "$UPSTREAM_REPOSITORY" ]
+    then
+        printf "%s - no github repo in package.json repository.url\n" \
+            "$0" >&2
+        exit 1
+    fi
     export UPSTREAM_GITHUB_IO="$(
         printf "%s" "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
@@ -933,7 +955,7 @@ import moduleFs from "fs";
         }).setEncoding("utf8");
     });
     result = Array.from(result.matchAll(
-        /^(\S+?) +?\S+? +?\S+? +?(\S+?)\t(\S+?)$/gm
+        /^(\S+?) +?\S+? +?\S+? +?(\S+?)\t(.+?)$/gm
     )).map(function ([
         ignore, mode, size, file
     ]) {
@@ -969,7 +991,7 @@ import moduleFs from "fs";
         }
         moduleChildProcess.spawn(
             "git",
-            ["log", "--max-count=1", "--format=%at", elem.file],
+            ["log", "--max-count=1", "--format=%at", "--", elem.file],
             {stdio: ["ignore", "overlapped", 2]}
         ).stdout.on("data", function (chunk) {
             elem.date = new Date(
@@ -1187,14 +1209,24 @@ shGithubPrCreate() {(set -e
     if git grep -Ei -e '^ *?(//|#) pr-xxx'
     then
         export UPSTREAM_REPOSITORY="$(sed -En \
-            -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
+            -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
             package.json
         )"
+        # an empty name queries a malformed issues api url
+        if [ ! "$UPSTREAM_REPOSITORY" ]
+        then
+            printf "%s - no github repo in package.json repository.url\n" \
+                "$0" >&2
+            exit 1
+        fi
         PR_XXX="$(curl -fs --ssl-no-revoke \
 "https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
         )"
+        # first match only - a milestone nests its own "number" further down
         PR_XXX="$(
-            printf "%s" "$PR_XXX" | sed -En -e 's/.*"number": ([0-9]+).*/\1/p'
+            printf "%s" "$PR_XXX" |
+                sed -En -e 's/.*"number": ([0-9]+).*/\1/p' |
+                head -n 1
         )"
         if [ ! "$PR_XXX" ]
         then
@@ -1347,7 +1379,7 @@ shGrep() {(set -e
     REGEXP="$1"
     shift
     FILE_FILTER="\
-/\\.|~$|/(obj|release)/|(\\b|_)(\\.\\d|\
+/\\.|~$|/(obj|release)/|(\\b|_)(\\.[0-9]|\
 archive|artifact|\
 bower_component|build|\
 coverage|\
@@ -1360,20 +1392,22 @@ log|\
 min|misc|mock|\
 node_module|\
 old|\
-raw|\rollup|\
+raw|rollup|\
 swp|\
 tmp|\
 vendor)s{0,1}(\\b|_)\
 "
+    # node's os.tmpdir, the dir shGrepReplace reads - /tmp differs on macos
+    TMPDIR_NODE="$(node --eval 'process.stdout.write(require("os").tmpdir())')"
     find . -type f |
         grep -v -E "$FILE_FILTER" |
         tr "\n" "\000" |
         xargs -0 grep -HIin -E "$REGEXP" "$@" |
-        tee /tmp/shGrep.txt || true
+        tee "$TMPDIR_NODE/shGrep.txt" || true
 )}
 
 shGrepReplace() {(set -e
-# This function will inline grep-and-replace /tmp/shGrep.txt.
+# This function will inline grep-and-replace shGrep.txt in node's os.tmpdir.
     node --input-type=module --eval '
 import moduleFs from "fs";
 import moduleOs from "os";
@@ -1408,13 +1442,14 @@ shHttpFileServer() {(set -e
 # This function will run simple node http-file-server on port $PORT.
     if [ ! "$npm_config_mode_auto_restart" ]
     then
-        EXIT_CODE=0
         export npm_config_mode_auto_restart=1
         while true
         do
             printf "\n"
             git --no-pager diff 2>/dev/null | cat || true
             printf "\nshHttpFileServer - (re)starting %s\n" "$*"
+            # reset per run, or one 77 restarts every later clean exit too
+            EXIT_CODE=0
             (shHttpFileServer "$@") || EXIT_CODE="$?"
             printf "\nshHttpFileServer - EXIT_CODE=%s\n" "$EXIT_CODE"
             # if $EXIT_CODE != 77, then exit process
@@ -1426,7 +1461,7 @@ shHttpFileServer() {(set -e
             # else restart process after 1 second
             sleep 1
         done
-        return
+        return "$EXIT_CODE"
     fi
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
@@ -1480,8 +1515,16 @@ import moduleRepl from "repl";
         let timeStart;
         // init timeStart
         timeStart = Date.now();
-        // init pathname
+        // init pathname, decoded so "%20" finds "a b.html"; the
+        // parent-directory check below runs on the decoded path
         pathname = new URL(req.url, "http://localhost").pathname;
+        try {
+            pathname = decodeURIComponent(pathname);
+        } catch (ignore) {
+            res.statusCode = 400;
+            res.end();
+            return;
+        }
         // debug - serverLog
         res.on("close", function () {
             if (pathname === "/favicon.ico") {
@@ -1500,10 +1543,11 @@ import moduleRepl from "repl";
             req.pipe(res);
             return;
         }
-        // replace trailing "/" with "/index.html"
+        // replace trailing "/" with "/index.html"; "$&" keeps the "/", as
+        // "./index.html" made "sub/" into "sub./index.html"
         file = pathname.slice(1).replace((
             /\/$|^$/m
-        ), "./index.html");
+        ), "$&index.html");
         // resolve file
         file = modulePath.resolve(file);
         // security - disable parent-directory lookup
@@ -3179,9 +3223,9 @@ body {
     ? "coverageMedium"
     : "coverageLow"
    );
-   coveragePct = String(coveragePct).replace((
-    /..$/m
-   ), ".$&");
+   coveragePct = String(Math.floor(coveragePct / 100)) + "." + String(
+    coveragePct % 100
+   ).padStart(2, "0");
    if (modeIndex && ii === 0) {
     fill = (
      "#" + Math.round(
@@ -3518,7 +3562,7 @@ function sentinel() {}
   source = await moduleFs.promises.readFile(pathname, "utf8");
   lineList = [{}];
   source.replace((
-   /^.*$/gm
+   /(?<![^\n\r])(?!(?<=\r)\n)[^\n\r]*/g
   ), function (line, startOffset) {
    if (line === "/*coverage-disable*/") {
     ignoreBlock = true;
@@ -3675,7 +3719,7 @@ import moduleFs from "fs";
     */
     // normalize "\r\n"
     result = result.replace((
-        /\r\n?/
+        /\r\n?/g
     ), "\n").trimEnd();
     // limit number-of-lines
     result = result.split("\n").slice(
@@ -3750,15 +3794,15 @@ fi
     then
         exit
     fi
-    unset shCiArtifactUploadCustom
-    unset shCiBaseCustom
-    unset shCiBaseCustom2
-    unset shCiLintCustom
-    unset shCiLintCustom2
-    unset shCiPreCustom
-    unset shCiPreCustom2
-    unset shCiPublishNpmCustom
-    unset shCiPublishPypiCustom
+    unset -f shCiArtifactUploadCustom
+    unset -f shCiBaseCustom
+    unset -f shCiBaseCustom2
+    unset -f shCiLintCustom
+    unset -f shCiLintCustom2
+    unset -f shCiPreCustom
+    unset -f shCiPreCustom2
+    unset -f shCiPublishNpmCustom
+    unset -f shCiPublishPypiCustom
     if [ -f ./myci2.sh ]
     then
         . ./myci2.sh

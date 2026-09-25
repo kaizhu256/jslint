@@ -12372,9 +12372,13 @@ body {
                 ? "coverageMedium"
                 : "coverageLow"
             );
-            coveragePct = String(coveragePct).replace((
-                /..$/m
-            ), ".$&");
+
+// Basis points to a percent with 2 decimals. Inserting "." before the last
+// two digits printed 5 bp as "5" and 42 bp as ".42".
+
+            coveragePct = String(Math.floor(coveragePct / 100)) + "." + String(
+                coveragePct % 100
+            ).padStart(2, "0");
             if (modeIndex && ii === 0) {
                 fill = (
 
@@ -12810,8 +12814,12 @@ function sentinel() {}
         let source;
         source = await moduleFs.promises.readFile(pathname, "utf8");
         lineList = [{}];
+
+// One entry per line, "\r\n" being ONE terminator: /^.*$/gm also ends a line
+// at "\r", so a crlf file got an empty entry after every line.
+
         source.replace((
-            /^.*$/gm
+            /(?<![^\n\r])(?!(?<=\r)\n)[^\n\r]*/g
         ), function (line, startOffset) {
             if (line === "/*coverage-disable*/") {
                 ignoreBlock = true;
