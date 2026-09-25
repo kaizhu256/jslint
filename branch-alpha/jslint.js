@@ -3423,7 +3423,7 @@ function jslint_phase2_lex(state) {
 // [" 0a", "lex_number", "unexpected_a_after_b", "0", 3]
 // [" 0a;", "lex_number", "unexpected_a_after_b", "0", 3]
 
-            warn_at(
+            return stop_at(
                 "unexpected_a_after_b",
                 line,
                 column - 1,
