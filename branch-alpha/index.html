@@ -13,9 +13,9 @@
     <meta name="author" content="Douglas Crockford">
     <link rel="icon" type="image/png" href="asset_image_logo_256.svg">
     <title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
-    <script defer src="./asset_codemirror_rollup.js?cc=bf22"></script>
-    <script type="module" src="./jslint.mjs?cc=bf22?window_jslint=1"></script>
-    <script defer src="./jslint_wrapper_codemirror.js?cc=bf22"></script>
+    <script defer src="./asset_codemirror_rollup.js?cc=ttrn"></script>
+    <script type="module" src="./jslint.mjs?cc=ttrn?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js?cc=ttrn"></script>
 <style>
 /*jslint-disable*/
 /*
@@ -1298,13 +1298,6 @@ async function jslint_run(mode) {
             /[\s,;'"]+/
         );
 
-// ?debug=1 forces trace on here, not by ticking its checkbox: a tick is
-// persisted to localStorage, and every later plain visit kept trace on.
-
-        if (mode_debug) {
-            jslint_option_dict.trace = true;
-        }
-
 // PR-509 - Autofix.
 
         if (mode === "autofix") {
@@ -1579,6 +1572,11 @@ document.querySelector("#JSLINT_EDITION").textContent = (
 mode_debug = (
     /\bdebug=1\b/
 ).test(location.search);
+if (mode_debug) {
+    document.querySelector(
+        "#JSLINT_OPTIONS input[value=trace]"
+    ).click();
+}
 
 // Init CodeMirror editor.
 
