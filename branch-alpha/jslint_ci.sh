@@ -1736,6 +1736,7 @@ import moduleFs from "fs";
 import moduleHttps from "https";
 (async function () {
     let file;
+    let mime;
     let result;
     file = process.argv[1];
     if ((
@@ -1755,10 +1756,19 @@ import moduleHttps from "https";
     } else {
         result = await moduleFs.promises.readFile(file);
     }
+    // mime subtype from the extension; "svg" and "jpg" are not subtypes
+    mime = file.match(
+        /\.[^.]*?$|$/m
+    )[0].slice(1).toLowerCase();
+    mime = (
+        mime === "jpg"
+        ? "jpeg"
+        : mime === "svg"
+        ? "svg+xml"
+        : mime
+    );
     result = String(
-        "data:image/" + file.match(
-            /\.[^.]*?$|$/m
-        )[0].slice(1) + ";base64," + result.toString("base64")
+        "data:image/" + mime + ";base64," + result.toString("base64")
     ).replace((
         /.{72}/g
     ), "$&\\\n");
@@ -1927,6 +1937,8 @@ shLintShell() {(set -e
 # This function will shellcheck shell-files $@.
     if (! shellcheck --version >/dev/null 2>&1)
     then
+        # say so, or a skipped lint prints the same nothing as a clean one
+        printf "shLintShell - shellcheck not installed, SKIPPED %s\n" "$*" >&2
         return
     fi
     FILE_LIST="$*"
@@ -2080,6 +2092,38 @@ function replaceListReplace(replaceList, data) {
     let matchObj;
     let promiseList = [];
     let repoDict;
+    function httpsGetOk(url, elem, redirectLeft, onResponse) {
+
+// This function will GET <url> into <elem>.data, following up to <redirectLeft>
+// redirects, and throw on any other non-2xx status - a 404 or 5xx page was
+// saved as the file content, and only a 302 was followed.
+
+        moduleHttps.get(url, function (res) {
+            onResponse();
+            if (
+                res.statusCode >= 300 && res.statusCode < 400 &&
+                res.headers.location && redirectLeft > 0
+            ) {
+                res.resume();
+                httpsGetOk(
+                    new URL(res.headers.location, url).href,
+                    elem,
+                    redirectLeft - 1,
+                    noop
+                );
+                return;
+            }
+            if (!(res.statusCode >= 200 && res.statusCode < 300)) {
+                throw new Error(
+                    `shRollupFetch - http ${res.statusCode} ${url}`
+                );
+            }
+            pipeToBuffer(res, elem, "data");
+        });
+    }
+    function noop() {
+        return;
+    }
     function pipeToBuffer(res, dict, key) {
 
 // This function will concat data from <res> to <dict>[<key>].
@@ -2106,6 +2150,7 @@ function replaceListReplace(replaceList, data) {
     // init repoDict, fetchList
     repoDict = {};
     fetchList.forEach(async function (elem) {
+        let child;
         if (!elem.url) {
             return;
         }
@@ -2123,49 +2168,58 @@ function replaceListReplace(replaceList, data) {
                 }).end();
             }));
         }
-        // fetch file
-        if (elem.node) {
-            pipeToBuffer(moduleChildProcess.spawn(
-                "node",
-                ["-e", elem.node],
+        // fetch file; a failed sub-command throws, or its empty output would
+        // be saved as the file
+        if (elem.node || elem.sh) {
+            child = moduleChildProcess.spawn(
+                (
+                    elem.node
+                    ? "node"
+                    : "sh"
+                ),
+                [
+                    (
+                        elem.node
+                        ? "-e"
+                        : "-c"
+                    ),
+                    elem.node || elem.sh
+                ],
                 {stdio: ["ignore", "overlapped", 2]}
-            ).stdout, elem, "data");
-            return;
-        }
-        if (elem.sh) {
-            pipeToBuffer(moduleChildProcess.spawn(
-                "sh",
-                ["-c", elem.sh],
-                {stdio: ["ignore", "overlapped", 2]}
-            ).stdout, elem, "data");
+            );
+            pipeToBuffer(child.stdout, elem, "data");
+            child.on("exit", function (exitCode) {
+                if (exitCode !== 0) {
+                    throw new Error(
+                        "shRollupFetch - exitCode " + exitCode + " " +
+                        (elem.node || elem.sh)
+                    );
+                }
+            });
             return;
         }
         fetchCount += 1;
         await new Promise(function (resolve) {
             setTimeout(resolve, fetchCount * 50);
         });
-        moduleHttps.get(elem.url2 || elem.url.replace(
+        httpsGetOk(elem.url2 || elem.url.replace(
             "https://github.com/",
             "https://raw.githubusercontent.com/"
-        ).replace("/blob/", "/"), function (res) {
+        ).replace("/blob/", "/"), elem, 5, function () {
             fetchCount -= 1;
             console.error(`shRollupFetch - ${fetchCount} remaining fetches`);
-            // http-redirect
-            if (res.statusCode === 302) {
-                moduleHttps.get(res.headers.location, function (res) {
-                    pipeToBuffer(res, elem, "data");
-                });
-                return;
-            }
-            pipeToBuffer(res, elem, "data");
         });
     });
     await Promise.all(promiseList);
-    // parse fetched data
-    process.on("exit", function () {
+    // parse fetched data; write nothing if a fetch failed, or the rollup
+    // would be written with pieces missing
+    process.on("exit", function (exitCode) {
         let rollupBody;
         let rollupBody0;
         let rollupHeader;
+        if (exitCode !== 0) {
+            return;
+        }
         rollupBody = "";
         fetchList.forEach(function (elem) {
             let {
