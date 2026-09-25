@@ -4402,7 +4402,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*jslint-enable*/", "read_line", "unopened_enable", "", 1]
 
-                warn_at("unopened_enable", line, column - 0);
+                return stop_at("unopened_enable", line, column - 0);
             }
             line_disable = undefined;
         } else if (
@@ -8108,7 +8108,7 @@ function jslint_phase3_parse(state) {
 // ["try{}catch(aa);;", "stmt_try", "expected_a_b", ";", 15]
 
             if (token_nxt.id !== "{") {
-                warn("expected_a_b", token_nxt, "{", artifact());
+                return stop("expected_a_b", token_nxt, "{", artifact());
             }
             the_catch.block = block(ignored);
             if (the_catch.block.disrupt !== true) {
