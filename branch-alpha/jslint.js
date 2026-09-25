@@ -6340,7 +6340,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["let{aa:...aa}=0", "name_parse", "unexpected_a", "...", 8]
 
-                    warn("unexpected_a", token_nxt);
+                    return stop("unexpected_a", token_nxt);
                 }
                 if (!token_nxt.identifier) {
 
@@ -7325,7 +7325,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["export", "stmt_export", "unexpected_a", "(end)", 6]
 
-                warn("unexpected_a");
+                return stop("unexpected_a");
             }
         }
         state.mode_module = true;
@@ -8137,7 +8137,7 @@ function jslint_phase3_parse(state) {
 // ["try{}finally;", "stmt_try", "expected_a_b", ";", 13]
 
             if (token_nxt.id !== "{") {
-                warn("expected_a_b", token_nxt, "{", artifact());
+                return stop("expected_a_b", token_nxt, "{", artifact());
             }
             the_try.else = block();
             the_disrupt = the_try.else.disrupt;
