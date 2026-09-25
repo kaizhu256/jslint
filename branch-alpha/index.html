@@ -13,9 +13,9 @@
     <meta name="author" content="Douglas Crockford">
     <link rel="icon" type="image/png" href="asset_image_logo_256.svg">
     <title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
-    <script defer src="./asset_codemirror_rollup.js?cc=wvcd"></script>
-    <script type="module" src="./jslint.mjs?cc=wvcd?window_jslint=1"></script>
-    <script defer src="./jslint_wrapper_codemirror.js?cc=wvcd"></script>
+    <script defer src="./asset_codemirror_rollup.js?cc=tdej"></script>
+    <script type="module" src="./jslint.mjs?cc=tdej?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js?cc=tdej"></script>
 <style>
 /*jslint-disable*/
 /*
@@ -1133,9 +1133,6 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         <div title="Allow complex fat-arrow.">
         <label><input type="checkbox" value="fart">fart</label>
         </div>
-        <div title="Allow for-statement.">
-        <label><input type="checkbox" value="for">for</label>
-        </div>
         <div title="Allow get() and set().">
         <label><input type="checkbox" value="getset">getset</label>
         </div>
@@ -1222,7 +1219,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     replace, replaceSelection, result, reverse, search, setCursor, setItem,
     setSize, setValue, showTrailingSpace, somethingSelected, sort, split,
     stopPropagation, stringify, style, styleActiveLine, tagName, target, test,
-    textContent, trim, value, width
+    textContent, trace, trim, value, width
 */
 
 // This is the web script companion file for JSLint. It includes code for
@@ -1297,6 +1294,13 @@ async function jslint_run(mode) {
         ).value.trim().split(
             /[\s,;'"]+/
         );
+
+// ?debug=1 forces trace on here, not by ticking its checkbox: a tick is
+// persisted to localStorage, and every later plain visit kept trace on.
+
+        if (mode_debug) {
+            jslint_option_dict.trace = true;
+        }
 
 // PR-509 - Autofix.
 
@@ -1572,11 +1576,6 @@ document.querySelector("#JSLINT_EDITION").textContent = (
 mode_debug = (
     /\bdebug=1\b/
 ).test(location.search);
-if (mode_debug) {
-    document.querySelector(
-        "#JSLINT_OPTIONS input[value=trace]"
-    ).click();
-}
 
 // Init CodeMirror editor.
 
