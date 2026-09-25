@@ -170,10 +170,11 @@ shBashrcWindowsInit() {
         return
         ;;
     esac
-    # alias curl.exe - disabled:
+    # alias curl.exe
     # if (! alias curl 2>/dev/null) && [ -f c:/windows/system32/curl.exe ]
-    # then alias curl=c:/windows/system32/curl.exe; fi
-
+    # then
+    #     alias curl=c:/windows/system32/curl.exe
+    # fi
     # alias node.exe
     if (! alias node 2>/dev/null)
     then
@@ -269,7 +270,7 @@ import modulePath from "path";
 
 shCiArtifactUpload() {(set -e
 # This function will upload build-artifacts to branch-gh-pages.
-
+#
 # shCiArtifactUploadCustom() {(set -e
 # # This function will run custom-code to upload build-artifacts.
 #     return
@@ -387,12 +388,12 @@ shCiArtifactUpload() {(set -e
 
 shCiBase() {(set -e
 # This function will run base-ci.
-
+#
 # shCiBaseCustom() {(set -e
 # # This function will run custom-code for base-ci.
 #     return
 # )}
-
+#
 # shCiLintCustom() {(set -e
 # # This function will run custom-code to lint files.
 # )}
@@ -598,7 +599,7 @@ shCiMatrixIsmainNodeversion() {(set -e
 
 shCiPre() {(set -e
 # This function will run pre-ci.
-
+#
 # shCiPreCustom() {(set -e
 # # This function will run custom-code for pre-ci.
 #     return
@@ -620,7 +621,7 @@ shCiPre() {(set -e
 
 shCiPublishNpm() {(set -e
 # This function will publish npm-package.
-
+#
 # shCiPublishNpmCustom() {(set -e
 # # This function will run custom-code to publish npm-package.
 #     # npm publish --access public
@@ -648,7 +649,7 @@ shCiPublishNpm() {(set -e
 
 shCiPublishPypi() {(set -e
 # This function will publish pypi-package.
-
+#
 # shCiPublishPypiCustom() {(set -e
 # # This function will run custom-code to publish pypi-package.
 #     # npm publish --access public
@@ -936,7 +937,7 @@ shGitLsTree() {(set -e
 # The sha256 column hashes the WORKING-TREE file, not the git blob,
 # so it can be compared against a copy sent elsewhere with
 # `sha256sum <file> | cut -c1-8`.
-
+#
 # example usage:
 # shGitLsTree | sort -rk3 # sort by date
 # shGitLsTree | sort -rk4 # sort by size
