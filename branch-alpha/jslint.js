@@ -12365,10 +12365,6 @@ body {
                 ? "coverageMedium"
                 : "coverageLow"
             );
-
-// Basis points to a percent with 2 decimals. Inserting "." before the last
-// two digits printed 5 bp as "5" and 42 bp as ".42".
-
             coveragePct = Number(coveragePct / 100).toFixed(2);
             if (modeIndex && ii === 0) {
                 fill = (
