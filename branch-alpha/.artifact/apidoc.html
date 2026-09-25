@@ -1235,7 +1235,6 @@ if (!state.mode_json) {
         scope_block_push,
         scope_function_pop,
         scope_function_push,
-        stop,
         syntax_dict,
         test_cause,
         token_global,
@@ -1294,7 +1293,9 @@ if (!state.mode_json) {
 // Produce a function that will act on the tasks registered by an action
 // function while walking the tree.
 
-        return function (t...
+        return function (the_token) {
+
+/...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
