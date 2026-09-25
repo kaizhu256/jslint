@@ -3,6 +3,7 @@ import jslint from "./jslint.mjs";
 import jslintCjs from "./jslint_wrapper_cjs.cjs";
 import moduleFs from "fs";
 import modulePath from "path";
+import moduleVm from "vm";
 
 let {
     assertErrorThrownAsync,
@@ -2022,6 +2023,163 @@ jstestDescribe((
             });
             return "";
         });
+    });
+});
+
+jstestDescribe((
+    "test jslint_wrapper_vscode handling-behavior"
+), function testBehaviorJslintWrapperVscode() {
+    jstestIt((
+        "test jslint_wrapper_vscode commands handling-behavior"
+    ), async function () {
+
+// Load the extension against a stub vscode api, then drive every command.
+// The stub's <registerTextEditorCommand> only records, as the two commands
+// using it are sync edit-builder callers.
+
+        const commandDict = {};
+        const moduleStub = {
+            exports: {}
+        };
+        const sourceWrapper = await moduleFs.promises.readFile(
+            "jslint_wrapper_vscode.js",
+            "utf8"
+        );
+        const state = {};
+        const subscriptions = [];
+        const vscode = {
+            Diagnostic: function (ignore, message) {
+                return {
+                    message
+                };
+            },
+            DiagnosticSeverity: {},
+            ProgressLocation: {},
+            Range: noop,
+            commands: {
+                registerCommand: function (id, callback) {
+                    commandDict[id] = callback;
+                    return [id, "registerCommand"];
+                },
+                registerTextEditorCommand: function (id) {
+                    return [id, "registerTextEditorCommand"];
+                }
+            },
+            languages: {
+                createDiagnosticCollection: function () {
+                    return {
+                        clear: function () {
+                            delete state.diagnosticList;
+                        },
+                        set: function (ignore, list) {
+                            state.diagnosticList = list.map(function ({
+                                message
+                            }) {
+                                return message;
+                            });
+                        }
+                    };
+                }
+            },
+            window: {
+                withProgress: function (ignore, callback) {
+                    return callback({
+                        report: noop
+                    });
+                }
+            }
+        };
+        function editorCreate(text) {
+            state.source = text;
+            vscode.window.activeTextEditor = {
+                document: {
+                    getText: function () {
+                        return state.source;
+                    },
+                    save: function () {
+
+// Stand in for a format-on-save that rewrites the text.
+
+                        state.source = "let cc = 3;\n";
+                        return Promise.resolve(true);
+                    },
+                    validateRange: noop
+                },
+                edit: function (callback) {
+                    callback({
+                        replace: function (ignore, text) {
+                            state.source = text;
+                        }
+                    });
+                    return Promise.resolve(true);
+                }
+            };
+        }
+        moduleVm.runInThisContext(String(`
+(function (__dirname, exports, module, require) {
+${sourceWrapper}
+})
+        `).trim() + "\n")(
+            modulePath.resolve("."),
+            moduleStub.exports,
+            moduleStub,
+            function (id) {
+                return (
+                    id === "vscode"
+                    ? vscode
+                    : id === "vm"
+                    ? moduleVm
+                    : moduleFs
+                );
+            }
+        );
+
+// Activation reuses moduleStub to load jslint, so read activate first.
+
+        moduleStub.exports.activate({
+            subscriptions
+        });
+        assertJsonEqual(subscriptions, [
+            ["jslint.autofix", "registerCommand"],
+            ["jslint.clear", "registerCommand"],
+            ["jslint.disableRegion", "registerTextEditorCommand"],
+            ["jslint.ignoreLine", "registerTextEditorCommand"],
+            ["jslint.lint", "registerCommand"],
+            ["jslint.lintAndSave", "registerCommand"]
+        ]);
+
+// With no active editor, clear still clears and the rest return quietly.
+
+        state.diagnosticList = ["aa"];
+        await commandDict["jslint.clear"]();
+        assertJsonEqual(state.diagnosticList, undefined);
+        await commandDict["jslint.autofix"]();
+        await commandDict["jslint.lint"]();
+        await commandDict["jslint.lintAndSave"]();
+        assertJsonEqual(state.diagnosticList, undefined);
+
+// Lint ignores the context menu's uri argument, and resolves only after the
+// warnings are set.
+
+        editorCreate("let aa = 1;\n");
+        await commandDict["jslint.lint"]("file:///aa.js");
+        assertJsonEqual(state.diagnosticList, ["JSLint - Unused 'aa'."]);
+
+// Lint-and-save lints the text as saved.
+
+        editorCreate("let bb = 2;\n");
+        await commandDict["jslint.lintAndSave"]();
+        assertJsonEqual(state.diagnosticList, ["JSLint - Unused 'cc'."]);
+
+// Autofix rewrites the text, then re-lints it.
+
+        editorCreate("function aa() {\n  return 1;\n}\naa();\n");
+        await commandDict["jslint.autofix"]();
+        assertJsonEqual(
+            state.source,
+            "function aa() {\n    return 1;\n}\naa();\n"
+        );
+        assertJsonEqual(state.diagnosticList, []);
     });
 });
 
