@@ -3378,12 +3378,12 @@ body {
 <pre><span class="lineno"><a href="#line_3213" id="line_3213"> 3213.</a></span><span class="count                ">     76</span><span>// Lex/loop through each directive in /*...*/</span></pre>
 <pre><span class="lineno"><a href="#line_3214" id="line_3214"> 3214.</a></span><span class="count                ">     76</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3215" id="line_3215"> 3215.</a></span><span class="count                ">     76</span><span>        ii = 0;</span></pre>
-<pre><span class="lineno"><a href="#line_3216" id="line_3216"> 3216.</a></span><span class="count                ">   1927</span><span>        body.replace(jslint_rgx_directive_part, function (</span></pre>
-<pre><span class="lineno"><a href="#line_3217" id="line_3217"> 3217.</a></span><span class="count                ">   1927</span><span>            match0,</span></pre>
-<pre><span class="lineno"><a href="#line_3218" id="line_3218"> 3218.</a></span><span class="count                ">   1927</span><span>            key,</span></pre>
-<pre><span class="lineno"><a href="#line_3219" id="line_3219"> 3219.</a></span><span class="count                ">   1927</span><span>            value,</span></pre>
-<pre><span class="lineno"><a href="#line_3220" id="line_3220"> 3220.</a></span><span class="count                ">   1927</span><span>            jj</span></pre>
-<pre><span class="lineno"><a href="#line_3221" id="line_3221"> 3221.</a></span><span class="count                ">   1927</span><span>        ) {</span></pre>
+<pre><span class="lineno"><a href="#line_3216" id="line_3216"> 3216.</a></span><span class="count                ">   1926</span><span>        body.replace(jslint_rgx_directive_part, function (</span></pre>
+<pre><span class="lineno"><a href="#line_3217" id="line_3217"> 3217.</a></span><span class="count                ">   1926</span><span>            match0,</span></pre>
+<pre><span class="lineno"><a href="#line_3218" id="line_3218"> 3218.</a></span><span class="count                ">   1926</span><span>            key,</span></pre>
+<pre><span class="lineno"><a href="#line_3219" id="line_3219"> 3219.</a></span><span class="count                ">   1926</span><span>            value,</span></pre>
+<pre><span class="lineno"><a href="#line_3220" id="line_3220"> 3220.</a></span><span class="count                ">   1926</span><span>            jj</span></pre>
+<pre><span class="lineno"><a href="#line_3221" id="line_3221"> 3221.</a></span><span class="count                ">   1926</span><span>        ) {</span></pre>
 <pre><span class="lineno"><a href="#line_3222" id="line_3222"> 3222.</a></span><span class="count                ">     76</span><span>            if (ii !== jj) {</span></pre>
 <pre><span class="lineno"><a href="#line_3223" id="line_3223"> 3223.</a></span><span class="count                ">     76</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3224" id="line_3224"> 3224.</a></span><span class="count                ">     76</span><span>// test_cause:</span></pre>
@@ -3394,10 +3394,10 @@ body {
 <pre><span class="lineno"><a href="#line_3229" id="line_3229"> 3229.</a></span><span class="count                ">     76</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_3230" id="line_3230"> 3230.</a></span><span class="count                ">     76</span><span>            if (match0 === "") {</span></pre>
 <pre><span class="lineno"><a href="#line_3231" id="line_3231"> 3231.</a></span><span class="count                ">     76</span><span>                return "";</span></pre>
-<pre><span class="lineno"><a href="#line_3232" id="line_3232"> 3232.</a></span><span class="count                ">   1851</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_3233" id="line_3233"> 3233.</a></span><span class="count                ">   1851</span><span>            ii += match0.length;</span></pre>
-<pre><span class="lineno"><a href="#line_3234" id="line_3234"> 3234.</a></span><span class="count                ">   1851</span><span>            switch (the_comment.directive) {</span></pre>
-<pre><span class="lineno"><a href="#line_3235" id="line_3235"> 3235.</a></span><span class="count                ">   1851</span><span>            case "global":</span></pre>
+<pre><span class="lineno"><a href="#line_3232" id="line_3232"> 3232.</a></span><span class="count                ">   1850</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_3233" id="line_3233"> 3233.</a></span><span class="count                ">   1850</span><span>            ii += match0.length;</span></pre>
+<pre><span class="lineno"><a href="#line_3234" id="line_3234"> 3234.</a></span><span class="count                ">   1850</span><span>            switch (the_comment.directive) {</span></pre>
+<pre><span class="lineno"><a href="#line_3235" id="line_3235"> 3235.</a></span><span class="count                ">   1850</span><span>            case "global":</span></pre>
 <pre><span class="lineno"><a href="#line_3236" id="line_3236"> 3236.</a></span><span class="count                ">     76</span><span>                if (value) {</span></pre>
 <pre><span class="lineno"><a href="#line_3237" id="line_3237"> 3237.</a></span><span class="count                ">     76</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3238" id="line_3238"> 3238.</a></span><span class="count                ">     76</span><span>// test_cause:</span></pre>
@@ -3422,13 +3422,13 @@ body {
 <pre><span class="lineno"><a href="#line_3257" id="line_3257"> 3257.</a></span><span class="count                ">    101</span><span>                    warn("bad_option_a", the_comment, key);</span></pre>
 <pre><span class="lineno"><a href="#line_3258" id="line_3258"> 3258.</a></span><span class="count                ">    101</span><span>                }</span></pre>
 <pre><span class="lineno"><a href="#line_3259" id="line_3259"> 3259.</a></span><span class="count                ">    101</span><span>                break;</span></pre>
-<pre><span class="lineno"><a href="#line_3260" id="line_3260"> 3260.</a></span><span class="count                ">   1741</span><span>            case "property":</span></pre>
-<pre><span class="lineno"><a href="#line_3261" id="line_3261"> 3261.</a></span><span class="count                ">   1741</span><span>                state.mode_property = true;</span></pre>
-<pre><span class="lineno"><a href="#line_3262" id="line_3262"> 3262.</a></span><span class="count                ">   1741</span><span>                tenure[key] = true;</span></pre>
-<pre><span class="lineno"><a href="#line_3263" id="line_3263"> 3263.</a></span><span class="count                ">   1741</span><span>                break;</span></pre>
-<pre><span class="lineno"><a href="#line_3264" id="line_3264"> 3264.</a></span><span class="count                ">   1851</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_3265" id="line_3265"> 3265.</a></span><span class="count                ">   1851</span><span>            return "";</span></pre>
-<pre><span class="lineno"><a href="#line_3266" id="line_3266"> 3266.</a></span><span class="count                ">   1851</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_3260" id="line_3260"> 3260.</a></span><span class="count                ">   1740</span><span>            case "property":</span></pre>
+<pre><span class="lineno"><a href="#line_3261" id="line_3261"> 3261.</a></span><span class="count                ">   1740</span><span>                state.mode_property = true;</span></pre>
+<pre><span class="lineno"><a href="#line_3262" id="line_3262"> 3262.</a></span><span class="count                ">   1740</span><span>                tenure[key] = true;</span></pre>
+<pre><span class="lineno"><a href="#line_3263" id="line_3263"> 3263.</a></span><span class="count                ">   1740</span><span>                break;</span></pre>
+<pre><span class="lineno"><a href="#line_3264" id="line_3264"> 3264.</a></span><span class="count                ">   1850</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_3265" id="line_3265"> 3265.</a></span><span class="count                ">   1850</span><span>            return "";</span></pre>
+<pre><span class="lineno"><a href="#line_3266" id="line_3266"> 3266.</a></span><span class="count                ">   1850</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_3267" id="line_3267"> 3267.</a></span><span class="count                ">     76</span><span>        return the_comment;</span></pre>
 <pre><span class="lineno"><a href="#line_3268" id="line_3268"> 3268.</a></span><span class="count                ">     76</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_3269" id="line_3269"> 3269.</a></span><span class="count                ">    899</span><span></span></pre>
