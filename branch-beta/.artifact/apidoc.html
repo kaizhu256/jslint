@@ -475,21 +475,21 @@ assertOrThrow((
     return argList[0];
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-        if (consoleError === Object) {
-            consoleError = console.error;
-        }
-        return argList[0];
+    if (consoleError === Object) {
+        consoleError = console.error;
     }
-    return debug;
+    return argList[0];
+}
+return debug;
 }());
 <span class="apidocCodeKeywordSpan">debugInline</span>(); // coverage-hack
+
 const jslint_autofix_warning_list = [ //jslint-ignore-line
-    "expected_a_at_b_c",
-    "expected_a_at_end",
-    "expected_line_break_a_b",
-    "expected_space_a_b",
-    "unexpected_space_a_b"
-];
+"expected_a_at_b_c",
+"expected_a_at_end",
+"expected_line_break_a_b",
+"expected_space_a_b",
+"unexpected_space_a_b",
 ...</pre></li>
 
 <li>
@@ -1310,9 +1310,9 @@ if (!state.mode_json) {
 
 // PHASE 5. Check whitespace between tokens in &lt;token_list&gt;.
 
-if (!state.mode_json &amp;&amp; warning_list.length === 0) {
-    jslint_phase5_whitage(state);
-}
+if (
+    !state.mode_json &amp;&amp;
+    !warning_list.some(function ({
 ...</pre></li>
 
 <li>
@@ -1403,13 +1403,13 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-if (!state.mode_json) {
-    jslint_phase4_walk(state);
-}
+// PR-511 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
 
-// PHASE 5. Check whitespace between tokens in &lt;token_list&gt;.
-
-if (!state.mode_json &amp;&amp; warning_list.length === 0) {
+            return !jslint_autofix_warning_list.includes(code);
+        }
+        return true;
+    })
+) {
     <span class="apidocCodeKeywordSpan">jslint_phase5_whitage</span>(state);
 }
 
@@ -1486,7 +1486,7 @@ if (mode_autofix) {
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-        if (!state.mode_json &amp;&amp; warning_list.length === 0) {
+        ) {
             jslint_phase5_whitage(state);
         }
 
