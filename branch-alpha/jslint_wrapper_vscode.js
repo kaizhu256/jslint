@@ -59,11 +59,6 @@ function activate({
 // PR-xxx - Add command "JSLint - Autofix Whitespace".
 
     async function jslintAutofix() {
-
-// Registered with registerCommand, not registerTextEditorCommand: the latter's
-// edit-builder is only valid while its callback runs, but the re-lint must
-// read the document AFTER the autofixed text lands.
-
         const editor = vscode.window.activeTextEditor;
         let result;
         if (!editor) {
@@ -80,7 +75,7 @@ function activate({
                 ), result.autofixed);
             });
         }
-        await jslintLint(editor);
+        await jslintLint();
     }
 
     function jslintClear() {
@@ -152,9 +147,11 @@ function activate({
         }, " //jslint-ignore-line");
     }
 
-    function jslintLint({
-        document
-    }) {
+    function jslintLint() {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            return;
+        }
         return vscode.window.withProgress({
             cancellable: false,
             location: vscode.ProgressLocation.Window,
@@ -168,7 +165,7 @@ function activate({
 // Clear "Problems" tab.
 
             diagnosticCollection.clear();
-            result = document.getText();
+            result = editor.document.getText();
             result = jslint.jslint(result);
             result = result.warnings.slice(0, 100).map(function ({
                 column,
@@ -202,7 +199,7 @@ function activate({
 
 // Update "Problems" tab.
 
-            diagnosticCollection.set(document.uri, result);
+            diagnosticCollection.set(editor.document.uri, result);
             progress.report({
                 increment: 100
             });
@@ -211,16 +208,16 @@ function activate({
 
 // PR-429 - Add manual lint-on-save command.
 
-    async function jslintLintAndSave({
-        document
-    }) {
-        jslintLint({
-            document
-        });
+    async function jslintLintAndSave() {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            return;
+        }
         await require("fs").promises.writeFile(
-            document.uri.fsPath,
-            document.getText()
+            editor.document.uri.fsPath,
+            editor.document.getText()
         );
+        await jslintLint();
     }
 
 // Initialize vscode and jslint.
@@ -250,11 +247,14 @@ function activate({
     jslint = module.exports;
 
 // Register extension commands.
+// Async commands use <registerCommand>: <registerTextEditorCommand> drops the
+// callback's promise, so the command ends before its work does, and errors go
+// unreported. Only the two sync edit-builder commands keep it.
 
     subscriptions.push(vscode.commands.registerCommand((
         "jslint.autofix"
     ), jslintAutofix));
-    subscriptions.push(vscode.commands.registerTextEditorCommand((
+    subscriptions.push(vscode.commands.registerCommand((
         "jslint.clear"
     ), jslintClear));
     subscriptions.push(vscode.commands.registerTextEditorCommand((
@@ -263,10 +263,10 @@ function activate({
     subscriptions.push(vscode.commands.registerTextEditorCommand((
         "jslint.ignoreLine"
     ), jslintIgnoreLine));
-    subscriptions.push(vscode.commands.registerTextEditorCommand((
+    subscriptions.push(vscode.commands.registerCommand((
         "jslint.lint"
     ), jslintLint));
-    subscriptions.push(vscode.commands.registerTextEditorCommand((
+    subscriptions.push(vscode.commands.registerCommand((
         "jslint.lintAndSave"
     ), jslintLintAndSave));
 }
