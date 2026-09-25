@@ -25,7 +25,6 @@
 ## ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 ## OTHER DEALINGS IN THE SOFTWARE.
 
-
 # POSIX reference
 # http://pubs.opengroup.org/onlinepubs/9699919799/utilities/test.html
 # http://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
@@ -171,11 +170,10 @@ shBashrcWindowsInit() {
         return
         ;;
     esac
-    # alias curl.exe
+    # alias curl.exe - disabled:
     # if (! alias curl 2>/dev/null) && [ -f c:/windows/system32/curl.exe ]
-    # then
-    #     alias curl=c:/windows/system32/curl.exe
-    # fi
+    # then alias curl=c:/windows/system32/curl.exe; fi
+
     # alias node.exe
     if (! alias node 2>/dev/null)
     then
@@ -271,13 +269,14 @@ import modulePath from "path";
 
 shCiArtifactUpload() {(set -e
 # This function will upload build-artifacts to branch-gh-pages.
+
 # shCiArtifactUploadCustom() {(set -e
 # # This function will run custom-code to upload build-artifacts.
 #     return
 # )}
     if ! shCiMatrixIsmainName || \
         [ ! -f package.json ] || \
-        ! grep -qE '^ {4}"shCiArtifactUpload": 1,$' package.json
+        ! grep -Eq '^ {4}"shCiArtifactUpload": 1,$' package.json
     then
         return
     fi
@@ -388,10 +387,12 @@ shCiArtifactUpload() {(set -e
 
 shCiBase() {(set -e
 # This function will run base-ci.
+
 # shCiBaseCustom() {(set -e
 # # This function will run custom-code for base-ci.
 #     return
 # )}
+
 # shCiLintCustom() {(set -e
 # # This function will run custom-code to lint files.
 # )}
@@ -597,6 +598,7 @@ shCiMatrixIsmainNodeversion() {(set -e
 
 shCiPre() {(set -e
 # This function will run pre-ci.
+
 # shCiPreCustom() {(set -e
 # # This function will run custom-code for pre-ci.
 #     return
@@ -618,12 +620,13 @@ shCiPre() {(set -e
 
 shCiPublishNpm() {(set -e
 # This function will publish npm-package.
+
 # shCiPublishNpmCustom() {(set -e
 # # This function will run custom-code to publish npm-package.
 #     # npm publish --access public
 # )}
     if [ ! -f package.json ] || \
-        ! grep -qE '^ {4}"shCiPublishNpm": 1,$' package.json
+        ! grep -Eq '^ {4}"shCiPublishNpm": 1,$' package.json
     then
         return
     fi
@@ -645,6 +648,7 @@ shCiPublishNpm() {(set -e
 
 shCiPublishPypi() {(set -e
 # This function will publish pypi-package.
+
 # shCiPublishPypiCustom() {(set -e
 # # This function will run custom-code to publish pypi-package.
 #     # npm publish --access public
@@ -932,6 +936,7 @@ shGitLsTree() {(set -e
 # The sha256 column hashes the WORKING-TREE file, not the git blob,
 # so it can be compared against a copy sent elsewhere with
 # `sha256sum <file> | cut -c1-8`.
+
 # example usage:
 # shGitLsTree | sort -rk3 # sort by date
 # shGitLsTree | sort -rk4 # sort by size
@@ -1918,6 +1923,7 @@ shLintPython() {(set -e
 )}
 
 shLintShell() {(set -e
+# This function will shellcheck shell-files $@.
     if (! shellcheck --version >/dev/null 2>&1)
     then
         return

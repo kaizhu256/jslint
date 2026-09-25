@@ -6,7 +6,7 @@ sh jslint_ci.sh shCiJslintGlobalDictAllFetch
 '
 
 shCiArtifactUploadCustom() {(set -e
-# this function will run custom-code to upload build-artifacts
+# This function will run custom-code to upload build-artifacts.
     # .github_cache - restore
     if [ "$GITHUB_ACTION" ] && [ -d .github_cache ]
     then
@@ -183,7 +183,7 @@ import moduleChildProcess from "child_process";
 )}
 
 shCiBaseCustom() {(set -e
-# this function will run custom-code for base-ci
+# This function will run custom-code for base-ci.
     # update files
     if [ "$(git branch --show-current)" = alpha ]
     then
@@ -303,7 +303,7 @@ import moduleFs from "fs";
 )}
 
 shCiJslintGlobalDictAllFetch() {(set -e
-# this function will fetch list of common, javascript global-objects
+# This function will fetch list of common, javascript global-objects
 # from online-resources.
     node --input-type=module --eval '
 import moduleFs from "fs";
@@ -475,12 +475,12 @@ function objectDeepCopyWithKeysSorted(obj) {
 )}
 
 shCiPublishNpmCustom() {(set -e
-# this function will run custom-code to npm-publish package
+# This function will run custom-code to npm-publish package.
     npm publish --access public
 )}
 
 shCiVscePackageJslintWrapperVscode() {(set -e
-# this function will vsce-package jslint_wrapper_vscode
+# This function will vsce-package jslint_wrapper_vscode.
     # Start empty, or vsce packs files left over from an earlier build.
     # Empty the dir, not remove it: an open dev-host window locks it on windows.
     mkdir -p .artifact/jslint_wrapper_vscode
