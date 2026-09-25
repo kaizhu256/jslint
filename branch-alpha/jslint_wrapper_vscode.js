@@ -26,14 +26,15 @@
 
 /*jslint beta, node*/
 /*property
-    Diagnostic, DiagnosticSeverity, ProgressLocation, Warning, Window, activate,
-    cancellable, character, clear, column, commands, createDiagnosticCollection,
-    document, end, endsWith, exports, fsPath, getText, increment, insert,
-    isEmpty, jslint, languages, line, lineAt, location, map, message, module,
+    Diagnostic, DiagnosticSeverity, ProgressLocation, Range, Warning, Window,
+    activate, activeTextEditor, autofix, autofixed, cancellable, character,
+    clear, column, commands, createDiagnosticCollection, document, edit, end,
+    endsWith, exports, fsPath, getText, increment, insert, isEmpty, jslint,
+    languages, line, lineAt, lineCount, location, map, message, module,
     promises, push, range, rangeIncludingLineBreak, readFileSync,
-    registerTextEditorCommand, replace, report, runInNewContext, selection, set,
-    slice, start, subscriptions, title, uri, warnings, window, withProgress,
-    writeFile
+    registerCommand, registerTextEditorCommand, replace, report,
+    runInNewContext, selection, set, slice, start, subscriptions, title, uri,
+    validateRange, warnings, window, withProgress, writeFile
 */
 
 "use strict";
@@ -54,6 +55,33 @@ function activate({
     let diagnosticCollection;
     let jslint;
     let vscode;
+
+// PR-xxx - Add command "JSLint - Autofix Whitespace".
+
+    async function jslintAutofix() {
+
+// Registered with registerCommand, not registerTextEditorCommand: the latter's
+// edit-builder is only valid while its callback runs, but the re-lint must
+// read the document AFTER the autofixed text lands.
+
+        const editor = vscode.window.activeTextEditor;
+        let result;
+        if (!editor) {
+            return;
+        }
+        result = editor.document.getText();
+        result = jslint.jslint(result, {
+            autofix: true
+        });
+        if (result.autofixed !== undefined) {
+            await editor.edit(function (editBuilder) {
+                editBuilder.replace(editor.document.validateRange(
+                    new vscode.Range(0, 0, editor.document.lineCount, 0)
+                ), result.autofixed);
+            });
+        }
+        await jslintLint(editor);
+    }
 
     function jslintClear() {
         return vscode.window.withProgress({
@@ -223,6 +251,9 @@ function activate({
 
 // Register extension commands.
 
+    subscriptions.push(vscode.commands.registerCommand((
+        "jslint.autofix"
+    ), jslintAutofix));
     subscriptions.push(vscode.commands.registerTextEditorCommand((
         "jslint.clear"
     ), jslintClear));

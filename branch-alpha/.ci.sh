@@ -526,6 +526,7 @@ import moduleFs from "fs";
             file: "package.json",
             src: JSON.stringify({
                 "activationEvents": [
+                    "onCommand:jslint.autofix",
                     "onCommand:jslint.clear",
                     "onCommand:jslint.disableRegion",
                     "onCommand:jslint.ignoreLine",
@@ -540,6 +541,11 @@ import moduleFs from "fs";
                 ],
                 "contributes": {
                     "commands": [
+                        {
+                            "category": "jslint",
+                            "command": "jslint.autofix",
+                            "title": "JSLint - Autofix Whitespace"
+                        },
                         {
                             "category": "jslint",
                             "command": "jslint.clear",
@@ -567,6 +573,12 @@ import moduleFs from "fs";
                         }
                     ],
                     "keybindings": [
+                        {
+                            "command": "jslint.autofix",
+                            "key": "ctrl+shift+j a",
+                            "mac": "cmd+shift+j a",
+                            "when": "editorTextFocus"
+                        },
                         {
                             "command": "jslint.clear",
                             "key": "ctrl+shift+j c",
@@ -611,6 +623,11 @@ import moduleFs from "fs";
                             {
                                 "command": "jslint.ignoreLine",
                                 "group": "7_modification@5",
+                                "when": "resourceLangId == javascript"
+                            },
+                            {
+                                "command": "jslint.autofix",
+                                "group": "7_modification@6",
                                 "when": "resourceLangId == javascript"
                             }
                         ]

@@ -1630,6 +1630,8 @@ aa();
             ],
             literal: [
                 "String(\"\".at());",
+                "String(\"\\u{000041}\");",
+                "String(\"\\u{10FFFF}\");",
                 "String([].at());"
             ],
             logical_assignment: [
