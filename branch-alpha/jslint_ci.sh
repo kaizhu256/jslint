@@ -269,7 +269,7 @@ shCiArtifactUpload() {(set -e
 # )}
     if ! shCiMatrixIsmainName || \
         [ ! -f package.json ] || \
-        ! grep -q '^    "shCiArtifactUpload": 1,$' package.json
+        ! grep -qE '^ {4}"shCiArtifactUpload": 1,$' package.json
     then
         return
     fi
@@ -441,8 +441,8 @@ import moduleFs from "fs";
         }, {
             file: "package.json",
             src: fileDict["package.json"].replace((
-                /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
-            ), `    "version": "${versionBeta}"`)
+                / {4}"version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
+            ), `${" ".repeat(4)}"version": "${versionBeta}"`)
         }, {
             file: fileMain,
             // update version
@@ -608,7 +608,7 @@ shCiPublishNpm() {(set -e
 #     # npm publish --access public
 # )}
     if [ ! -f package.json ] || \
-        ! grep -q '^    "shCiPublishNpm": 1,$' package.json
+        ! grep -qE '^ {4}"shCiPublishNpm": 1,$' package.json
     then
         return
     fi

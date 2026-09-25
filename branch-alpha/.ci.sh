@@ -219,8 +219,8 @@ import moduleFs from "fs";
             file: ".ci.sh",
             // update version
             src: fileDict[".ci.sh"].replace((
-                /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
-            ), `    "version": "${versionBeta.split("-")[0]}"`)
+                / {4}"version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
+            ), `${" ".repeat(4)}"version": "${versionBeta.split("-")[0]}"`)
         }, {
             file: "README.md",
             src: fileDict["README.md"].replace((
@@ -448,7 +448,7 @@ function objectDeepCopyWithKeysSorted(obj) {
 // jslint_global_dict_all - auto-generated - end.)
         `).trim()),
         (
-            "$1    " +
+            "$1" + " ".repeat(4) +
             JSON.stringify(
                 objectDeepCopyWithKeysSorted(dictAll),
                 undefined,

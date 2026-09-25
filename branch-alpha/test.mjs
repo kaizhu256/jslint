@@ -2034,8 +2034,8 @@ jstestDescribe((
     ), async function () {
 
 // Load the extension against a stub vscode api, then drive every command.
-// The stub's <registerTextEditorCommand> only records, as the two commands
-// using it are sync edit-builder callers.
+// Like vscode, the stub's <registerTextEditorCommand> runs its callback inside
+// <edit>, and <edit> applies the builder's edits once the callback returns.
 
         const commandDict = {};
         const moduleStub = {
@@ -2061,7 +2061,12 @@ jstestDescribe((
                     commandDict[id] = callback;
                     return [id, "registerCommand"];
                 },
-                registerTextEditorCommand: function (id) {
+                registerTextEditorCommand: function (id, callback) {
+                    commandDict[id] = function () {
+                        return state.editor.edit(function (edit) {
+                            callback(state.editor, edit);
+                        });
+                    };
                     return [id, "registerTextEditorCommand"];
                 }
             },
@@ -2089,12 +2094,53 @@ jstestDescribe((
                 }
             }
         };
-        function editorCreate(text) {
+        function editorCreate(text, selection) {
             state.source = text;
-            vscode.window.activeTextEditor = {
+            state.editor = {
                 document: {
-                    getText: function () {
-                        return state.source;
+                    getText: function (range) {
+                        return (
+                            range
+                            ? state.source.slice(
+                                offsetAt(range.start),
+                                offsetAt(range.end)
+                            )
+                            : state.source
+                        );
+                    },
+                    lineAt: function ({
+                        line
+                    }) {
+                        const lineList = state.source.split("\n");
+                        return {
+                            range: {
+                                end: {
+                                    character: lineList[line].length,
+                                    line
+                                },
+                                start: {
+                                    character: 0,
+                                    line
+                                }
+                            },
+                            rangeIncludingLineBreak: {
+                                end: (
+                                    line + 1 < lineList.length
+                                    ? {
+                                        character: 0,
+                                        line: line + 1
+                                    }
+                                    : {
+                                        character: lineList[line].length,
+                                        line
+                                    }
+                                ),
+                                start: {
+                                    character: 0,
+                                    line
+                                }
+                            }
+                        };
                     },
                     save: function () {
 
@@ -2106,14 +2152,62 @@ jstestDescribe((
                     validateRange: noop
                 },
                 edit: function (callback) {
+                    const editList = [];
                     callback({
-                        replace: function (ignore, text) {
-                            state.source = text;
+                        insert: function (position, text) {
+                            editList.push([position, position, text]);
+                        },
+                        replace: function (range, text) {
+
+// An undefined range, from the stub <validateRange>, is the whole document.
+
+                            editList.push([range?.start, range?.end, text]);
                         }
                     });
+
+// Resolve offsets against the text before any edit, then apply right to left.
+// On a tie the later edit goes first, so an insert lands before a replace.
+
+                    editList.map(function ([start, end, text], ii) {
+                        return [
+                            (
+                                start
+                                ? offsetAt(start)
+                                : 0
+                            ),
+                            (
+                                end
+                                ? offsetAt(end)
+                                : state.source.length
+                            ),
+                            text,
+                            ii
+                        ];
+                    }).sort(function (aa, bb) {
+                        return bb[0] - aa[0] || bb[3] - aa[3];
+                    }).forEach(function ([start, end, text]) {
+                        state.source = (
+                            state.source.slice(0, start) +
+                            text +
+                            state.source.slice(end)
+                        );
+                    });
                     return Promise.resolve(true);
-                }
+                },
+                selection
             };
+            vscode.window.activeTextEditor = state.editor;
+        }
+        function offsetAt({
+            character,
+            line
+        }) {
+            return state.source.split("\n").slice(0, line).reduce(function (
+                sum,
+                text
+            ) {
+                return sum + text.length + 1;
+            }, character);
         }
         moduleVm.runInThisContext(String(`
 (function (__dirname, exports, module, require) {
@@ -2180,6 +2274,80 @@ ${sourceWrapper}
             "function aa() {\n    return 1;\n}\naa();\n"
         );
         assertJsonEqual(state.diagnosticList, []);
+
+// Disable-region, with a cursor: wrap the cursor's line.
+
+        editorCreate("aa();\nbb();\n", {
+            end: {
+                character: 2,
+                line: 0
+            },
+            isEmpty: true,
+            start: {
+                character: 2,
+                line: 0
+            }
+        });
+        await commandDict["jslint.disableRegion"]();
+        assertJsonEqual(
+            state.source,
+            "/*jslint-disable*/\naa();\n/*jslint-enable*/\nbb();\n"
+        );
+
+// Disable-region, with a selection ending at the start of a line: the enable
+// directive goes before that line, not after it.
+
+        editorCreate("aa();\nbb();\ncc();\n", {
+            end: {
+                character: 0,
+                line: 2
+            },
+            isEmpty: false,
+            start: {
+                character: 0,
+                line: 0
+            }
+        });
+        await commandDict["jslint.disableRegion"]();
+        assertJsonEqual(
+            state.source,
+            "/*jslint-disable*/\naa();\nbb();\n/*jslint-enable*/\ncc();\n"
+        );
+
+// Disable-region, on a last line with no line break: add one first.
+
+        editorCreate("aa();", {
+            end: {
+                character: 0,
+                line: 0
+            },
+            isEmpty: true,
+            start: {
+                character: 0,
+                line: 0
+            }
+        });
+        await commandDict["jslint.disableRegion"]();
+        assertJsonEqual(
+            state.source,
+            "/*jslint-disable*/\naa();\n/*jslint-enable*/"
+        );
+
+// Ignore-line: append the directive to the end of the selection's last line.
+
+        editorCreate("aa();\nbb();\n", {
+            end: {
+                character: 2,
+                line: 1
+            },
+            isEmpty: true,
+            start: {
+                character: 2,
+                line: 1
+            }
+        });
+        await commandDict["jslint.ignoreLine"]();
+        assertJsonEqual(state.source, "aa();\nbb(); //jslint-ignore-line\n");
     });
 });
 
