@@ -29,12 +29,12 @@
     Diagnostic, DiagnosticSeverity, ProgressLocation, Range, Warning, Window,
     activate, activeTextEditor, autofix, autofixed, cancellable, character,
     clear, column, commands, createDiagnosticCollection, document, edit, end,
-    endsWith, exports, fsPath, getText, increment, insert, isEmpty, jslint,
-    languages, line, lineAt, lineCount, location, map, message, module,
-    promises, push, range, rangeIncludingLineBreak, readFileSync,
-    registerCommand, registerTextEditorCommand, replace, report,
-    runInNewContext, selection, set, slice, start, subscriptions, title, uri,
-    validateRange, warnings, window, withProgress, writeFile
+    endsWith, exports, getText, increment, insert, isEmpty, jslint, languages,
+    line, lineAt, lineCount, location, map, message, module, push, range,
+    rangeIncludingLineBreak, readFileSync, registerCommand,
+    registerTextEditorCommand, replace, report, runInNewContext, save,
+    selection, set, slice, start, subscriptions, title, uri, validateRange,
+    warnings, window, withProgress
 */
 
 "use strict";
@@ -162,7 +162,8 @@ function activate({
                 increment: 0
             });
 
-// Clear "Problems" tab.
+// Clear "Problems" tab, all files, not just this one - intentional: every
+// jslint command lints one file, so the tab shows only that file's warnings.
 
             diagnosticCollection.clear();
             result = editor.document.getText();
@@ -213,10 +214,7 @@ function activate({
         if (!editor) {
             return;
         }
-        await require("fs").promises.writeFile(
-            editor.document.uri.fsPath,
-            editor.document.getText()
-        );
+        await editor.document.save();
         await jslintLint();
     }
 
