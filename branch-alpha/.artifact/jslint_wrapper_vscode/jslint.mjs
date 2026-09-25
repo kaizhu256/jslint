@@ -374,6 +374,7 @@
     test_unknown_warning_code,
     this,
     thru,
+    toFixed,
     toLocaleString,
     toString,
     token,
@@ -12370,9 +12371,7 @@ body {
 // Basis points to a percent with 2 decimals. Inserting "." before the last
 // two digits printed 5 bp as "5" and 42 bp as ".42".
 
-            coveragePct = String(Math.floor(coveragePct / 100)) + "." + String(
-                coveragePct % 100
-            ).padStart(2, "0");
+            coveragePct = Number(coveragePct / 100).toFixed(2);
             if (modeIndex && ii === 0) {
                 fill = (
 

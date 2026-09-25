@@ -3230,9 +3230,7 @@ body {
     ? "coverageMedium"
     : "coverageLow"
    );
-   coveragePct = String(Math.floor(coveragePct / 100)) + "." + String(
-    coveragePct % 100
-   ).padStart(2, "0");
+   coveragePct = Number(coveragePct / 100).toFixed(2);
    if (modeIndex && ii === 0) {
     fill = (
      "#" + Math.round(
