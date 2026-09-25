@@ -241,7 +241,6 @@
     keys,
     label_break,
     label_name,
-    lastIndexOf,
     lbp,
     led_infix,
     length,
@@ -2887,6 +2886,9 @@ function jslint_phase2_lex(state) {
         warn,
         warn_at
     } = state;
+    const mode_digits_empty_string = 1;
+    const mode_digits_numeric_separator = 2;
+    const mode_digits_unicode = 3;
     const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
@@ -2897,8 +2899,6 @@ function jslint_phase2_lex(state) {
     let line_mega;              // The starting line of megastring.
     let line_source = "";       // The remaining line source string.
     let line_whole = "";        // The whole line source string.
-    let mode_digits_empty_string = 1;
-    let mode_digits_numeric_separator = 2;
     let mode_directive = true;  // true if directives are still allowed.
     let mode_mega = false;      // true if currently parsing a megastring
                                 // ... literal.
@@ -2998,26 +2998,7 @@ function jslint_phase2_lex(state) {
 
                     warn_at("unexpected_a", line, column - 1, char);
                 }
-
-// PR-xxx - Check the code point's value, not its digit count - '\u{10FFFF}' and
-// '\u{000041}' are legal. Above 10FFFF a string or template is a SyntaxError,
-// and a regexp without flag 'u' reads '\u{110000}' as 'u' repeated; linting
-// continues past either, so warn.
-
-                read_digits("x", undefined);
-                if (
-                    Number.parseInt(
-                        snippet.slice(snippet.lastIndexOf("{") + 1),
-                        16
-                    ) > 0x10ffff
-                ) {
-
-// test_cause:
-// ["\"\\u{110000}\"", "char_after_escape", "too_many_digits", "", 11]
-// ["aa=/\\u{110000}/", "char_after_escape", "too_many_digits", "", 14]
-
-                    warn_at("too_many_digits", line, column - 1);
-                }
+                read_digits("x", mode_digits_unicode);
                 if (char !== "}") {
 
 // test_cause:
@@ -4346,6 +4327,23 @@ function jslint_phase2_lex(state) {
                 line,
                 column + digits.indexOf("_")
             );
+        }
+
+// PR-xxx - Check the code point's value, not its digit count - '\u{10FFFF}' and
+// '\u{000041}' are legal. Above 10FFFF a string or template is a SyntaxError,
+// and a regexp without flag 'u' reads '\u{110000}' as 'u' repeated; linting
+// continues past either, so warn.
+
+        if (
+            mode === mode_digits_unicode &&
+            Number.parseInt(digits, 16) > 0x10ffff
+        ) {
+
+// test_cause:
+// ["\"\\u{110000}\"", "read_digits", "too_many_digits", "", 11]
+// ["aa=/\\u{110000}/", "read_digits", "too_many_digits", "", 14]
+
+            warn_at("too_many_digits", line, column + digits.length);
         }
         snippet += digits;
         column += digits.length;

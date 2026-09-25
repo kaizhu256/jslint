@@ -1073,6 +1073,9 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         warn,
         warn_at
     } = state;
+    const mode_digits_empty_string = 1;
+    const mode_digits_numeric_separator = 2;
+    const mode_digits_unicode = 3;
     const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
@@ -1083,8 +1086,6 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     let line_mega;              // The starting line of megastring.
     let line_source = "";       // The remaining line source string.
     let line_whole = "";        // The whole line source string.
-    let mode_digits_empty_string = 1;
-    let mode_digits_numeric_separator = 2;
     let mode_directive = true;  // true if directives are still allowed.
     let mode_mega = false;      // true if currently parsing a megastring
                                 // ... literal.
@@ -1098,7 +1099,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     let token_prv_expr = token_global;  // The previous token excluding
                                         // ... comments.
 
-// Most tokens, including the identifiers, operators, and ...
+// Most tokens, inc...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
