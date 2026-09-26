@@ -581,7 +581,10 @@ import moduleFs from "fs";
                             "command": "jslint.autofix",
                             "key": "ctrl+shift+j a",
                             "mac": "cmd+shift+j a",
-                            "when": "editorTextFocus"
+                            "when": (
+                                "editorTextFocus && " +
+                                "editorLangId == javascript"
+                            )
                         },
                         {
                             "command": "jslint.clear",
