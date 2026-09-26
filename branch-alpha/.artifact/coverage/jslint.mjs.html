@@ -4514,9 +4514,9 @@ body {
 <pre><span class="lineno"><a href="#line_4349" id="line_4349"> 4349.</a></span><span class="count                ">    376</span><span>        case mode_digits_unicode_escape:</span></pre>
 <pre><span class="lineno"><a href="#line_4350" id="line_4350"> 4350.</a></span><span class="count                ">    376</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_4351" id="line_4351"> 4351.</a></span><span class="count                ">    376</span><span>// PR-xxx - Check the code point's value, not its digit count - '\u{10FFFF}' and</span></pre>
-<pre><span class="lineno"><a href="#line_4352" id="line_4352"> 4352.</a></span><span class="count                ">    376</span><span>// '\u{000041}' are legal. Above 10FFFF a string or template is a SyntaxError,</span></pre>
-<pre><span class="lineno"><a href="#line_4353" id="line_4353"> 4353.</a></span><span class="count                ">    376</span><span>// and a regexp without flag 'u' reads '\u{110000}' as 'u' repeated; linting</span></pre>
-<pre><span class="lineno"><a href="#line_4354" id="line_4354"> 4354.</a></span><span class="count                ">    376</span><span>// continues past either, so warn. &lt;char&gt; is still '{' only for '\u{...}'.</span></pre>
+<pre><span class="lineno"><a href="#line_4352" id="line_4352"> 4352.</a></span><span class="count                ">    376</span><span>// '\u{000041}' are legal. Above 10FFFF a string is a SyntaxError, and a regexp</span></pre>
+<pre><span class="lineno"><a href="#line_4353" id="line_4353"> 4353.</a></span><span class="count                ">    376</span><span>// without flag 'u' reads '\u{110000}' as 'u' repeated; both lint on, so warn.</span></pre>
+<pre><span class="lineno"><a href="#line_4354" id="line_4354"> 4354.</a></span><span class="count                ">    376</span><span>// Template escapes never get here, unchecked. &lt;char&gt; is '{' only for '\u{...}'.</span></pre>
 <pre><span class="lineno"><a href="#line_4355" id="line_4355"> 4355.</a></span><span class="count                ">    376</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_4356" id="line_4356"> 4356.</a></span><span class="count                ">    376</span><span>            if (char !== "{") {</span></pre>
 <pre><span class="lineno"><a href="#line_4357" id="line_4357"> 4357.</a></span><span class="count                ">    376</span><span>                if (digits.length &lt; 4) {</span></pre>
