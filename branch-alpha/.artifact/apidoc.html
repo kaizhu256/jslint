@@ -1071,7 +1071,8 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         token_global,
         token_list,
         warn,
-        warn_at
+        warn_at,
+        warning_list
     } = state;
     const mode_digits_numeric_separator = 1;
     const mode_digits_regexp_quantifier = 2;
@@ -1097,9 +1098,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     let token_prv = token_global;       // The previous token including
                                         // ... comments.
     let token_prv_expr = token_global;  // The previous token excluding
-                                        // ... comments.
-
-// Most...
+                                        // ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1167,7 +1166,8 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         token_global,
         token_list,
         warn,
-        warn_at
+        warn_at,
+        warning_list
     } = state;
     let anon = "anonymous";     // The guessed name for anonymous functions.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -1189,8 +1189,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         if (
             token_now.identifier &amp;&amp;
             token_now.id !== "function" &amp;&amp;
-            token_now.id !== "async"
-      ...
+            token_now...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

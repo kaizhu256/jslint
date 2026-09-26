@@ -157,6 +157,7 @@
     entries,
     env,
     error,
+    escape_list,
     eval,
     every,
     example_list,
@@ -2895,7 +2896,8 @@ function jslint_phase2_lex(state) {
         token_global,
         token_list,
         warn,
-        warn_at
+        warn_at,
+        warning_list
     } = state;
     const mode_digits_numeric_separator = 1;
     const mode_digits_regexp_quantifier = 2;
@@ -2967,13 +2969,23 @@ function jslint_phase2_lex(state) {
         return char;
     }
 
-    function char_after_escape(extra) {
+    function char_after_escape(extra, mode_template) {
 
-// Validate char after escape "\\".
+// Validate char after escape "\\". In a template, <mode_template>, linting
+// continues past a bad escape, so warn where a string would stop; and '\' at
+// end of line continues the line.
 
         char_after("\\");
         switch (char) {
         case "":
+            if (mode_template) {
+
+// test_cause:
+// ["`\\\n`", "char_after_escape", "mode_template", "", 0]
+
+                test_cause("mode_template");
+                return;
+            }
 
 // test_cause:
 // ["\"\\", "char_after_escape", "unclosed_string", "", 2]
@@ -3015,8 +3027,13 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\u{12345\"", "char_after_escape", "expected_a_before_b", "\"", 10]
 // ["\"\\u{12345\";", "char_after_escape", "expected_a_before_b", "\"", 10]
+// ["`\\u{12`", "char_after_escape", "expected_a_before_b", "`", 7]
 
-                    return stop_at(
+                    return (
+                        mode_template
+                        ? warn_at
+                        : stop_at
+                    )(
                         "expected_a_before_b",
                         line,
                         column - 1,
@@ -3254,7 +3271,9 @@ function jslint_phase2_lex(state) {
     }
 
     function lex_megastring() {
+        const escape_list = [];
         let id;
+        let ii;
         let match;
 
 // The token is a megastring. We don't allow any kind of mega nesting.
@@ -3274,7 +3293,7 @@ function jslint_phase2_lex(state) {
 
 // Parsing a mega literal is tricky. First create a ` token.
 
-        token_create("`");
+        token_create("`").escape_list = escape_list;
         from += 1;
 
 // Then loop, building up a string, possibly from many lines, until seeing
@@ -3329,9 +3348,17 @@ function jslint_phase2_lex(state) {
                 }
                 break;
             case "\\":
-                snippet += line_source.slice(0, 2);
-                column += 2;
-                line_source = line_source.slice(2);
+
+// PR-xxx - Check the escape with <char_after_escape>, as a string does, but
+// move its warnings to <escape_list>: a tagged template may hold any escape, so
+// <prefix_tick> keeps them only for an untagged one. '$' and '{' escape '${'.
+// Push back the char it leaves in <char>, which may be the closing '`'.
+
+                ii = warning_list.length;
+                char_after();
+                char_after_escape("${", true);
+                char_before();
+                escape_list.push(...warning_list.splice(ii));
                 break;
             case "`":
 
@@ -4351,7 +4378,7 @@ function jslint_phase2_lex(state) {
 // PR-xxx - Check the code point's value, not its digit count - '\u{10FFFF}' and
 // '\u{000041}' are legal. Above 10FFFF a string is a SyntaxError, and a regexp
 // without flag 'u' reads '\u{110000}' as 'u' repeated; both lint on, so warn.
-// Template escapes never get here, unchecked. <char> is '{' only for '\u{...}'.
+// A template's '\u' gets here too. <char> is '{' only for '\u{...}'.
 
             if (char !== "{") {
                 if (digits.length < 4) {
@@ -4359,6 +4386,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\u0\"", "read_digits", "expected_four_digits", "", 5]
 // ["\"\\u0\";", "read_digits", "expected_four_digits", "", 5]
+// ["`\\u0`", "read_digits", "expected_four_digits", "", 5]
 
                     warn_at("expected_four_digits", line, column - 0);
                 }
@@ -4366,6 +4394,7 @@ function jslint_phase2_lex(state) {
 
 // test_cause:
 // ["\"\\u{110000}\"", "read_digits", "too_many_digits", "", 11]
+// ["`\\u{110000}`", "read_digits", "too_many_digits", "", 11]
 // ["aa=/\\u{110000}/", "read_digits", "too_many_digits", "", 14]
 
                 warn_at("too_many_digits", line, column - 0);
@@ -4691,7 +4720,8 @@ function jslint_phase3_parse(state) {
         token_global,
         token_list,
         warn,
-        warn_at
+        warn_at,
+        warning_list
     } = state;
     let anon = "anonymous";     // The guessed name for anonymous functions.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -5455,7 +5485,7 @@ function jslint_phase3_parse(state) {
     }
 
     function infix_grave(left) {
-        const the_tick = prefix_tick();
+        const the_tick = prefix_tick(true);
 
 // test_cause:
 // ["0``", "check_left", "unexpected_a", "`", 2]
@@ -7012,8 +7042,11 @@ function jslint_phase3_parse(state) {
         return the_new;
     }
 
-    function prefix_tick() {
+    function prefix_tick(mode_tagged) {
         const the_tick = token_now;
+        if (!mode_tagged) {
+            warning_list.push(...the_tick.escape_list);
+        }
         the_tick.value = [];
         the_tick.expression = [];
         if (token_nxt.id !== "`") {
