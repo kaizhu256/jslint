@@ -2503,6 +2503,13 @@ async function jslint_cli({
         mode_conditional,
         option = empty()
     }) {
+
+// Pad with the block's OWN terminator - phase 6 rejoins with the first one it
+// sees, so a "\n" pad turned a CRLF block's fixed lines into LF.
+
+        const line_pad = String(
+            jslint_rgx_crlf.exec(code)?.[0] || "\n"
+        ).repeat(line_offset);
         let result_from_file;
         if (
             mode_conditional &&
@@ -2531,7 +2538,9 @@ async function jslint_cli({
                         browser: true,
                         ...option
                     },
-                    rgx: (/^<script\b[^>]*?>\n([\S\s]*?\n)<\/script>$/gm),
+                    rgx: (
+                        /^<script\b[^>]*?>(?:\n|\r\n?)([\S\s]*?(?:\n|\r\n?))<\/script>$/gm
+                    ),
                     suffix: "</script>",
                     suffix_file: ".<script>.js"
                 })
@@ -2556,15 +2565,15 @@ async function jslint_cli({
                 option
             });
         default:
-            result_from_file = jslint("\n".repeat(line_offset) + code, option);
+            result_from_file = jslint(line_pad + code, option);
 
-// The <line_offset> newlines prefixed above make the warnings absolute, and
+// The <line_pad> terminators prefixed above make the warnings absolute, and
 // they ride along in <autofixed> too. Strip exactly them back off, so the
 // caller splices the block back between its OWN delimiters.
 
             if (line_offset > 0 && result_from_file.autofixed !== undefined) {
                 result_from_file.autofixed = (
-                    result_from_file.autofixed.slice(line_offset)
+                    result_from_file.autofixed.slice(line_pad.length)
                 );
             }
         }
@@ -2626,7 +2635,9 @@ async function jslint_cli({
                     node: true,
                     ...option
                 },
-                rgx: (/\bnode\b.*? (?:--eval|-e) '\n([\S\s]*?\n)'/gm),
+                rgx: (
+                    /\bnode\b.*? (?:--eval|-e) '(?:\n|\r\n?)([\S\s]*?(?:\n|\r\n?))'/gm
+                ),
                 suffix: "'",
                 suffix_file: ".<node -e>.js"
             })
