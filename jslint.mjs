@@ -2206,7 +2206,7 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
             "\n\n\n\n\n\n\n\n"
         );
         result = result.replace((
-            /\r\n*/g
+            /\r\n?/g
         ), "\n");
         return result;
     }));
@@ -2504,6 +2504,13 @@ async function jslint_cli({
         mode_conditional,
         option = empty()
     }) {
+
+// PR-xxx - Pad with the block's OWN terminator. Phase 6 rejoins with the
+// first one it sees, so a "\n" pad turned a CRLF block's fixed lines into LF.
+
+        const line_pad = String(
+            jslint_rgx_crlf.exec(code)?.[0] || "\n"
+        ).repeat(line_offset);
         let result_from_file;
         if (
             mode_conditional &&
@@ -2532,7 +2539,9 @@ async function jslint_cli({
                         browser: true,
                         ...option
                     },
-                    rgx: (/^<script\b[^>]*?>\n([\S\s]*?\n)<\/script>$/gm),
+                    rgx: (
+                        /^<script\b[^>]*?>(?:\n|\r\n?)([\S\s]*?(?:\n|\r\n?))<\/script>$/gm
+                    ),
                     suffix: "</script>",
                     suffix_file: ".<script>.js"
                 })
@@ -2557,15 +2566,15 @@ async function jslint_cli({
                 option
             });
         default:
-            result_from_file = jslint("\n".repeat(line_offset) + code, option);
+            result_from_file = jslint(line_pad + code, option);
 
-// The <line_offset> newlines prefixed above make the warnings absolute, and
+// The <line_pad> terminators prefixed above make the warnings absolute, and
 // they ride along in <autofixed> too. Strip exactly them back off, so the
 // caller splices the block back between its OWN delimiters.
 
             if (line_offset > 0 && result_from_file.autofixed !== undefined) {
                 result_from_file.autofixed = (
-                    result_from_file.autofixed.slice(line_offset)
+                    result_from_file.autofixed.slice(line_pad.length)
                 );
             }
         }
@@ -2627,7 +2636,9 @@ async function jslint_cli({
                     node: true,
                     ...option
                 },
-                rgx: (/\bnode\b.*? (?:--eval|-e) '\n([\S\s]*?\n)'/gm),
+                rgx: (
+                    /\bnode\b.*? (?:--eval|-e) '(?:\n|\r\n?)([\S\s]*?(?:\n|\r\n?))'/gm
+                ),
                 suffix: "'",
                 suffix_file: ".<node -e>.js"
             })
@@ -12853,8 +12864,12 @@ function sentinel() {}
         let source;
         source = await moduleFs.promises.readFile(pathname, "utf8");
         lineList = [{}];
+
+// PR-xxx - One entry per line, "\r\n" being ONE terminator: /^.*$/gm also ends
+// a line at "\r", so a crlf file got an empty entry after every line.
+
         source.replace((
-            /^.*$/gm
+            /(?<![^\n\r])(?!(?<=\r)\n)[^\n\r]*/g
         ), function (line, startOffset) {
             if (line === "/*coverage-disable*/") {
                 ignoreBlock = true;

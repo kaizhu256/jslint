@@ -875,6 +875,35 @@ aa(dd(0), 0);
             )
         });
 
+// A CRLF or CR container is fixed the same way, and its line terminators
+// survive, inside the embedded block too.
+
+        await autofixFile({
+            expect: String(
+                "shAa() {\n    node --eval '\nconsole.log(\n    0 +\n    0\n" +
+                ");\n'\n}\n"
+            ).replace((/\n/g), "\r\n"),
+            name: "autofix_embedded_crlf.sh",
+            process_env: {
+                JSLINT_BETA: "1"
+            },
+            source: String(
+                "shAa() {\n    node --eval '\nconsole.log(\n    0\n  + 0\n" +
+                ");\n'\n}\n"
+            ).replace((/\n/g), "\r\n")
+        });
+        await autofixFile({
+            expect: String(
+                "<body>\n<script>\n/*jslint browser*/\nwindow.console.log(\n" +
+                "    0\n    + 0\n);\n</script>\n</body>\n"
+            ).replace((/\n/g), "\r"),
+            name: "autofix_embedded_cr.html",
+            source: String(
+                "<body>\n<script>\n/*jslint browser*/\nwindow.console.log(\n" +
+                "    0\n  + 0\n);\n</script>\n</body>\n"
+            ).replace((/\n/g), "\r")
+        });
+
 // A missing file exits 1 with the error printed, like a plain lint - not an
 // unhandled rejection that never reaches process_exit.
 
