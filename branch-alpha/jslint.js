@@ -2886,9 +2886,6 @@ function jslint_phase2_lex(state) {
         warn,
         warn_at
     } = state;
-    const mode_digits_empty_string = 1;
-    const mode_digits_numeric_separator = 2;
-    const mode_digits_unicode = 3;
     const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
@@ -2998,7 +2995,7 @@ function jslint_phase2_lex(state) {
 
                     warn_at("unexpected_a", line, column - 1, char);
                 }
-                read_digits("x", mode_digits_unicode);
+                read_digits("x", "regexp_unicode");
                 if (char !== "}") {
 
 // test_cause:
@@ -3016,14 +3013,7 @@ function jslint_phase2_lex(state) {
                 return char_after();
             }
             char_before();
-            if (read_digits("x", mode_digits_empty_string) < 4) {
-
-// test_cause:
-// ["\"\\u0\"", "char_after_escape", "expected_four_digits", "", 5]
-// ["\"\\u0\";", "char_after_escape", "expected_four_digits", "", 5]
-
-                warn_at("expected_four_digits", line, column - 1);
-            }
+            read_digits("x", "regexp_unicode");
             return;
         default:
             if (extra && extra.indexOf(char) >= 0) {
@@ -3371,7 +3361,7 @@ function jslint_phase2_lex(state) {
         case "b":
         case "o":
         case "x":
-            read_digits(char, mode_digits_numeric_separator);
+            read_digits(char, "lex_number");
 
 // PR-351 - Ignore BigInt suffix 'n'.
 
@@ -3381,14 +3371,14 @@ function jslint_phase2_lex(state) {
             break;
         default:
             if (char === ".") {
-                read_digits("d", mode_digits_numeric_separator);
+                read_digits("d", "lex_number");
             }
             if (char === "E" || char === "e") {
                 char_after(char);
                 if (char !== "+" && char !== "-") {
                     char_before();
                 }
-                read_digits("d", mode_digits_numeric_separator);
+                read_digits("d", "lex_number");
             }
         }
 
@@ -3761,27 +3751,7 @@ function jslint_phase2_lex(state) {
                     }
                     break;
                 case "{":
-                    if (read_digits("d", mode_digits_empty_string) === 0) {
-
-// test_cause:
-// ["aa=/aa{/", "lex_regexp_group", "expected_a_before_b", ",", 8]
-
-                        warn_at(
-                            "expected_a_before_b",
-                            line,
-                            column - 1,
-                            "0",
-                            ","
-                        );
-                    }
-                    if (char === ",") {
-
-// test_cause:
-// ["aa=/.{,/", "lex_regexp_group", "comma", "", 0]
-
-                        test_cause("comma");
-                        read_digits("d", mode_digits_empty_string);
-                    }
+                    read_digits("d", "regexp_quantifier");
                     if (char_after("}") === "?") {
 
 // test_cause:
@@ -4302,7 +4272,13 @@ function jslint_phase2_lex(state) {
             : jslint_rgx_digits_decimals
         )[0];
         if (
-            (mode !== mode_digits_empty_string && digits.length === 0) ||
+            (
+                digits.length === 0 &&
+                (
+                    mode === "lex_number" ||
+                    (mode === "regexp_unicode" && char === "{")
+                )
+            ) ||
             digits[0] === "_"
         ) {
 
@@ -4315,7 +4291,7 @@ function jslint_phase2_lex(state) {
 
 // PR-390 - Add numeric-separator check.
 
-        if (mode === mode_digits_numeric_separator) {
+        if (mode === "lex_number") {
             check_numeric_separator(digits, column);
         } else if (digits.indexOf("_") >= 0) {
 
@@ -4328,28 +4304,59 @@ function jslint_phase2_lex(state) {
                 column + digits.indexOf("_")
             );
         }
+        snippet += digits;
+        column += digits.length;
+        line_source = line_source.slice(digits.length);
+        switch (mode) {
+        case "regexp_quantifier":
+            if (digits.length === 0) {
+
+// test_cause:
+// ["aa=/aa{/", "read_digits", "expected_a_before_b", ",", 8]
+
+                warn_at("expected_a_before_b", line, column - 0, "0", ",");
+            }
+            if (line_source[0] === ",") {
+
+// test_cause:
+// ["aa=/.{,/", "read_digits", "comma", "", 0]
+
+                test_cause("comma");
+                char_after();
+
+// Recurse read_digits.
+
+                read_digits("d", undefined);
+                return;
+            }
+            break;
 
 // PR-xxx - Check the code point's value, not its digit count - '\u{10FFFF}' and
 // '\u{000041}' are legal. Above 10FFFF a string or template is a SyntaxError,
 // and a regexp without flag 'u' reads '\u{110000}' as 'u' repeated; linting
-// continues past either, so warn.
+// continues past either, so warn. <char> is still '{' only for '\u{...}'.
 
-        if (
-            mode === mode_digits_unicode &&
-            Number.parseInt(digits, 16) > 0x10ffff
-        ) {
+        case "regexp_unicode":
+            if (char !== "{") {
+                if (digits.length < 4) {
+
+// test_cause:
+// ["\"\\u0\"", "read_digits", "expected_four_digits", "", 5]
+// ["\"\\u0\";", "read_digits", "expected_four_digits", "", 5]
+
+                    warn_at("expected_four_digits", line, column - 0);
+                }
+            } else if (Number.parseInt(digits, 16) > 0x10ffff) {
 
 // test_cause:
 // ["\"\\u{110000}\"", "read_digits", "too_many_digits", "", 11]
 // ["aa=/\\u{110000}/", "read_digits", "too_many_digits", "", 14]
 
-            warn_at("too_many_digits", line, column + digits.length);
+                warn_at("too_many_digits", line, column - 0);
+            }
+            break;
         }
-        snippet += digits;
-        column += digits.length;
-        line_source = line_source.slice(digits.length);
         char_after();
-        return digits.length;
     }
 
     function read_line() {
