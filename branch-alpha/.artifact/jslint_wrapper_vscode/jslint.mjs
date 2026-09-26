@@ -2969,22 +2969,22 @@ function jslint_phase2_lex(state) {
         return char;
     }
 
-    function char_after_escape(escape_char_list, mode_template) {
+    function char_after_escape(escape_char_list) {
 
 // Validate char after escape "\\". <escape_char_list> lists the chars this
 // caller may escape beyond the shared '/\`bfnrtu', such as a string's quote, a
-// template's '${', or a regexp's metachars. In a template, <mode_template>,
-// '\' at end of line continues the line.
+// megastring's '${', or a regexp's metachars. A megastring passes '${', and
+// there '\' at end of line continues the line.
 
         char_after("\\");
         switch (char) {
         case "":
-            if (mode_template) {
+            if (escape_char_list === "${") {
 
 // test_cause:
-// ["`\\\n`", "char_after_escape", "mode_template", "", 0]
+// ["`\\\n`", "char_after_escape", "megastring_continue", "", 0]
 
-                test_cause("mode_template");
+                test_cause("megastring_continue");
                 return;
             }
 
@@ -3358,7 +3358,7 @@ function jslint_phase2_lex(state) {
 
                 ii = warning_list.length;
                 char_after();
-                char_after_escape("${", true);
+                char_after_escape("${");
                 char_before();
                 warning_list_untagged.push(...warning_list.splice(ii));
                 break;
@@ -4382,7 +4382,7 @@ function jslint_phase2_lex(state) {
 // PR-xxx - Check the code point's value, not its digit count. '\u{10FFFF}' and
 // '\u{000041}' are legal. Above 10FFFF a string is a SyntaxError, and a regexp
 // without flag 'u' reads '\u{110000}' as 'u' repeated. Both lint on, so warn.
-// A template's '\u' gets here too. <char> is '{' only for '\u{...}'.
+// A megastring's '\u' gets here too. <char> is '{' only for '\u{...}'.
 
             if (char !== "{") {
                 if (digits.length < 4) {
