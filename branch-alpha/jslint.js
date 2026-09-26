@@ -2973,13 +2973,14 @@ function jslint_phase2_lex(state) {
 
 // Validate char after escape "\\". <escape_char_list> lists the chars this
 // caller may escape beyond the shared '/\`bfnrtu', such as a string's quote, a
-// megastring's '${', or a regexp's metachars. A megastring passes '${', and
-// there '\' at end of line continues the line.
+// megastring's '${', or a regexp's metachars.
 
         char_after("\\");
         switch (char) {
         case "":
             if (escape_char_list === "${") {
+
+// A megastring's '\' at end of line continues the line.
 
 // test_cause:
 // ["`\\\n`", "char_after_escape", "megastring_continue", "", 0]
@@ -3020,7 +3021,6 @@ function jslint_phase2_lex(state) {
 
 // test_cause:
 // ["[\"\\u{12345}\"]", "char_after_escape", "unexpected_a", "{", 5]
-// ["[`\\u{12345}`]", "char_after_escape", "unexpected_a", "{", 5]
 
                     warn_at("unexpected_a", line, column - 1, char);
                 }

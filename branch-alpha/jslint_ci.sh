@@ -1404,6 +1404,12 @@ import modulePath from "path";
             modulePath.resolve(file),
             "utf8"
         ).split("\n");
+        if (dict[file][lineno - 1] === undefined) {
+            throw new Error(
+                "shGrepReplace - stale grep result, " + file +
+                " has no line " + lineno
+            );
+        }
         // Keep the "\r" of a crlf line, which only windows grep strips.
         // Grep splits on "\n" alone, so <str> runs to it past any lone "\r".
         dict[file][lineno - 1] = (
