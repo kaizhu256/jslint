@@ -4349,9 +4349,9 @@ function jslint_phase2_lex(state) {
         case mode_digits_unicode_escape:
 
 // PR-xxx - Check the code point's value, not its digit count - '\u{10FFFF}' and
-// '\u{000041}' are legal. Above 10FFFF a string or template is a SyntaxError,
-// and a regexp without flag 'u' reads '\u{110000}' as 'u' repeated; linting
-// continues past either, so warn. <char> is still '{' only for '\u{...}'.
+// '\u{000041}' are legal. Above 10FFFF a string is a SyntaxError, and a regexp
+// without flag 'u' reads '\u{110000}' as 'u' repeated; both lint on, so warn.
+// Template escapes never get here, unchecked. <char> is '{' only for '\u{...}'.
 
             if (char !== "{") {
                 if (digits.length < 4) {
