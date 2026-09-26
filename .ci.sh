@@ -480,7 +480,11 @@ shCiPublishNpmCustom() {(set -e
 )}
 
 shCiVscePackageJslintWrapperVscode() {(set -e
-# this function will vsce-package jslint_wrapper_vscode
+# This function will vsce-package jslint_wrapper_vscode.
+    # Start empty, or vsce packs files left over from an earlier build.
+    # Empty the dir, not remove it: an open dev-host window locks it on windows.
+    mkdir -p .artifact/jslint_wrapper_vscode
+    find .artifact/jslint_wrapper_vscode -mindepth 1 -delete
     mkdir -p .artifact/jslint_wrapper_vscode/.vscode
     (set -e
     cd .artifact/jslint_wrapper_vscode
@@ -526,6 +530,7 @@ import moduleFs from "fs";
             file: "package.json",
             src: JSON.stringify({
                 "activationEvents": [
+                    "onCommand:jslint.autofix",
                     "onCommand:jslint.clear",
                     "onCommand:jslint.disableRegion",
                     "onCommand:jslint.ignoreLine",
@@ -540,6 +545,11 @@ import moduleFs from "fs";
                 ],
                 "contributes": {
                     "commands": [
+                        {
+                            "category": "jslint",
+                            "command": "jslint.autofix",
+                            "title": "JSLint - Autofix Whitespace"
+                        },
                         {
                             "category": "jslint",
                             "command": "jslint.clear",
@@ -567,6 +577,15 @@ import moduleFs from "fs";
                         }
                     ],
                     "keybindings": [
+                        {
+                            "command": "jslint.autofix",
+                            "key": "ctrl+shift+j a",
+                            "mac": "cmd+shift+j a",
+                            "when": (
+                                "editorTextFocus && " +
+                                "editorLangId == javascript"
+                            )
+                        },
                         {
                             "command": "jslint.clear",
                             "key": "ctrl+shift+j c",
@@ -611,6 +630,11 @@ import moduleFs from "fs";
                             {
                                 "command": "jslint.ignoreLine",
                                 "group": "7_modification@5",
+                                "when": "resourceLangId == javascript"
+                            },
+                            {
+                                "command": "jslint.autofix",
+                                "group": "7_modification@6",
                                 "when": "resourceLangId == javascript"
                             }
                         ]
