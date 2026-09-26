@@ -29,10 +29,10 @@
     href, pathToFileURL, readFileSync, replace, runInThisContext, stringify
 */
 
-// Run jslint.mjs in THIS context, wrapped as a function, not in a new one: a
-// new context has no process or console, so <jslint_cli> linted nothing and
-// resolved 0. Its ' import(' calls go to <import_cjs>, the real one here; the
-// file url lets its cli self-detect.
+// PR-xxx - Run jslint.mjs in THIS context, wrapped as a function, not in a new
+// one: a new context has no process or console, so <jslint_cli> linted nothing
+// and resolved 0. Its ' import(' calls go to <import_cjs>, the real one here;
+// the file url lets its cli self-detect.
 
 const fileJslint = __dirname + "/jslint.mjs";
 const jslintRun = require("vm").runInThisContext(

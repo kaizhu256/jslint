@@ -194,10 +194,10 @@ body {
 <pre><span class="lineno"><a href="#line_29" id="line_29">   29.</a></span><span class="count                ">      1</span><span>    href, pathToFileURL, readFileSync, replace, runInThisContext, stringify</span></pre>
 <pre><span class="lineno"><a href="#line_30" id="line_30">   30.</a></span><span class="count                ">      1</span><span>*/</span></pre>
 <pre><span class="lineno"><a href="#line_31" id="line_31">   31.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_32" id="line_32">   32.</a></span><span class="count                ">      1</span><span>// Run jslint.mjs in THIS context, wrapped as a function, not in a new one: a</span></pre>
-<pre><span class="lineno"><a href="#line_33" id="line_33">   33.</a></span><span class="count                ">      1</span><span>// new context has no process or console, so &lt;jslint_cli&gt; linted nothing and</span></pre>
-<pre><span class="lineno"><a href="#line_34" id="line_34">   34.</a></span><span class="count                ">      1</span><span>// resolved 0. Its ' import(' calls go to &lt;import_cjs&gt;, the real one here; the</span></pre>
-<pre><span class="lineno"><a href="#line_35" id="line_35">   35.</a></span><span class="count                ">      1</span><span>// file url lets its cli self-detect.</span></pre>
+<pre><span class="lineno"><a href="#line_32" id="line_32">   32.</a></span><span class="count                ">      1</span><span>// PR-xxx - Run jslint.mjs in THIS context, wrapped as a function, not in a new</span></pre>
+<pre><span class="lineno"><a href="#line_33" id="line_33">   33.</a></span><span class="count                ">      1</span><span>// one: a new context has no process or console, so &lt;jslint_cli&gt; linted nothing</span></pre>
+<pre><span class="lineno"><a href="#line_34" id="line_34">   34.</a></span><span class="count                ">      1</span><span>// and resolved 0. Its ' import(' calls go to &lt;import_cjs&gt;, the real one here;</span></pre>
+<pre><span class="lineno"><a href="#line_35" id="line_35">   35.</a></span><span class="count                ">      1</span><span>// the file url lets its cli self-detect.</span></pre>
 <pre><span class="lineno"><a href="#line_36" id="line_36">   36.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_37" id="line_37">   37.</a></span><span class="count                ">      1</span><span>const fileJslint = __dirname + "/jslint.mjs";</span></pre>
 <pre><span class="lineno"><a href="#line_38" id="line_38">   38.</a></span><span class="count                ">      1</span><span>const jslintRun = require("vm").runInThisContext(</span></pre>
