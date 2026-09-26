@@ -157,7 +157,6 @@
     entries,
     env,
     error,
-    escape_list,
     eval,
     every,
     example_list,
@@ -406,6 +405,7 @@
     warn_at,
     warning,
     warning_list,
+    warning_list_untagged,
     warnings,
     white,
     wrapped,
@@ -2971,9 +2971,8 @@ function jslint_phase2_lex(state) {
 
     function char_after_escape(extra, mode_template) {
 
-// Validate char after escape "\\". In a template, <mode_template>, linting
-// continues past a bad escape, so warn where a string would stop; and '\' at
-// end of line continues the line.
+// Validate char after escape "\\". In a template, <mode_template>, '\' at end
+// of line continues the line.
 
         char_after("\\");
         switch (char) {
@@ -3009,6 +3008,7 @@ function jslint_phase2_lex(state) {
 
 // test_cause:
 // ["\"\\/\\\\\\`\\b\\f\\n\\r\\t\"", "char_after_escape", "char_after", "", 0]
+// ["`\\/\\\\\\`\\b\\f\\n\\r\\t`", "char_after_escape", "char_after", "", 0]
 
             test_cause("char_after");
             return char_after();
@@ -3027,19 +3027,18 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\u{12345\"", "char_after_escape", "expected_a_before_b", "\"", 10]
 // ["\"\\u{12345\";", "char_after_escape", "expected_a_before_b", "\"", 10]
+// ["`\\u{12345`", "char_after_escape", "expected_a_before_b", "`", 10]
+// ["`\\u{12345`;", "char_after_escape", "expected_a_before_b", "`", 10]
 // ["`\\u{12`", "char_after_escape", "expected_a_before_b", "`", 7]
 
-                    return (
-                        mode_template
-                        ? warn_at
-                        : stop_at
-                    )(
+                    warn_at(
                         "expected_a_before_b",
                         line,
                         column - 1,
                         "}",
                         char
                     );
+                    return;
                 }
                 return char_after();
             }
@@ -3053,6 +3052,7 @@ function jslint_phase2_lex(state) {
 
 // test_cause:
 // ["\"\\0\"", "char_after_escape", "unexpected_a_before_b", "0", 3]
+// ["`\\0`", "char_after_escape", "unexpected_a_before_b", "0", 3]
 
             warn_at("unexpected_a_before_b", line, column - 1, "\\", char);
         }
@@ -3271,7 +3271,7 @@ function jslint_phase2_lex(state) {
     }
 
     function lex_megastring() {
-        const escape_list = [];
+        const warning_list_untagged = [];
         let id;
         let ii;
         let match;
@@ -3293,7 +3293,7 @@ function jslint_phase2_lex(state) {
 
 // Parsing a mega literal is tricky. First create a ` token.
 
-        token_create("`").escape_list = escape_list;
+        token_create("`").warning_list_untagged = warning_list_untagged;
         from += 1;
 
 // Then loop, building up a string, possibly from many lines, until seeing
@@ -3350,15 +3350,15 @@ function jslint_phase2_lex(state) {
             case "\\":
 
 // PR-xxx - Check the escape with <char_after_escape>, as a string does, but
-// move its warnings to <escape_list>: a tagged template may hold any escape, so
-// <prefix_tick> keeps them only for an untagged one. '$' and '{' escape '${'.
-// Push back the char it leaves in <char>, which may be the closing '`'.
+// move its warnings to <warning_list_untagged>: a tagged template may hold any
+// escape. '$' and '{' escape '${'. Push back the char it leaves in <char>,
+// which may be the closing '`'.
 
                 ii = warning_list.length;
                 char_after();
                 char_after_escape("${", true);
                 char_before();
-                escape_list.push(...warning_list.splice(ii));
+                warning_list_untagged.push(...warning_list.splice(ii));
                 break;
             case "`":
 
@@ -4327,6 +4327,7 @@ function jslint_phase2_lex(state) {
 // ["0x", "read_digits", "expected_digits_after_a", "0x", 2]
 // ["0x_", "read_digits", "expected_digits_after_a", "0x", 2]
 // ["\"\\u{}\"", "read_digits", "expected_digits_after_a", "\\u{", 4]
+// ["`\\u{}`", "read_digits", "expected_digits_after_a", "\\u{", 4]
 
             warn_at("expected_digits_after_a", line, column - 1, snippet);
         }
@@ -4339,6 +4340,7 @@ function jslint_phase2_lex(state) {
 
 // test_cause:
 // ["\"\\u{1_2}\"", "read_digits", "illegal_num_separator", "", 6]
+// ["`\\u{1_2}`", "read_digits", "illegal_num_separator", "", 6]
 
             warn_at(
                 "illegal_num_separator",
@@ -7045,7 +7047,7 @@ function jslint_phase3_parse(state) {
     function prefix_tick(mode_tagged) {
         const the_tick = token_now;
         if (!mode_tagged) {
-            warning_list.push(...the_tick.escape_list);
+            warning_list.push(...the_tick.warning_list_untagged);
         }
         the_tick.value = [];
         the_tick.expression = [];
