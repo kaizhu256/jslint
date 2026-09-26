@@ -1378,11 +1378,13 @@ vendor)s{0,1}(\\b|_)\
         grep -v -E "$FILE_FILTER" |
         tr "\n" "\000" |
         xargs -0 grep -HIin -E "$REGEXP" "$@" |
-        tee /tmp/shGrep.txt || true
+        tee "$(
+            node --eval 'process.stdout.write(require("os").tmpdir())'
+        )/shGrep.txt" || true
 )}
 
 shGrepReplace() {(set -e
-# This function will inline grep-and-replace /tmp/shGrep.txt.
+# This function will inline grep-and-replace shGrep.txt in node's os.tmpdir.
     node --input-type=module --eval '
 import moduleFs from "fs";
 import moduleOs from "os";
@@ -1391,9 +1393,10 @@ import modulePath from "path";
     "use strict";
     let data;
     let dict = {};
-    data = await moduleFs.promises.readFile((
-        moduleOs.tmpdir() + "/shGrep.txt"
-    ), "utf8");
+    data = await moduleFs.promises.readFile(
+        `${moduleOs.tmpdir()}/shGrep.txt`,
+        "utf8"
+    );
     data = data.replace((
         /^(.+?):(\d+?):(.*?)$/gm
     ), function (ignore, file, lineno, str) {
@@ -2131,11 +2134,6 @@ function replaceListReplace(replaceList, data) {
         res = await fetch(url);
         fetchCount -= 1;
         console.error(`shRollupFetch - ${fetchCount} remaining fetches`);
-
-// Fail on a non-2xx status, or a 404 or 5xx page is saved as the file content.
-// Set exitCode rather than throw - a throw with a fetch socket open trips a
-// libuv assert on windows, exiting 127.
-
         if (!res.ok) {
             console.error(`shRollupFetch - http ${res.status} ${url}`);
             process.exitCode = 1;
