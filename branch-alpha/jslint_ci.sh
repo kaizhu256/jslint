@@ -1404,7 +1404,7 @@ import modulePath from "path";
             modulePath.resolve(file),
             "utf8"
         ).split("\n");
-        // Keep a crlf line "\r": windows grep strips it, other grep keeps it.
+        // Keep the "\r" of a crlf line, which only windows grep strips.
         // Grep splits on "\n" alone, so <str> runs to it past any lone "\r".
         dict[file][lineno - 1] = (
             (dict[file][lineno - 1].endsWith("\r") && !str.endsWith("\r"))

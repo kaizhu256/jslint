@@ -2506,7 +2506,7 @@ async function jslint_cli({
         option = empty()
     }) {
 
-// PR-xxx - Pad with the block's OWN terminator - phase 6 rejoins with the
+// PR-xxx - Pad with the block's OWN terminator. Phase 6 rejoins with the
 // first one it sees, so a "\n" pad turned a CRLF block's fixed lines into LF.
 
         const line_pad = String(
@@ -2969,10 +2969,12 @@ function jslint_phase2_lex(state) {
         return char;
     }
 
-    function char_after_escape(extra, mode_template) {
+    function char_after_escape(escape_char_list, mode_template) {
 
-// Validate char after escape "\\". In a template, <mode_template>, '\' at end
-// of line continues the line.
+// Validate char after escape "\\". <escape_char_list> lists the chars this
+// caller may escape beyond the shared '/\`bfnrtu', such as a string's quote, a
+// template's '${', or a regexp's metachars. In a template, <mode_template>,
+// '\' at end of line continues the line.
 
         char_after("\\");
         switch (char) {
@@ -3046,7 +3048,7 @@ function jslint_phase2_lex(state) {
             read_digits("x", mode_digits_unicode_escape);
             return;
         default:
-            if (extra && extra.indexOf(char) >= 0) {
+            if (escape_char_list && escape_char_list.indexOf(char) >= 0) {
                 return char_after();
             }
 
@@ -3350,9 +3352,9 @@ function jslint_phase2_lex(state) {
             case "\\":
 
 // PR-xxx - Check the escape with <char_after_escape>, as a string does, but
-// move its warnings to <warning_list_untagged>: a tagged template may hold any
-// escape. '$' and '{' escape '${'. Push back the char it leaves in <char>,
-// which may be the closing '`'.
+// move its warnings to <warning_list_untagged>, since a tagged template may
+// hold any escape. '$' and '{' escape '${'. Push back the char it leaves in
+// <char>, which may be the closing '`'.
 
                 ii = warning_list.length;
                 char_after();
@@ -4377,9 +4379,9 @@ function jslint_phase2_lex(state) {
 
         case mode_digits_unicode_escape:
 
-// PR-xxx - Check the code point's value, not its digit count - '\u{10FFFF}' and
+// PR-xxx - Check the code point's value, not its digit count. '\u{10FFFF}' and
 // '\u{000041}' are legal. Above 10FFFF a string is a SyntaxError, and a regexp
-// without flag 'u' reads '\u{110000}' as 'u' repeated; both lint on, so warn.
+// without flag 'u' reads '\u{110000}' as 'u' repeated. Both lint on, so warn.
 // A template's '\u' gets here too. <char> is '{' only for '\u{...}'.
 
             if (char !== "{") {
