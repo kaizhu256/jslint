@@ -157,6 +157,7 @@
     entries,
     env,
     error,
+    escape_list,
     eval,
     every,
     example_list,
@@ -2206,7 +2207,7 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
             "\n\n\n\n\n\n\n\n"
         );
         result = result.replace((
-            /\r\n*/g
+            /\r\n?/g
         ), "\n");
         return result;
     }));
@@ -2505,8 +2506,8 @@ async function jslint_cli({
         option = empty()
     }) {
 
-// Pad with the block's OWN terminator - phase 6 rejoins with the first one it
-// sees, so a "\n" pad turned a CRLF block's fixed lines into LF.
+// PR-xxx - Pad with the block's OWN terminator - phase 6 rejoins with the
+// first one it sees, so a "\n" pad turned a CRLF block's fixed lines into LF.
 
         const line_pad = String(
             jslint_rgx_crlf.exec(code)?.[0] || "\n"
@@ -3254,6 +3255,7 @@ function jslint_phase2_lex(state) {
     }
 
     function lex_megastring() {
+        const escape_list = [];
         let id;
         let match;
 
@@ -3274,7 +3276,7 @@ function jslint_phase2_lex(state) {
 
 // Parsing a mega literal is tricky. First create a ` token.
 
-        token_create("`");
+        token_create("`").escape_list = escape_list;
         from += 1;
 
 // Then loop, building up a string, possibly from many lines, until seeing
@@ -3329,6 +3331,61 @@ function jslint_phase2_lex(state) {
                 }
                 break;
             case "\\":
+
+// PR-xxx - Check an escape as <char_after_escape> checks a string's, but only
+// save the warning: a tagged template may hold any escape, so <prefix_tick>
+// raises it for an untagged one. '\$' or '$\{' writes a literal '${', and a
+// '\' at end of line continues the line.
+
+                if (line_source[1] === "u") {
+                    match = line_source.slice(2).match(
+                        /^(\{?)([0-9A-Fa-f]*)(.?)/
+                    );
+                    if (match[1] === "") {
+                        if (match[2].length < 4) {
+                            escape_list.push([
+                                "expected_four_digits",
+                                line,
+                                column + 2 + match[2].length
+                            ]);
+                        }
+                    } else {
+                        if (match[2] === "") {
+                            escape_list.push([
+                                "expected_digits_after_a",
+                                line,
+                                column + 2,
+                                "\\u{"
+                            ]);
+                        }
+                        if (match[3] !== "}") {
+                            escape_list.push([
+                                "expected_a_before_b",
+                                line,
+                                column + 3 + match[2].length,
+                                "}",
+                                match[3]
+                            ]);
+                        } else if (Number.parseInt(match[2], 16) > 0x10ffff) {
+                            escape_list.push([
+                                "too_many_digits",
+                                line,
+                                column + 3 + match[2].length
+                            ]);
+                        }
+                    }
+                } else if (
+                    line_source.length > 1 &&
+                    !"/\\`${bfnrt".includes(line_source[1])
+                ) {
+                    escape_list.push([
+                        "unexpected_a_before_b",
+                        line,
+                        column + 1,
+                        "\\",
+                        line_source[1]
+                    ]);
+                }
                 snippet += line_source.slice(0, 2);
                 column += 2;
                 line_source = line_source.slice(2);
@@ -5455,7 +5512,7 @@ function jslint_phase3_parse(state) {
     }
 
     function infix_grave(left) {
-        const the_tick = prefix_tick();
+        const the_tick = prefix_tick(true);
 
 // test_cause:
 // ["0``", "check_left", "unexpected_a", "`", 2]
@@ -7012,8 +7069,21 @@ function jslint_phase3_parse(state) {
         return the_new;
     }
 
-    function prefix_tick() {
+    function prefix_tick(mode_tagged) {
         const the_tick = token_now;
+        if (!mode_tagged) {
+            the_tick.escape_list.forEach(function (argument_list) {
+
+// test_cause:
+// ["`\\0`", "prefix_tick", "unexpected_a_before_b", "0", 3]
+// ["`\\u0`", "prefix_tick", "expected_four_digits", "", 5]
+// ["`\\u{110000}`", "prefix_tick", "too_many_digits", "", 11]
+// ["`\\u{12`", "prefix_tick", "expected_a_before_b", "`", 7]
+// ["`\\u{}`", "prefix_tick", "expected_digits_after_a", "\\u{", 4]
+
+                warn_at(...argument_list);
+            });
+        }
         the_tick.value = [];
         the_tick.expression = [];
         if (token_nxt.id !== "`") {

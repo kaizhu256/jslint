@@ -1398,13 +1398,19 @@ import modulePath from "path";
         "utf8"
     );
     data = data.replace((
-        /^(.+?):(\d+?):(.*?)$/gm
+        /^(.+?):(\d+?):([^\n]*)/gm
     ), function (ignore, file, lineno, str) {
         dict[file] = dict[file] || moduleFs.readFileSync( //jslint-ignore-line
             modulePath.resolve(file),
             "utf8"
         ).split("\n");
-        dict[file][lineno - 1] = str;
+        // Keep a crlf line "\r": windows grep strips it, other grep keeps it.
+        // Grep splits on "\n" alone, so <str> runs to it past any lone "\r".
+        dict[file][lineno - 1] = (
+            (dict[file][lineno - 1].endsWith("\r") && !str.endsWith("\r"))
+            ? str + "\r"
+            : str
+        );
         return "";
     });
     Object.entries(dict).forEach(function ([
