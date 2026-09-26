@@ -1075,7 +1075,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     } = state;
     const mode_digits_numeric_separator = 1;
     const mode_digits_regexp_quantifier = 2;
-    const mode_digits_unicode = 3;
+    const mode_digits_unicode_escape = 3;
     const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
@@ -1099,7 +1099,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     let token_prv_expr = token_global;  // The previous token excluding
                                         // ... comments.
 
-// Most tokens...
+// Most...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

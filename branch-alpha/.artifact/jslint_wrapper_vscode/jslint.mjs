@@ -2888,7 +2888,7 @@ function jslint_phase2_lex(state) {
     } = state;
     const mode_digits_numeric_separator = 1;
     const mode_digits_regexp_quantifier = 2;
-    const mode_digits_unicode = 3;
+    const mode_digits_unicode_escape = 3;
     const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
@@ -2998,7 +2998,7 @@ function jslint_phase2_lex(state) {
 
                     warn_at("unexpected_a", line, column - 1, char);
                 }
-                read_digits("x", mode_digits_unicode);
+                read_digits("x", mode_digits_unicode_escape);
                 if (char !== "}") {
 
 // test_cause:
@@ -3016,7 +3016,7 @@ function jslint_phase2_lex(state) {
                 return char_after();
             }
             char_before();
-            read_digits("x", mode_digits_unicode);
+            read_digits("x", mode_digits_unicode_escape);
             return;
         default:
             if (extra && extra.indexOf(char) >= 0) {
@@ -4279,7 +4279,7 @@ function jslint_phase2_lex(state) {
                 digits.length === 0 &&
                 (
                     mode === mode_digits_numeric_separator ||
-                    (mode === mode_digits_unicode && char === "{")
+                    (mode === mode_digits_unicode_escape && char === "{")
                 )
             ) ||
             digits[0] === "_"
@@ -4339,7 +4339,7 @@ function jslint_phase2_lex(state) {
 // and a regexp without flag 'u' reads '\u{110000}' as 'u' repeated; linting
 // continues past either, so warn. <char> is still '{' only for '\u{...}'.
 
-        case mode_digits_unicode:
+        case mode_digits_unicode_escape:
             if (char !== "{") {
                 if (digits.length < 4) {
 

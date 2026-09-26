@@ -3053,7 +3053,7 @@ body {
 <pre><span class="lineno"><a href="#line_2888" id="line_2888"> 2888.</a></span><span class="count                ">    899</span><span>    } = state;</span></pre>
 <pre><span class="lineno"><a href="#line_2889" id="line_2889"> 2889.</a></span><span class="count                ">    899</span><span>    const mode_digits_numeric_separator = 1;</span></pre>
 <pre><span class="lineno"><a href="#line_2890" id="line_2890"> 2890.</a></span><span class="count                ">    899</span><span>    const mode_digits_regexp_quantifier = 2;</span></pre>
-<pre><span class="lineno"><a href="#line_2891" id="line_2891"> 2891.</a></span><span class="count                ">    899</span><span>    const mode_digits_unicode = 3;</span></pre>
+<pre><span class="lineno"><a href="#line_2891" id="line_2891"> 2891.</a></span><span class="count                ">    899</span><span>    const mode_digits_unicode_escape = 3;</span></pre>
 <pre><span class="lineno"><a href="#line_2892" id="line_2892"> 2892.</a></span><span class="count                ">    899</span><span>    const opener_stack = [];    // Stack of opener tokens: (, [.</span></pre>
 <pre><span class="lineno"><a href="#line_2893" id="line_2893"> 2893.</a></span><span class="count                ">    899</span><span>    let char;                   // The current character being lexed.</span></pre>
 <pre><span class="lineno"><a href="#line_2894" id="line_2894"> 2894.</a></span><span class="count                ">    899</span><span>    let column = 0;             // The column number of the next character.</span></pre>
@@ -3163,7 +3163,7 @@ body {
 <pre><span class="lineno"><a href="#line_2998" id="line_2998"> 2998.</a></span><span class="count                ">    375</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2999" id="line_2999"> 2999.</a></span><span class="count                ">    375</span><span>                    warn_at("unexpected_a", line, column - 1, char);</span></pre>
 <pre><span class="lineno"><a href="#line_3000" id="line_3000"> 3000.</a></span><span class="count                ">    375</span><span>                }</span></pre>
-<pre><span class="lineno"><a href="#line_3001" id="line_3001"> 3001.</a></span><span class="count                ">    375</span><span>                read_digits("x", mode_digits_unicode);</span></pre>
+<pre><span class="lineno"><a href="#line_3001" id="line_3001"> 3001.</a></span><span class="count                ">    375</span><span>                read_digits("x", mode_digits_unicode_escape);</span></pre>
 <pre><span class="lineno"><a href="#line_3002" id="line_3002"> 3002.</a></span><span class="count                ">    375</span><span>                if (char !== "}") {</span></pre>
 <pre><span class="lineno"><a href="#line_3003" id="line_3003"> 3003.</a></span><span class="count                ">    375</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3004" id="line_3004"> 3004.</a></span><span class="count                ">    375</span><span>// test_cause:</span></pre>
@@ -3181,7 +3181,7 @@ body {
 <pre><span class="lineno"><a href="#line_3016" id="line_3016"> 3016.</a></span><span class="count                ">    375</span><span>                return char_after();</span></pre>
 <pre><span class="lineno"><a href="#line_3017" id="line_3017"> 3017.</a></span><span class="count                ">    375</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_3018" id="line_3018"> 3018.</a></span><span class="count                ">    375</span><span>            char_before();</span></pre>
-<pre><span class="lineno"><a href="#line_3019" id="line_3019"> 3019.</a></span><span class="count                ">    375</span><span>            read_digits("x", mode_digits_unicode);</span></pre>
+<pre><span class="lineno"><a href="#line_3019" id="line_3019"> 3019.</a></span><span class="count                ">    375</span><span>            read_digits("x", mode_digits_unicode_escape);</span></pre>
 <pre><span class="lineno"><a href="#line_3020" id="line_3020"> 3020.</a></span><span class="count                ">    375</span><span>            return;</span></pre>
 <pre><span class="lineno"><a href="#line_3021" id="line_3021"> 3021.</a></span><span class="count                ">    833</span><span>        default:</span></pre>
 <pre><span class="lineno"><a href="#line_3022" id="line_3022"> 3022.</a></span><span class="count                ">    833</span><span>            if (extra &amp;&amp; extra.indexOf(char) &gt;= 0) {</span></pre>
@@ -4444,7 +4444,7 @@ body {
 <pre><span class="lineno"><a href="#line_4279" id="line_4279"> 4279.</a></span><span class="count                ">     13</span><span>                digits.length === 0 &amp;&amp;</span></pre>
 <pre><span class="lineno"><a href="#line_4280" id="line_4280"> 4280.</a></span><span class="count                ">     13</span><span>                (</span></pre>
 <pre><span class="lineno"><a href="#line_4281" id="line_4281"> 4281.</a></span><span class="count                ">     13</span><span>                    mode === mode_digits_numeric_separator ||</span></pre>
-<pre><span class="lineno"><a href="#line_4282" id="line_4282"> 4282.</a></span><span class="count                uncovered">     -0</span><span>                    (mode === mode_digits_unicode </span><span class="uncovered">&amp;&amp; char === "{"</span><span>)</span></pre>
+<pre><span class="lineno"><a href="#line_4282" id="line_4282"> 4282.</a></span><span class="count                uncovered">     -0</span><span>                    (mode === mode_digits_unicode_escape </span><span class="uncovered">&amp;&amp; char === "{"</span><span>)</span></pre>
 <pre><span class="lineno"><a href="#line_4283" id="line_4283"> 4283.</a></span><span class="count                ">     13</span><span>                )</span></pre>
 <pre><span class="lineno"><a href="#line_4284" id="line_4284"> 4284.</a></span><span class="count                ">    474</span><span>            ) ||</span></pre>
 <pre><span class="lineno"><a href="#line_4285" id="line_4285"> 4285.</a></span><span class="count                ">    474</span><span>            digits[0] === "_"</span></pre>
@@ -4504,7 +4504,7 @@ body {
 <pre><span class="lineno"><a href="#line_4339" id="line_4339"> 4339.</a></span><span class="count                ">    475</span><span>// and a regexp without flag 'u' reads '\u{110000}' as 'u' repeated; linting</span></pre>
 <pre><span class="lineno"><a href="#line_4340" id="line_4340"> 4340.</a></span><span class="count                ">    475</span><span>// continues past either, so warn. &lt;char&gt; is still '{' only for '\u{...}'.</span></pre>
 <pre><span class="lineno"><a href="#line_4341" id="line_4341"> 4341.</a></span><span class="count                ">    475</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_4342" id="line_4342"> 4342.</a></span><span class="count                ">    375</span><span>        case mode_digits_unicode:</span></pre>
+<pre><span class="lineno"><a href="#line_4342" id="line_4342"> 4342.</a></span><span class="count                ">    375</span><span>        case mode_digits_unicode_escape:</span></pre>
 <pre><span class="lineno"><a href="#line_4343" id="line_4343"> 4343.</a></span><span class="count                ">    375</span><span>            if (char !== "{") {</span></pre>
 <pre><span class="lineno"><a href="#line_4344" id="line_4344"> 4344.</a></span><span class="count                ">    375</span><span>                if (digits.length &lt; 4) {</span></pre>
 <pre><span class="lineno"><a href="#line_4345" id="line_4345"> 4345.</a></span><span class="count                ">    375</span><span></span></pre>
