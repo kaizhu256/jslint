@@ -373,6 +373,7 @@
     test_unknown_warning_code,
     this,
     thru,
+    toFixed,
     toLocaleString,
     toString,
     token,
@@ -5624,7 +5625,7 @@ function jslint_phase3_parse(state) {
 //    or function-parameter.
 //
 // Most calls to name_declare() are commented regarding thing being declared,
-// and its lifecycle.  Below is a copy of all such comments.
+// and its lifecycle. Below is a copy of all such comments.
 //
 // 1.imp.1 - Mark 'declared', the import-name, during import-statement.
 // 1.imp.2 - Mark 'alive', the import-name, after import-statement.
@@ -12426,9 +12427,7 @@ body {
                 ? "coverageMedium"
                 : "coverageLow"
             );
-            coveragePct = String(coveragePct).replace((
-                /..$/m
-            ), ".$&");
+            coveragePct = Number(coveragePct / 100).toFixed(2);
             if (modeIndex && ii === 0) {
                 fill = (
 

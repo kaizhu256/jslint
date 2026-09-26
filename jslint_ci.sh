@@ -3226,9 +3226,7 @@ body {
     ? "coverageMedium"
     : "coverageLow"
    );
-   coveragePct = String(coveragePct).replace((
-    /..$/m
-   ), ".$&");
+   coveragePct = Number(coveragePct / 100).toFixed(2);
    if (modeIndex && ii === 0) {
     fill = (
      "#" + Math.round(
