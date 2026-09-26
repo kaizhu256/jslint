@@ -692,7 +692,6 @@ shDirHttplinkValidate() {(set -e
     node --input-type=module --eval '
 import moduleAssert from "assert";
 import moduleFs from "fs";
-import moduleHttps from "https";
 (async function () {
     const {
         GITHUB_BRANCH0,
@@ -718,7 +717,6 @@ import moduleHttps from "https";
             /\bhttps?:\/\/.+?([\s")\]]|\W?$)(<!--no-validate-->)?/gm
         ), function (url, removeLast, noValidate) {
             const timeStart = Date.now();
-            let req;
             if (removeLast && removeLast !== "/") {
                 url = url.slice(0, -1);
             }
@@ -753,28 +751,26 @@ import moduleHttps from "https";
                 return "";
             }
             dict[url] = true;
-            req = moduleHttps.request(url, {
+            fetch(url, {
                 headers: {
                     "user-agent": "undefined"
-                }
-            }, function (res) {
+                },
+                redirect: "manual",
+                signal: AbortSignal.timeout(60000)
+            }).then(function (res) {
                 console.error(
-                    `shDirHttplinkValidate - ${res.statusCode}` +
+                    `shDirHttplinkValidate - ${res.status}` +
                     ` - ${file} - ${url} - ${Date.now() - timeStart}ms`
                 );
-                moduleAssert.ok(res.statusCode < 400);
-                req.destroy();
-                res.destroy();
-            });
-            req.on("error", function (err) {
+                moduleAssert.ok(res.status < 400);
+                res.body?.cancel();
+            }, function (err) {
                 console.error(
                     `shDirHttplinkValidate - error` +
                     ` - ${file} - ${url} - ${Date.now() - timeStart}ms`
                 );
                 throw err;
             });
-            req.setTimeout(60000);
-            req.end();
             return "";
         });
         data.replace((
@@ -1103,7 +1099,6 @@ shGithubFileDownloadUpload() {(set -e
     node --input-type=module --eval '
 import moduleAssert from "assert";
 import moduleFs from "fs";
-import moduleHttps from "https";
 import modulePath from "path";
 (async function () {
     let branch;
@@ -1111,44 +1106,32 @@ import modulePath from "path";
     let repo;
     let responseBuf;
     let url;
-    function httpRequest({
+    async function httpRequest({
         method,
         payload
     }) {
-        return new Promise(function (resolve) {
-            moduleHttps.request(`${url}?ref=${branch}`, {
-                headers: {
-                    accept: (
-                        mode === "download"
-                        ? "application/vnd.github.v3.raw"
-                        : "application/vnd.github.v3+json"
-                    ),
-                    authorization: `Bearer ${process.env.MY_GITHUB_TOKEN}`,
-                    "user-agent": "undefined"
-                },
-                method
-            }, function (res) {
-                responseBuf = [];
-                res.on("data", function (chunk) {
-                    responseBuf.push(chunk);
-                });
-                res.on("end", function () {
-                    responseBuf = Buffer.concat(responseBuf);
-                    moduleAssert.ok(
-                        (
-                            res.statusCode < 400 ||
-                            (res.statusCode === 404 && mode === "upload")
-                        ),
-                        (
-                            `shGithubFileUpload - ${res.statusCode}` +
-                            ` - failed to download/upload file ${url} - ` +
-                            responseBuf.slice(0, 1024).toString()
-                        )
-                    );
-                    resolve();
-                });
-            }).end(payload);
+        const res = await fetch(`${url}?ref=${branch}`, {
+            body: payload,
+            headers: {
+                accept: (
+                    mode === "download"
+                    ? "application/vnd.github.v3.raw"
+                    : "application/vnd.github.v3+json"
+                ),
+                authorization: `Bearer ${process.env.MY_GITHUB_TOKEN}`,
+                "user-agent": "undefined"
+            },
+            method
         });
+        responseBuf = Buffer.from(await res.arrayBuffer());
+        moduleAssert.ok(
+            (res.status < 400 || (res.status === 404 && mode === "upload")),
+            (
+                `shGithubFileUpload - ${res.status}` +
+                ` - failed to download/upload file ${url} - ` +
+                responseBuf.slice(0, 1024).toString()
+            )
+        );
     }
     console.error(
         mode === "download"
@@ -1733,7 +1716,6 @@ shImageToDataUri() {(set -e
 # This function will convert image $1 to data-uri string.
     node --input-type=module --eval '
 import moduleFs from "fs";
-import moduleHttps from "https";
 (async function () {
     let file;
     let mime;
@@ -1742,17 +1724,17 @@ import moduleHttps from "https";
     if ((
         /^https:\/\//
     ).test(file)) {
-        result = await new Promise(function (resolve) {
-            moduleHttps.get(file, function (res) {
-                let chunkList;
-                chunkList = [];
-                res.on("data", function (chunk) {
-                    chunkList.push(chunk);
-                }).on("end", function () {
-                    resolve(Buffer.concat(chunkList));
-                });
-            });
-        });
+        result = await fetch(file);
+
+// Set exitCode rather than throw - a throw with a fetch socket open trips a
+// libuv assert on windows, exiting 127.
+
+        if (!result.ok) {
+            console.error(`shImageToDataUri - http ${result.status} ${file}`);
+            process.exitCode = 1;
+            return;
+        }
+        result = Buffer.from(await result.arrayBuffer());
     } else {
         result = await moduleFs.promises.readFile(file);
     }
@@ -2009,7 +1991,6 @@ shRollupFetch() {(set -e
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
-import moduleHttps from "https";
 import modulePath from "path";
 function objectDeepCopyWithKeysSorted(obj) {
 
@@ -2092,38 +2073,6 @@ function replaceListReplace(replaceList, data) {
     let matchObj;
     let promiseList = [];
     let repoDict;
-    function httpsGetOk(url, elem, redirectLeft, onResponse) {
-
-// This function will GET <url> into <elem>.data, following up to <redirectLeft>
-// redirects, and throw on any other non-2xx status - a 404 or 5xx page was
-// saved as the file content, and only a 302 was followed.
-
-        moduleHttps.get(url, function (res) {
-            onResponse();
-            if (
-                res.statusCode >= 300 && res.statusCode < 400 &&
-                res.headers.location && redirectLeft > 0
-            ) {
-                res.resume();
-                httpsGetOk(
-                    new URL(res.headers.location, url).href,
-                    elem,
-                    redirectLeft - 1,
-                    noop
-                );
-                return;
-            }
-            if (!(res.statusCode >= 200 && res.statusCode < 300)) {
-                throw new Error(
-                    `shRollupFetch - http ${res.statusCode} ${url}`
-                );
-            }
-            pipeToBuffer(res, elem, "data");
-        });
-    }
-    function noop() {
-        return;
-    }
     function pipeToBuffer(res, dict, key) {
 
 // This function will concat data from <res> to <dict>[<key>].
@@ -2151,6 +2100,8 @@ function replaceListReplace(replaceList, data) {
     repoDict = {};
     fetchList.forEach(async function (elem) {
         let child;
+        let res;
+        let url;
         if (!elem.url) {
             return;
         }
@@ -2158,14 +2109,11 @@ function replaceListReplace(replaceList, data) {
         // fetch dateCommitted
         if (!repoDict.hasOwnProperty(elem.prefix)) {
             repoDict[elem.prefix] = true;
-            promiseList.push(new Promise(function (resolve) {
-                moduleHttps.request(elem.prefix.replace(
-                    "/blob/",
-                    "/commits/"
-                ), function (res) {
-                    pipeToBuffer(res, elem, "dateCommitted");
-                    res.on("end", resolve);
-                }).end();
+            promiseList.push(fetch(elem.prefix.replace(
+                "/blob/",
+                "/commits/"
+            )).then(async function (res) {
+                elem.dateCommitted = Buffer.from(await res.arrayBuffer());
             }));
         }
         // fetch file; a failed sub-command throws, or its empty output would
@@ -2202,13 +2150,24 @@ function replaceListReplace(replaceList, data) {
         await new Promise(function (resolve) {
             setTimeout(resolve, fetchCount * 50);
         });
-        httpsGetOk(elem.url2 || elem.url.replace(
+        url = elem.url2 || elem.url.replace(
             "https://github.com/",
             "https://raw.githubusercontent.com/"
-        ).replace("/blob/", "/"), elem, 5, function () {
-            fetchCount -= 1;
-            console.error(`shRollupFetch - ${fetchCount} remaining fetches`);
-        });
+        ).replace("/blob/", "/");
+        res = await fetch(url);
+        fetchCount -= 1;
+        console.error(`shRollupFetch - ${fetchCount} remaining fetches`);
+
+// Fail on a non-2xx status, or a 404 or 5xx page is saved as the file content.
+// Set exitCode rather than throw - a throw with a fetch socket open trips a
+// libuv assert on windows, exiting 127.
+
+        if (!res.ok) {
+            console.error(`shRollupFetch - http ${res.status} ${url}`);
+            process.exitCode = 1;
+            return;
+        }
+        elem.data = Buffer.from(await res.arrayBuffer());
     });
     await Promise.all(promiseList);
     // parse fetched data; write nothing if a fetch failed, or the rollup
