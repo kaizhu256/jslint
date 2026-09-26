@@ -3020,6 +3020,7 @@ function jslint_phase2_lex(state) {
 
 // test_cause:
 // ["[\"\\u{12345}\"]", "char_after_escape", "unexpected_a", "{", 5]
+// ["[`\\u{12345}`]", "char_after_escape", "unexpected_a", "{", 5]
 
                     warn_at("unexpected_a", line, column - 1, char);
                 }
@@ -3029,6 +3030,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\u{12345\"", "char_after_escape", "expected_a_before_b", "\"", 10]
 // ["\"\\u{12345\";", "char_after_escape", "expected_a_before_b", "\"", 10]
+// ["\"\\u{12\"", "char_after_escape", "expected_a_before_b", "\"", 7]
 // ["`\\u{12345`", "char_after_escape", "expected_a_before_b", "`", 10]
 // ["`\\u{12345`;", "char_after_escape", "expected_a_before_b", "`", 10]
 // ["`\\u{12`", "char_after_escape", "expected_a_before_b", "`", 7]
