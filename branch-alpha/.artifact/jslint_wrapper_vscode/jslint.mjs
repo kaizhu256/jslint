@@ -2886,6 +2886,9 @@ function jslint_phase2_lex(state) {
         warn,
         warn_at
     } = state;
+    const mode_digits_numeric_separator = 1;
+    const mode_digits_regexp_quantifier = 2;
+    const mode_digits_unicode = 3;
     const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
@@ -2995,7 +2998,7 @@ function jslint_phase2_lex(state) {
 
                     warn_at("unexpected_a", line, column - 1, char);
                 }
-                read_digits("x", "regexp_unicode");
+                read_digits("x", mode_digits_unicode);
                 if (char !== "}") {
 
 // test_cause:
@@ -3013,7 +3016,7 @@ function jslint_phase2_lex(state) {
                 return char_after();
             }
             char_before();
-            read_digits("x", "regexp_unicode");
+            read_digits("x", mode_digits_unicode);
             return;
         default:
             if (extra && extra.indexOf(char) >= 0) {
@@ -3361,7 +3364,7 @@ function jslint_phase2_lex(state) {
         case "b":
         case "o":
         case "x":
-            read_digits(char, "lex_number");
+            read_digits(char, mode_digits_numeric_separator);
 
 // PR-351 - Ignore BigInt suffix 'n'.
 
@@ -3371,14 +3374,14 @@ function jslint_phase2_lex(state) {
             break;
         default:
             if (char === ".") {
-                read_digits("d", "lex_number");
+                read_digits("d", mode_digits_numeric_separator);
             }
             if (char === "E" || char === "e") {
                 char_after(char);
                 if (char !== "+" && char !== "-") {
                     char_before();
                 }
-                read_digits("d", "lex_number");
+                read_digits("d", mode_digits_numeric_separator);
             }
         }
 
@@ -3751,7 +3754,7 @@ function jslint_phase2_lex(state) {
                     }
                     break;
                 case "{":
-                    read_digits("d", "regexp_quantifier");
+                    read_digits("d", mode_digits_regexp_quantifier);
                     if (char_after("}") === "?") {
 
 // test_cause:
@@ -4275,8 +4278,8 @@ function jslint_phase2_lex(state) {
             (
                 digits.length === 0 &&
                 (
-                    mode === "lex_number" ||
-                    (mode === "regexp_unicode" && char === "{")
+                    mode === mode_digits_numeric_separator ||
+                    (mode === mode_digits_unicode && char === "{")
                 )
             ) ||
             digits[0] === "_"
@@ -4291,7 +4294,7 @@ function jslint_phase2_lex(state) {
 
 // PR-390 - Add numeric-separator check.
 
-        if (mode === "lex_number") {
+        if (mode === mode_digits_numeric_separator) {
             check_numeric_separator(digits, column);
         } else if (digits.indexOf("_") >= 0) {
 
@@ -4308,7 +4311,7 @@ function jslint_phase2_lex(state) {
         column += digits.length;
         line_source = line_source.slice(digits.length);
         switch (mode) {
-        case "regexp_quantifier":
+        case mode_digits_regexp_quantifier:
             if (digits.length === 0) {
 
 // test_cause:
@@ -4336,7 +4339,7 @@ function jslint_phase2_lex(state) {
 // and a regexp without flag 'u' reads '\u{110000}' as 'u' repeated; linting
 // continues past either, so warn. <char> is still '{' only for '\u{...}'.
 
-        case "regexp_unicode":
+        case mode_digits_unicode:
             if (char !== "{") {
                 if (digits.length < 4) {
 
