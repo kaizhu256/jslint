@@ -373,6 +373,7 @@
     test_unknown_warning_code,
     this,
     thru,
+    toFixed,
     toLocaleString,
     toString,
     token,
@@ -4345,12 +4346,13 @@ function jslint_phase2_lex(state) {
             }
             break;
 
+        case mode_digits_unicode_escape:
+
 // PR-xxx - Check the code point's value, not its digit count - '\u{10FFFF}' and
 // '\u{000041}' are legal. Above 10FFFF a string or template is a SyntaxError,
 // and a regexp without flag 'u' reads '\u{110000}' as 'u' repeated; linting
 // continues past either, so warn. <char> is still '{' only for '\u{...}'.
 
-        case mode_digits_unicode_escape:
             if (char !== "{") {
                 if (digits.length < 4) {
 
@@ -12386,9 +12388,7 @@ body {
                 ? "coverageMedium"
                 : "coverageLow"
             );
-            coveragePct = String(coveragePct).replace((
-                /..$/m
-            ), ".$&");
+            coveragePct = Number(coveragePct / 100).toFixed(2);
             if (modeIndex && ii === 0) {
                 fill = (
 
@@ -12824,8 +12824,12 @@ function sentinel() {}
         let source;
         source = await moduleFs.promises.readFile(pathname, "utf8");
         lineList = [{}];
+
+// PR-xxx - One entry per line, "\r\n" being ONE terminator: /^.*$/gm also ends
+// a line at "\r", so a crlf file got an empty entry after every line.
+
         source.replace((
-            /^.*$/gm
+            /(?<![^\n\r])(?!(?<=\r)\n)[^\n\r]*/g
         ), function (line, startOffset) {
             if (line === "/*coverage-disable*/") {
                 ignoreBlock = true;

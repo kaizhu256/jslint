@@ -6,7 +6,7 @@ sh jslint_ci.sh shCiJslintGlobalDictAllFetch
 '
 
 shCiArtifactUploadCustom() {(set -e
-# this function will run custom-code to upload build-artifacts
+# This function will run custom-code to upload build-artifacts.
     # .github_cache - restore
     if [ "$GITHUB_ACTION" ] && [ -d .github_cache ]
     then
@@ -183,7 +183,7 @@ import moduleChildProcess from "child_process";
 )}
 
 shCiBaseCustom() {(set -e
-# this function will run custom-code for base-ci
+# This function will run custom-code for base-ci.
     # update files
     if [ "$(git branch --show-current)" = alpha ]
     then
@@ -219,8 +219,8 @@ import moduleFs from "fs";
             file: ".ci.sh",
             // update version
             src: fileDict[".ci.sh"].replace((
-                /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
-            ), `    "version": "${versionBeta.split("-")[0]}"`)
+                / {4}"version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
+            ), `${" ".repeat(4)}"version": "${versionBeta.split("-")[0]}"`)
         }, {
             file: "README.md",
             src: fileDict["README.md"].replace((
@@ -303,7 +303,7 @@ import moduleFs from "fs";
 )}
 
 shCiJslintGlobalDictAllFetch() {(set -e
-# this function will fetch list of common, javascript global-objects
+# This function will fetch list of common, javascript global-objects
 # from online-resources.
     node --input-type=module --eval '
 import moduleFs from "fs";
@@ -448,7 +448,7 @@ function objectDeepCopyWithKeysSorted(obj) {
 // jslint_global_dict_all - auto-generated - end.)
         `).trim()),
         (
-            "$1    " +
+            "$1" + " ".repeat(4) +
             JSON.stringify(
                 objectDeepCopyWithKeysSorted(dictAll),
                 undefined,
@@ -475,12 +475,12 @@ function objectDeepCopyWithKeysSorted(obj) {
 )}
 
 shCiPublishNpmCustom() {(set -e
-# this function will run custom-code to npm-publish package
+# This function will run custom-code to npm-publish package.
     npm publish --access public
 )}
 
 shCiVscePackageJslintWrapperVscode() {(set -e
-# this function will vsce-package jslint_wrapper_vscode
+# This function will vsce-package jslint_wrapper_vscode.
     # Start empty, or vsce packs files left over from an earlier build.
     # Empty the dir, not remove it: an open dev-host window locks it on windows.
     mkdir -p .artifact/jslint_wrapper_vscode
