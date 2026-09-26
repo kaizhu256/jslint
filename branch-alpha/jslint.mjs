@@ -1185,7 +1185,7 @@ function jslint(
 // slot that can be undefined on both sides is <expression>[1] of a binary
 // token. Case "`" returns before that branch, and <aa>.id !== "(" skips it.
 //
-// deadcode-revive - Delete case '`' below and a tagged template with no
+// deadcode-revive - Delete case '`' below and a tagged-megastring with no
 // substitution falls through to the binary branch again. Its <expression>
 // holds one element, so both sides read <expression>[1] as undefined. Any
 // token with fewer slots than its <arity> implies does the same.
@@ -1241,7 +1241,7 @@ function jslint(
 
                 is_equal(aa.value, bb.value) &&
 
-// PR-510 - Bugfix - Fix jslint treating tagged templates as equal when they
+// PR-510 - Bugfix - Fix jslint treating tagged-megastrings as equal when they
 // differ past the first substitution, which is all the binary branch compared.
 
                 is_equal(aa.expression, bb.expression)
@@ -3354,7 +3354,7 @@ function jslint_phase2_lex(state) {
             case "\\":
 
 // PR-xxx - Check the escape with <char_after_escape>, as a string does, but
-// move its warnings to <warning_list_untagged>, since a tagged template may
+// move its warnings to <warning_list_untagged>, since a tagged-megastring may
 // hold any escape. '$' and '{' escape '${'. Push back the char it leaves in
 // <char>, which may be the closing '`'.
 
@@ -9081,7 +9081,7 @@ function jslint_phase4_walk(state) {
         case "(":
         case "=>":
 
-// Tagged-template is infix at same binding-power as "(" and is a call,
+// Tagged-megastring is infix at same binding-power as "(" and is a call,
 // not binary-operator.
 
         case "`":
@@ -10548,9 +10548,9 @@ function jslint_phase5_whitage(state) {
 
         if (left.line !== right.line) {
 
-// PR-511 - Binary operators at end-of-line - A tagged template is a binary '`'
-// whose right side is the template. Moving its backtick up would put the line
-// break INSIDE the template and change its value, so it is excluded.
+// PR-511 - Binary operators at end-of-line - A tagged-megastring is a binary
+// '`' whose right side is the megastring. Moving its backtick up would put the
+// line break INSIDE the megastring and change its value, so it is excluded.
 
             if (
                 option_dict.beta &&

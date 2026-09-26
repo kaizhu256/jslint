@@ -1350,7 +1350,7 @@ body {
 <pre><span class="lineno"><a href="#line_1185" id="line_1185"> 1185.</a></span><span class="count                ">  34017</span><span>// slot that can be undefined on both sides is &lt;expression&gt;[1] of a binary</span></pre>
 <pre><span class="lineno"><a href="#line_1186" id="line_1186"> 1186.</a></span><span class="count                ">  34017</span><span>// token. Case "`" returns before that branch, and &lt;aa&gt;.id !== "(" skips it.</span></pre>
 <pre><span class="lineno"><a href="#line_1187" id="line_1187"> 1187.</a></span><span class="count                ">  34017</span><span>//</span></pre>
-<pre><span class="lineno"><a href="#line_1188" id="line_1188"> 1188.</a></span><span class="count                ">  34017</span><span>// deadcode-revive - Delete case '`' below and a tagged template with no</span></pre>
+<pre><span class="lineno"><a href="#line_1188" id="line_1188"> 1188.</a></span><span class="count                ">  34017</span><span>// deadcode-revive - Delete case '`' below and a tagged-megastring with no</span></pre>
 <pre><span class="lineno"><a href="#line_1189" id="line_1189"> 1189.</a></span><span class="count                ">  34017</span><span>// substitution falls through to the binary branch again. Its &lt;expression&gt;</span></pre>
 <pre><span class="lineno"><a href="#line_1190" id="line_1190"> 1190.</a></span><span class="count                ">  34017</span><span>// holds one element, so both sides read &lt;expression&gt;[1] as undefined. Any</span></pre>
 <pre><span class="lineno"><a href="#line_1191" id="line_1191"> 1191.</a></span><span class="count                ">  34017</span><span>// token with fewer slots than its &lt;arity&gt; implies does the same.</span></pre>
@@ -1406,7 +1406,7 @@ body {
 <pre><span class="lineno"><a href="#line_1241" id="line_1241"> 1241.</a></span><span class="count                ">     18</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1242" id="line_1242"> 1242.</a></span><span class="count                ">     18</span><span>                is_equal(aa.value, bb.value) &amp;&amp;</span></pre>
 <pre><span class="lineno"><a href="#line_1243" id="line_1243"> 1243.</a></span><span class="count                ">     18</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1244" id="line_1244"> 1244.</a></span><span class="count                ">     18</span><span>// PR-510 - Bugfix - Fix jslint treating tagged templates as equal when they</span></pre>
+<pre><span class="lineno"><a href="#line_1244" id="line_1244"> 1244.</a></span><span class="count                ">     18</span><span>// PR-510 - Bugfix - Fix jslint treating tagged-megastrings as equal when they</span></pre>
 <pre><span class="lineno"><a href="#line_1245" id="line_1245"> 1245.</a></span><span class="count                ">     18</span><span>// differ past the first substitution, which is all the binary branch compared.</span></pre>
 <pre><span class="lineno"><a href="#line_1246" id="line_1246"> 1246.</a></span><span class="count                ">     18</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1247" id="line_1247"> 1247.</a></span><span class="count                ">     18</span><span>                is_equal(aa.expression, bb.expression)</span></pre>
@@ -3519,7 +3519,7 @@ body {
 <pre><span class="lineno"><a href="#line_3354" id="line_3354"> 3354.</a></span><span class="count                ">   6718</span><span>            case "\\":</span></pre>
 <pre><span class="lineno"><a href="#line_3355" id="line_3355"> 3355.</a></span><span class="count                ">   6718</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3356" id="line_3356"> 3356.</a></span><span class="count                ">   6718</span><span>// PR-xxx - Check the escape with &lt;char_after_escape&gt;, as a string does, but</span></pre>
-<pre><span class="lineno"><a href="#line_3357" id="line_3357"> 3357.</a></span><span class="count                ">   6718</span><span>// move its warnings to &lt;warning_list_untagged&gt;, since a tagged template may</span></pre>
+<pre><span class="lineno"><a href="#line_3357" id="line_3357"> 3357.</a></span><span class="count                ">   6718</span><span>// move its warnings to &lt;warning_list_untagged&gt;, since a tagged-megastring may</span></pre>
 <pre><span class="lineno"><a href="#line_3358" id="line_3358"> 3358.</a></span><span class="count                ">   6718</span><span>// hold any escape. '$' and '{' escape '${'. Push back the char it leaves in</span></pre>
 <pre><span class="lineno"><a href="#line_3359" id="line_3359"> 3359.</a></span><span class="count                ">   6718</span><span>// &lt;char&gt;, which may be the closing '`'.</span></pre>
 <pre><span class="lineno"><a href="#line_3360" id="line_3360"> 3360.</a></span><span class="count                ">   6718</span><span></span></pre>
@@ -9246,7 +9246,7 @@ body {
 <pre><span class="lineno"><a href="#line_9081" id="line_9081"> 9081.</a></span><span class="count                ">  11227</span><span>        case "(":</span></pre>
 <pre><span class="lineno"><a href="#line_9082" id="line_9082"> 9082.</a></span><span class="count                ">  11249</span><span>        case "=&gt;":</span></pre>
 <pre><span class="lineno"><a href="#line_9083" id="line_9083"> 9083.</a></span><span class="count                ">  33997</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9084" id="line_9084"> 9084.</a></span><span class="count                ">  33997</span><span>// Tagged-template is infix at same binding-power as "(" and is a call,</span></pre>
+<pre><span class="lineno"><a href="#line_9084" id="line_9084"> 9084.</a></span><span class="count                ">  33997</span><span>// Tagged-megastring is infix at same binding-power as "(" and is a call,</span></pre>
 <pre><span class="lineno"><a href="#line_9085" id="line_9085"> 9085.</a></span><span class="count                ">  33997</span><span>// not binary-operator.</span></pre>
 <pre><span class="lineno"><a href="#line_9086" id="line_9086"> 9086.</a></span><span class="count                ">  33997</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9087" id="line_9087"> 9087.</a></span><span class="count                ">  11258</span><span>        case "`":</span></pre>
@@ -10713,9 +10713,9 @@ body {
 <pre><span class="lineno"><a href="#line_10548" id="line_10548">10548.</a></span><span class="count                "> 203786</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_10549" id="line_10549">10549.</a></span><span class="count                "> 203786</span><span>        if (left.line !== right.line) {</span></pre>
 <pre><span class="lineno"><a href="#line_10550" id="line_10550">10550.</a></span><span class="count                ">  42467</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_10551" id="line_10551">10551.</a></span><span class="count                ">  42467</span><span>// PR-511 - Binary operators at end-of-line - A tagged template is a binary '`'</span></pre>
-<pre><span class="lineno"><a href="#line_10552" id="line_10552">10552.</a></span><span class="count                ">  42467</span><span>// whose right side is the template. Moving its backtick up would put the line</span></pre>
-<pre><span class="lineno"><a href="#line_10553" id="line_10553">10553.</a></span><span class="count                ">  42467</span><span>// break INSIDE the template and change its value, so it is excluded.</span></pre>
+<pre><span class="lineno"><a href="#line_10551" id="line_10551">10551.</a></span><span class="count                ">  42467</span><span>// PR-511 - Binary operators at end-of-line - A tagged-megastring is a binary</span></pre>
+<pre><span class="lineno"><a href="#line_10552" id="line_10552">10552.</a></span><span class="count                ">  42467</span><span>// '`' whose right side is the megastring. Moving its backtick up would put the</span></pre>
+<pre><span class="lineno"><a href="#line_10553" id="line_10553">10553.</a></span><span class="count                ">  42467</span><span>// line break INSIDE the megastring and change its value, so it is excluded.</span></pre>
 <pre><span class="lineno"><a href="#line_10554" id="line_10554">10554.</a></span><span class="count                ">  42467</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_10555" id="line_10555">10555.</a></span><span class="count                ">  42467</span><span>            if (</span></pre>
 <pre><span class="lineno"><a href="#line_10556" id="line_10556">10556.</a></span><span class="count                ">  42467</span><span>                option_dict.beta &amp;&amp;</span></pre>
