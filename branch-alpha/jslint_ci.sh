@@ -203,16 +203,12 @@ import modulePath from "path";
     let child;
     let exitCode;
     let file;
-
-// A local path is resolved, or the browser reads "index.html" as a domain; it
-// then skips new URL, which reads win32 "C:" as a scheme.
-
-    file = String(
-        (/^\w+?:/).test(url)
+    file = (
+        url === process.argv[1]
         ? new URL(url, "http://localhost").pathname
         : url
-    ).replace((/\\/g), "/");
-    // Remove prefix $PWD from file
+    );
+    // Remove prefix $PWD from file.
     if (String(file + "/").startsWith(cwd + "/")) {
         file = file.replace(cwd, "");
     }
@@ -297,11 +293,9 @@ shCiArtifactUpload() {(set -e
         -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
         package.json
     )"
-    # An empty name makes every \b$UPSTREAM_REPOSITORY\b match everywhere
     if [ ! "$UPSTREAM_REPOSITORY" ]
     then
-        printf "%s - no github repo in package.json repository.url\n" \
-            "$0" >&2
+        printf "shCiArtifactUpload - missing UPSTREAM_REPOSITORY\n" >&2
         exit 1
     fi
     export UPSTREAM_GITHUB_IO="$(
@@ -671,11 +665,9 @@ shDirHttplinkValidate() {(set -e
         -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
         package.json
     )"
-    # An empty name makes every \b$UPSTREAM_REPOSITORY\b match everywhere
     if [ ! "$UPSTREAM_REPOSITORY" ]
     then
-        printf "%s - no github repo in package.json repository.url\n" \
-            "$0" >&2
+        printf "shDirHttplinkValidate - missing UPSTREAM_REPOSITORY\n" >&2
         exit 1
     fi
     export UPSTREAM_GITHUB_IO="$(
@@ -1194,15 +1186,14 @@ shGithubPrCreate() {(set -e
     # Update 'PR-xxx' placeholder in codebase.
     if git grep -Ei -e '^ *?(//|#) pr-xxx'
     then
+        # init $UPSTREAM_XXX
         export UPSTREAM_REPOSITORY="$(sed -En \
             -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
             package.json
         )"
-        # An empty name queries a malformed issues api url
         if [ ! "$UPSTREAM_REPOSITORY" ]
         then
-            printf "%s - no github repo in package.json repository.url\n" \
-                "$0" >&2
+            printf "shGithubPrCreate - missing UPSTREAM_REPOSITORY\n" >&2
             exit 1
         fi
         PR_XXX="$(curl -fs --ssl-no-revoke \
@@ -1383,17 +1374,15 @@ swp|\
 tmp|\
 vendor)s{0,1}(\\b|_)\
 "
-    # Node's os.tmpdir, the dir shGrepReplace reads - /tmp differs on macos
-    TMPDIR_NODE="$(node --eval 'process.stdout.write(require("os").tmpdir())')"
     find . -type f |
         grep -v -E "$FILE_FILTER" |
         tr "\n" "\000" |
         xargs -0 grep -HIin -E "$REGEXP" "$@" |
-        tee "$TMPDIR_NODE/shGrep.txt" || true
+        tee /tmp/shGrep.txt || true
 )}
 
 shGrepReplace() {(set -e
-# This function will inline grep-and-replace shGrep.txt in node's os.tmpdir.
+# This function will inline grep-and-replace /tmp/shGrep.txt.
     node --input-type=module --eval '
 import moduleFs from "fs";
 import moduleOs from "os";
@@ -1529,8 +1518,7 @@ import moduleRepl from "repl";
             req.pipe(res);
             return;
         }
-        // Replace trailing "/" with "/index.html"; "$&" keeps the "/", as
-        // "./index.html" made "sub/" into "sub./index.html"
+        // Replace trailing "/" with "/index.html".
         file = pathname.slice(1).replace((
             /\/$|^$/m
         ), "$&index.html");
@@ -1718,14 +1706,8 @@ import moduleFs from "fs";
     let mime;
     let result;
     file = process.argv[1];
-    if ((
-        /^https:\/\//
-    ).test(file)) {
+    if ((/^https:\/\//).test(file)) {
         result = await fetch(file);
-
-// Set exitCode rather than throw - a throw with a fetch socket open trips a
-// libuv assert on windows, exiting 127.
-
         if (!result.ok) {
             console.error(`shImageToDataUri - http ${result.status} ${file}`);
             process.exitCode = 1;
@@ -1736,9 +1718,7 @@ import moduleFs from "fs";
         result = await moduleFs.promises.readFile(file);
     }
     // MIME subtype from the extension; "svg" and "jpg" are not subtypes
-    mime = file.match(
-        /\.[^.]*?$|$/m
-    )[0].slice(1).toLowerCase();
+    mime = file.match(/\.[^.]*?$|$/m)[0].slice(1).toLowerCase();
     mime = (
         mime === "jpg"
         ? "jpeg"
@@ -1746,11 +1726,8 @@ import moduleFs from "fs";
         ? "svg+xml"
         : mime
     );
-    result = String(
-        "data:image/" + mime + ";base64," + result.toString("base64")
-    ).replace((
-        /.{72}/g
-    ), "$&\\\n");
+    result = `data:image/${mime};base64,${result.toString("base64")}`;
+    result = result.replace((/.{72}/g), "$&\\\n");
     console.log(result);
 }());
 ' "$@" # '
