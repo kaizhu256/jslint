@@ -1116,6 +1116,31 @@ jstestDescribe((
         });
     });
     jstestIt((
+        "test cli-cjs-lint-file handling-behavior"
+    ), async function () {
+
+// Through the cjs wrapper, <jslint_cli> must lint, not resolve 0 unseen: in
+// its old new-context sandbox there was no process, so the cli returned early.
+
+        await fsWriteFileWithParents(
+            ".tmp/cli_cjs_lint_file/aa.js",
+            "let aa = 1;\n"
+        );
+        assertJsonEqual(
+            await jslintCjs.jslint_cli({
+                console_error: noop,
+                mode_cli: true,
+                process_argv: [
+                    "node",
+                    "jslint.mjs",
+                    ".tmp/cli_cjs_lint_file/aa.js"
+                ],
+                process_exit: processExit1
+            }),
+            1
+        );
+    });
+    jstestIt((
         "test cli-apidoc handling-behavior"
     ), function () {
         jslint.jslint_cli({
