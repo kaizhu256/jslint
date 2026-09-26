@@ -1689,6 +1689,7 @@ aa();
                 "String(\"\\u{10FFFF}\");",
                 "String(String.raw`\\u{110000}${0}\\u0`);",
                 "String([].at());",
+                "String(`\\u{000041}`);",
                 "String(`\\u{10FFFF}`);"
             ],
             logical_assignment: [
