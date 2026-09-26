@@ -190,38 +190,35 @@ import moduleFs from "fs";
 import moduleOs from "os";
 import modulePath from "path";
 (async function () {
+    const cwd = process.cwd().replace((/\\/g), "/");
+    const timeStart = Date.now();
+    const tmpdir = await moduleFs.promises.mkdtemp(
+        moduleOs.tmpdir() + "/shBrowserScreenshot-"
+    );
+    const url = (
+        (/^\w+?:/).test(process.argv[1])
+        ? process.argv[1]
+        : modulePath.resolve(process.argv[1])
+    ).replace((/\\/g), "/");
     let child;
-    let cwd = process.cwd().replace((
-        /\\/g
-    ), "/");
     let exitCode;
     let file;
-    let timeStart;
-    let tmpdir;
-    let url;
-    timeStart = Date.now();
-    url = process.argv[1];
-    file = new URL(url, "http://localhost").pathname;
-    if (!(
-        /^\w+?:/
-    ).test(url)) {
-        url = modulePath.resolve(url);
-        // A local path, "/"-joined: new URL() read win32 "C:" as a scheme,
-        // so the $PWD prefix never matched
-        file = url.replace((
-            /\\/g
-        ), "/");
-    }
-    // remove prefix $PWD from file
+
+// A local path is resolved, or the browser reads "index.html" as a domain; it
+// then skips new URL, which reads win32 "C:" as a scheme.
+
+    file = String(
+        (/^\w+?:/).test(url)
+        ? new URL(url, "http://localhost").pathname
+        : url
+    ).replace((/\\/g), "/");
+    // Remove prefix $PWD from file
     if (String(file + "/").startsWith(cwd + "/")) {
         file = file.replace(cwd, "");
     }
     file = ".artifact/screenshot_browser_" + encodeURIComponent(file).replace((
         /%/g
     ), "_").toLowerCase() + ".png";
-    tmpdir = await moduleFs.promises.mkdtemp(
-        moduleOs.tmpdir() + "/shBrowserScreenshot-"
-    );
     child = moduleChildProcess.spawn(
         (
             process.platform === "darwin"
@@ -1504,7 +1501,7 @@ import moduleRepl from "repl";
         let timeStart;
         // init timeStart
         timeStart = Date.now();
-        // init pathname, decoded so "%20" finds "a b.html"; the
+        // Init pathname, decoded so "%20" finds "a b.html"; the
         // parent-directory check below runs on the decoded path
         pathname = new URL(req.url, "http://localhost").pathname;
         try {
@@ -1738,7 +1735,7 @@ import moduleFs from "fs";
     } else {
         result = await moduleFs.promises.readFile(file);
     }
-    // mime subtype from the extension; "svg" and "jpg" are not subtypes
+    // MIME subtype from the extension; "svg" and "jpg" are not subtypes
     mime = file.match(
         /\.[^.]*?$|$/m
     )[0].slice(1).toLowerCase();

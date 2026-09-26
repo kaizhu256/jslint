@@ -4334,12 +4334,13 @@ function jslint_phase2_lex(state) {
             }
             break;
 
+        case mode_digits_unicode_escape:
+
 // PR-xxx - Check the code point's value, not its digit count - '\u{10FFFF}' and
 // '\u{000041}' are legal. Above 10FFFF a string or template is a SyntaxError,
 // and a regexp without flag 'u' reads '\u{110000}' as 'u' repeated; linting
 // continues past either, so warn. <char> is still '{' only for '\u{...}'.
 
-        case mode_digits_unicode_escape:
             if (char !== "{") {
                 if (digits.length < 4) {
 
@@ -12812,8 +12813,8 @@ function sentinel() {}
         source = await moduleFs.promises.readFile(pathname, "utf8");
         lineList = [{}];
 
-// One entry per line, "\r\n" being ONE terminator: /^.*$/gm also ends a line
-// at "\r", so a crlf file got an empty entry after every line.
+// PR-xxx - One entry per line, "\r\n" being ONE terminator: /^.*$/gm also ends
+// a line at "\r", so a crlf file got an empty entry after every line.
 
         source.replace((
             /(?<![^\n\r])(?!(?<=\r)\n)[^\n\r]*/g
