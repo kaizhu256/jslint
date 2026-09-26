@@ -302,6 +302,7 @@
     parameter_count,
     parentIi,
     parse,
+    parseInt,
     pathname,
     pathnameList,
     platform,
@@ -2884,6 +2885,9 @@ function jslint_phase2_lex(state) {
         warn,
         warn_at
     } = state;
+    const mode_digits_numeric_separator = 1;
+    const mode_digits_regexp_quantifier = 2;
+    const mode_digits_unicode_escape = 3;
     const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
@@ -2894,8 +2898,6 @@ function jslint_phase2_lex(state) {
     let line_mega;              // The starting line of megastring.
     let line_source = "";       // The remaining line source string.
     let line_whole = "";        // The whole line source string.
-    let mode_digits_empty_string = 1;
-    let mode_digits_numeric_separator = 2;
     let mode_directive = true;  // true if directives are still allowed.
     let mode_mega = false;      // true if currently parsing a megastring
                                 // ... literal.
@@ -2995,13 +2997,7 @@ function jslint_phase2_lex(state) {
 
                     warn_at("unexpected_a", line, column - 1, char);
                 }
-                if (read_digits("x", undefined) > 5) {
-
-// test_cause:
-// ["\"\\u{123456}\"", "char_after_escape", "too_many_digits", "", 11]
-
-                    warn_at("too_many_digits", line, column - 1);
-                }
+                read_digits("x", mode_digits_unicode_escape);
                 if (char !== "}") {
 
 // test_cause:
@@ -3019,14 +3015,7 @@ function jslint_phase2_lex(state) {
                 return char_after();
             }
             char_before();
-            if (read_digits("x", mode_digits_empty_string) < 4) {
-
-// test_cause:
-// ["\"\\u0\"", "char_after_escape", "expected_four_digits", "", 5]
-// ["\"\\u0\";", "char_after_escape", "expected_four_digits", "", 5]
-
-                warn_at("expected_four_digits", line, column - 1);
-            }
+            read_digits("x", mode_digits_unicode_escape);
             return;
         default:
             if (extra && extra.indexOf(char) >= 0) {
@@ -3210,7 +3199,7 @@ function jslint_phase2_lex(state) {
 // [" /*jslint !*/", "lex_comment", "bad_directive_a", "!", 2]
 // ["/*jslint !*/", "lex_comment", "bad_directive_a", "!", 1]
 
-                return stop("bad_directive_a", the_comment, body.slice(ii));
+                warn("bad_directive_a", the_comment, body.slice(ii));
             }
             if (match0 === "") {
                 return "";
@@ -3636,7 +3625,7 @@ function jslint_phase2_lex(state) {
 // ["aa=/(?ii:x)/", "lex_regexp_group", "unexpected_a_after_b", "(?i", 8]
 
                                     if (modifier_seen.includes(char)) {
-                                        return stop_at(
+                                        warn_at(
                                             "unexpected_a_after_b",
                                             line,
                                             column - 1,
@@ -3764,27 +3753,7 @@ function jslint_phase2_lex(state) {
                     }
                     break;
                 case "{":
-                    if (read_digits("d", mode_digits_empty_string) === 0) {
-
-// test_cause:
-// ["aa=/aa{/", "lex_regexp_group", "expected_a_before_b", ",", 8]
-
-                        warn_at(
-                            "expected_a_before_b",
-                            line,
-                            column - 1,
-                            "0",
-                            ","
-                        );
-                    }
-                    if (char === ",") {
-
-// test_cause:
-// ["aa=/.{,/", "lex_regexp_group", "comma", "", 0]
-
-                        test_cause("comma");
-                        read_digits("d", mode_digits_empty_string);
-                    }
+                    read_digits("d", mode_digits_regexp_quantifier);
                     if (char_after("}") === "?") {
 
 // test_cause:
@@ -4305,13 +4274,20 @@ function jslint_phase2_lex(state) {
             : jslint_rgx_digits_decimals
         )[0];
         if (
-            (mode !== mode_digits_empty_string && digits.length === 0) ||
+            (
+                digits.length === 0 &&
+                (
+                    mode === mode_digits_numeric_separator ||
+                    (mode === mode_digits_unicode_escape && char === "{")
+                )
+            ) ||
             digits[0] === "_"
         ) {
 
 // test_cause:
 // ["0x", "read_digits", "expected_digits_after_a", "0x", 2]
 // ["0x_", "read_digits", "expected_digits_after_a", "0x", 2]
+// ["\"\\u{}\"", "read_digits", "expected_digits_after_a", "\\u{", 4]
 
             warn_at("expected_digits_after_a", line, column - 1, snippet);
         }
@@ -4334,8 +4310,56 @@ function jslint_phase2_lex(state) {
         snippet += digits;
         column += digits.length;
         line_source = line_source.slice(digits.length);
+        switch (mode) {
+        case mode_digits_regexp_quantifier:
+            if (digits.length === 0) {
+
+// test_cause:
+// ["aa=/aa{/", "read_digits", "expected_a_before_b", ",", 8]
+
+                warn_at("expected_a_before_b", line, column - 0, "0", ",");
+            }
+            if (line_source[0] === ",") {
+
+// test_cause:
+// ["aa=/.{,/", "read_digits", "comma", "", 0]
+
+                test_cause("comma");
+                char_after();
+
+// Recurse read_digits.
+
+                read_digits("d", undefined);
+                return;
+            }
+            break;
+
+// PR-xxx - Check the code point's value, not its digit count - '\u{10FFFF}' and
+// '\u{000041}' are legal. Above 10FFFF a string or template is a SyntaxError,
+// and a regexp without flag 'u' reads '\u{110000}' as 'u' repeated; linting
+// continues past either, so warn. <char> is still '{' only for '\u{...}'.
+
+        case mode_digits_unicode_escape:
+            if (char !== "{") {
+                if (digits.length < 4) {
+
+// test_cause:
+// ["\"\\u0\"", "read_digits", "expected_four_digits", "", 5]
+// ["\"\\u0\";", "read_digits", "expected_four_digits", "", 5]
+
+                    warn_at("expected_four_digits", line, column - 0);
+                }
+            } else if (Number.parseInt(digits, 16) > 0x10ffff) {
+
+// test_cause:
+// ["\"\\u{110000}\"", "read_digits", "too_many_digits", "", 11]
+// ["aa=/\\u{110000}/", "read_digits", "too_many_digits", "", 14]
+
+                warn_at("too_many_digits", line, column - 0);
+            }
+            break;
+        }
         char_after();
-        return digits.length;
     }
 
     function read_line() {
@@ -6616,7 +6640,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["()=>delete aa", "prefix_function", "unexpected_a_after_b", "=>", 5]
 
-                return stop(
+                warn(
                     "unexpected_a_after_b",
                     token_nxt,
                     token_nxt.id,
@@ -7140,7 +7164,7 @@ function jslint_phase3_parse(state) {
 // ["delete 0", "stmt_delete", "expected_a_b", "0", 8]
 // ["delete 0;", "stmt_delete", "expected_a_b", "0", 8]
 
-            return stop("expected_a_b", the_value, ".", artifact(the_value));
+            warn("expected_a_b", the_value, ".", artifact(the_value));
         }
         the_token.expression = the_value;
         semicolon();
@@ -7338,7 +7362,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["for await(;;){}", "stmt_for", "expected_a", "for await...of", 1]
 
-                return stop("expected_a", the_for, "for await...of");
+                warn("expected_a", the_for, "for await...of");
             }
             if (scope_function.async === 0 && scope_function !== token_global) {
 
@@ -7472,7 +7496,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["for await(aa in aa){}", "stmt_for", "expected_a_b", "in", 14]
 
-                    return stop("expected_a_b", the_operator, "of", "in");
+                    warn("expected_a_b", the_operator, "of", "in");
                 }
 
 // test_cause:
@@ -8665,7 +8689,6 @@ function jslint_phase4_walk(state) {
         scope_block_push,
         scope_function_pop,
         scope_function_push,
-        stop,
         syntax_dict,
         test_cause,
         token_global,
@@ -9611,7 +9634,7 @@ function jslint_phase4_walk(state) {
 // test_cause:
 // ["0 of 0", "pre_b_of", "unexpected_a", "of", 3]
 
-            return stop("unexpected_a", thing);
+            warn("unexpected_a", thing);
         }
     }
 
