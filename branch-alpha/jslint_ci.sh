@@ -206,7 +206,7 @@ import modulePath from "path";
         /^\w+?:/
     ).test(url)) {
         url = modulePath.resolve(url);
-        // a local path, "/"-joined: new URL() read win32 "C:" as a scheme,
+        // A local path, "/"-joined: new URL() read win32 "C:" as a scheme,
         // so the $PWD prefix never matched
         file = url.replace((
             /\\/g
@@ -300,7 +300,7 @@ shCiArtifactUpload() {(set -e
         -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
         package.json
     )"
-    # an empty name makes every \b$UPSTREAM_REPOSITORY\b match everywhere
+    # An empty name makes every \b$UPSTREAM_REPOSITORY\b match everywhere
     if [ ! "$UPSTREAM_REPOSITORY" ]
     then
         printf "%s - no github repo in package.json repository.url\n" \
@@ -674,7 +674,7 @@ shDirHttplinkValidate() {(set -e
         -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
         package.json
     )"
-    # an empty name makes every \b$UPSTREAM_REPOSITORY\b match everywhere
+    # An empty name makes every \b$UPSTREAM_REPOSITORY\b match everywhere
     if [ ! "$UPSTREAM_REPOSITORY" ]
     then
         printf "%s - no github repo in package.json repository.url\n" \
@@ -1201,7 +1201,7 @@ shGithubPrCreate() {(set -e
             -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
             package.json
         )"
-        # an empty name queries a malformed issues api url
+        # An empty name queries a malformed issues api url
         if [ ! "$UPSTREAM_REPOSITORY" ]
         then
             printf "%s - no github repo in package.json repository.url\n" \
@@ -1211,7 +1211,7 @@ shGithubPrCreate() {(set -e
         PR_XXX="$(curl -fs --ssl-no-revoke \
 "https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
         )"
-        # first match only - a milestone nests its own "number" further down
+        # First match only - a milestone nests its own "number" further down
         PR_XXX="$(
             printf "%s" "$PR_XXX" |
                 sed -En -e 's/.*"number": ([0-9]+).*/\1/p' |
@@ -1386,7 +1386,7 @@ swp|\
 tmp|\
 vendor)s{0,1}(\\b|_)\
 "
-    # node's os.tmpdir, the dir shGrepReplace reads - /tmp differs on macos
+    # Node's os.tmpdir, the dir shGrepReplace reads - /tmp differs on macos
     TMPDIR_NODE="$(node --eval 'process.stdout.write(require("os").tmpdir())')"
     find . -type f |
         grep -v -E "$FILE_FILTER" |
@@ -1437,7 +1437,7 @@ shHttpFileServer() {(set -e
             printf "\n"
             git --no-pager diff 2>/dev/null | cat || true
             printf "\nshHttpFileServer - (re)starting %s\n" "$*"
-            # reset per run, or one 77 restarts every later clean exit too
+            # Reset per run, or one 77 restarts every later clean exit too
             EXIT_CODE=0
             (shHttpFileServer "$@") || EXIT_CODE="$?"
             printf "\nshHttpFileServer - EXIT_CODE=%s\n" "$EXIT_CODE"
@@ -1532,7 +1532,7 @@ import moduleRepl from "repl";
             req.pipe(res);
             return;
         }
-        // replace trailing "/" with "/index.html"; "$&" keeps the "/", as
+        // Replace trailing "/" with "/index.html"; "$&" keeps the "/", as
         // "./index.html" made "sub/" into "sub./index.html"
         file = pathname.slice(1).replace((
             /\/$|^$/m
@@ -1919,7 +1919,7 @@ shLintShell() {(set -e
 # This function will shellcheck shell-files $@.
     if (! shellcheck --version >/dev/null 2>&1)
     then
-        # say so, or a skipped lint prints the same nothing as a clean one
+        # Say so, or a skipped lint prints the same nothing as a clean one
         printf "shLintShell - shellcheck not installed, SKIPPED %s\n" "$*" >&2
         return
     fi
@@ -2116,7 +2116,7 @@ function replaceListReplace(replaceList, data) {
                 elem.dateCommitted = Buffer.from(await res.arrayBuffer());
             }));
         }
-        // fetch file; a failed sub-command throws, or its empty output would
+        // Fetch file; a failed sub-command throws, or its empty output would
         // be saved as the file
         if (elem.node || elem.sh) {
             child = moduleChildProcess.spawn(
@@ -2170,7 +2170,7 @@ function replaceListReplace(replaceList, data) {
         elem.data = Buffer.from(await res.arrayBuffer());
     });
     await Promise.all(promiseList);
-    // parse fetched data; write nothing if a fetch failed, or the rollup
+    // Parse fetched data; write nothing if a fetch failed, or the rollup
     // would be written with pieces missing
     process.on("exit", function (exitCode) {
         let rollupBody;
