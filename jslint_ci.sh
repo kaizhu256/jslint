@@ -191,23 +191,30 @@ import moduleOs from "os";
 import modulePath from "path";
 (async function () {
     const cwd = process.cwd().replace((/\\/g), "/");
+    // A scheme has 2+ chars, so a windows drive "C:" is a local path.
+    const isUrl = (/^\w{2,}:/).test(process.argv[1]);
     const timeStart = Date.now();
     const tmpdir = await moduleFs.promises.mkdtemp(
         moduleOs.tmpdir() + "/shBrowserScreenshot-"
     );
     const url = (
-        (/^\w+?:/).test(process.argv[1])
+        isUrl
         ? process.argv[1]
         : modulePath.resolve(process.argv[1])
     ).replace((/\\/g), "/");
     let child;
     let exitCode;
     let file;
-    file = (
-        url === process.argv[1]
-        ? new URL(url, "http://localhost").pathname
-        : url
-    );
+    file = url;
+    if (isUrl) {
+        // Decode the pathname, or encodeURIComponent below encodes its "%"
+        // again, and "a%20b.html" is named apart from local "a b.html".
+        try {
+            file = decodeURIComponent(new URL(url).pathname);
+        } catch (ignore) {
+            file = new URL(url).pathname;
+        }
+    }
     // Remove prefix $PWD from file.
     if (String(file + "/").startsWith(cwd + "/")) {
         file = file.replace(cwd, "");
