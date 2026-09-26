@@ -1406,8 +1406,7 @@ import modulePath from "path";
         ).split("\n");
         if (dict[file][lineno - 1] === undefined) {
             throw new Error(
-                "shGrepReplace - stale grep result, " + file +
-                " has no line " + lineno
+                `shGrepReplace - ${file} has no line ${lineno}, grep is stale`
             );
         }
         // Keep the "\r" of a crlf line, which only windows grep strips.
