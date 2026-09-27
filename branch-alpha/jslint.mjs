@@ -2506,7 +2506,7 @@ async function jslint_cli({
         option = empty()
     }) {
 
-// PR-xxx - Pad with the block's OWN terminator. Phase 6 rejoins with the
+// PR-513 - Pad with the block's OWN terminator. Phase 6 rejoins with the
 // first one it sees, so a "\n" pad turned a CRLF block's fixed lines into LF.
 
         const line_pad = String(
@@ -3353,7 +3353,7 @@ function jslint_phase2_lex(state) {
                 break;
             case "\\":
 
-// PR-xxx - Check the escape with <char_after_escape>, as a string does, but
+// PR-513 - Check the escape with <char_after_escape>, as a string does, but
 // move its warnings to <warning_list_untagged>, since a tagged-megastring may
 // hold any escape. '$' and '{' escape '${'. Push back the char it leaves in
 // <char>, which may be the closing '`'.
@@ -4381,7 +4381,7 @@ function jslint_phase2_lex(state) {
 
         case mode_digits_unicode_escape:
 
-// PR-xxx - Check the code point's value, not its digit count. '\u{10FFFF}' and
+// PR-513 - Check the code point's value, not its digit count. '\u{10FFFF}' and
 // '\u{000041}' are legal. Above 10FFFF a string is a SyntaxError, and a regexp
 // without flag 'u' reads '\u{110000}' as 'u' repeated. Both lint on, so warn.
 // A megastring's '\u' gets here too. <char> is '{' only for '\u{...}'.
@@ -12864,7 +12864,7 @@ function sentinel() {}
         source = await moduleFs.promises.readFile(pathname, "utf8");
         lineList = [{}];
 
-// PR-xxx - One entry per line, "\r\n" being ONE terminator: /^.*$/gm also ends
+// PR-513 - One entry per line, "\r\n" being ONE terminator: /^.*$/gm also ends
 // a line at "\r", so a crlf file got an empty entry after every line.
 
         source.replace((

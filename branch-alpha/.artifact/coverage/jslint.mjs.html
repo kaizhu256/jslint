@@ -2671,7 +2671,7 @@ body {
 <pre><span class="lineno"><a href="#line_2506" id="line_2506"> 2506.</a></span><span class="count                ">     70</span><span>        option = empty()</span></pre>
 <pre><span class="lineno"><a href="#line_2507" id="line_2507"> 2507.</a></span><span class="count                ">     70</span><span>    }) {</span></pre>
 <pre><span class="lineno"><a href="#line_2508" id="line_2508"> 2508.</a></span><span class="count                ">     70</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2509" id="line_2509"> 2509.</a></span><span class="count                ">     70</span><span>// PR-xxx - Pad with the block's OWN terminator. Phase 6 rejoins with the</span></pre>
+<pre><span class="lineno"><a href="#line_2509" id="line_2509"> 2509.</a></span><span class="count                ">     70</span><span>// PR-513 - Pad with the block's OWN terminator. Phase 6 rejoins with the</span></pre>
 <pre><span class="lineno"><a href="#line_2510" id="line_2510"> 2510.</a></span><span class="count                ">     70</span><span>// first one it sees, so a "\n" pad turned a CRLF block's fixed lines into LF.</span></pre>
 <pre><span class="lineno"><a href="#line_2511" id="line_2511"> 2511.</a></span><span class="count                ">     70</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2512" id="line_2512"> 2512.</a></span><span class="count                ">     70</span><span>        const line_pad = String(</span></pre>
@@ -3518,7 +3518,7 @@ body {
 <pre><span class="lineno"><a href="#line_3353" id="line_3353"> 3353.</a></span><span class="count                ">   6721</span><span>                break;</span></pre>
 <pre><span class="lineno"><a href="#line_3354" id="line_3354"> 3354.</a></span><span class="count                ">   6721</span><span>            case "\\":</span></pre>
 <pre><span class="lineno"><a href="#line_3355" id="line_3355"> 3355.</a></span><span class="count                ">   6721</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3356" id="line_3356"> 3356.</a></span><span class="count                ">   6721</span><span>// PR-xxx - Check the escape with &lt;char_after_escape&gt;, as a string does, but</span></pre>
+<pre><span class="lineno"><a href="#line_3356" id="line_3356"> 3356.</a></span><span class="count                ">   6721</span><span>// PR-513 - Check the escape with &lt;char_after_escape&gt;, as a string does, but</span></pre>
 <pre><span class="lineno"><a href="#line_3357" id="line_3357"> 3357.</a></span><span class="count                ">   6721</span><span>// move its warnings to &lt;warning_list_untagged&gt;, since a tagged-megastring may</span></pre>
 <pre><span class="lineno"><a href="#line_3358" id="line_3358"> 3358.</a></span><span class="count                ">   6721</span><span>// hold any escape. '$' and '{' escape '${'. Push back the char it leaves in</span></pre>
 <pre><span class="lineno"><a href="#line_3359" id="line_3359"> 3359.</a></span><span class="count                ">   6721</span><span>// &lt;char&gt;, which may be the closing '`'.</span></pre>
@@ -4546,7 +4546,7 @@ body {
 <pre><span class="lineno"><a href="#line_4381" id="line_4381"> 4381.</a></span><span class="count                ">    494</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_4382" id="line_4382"> 4382.</a></span><span class="count                ">    392</span><span>        case mode_digits_unicode_escape:</span></pre>
 <pre><span class="lineno"><a href="#line_4383" id="line_4383"> 4383.</a></span><span class="count                ">    392</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_4384" id="line_4384"> 4384.</a></span><span class="count                ">    392</span><span>// PR-xxx - Check the code point's value, not its digit count. '\u{10FFFF}' and</span></pre>
+<pre><span class="lineno"><a href="#line_4384" id="line_4384"> 4384.</a></span><span class="count                ">    392</span><span>// PR-513 - Check the code point's value, not its digit count. '\u{10FFFF}' and</span></pre>
 <pre><span class="lineno"><a href="#line_4385" id="line_4385"> 4385.</a></span><span class="count                ">    392</span><span>// '\u{000041}' are legal. Above 10FFFF a string is a SyntaxError, and a regexp</span></pre>
 <pre><span class="lineno"><a href="#line_4386" id="line_4386"> 4386.</a></span><span class="count                ">    392</span><span>// without flag 'u' reads '\u{110000}' as 'u' repeated. Both lint on, so warn.</span></pre>
 <pre><span class="lineno"><a href="#line_4387" id="line_4387"> 4387.</a></span><span class="count                ">    392</span><span>// A megastring's '\u' gets here too. &lt;char&gt; is '{' only for '\u{...}'.</span></pre>
@@ -13029,7 +13029,7 @@ body {
 <pre><span class="lineno"><a href="#line_12864" id="line_12864">12864.</a></span><span class="count                ">      8</span><span>        source = await moduleFs.promises.readFile(pathname, "utf8");</span></pre>
 <pre><span class="lineno"><a href="#line_12865" id="line_12865">12865.</a></span><span class="count                ">      8</span><span>        lineList = [{}];</span></pre>
 <pre><span class="lineno"><a href="#line_12866" id="line_12866">12866.</a></span><span class="count                ">      8</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12867" id="line_12867">12867.</a></span><span class="count                ">      8</span><span>// PR-xxx - One entry per line, "\r\n" being ONE terminator: /^.*$/gm also ends</span></pre>
+<pre><span class="lineno"><a href="#line_12867" id="line_12867">12867.</a></span><span class="count                ">      8</span><span>// PR-513 - One entry per line, "\r\n" being ONE terminator: /^.*$/gm also ends</span></pre>
 <pre><span class="lineno"><a href="#line_12868" id="line_12868">12868.</a></span><span class="count                ">      8</span><span>// a line at "\r", so a crlf file got an empty entry after every line.</span></pre>
 <pre><span class="lineno"><a href="#line_12869" id="line_12869">12869.</a></span><span class="count                ">      8</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_12870" id="line_12870">12870.</a></span><span class="count                ">      8</span><span>        source.replace((</span></pre>
