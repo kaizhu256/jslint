@@ -6689,7 +6689,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["()=>delete aa", "prefix_function", "unexpected_a_after_b", "=>", 5]
 
-                warn(
+                return stop(
                     "unexpected_a_after_b",
                     token_nxt,
                     token_nxt.id,
