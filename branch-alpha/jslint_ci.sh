@@ -1516,6 +1516,12 @@ import moduleRepl from "repl";
             res.end();
             return;
         }
+        // A NUL would make fs throw outside any handler and crash the server.
+        if (pathname.includes(String.fromCharCode(0))) {
+            res.statusCode = 400;
+            res.end();
+            return;
+        }
         // debug - serverLog
         res.on("close", function () {
             if (pathname === "/favicon.ico") {
