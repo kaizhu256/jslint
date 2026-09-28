@@ -7375,8 +7375,21 @@ function jslint_phase3_parse(state) {
         const the_value = parse_expression(0);
 
 // PR-xxx - Bugfix - Allow 'delete aa?.bb', a valid optional-chain operand.
+// PR-xxx - Bugfix - In 'delete aa[bb] || cc', the parse at rbp 0 swallows the
+// '||'. Warn on the operator, not on a missing '.'. Rbp 150 would stop the
+// lint on the leftover '|| cc'.
 
         if (
+            ["&&", "??", "||"].includes(the_value.id) &&
+            [".", "?.", "["].includes(the_value.expression[0].id) &&
+            the_value.expression[0].arity === "binary"
+        ) {
+
+// test_cause:
+// ["delete aa[aa]||aa", "stmt_delete", "unexpected_a", "||", 14]
+
+            warn("unexpected_a", the_value);
+        } else if (
             (
                 the_value.id !== "." &&
                 the_value.id !== "?." &&
