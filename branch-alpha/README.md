@@ -1240,7 +1240,7 @@ sh jslint_ci.sh shCiVscePackageJslintWrapperVscode
 # Open vscode with vscode-jslint, and press F5 to debug.
 code \
     --disable-extensions \
-    --extensionDevelopmentPath=.artifact/jslint_wrapper_vscode
+    --extensionDevelopmentPath='C:\Users\<username>\Documents\jslint\.artifact\jslint_wrapper_vscode'
 ```
 
 
