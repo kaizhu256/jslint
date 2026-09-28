@@ -78,7 +78,7 @@ Douglas Crockford <douglas@crockford.com>
     - [pull-request merge](#pull-request-merge)
     - [branch-master commit](#branch-master-commit)
     - [branch-master publish](#branch-master-publish)
-    - [vscode-jslint development](#vscode-jslint-development)
+    - [vscode-jslint qa](#vscode-jslint-qa)
     - [vscode-jslint publish](#vscode-jslint-publish)
 
 
@@ -1231,13 +1231,13 @@ if (false) {
 
 <br><br>
 
-### vscode-jslint development
+### vscode-jslint qa
 ```shell
 
-# Build vscode-jslint.
+# build vscode-jslint
 sh jslint_ci.sh shCiVscePackageJslintWrapperVscode
 
-# Open vscode and debug vscode-jslint.
+# open vscode and debug
 code \
     --disable-extensions \
     --extensionDevelopmentPath=\
