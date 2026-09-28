@@ -130,6 +130,7 @@
     console_log,
     constant,
     context,
+    context_report,
     convert,
     count,
     coverageDir,
@@ -334,6 +335,7 @@
     scope_block_pop,
     scope_block_push,
     scope_declared,
+    scope_function,
     scope_function_pop,
     scope_function_push,
     scriptId,
@@ -1380,6 +1382,14 @@ function jslint(
     }
 
     function scope_function_push(value, list_push) {
+
+// PR-xxx - Bugfix - <context_report> holds what <jslint_report> lists for a
+// function, which are the names it declares and the outer names it uses. It
+// is kept apart from <context>, which is a scope_block and holds parameters.
+
+        if (!value.context_report) {
+            value.context_report = empty();
+        }
         function_stack.unshift(value);
         if (list_push) {
             function_list.push(value);
@@ -2899,12 +2909,10 @@ function jslint_phase2_lex(state) {
         warn_at,
         warning_list
     } = state;
-    const brace_stack = [];     // Stack of opener tokens: {, ${.
     const mode_digits_numeric_separator = 1;
     const mode_digits_regexp_quantifier = 2;
     const mode_digits_unicode_escape = 3;
-    const opener_stack = [];    // Stack of opener tokens: (, [.
-    let brace_popped = empty();         // Last token popped from brace_stack.
+    const opener_stack = [];    // Stack of opener tokens: (, [, {, ${.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
     let from;                   // The starting column number of the token.
@@ -4567,12 +4575,15 @@ function jslint_phase2_lex(state) {
 // current depth is marked as a fart.
 
         switch (id) {
+
+// PR-xxx - Bugfix - Also push '{' and '${', so a ';' in a function-body inside
+// a for-loop-head 'for (const aa of function () {...}())' is not mistaken for
+// a for-loop-semicolon.
+
         case "${":
-        case "{":
-            brace_stack.unshift(the_token);
-            break;
         case "(":
         case "[":
+        case "{":
             opener_stack.unshift(the_token);
             break;
         case ")":
@@ -4626,7 +4637,12 @@ function jslint_phase2_lex(state) {
             }
             break;
         case "}":
-            brace_popped = brace_stack.shift() || empty();
+
+// Pop only a '{' or '${', and leave a dangling '}' to the parser.
+
+            if (opener_stack[0]?.id === "{" || opener_stack[0]?.id === "${") {
+                opener_stack.shift();
+            }
             break;
         }
         switch (token_prv_expr.id + " " + id) {
@@ -4651,13 +4667,6 @@ function jslint_phase2_lex(state) {
 
         case "for await":
             the_token.for_loop = token_prv_expr;
-            break;
-
-// PR-xxx - Fixes issue #512 - Mark '{' of object-destructuring-assignment
-// '({aa} = ...)', as "] =" marks '['.
-
-        case "} =":
-            brace_popped.assignment = the_token;
             break;
         }
 
@@ -5692,7 +5701,14 @@ function jslint_phase3_parse(state) {
 
 // Reserved words may not be declared.
 
-        if (syntax_dict[id] !== undefined && id !== "ignore") {
+// PR-xxx - Bugfix - 'of' is in <syntax_dict> only as the for..of operator,
+// and is not reserved, so 'let of = 0;' must not warn reserved_a.
+
+        if (
+            syntax_dict[id] !== undefined &&
+            id !== "ignore" &&
+            id !== "of"
+        ) {
 
 // test_cause:
 // ["let undefined", "name_declare", "reserved_a", "undefined", 5]
@@ -5703,7 +5719,12 @@ function jslint_phase3_parse(state) {
 
 // Has the name been declared in this context?
 
-        earlier = scope_block.context[id];
+// PR-xxx - Bugfix - Also check <scope_declared>, which differs from
+// <scope_block> for a var in a nested block. Else 'var bb' in an if-block
+// replaced an earlier 'var bb', and a use between them warned
+// temporal_dead_zone_a.
+
+        earlier = scope_block.context[id] || scope_declared.context[id];
         if (earlier) {
 
 // test_cause:
@@ -5711,6 +5732,8 @@ function jslint_phase3_parse(state) {
 // ["let aa;function aa(){}", "name_declare", "scope_current", "aa", 0]
 // ["let aa;let aa", "name_declare", "redefinition_a_b", "1", 12]
 // ["let aa;let aa", "name_declare", "scope_current", "aa", 0]
+// ["var aa;if(0){var aa}", "name_declare", "redefinition_a_b", "1", 18]
+// ["var aa;if(0){var aa}", "name_declare", "scope_current", "aa", 0]
 
             test_cause("scope_current", id);
             warn("redefinition_a_b", name, id, earlier.line);
@@ -5753,6 +5776,12 @@ function jslint_phase3_parse(state) {
 
         scope_declared.context[id] = name;
         name.scope_declared = scope_declared;
+
+// PR-xxx - Bugfix - Record the function that owns <name>, since a let/const
+// <scope_declared> may be a block inside it.
+
+        name.scope_function = scope_function;
+        scope_function.context_report[id] = name;
 
 // Warn about variable redefinition.
 
@@ -6161,15 +6190,7 @@ function jslint_phase3_parse(state) {
 // It is an expression statement.
 
             the_statement = parse_expression(0, true);
-
-// PR-xxx - Fixes issue #512 - Object-destructuring-assignment '({aa} = ...);'
-// needs its parens.
-
-            if (
-                the_statement.wrapped &&
-                the_statement.id !== "(" &&
-                the_statement.expression?.[0]?.id !== "{"
-            ) {
+            if (the_statement.wrapped && the_statement.id !== "(") {
 
 // test_cause:
 // [" (0)", "parse_statement_single", "unexpected_a", "(", 2]
@@ -6330,45 +6351,6 @@ function jslint_phase3_parse(state) {
                 }
             }
         }
-        function member_parse() {
-
-// PR-xxx - Fixes issue #512 - Allow member-expression like 'aa.bb' or 'aa[bb]'
-// as target in destructuring-assignment '[aa.bb] = ...'. Only that caller
-// passes no <scope_declared>, since it declares nothing. This function will
-// return a variable-target, else push a member-target to <name_list>.
-
-            const target = parse_expression(20);
-            if (target.arity === "variable") {
-                return target;
-            }
-
-// test_cause:
-// [";[aa()]=0", "check_mutation", "bad_assignment_a", "(", 5]
-
-            if (check_mutation(target)) {
-
-// test_cause:
-// [";[aa.bb]=0", "member_parse", "member", ".", 0]
-// [";[aa[0]]=0", "member_parse", "member", "[", 0]
-
-                test_cause("member", target.id);
-                name_list.push(target);
-            }
-            if (token_nxt.id === "=") {
-
-// PR-xxx - A default is pushed wrapped in an array, which has no <arity>, so
-// <prefix_destructure_assignment> walks it, and a variable default like 'cc'
-// is never looked up as a target.
-
-// test_cause:
-// [";[aa.bb=0]=0", "member_parse", "default", "", 0]
-
-                test_cause("default");
-                advance("=");
-                the_destructure.open = true;
-                name_list.push([parse_expression(0)]);
-            }
-        }
         function name_parse() {
             let name = token_nxt;
             switch (name.id) {
@@ -6450,14 +6432,7 @@ function jslint_phase3_parse(state) {
             if (is_lbrace) {
                 survey(name);
             }
-            if (!is_lbrace && scope_declared === undefined) {
-                name = member_parse();
-                if (!name) {
-                    return;
-                }
-            } else {
-                advance_and_signature_push(token_nxt.id);
-            }
+            advance_and_signature_push(token_nxt.id);
             if (is_lbrace && token_nxt.id === ":") {
                 advance_and_signature_push(":");
                 if (!the_function_toplevel) {
@@ -6481,19 +6456,17 @@ function jslint_phase3_parse(state) {
                     return;
                 }
                 token_nxt.name_alias = name;
-                if (scope_declared === undefined) {
-                    name = member_parse();
-                    if (!name) {
-                        return;
-                    }
-                } else {
-                    name = token_nxt;
-                    advance_and_signature_push(token_nxt.id);
-                }
-
-// PR-xxx - Fall through, so an aliased name takes a default, as in
-// 'let {aa: bb = 0} = ...'.
-
+                name = token_nxt;
+                name_declare(
+                    scope_declared,     // scope_declared
+                    role,               // role
+                    readonly,           // readonly
+                    sub_list,           // name_list
+                    name,               // name
+                    true                // assigned
+                );
+                advance_and_signature_push(token_nxt.id);
+                return;
             }
             name_declare(
                 scope_declared,         // scope_declared
@@ -6510,17 +6483,6 @@ function jslint_phase3_parse(state) {
                     the_destructure.open = true;
                 }
                 name.expression = parse_expression(0);
-                if (scope_declared === undefined) {
-
-// PR-xxx - Bugfix - Walk a default in destructuring-assignment
-// '[aa = bb] = ...', which no <post_s_var> walks, so 'bb' was never used.
-
-// test_cause:
-// [";[aa=0]=0", "name_parse", "default", "", 0]
-
-                    test_cause("default");
-                    name_list.push([name.expression]);
-                }
 
 // test_cause:
 // ["function aa([aa=aa]){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
@@ -6589,37 +6551,6 @@ function jslint_phase3_parse(state) {
         }
         advance_and_signature_push("]");
         return the_destructure;
-    }
-
-    function prefix_destructure_assignment() {
-
-// This function will parse destructuring-assignment '[aa] = ...' or
-// '({aa} = ...)', whose opener phase 2 marked with its '=' token.
-
-        const name_list = [];   // 3. name_list for "[aa] = ..."
-        const the_assignment = token_now.assignment;
-        const the_destructure = prefix_destructure(
-            undefined,          // scope_declared
-            "variable",         // role
-            false,              // readonly
-            name_list,          // name_list
-            undefined,          // the_function
-            false               // the_function_toplevel
-        );
-
-// PR-xxx - Fixes issue #512 - Walk member-targets like 'aa.bb' and defaults as
-// expressions, and leave only variables in <name_list> for <post_a_assignment>
-// to look up.
-
-        the_destructure.expression = name_list.filter(function (name) {
-            return name.arity !== "variable";
-        });
-        the_assignment.name_list = name_list.filter(function (name) {
-            return name.arity === "variable";
-        });
-        advance("=");
-        symbol("=").led_infix(the_destructure);
-        return the_assignment;
     }
 
     function prefix_ellipsis() {
@@ -7024,13 +6955,6 @@ function jslint_phase3_parse(state) {
             }
             return value;
         }
-        if (the_brace.assignment) {
-
-// PR-xxx - Fixes issue #512 - Parse object-destructuring-assignment
-// '({aa} = ...)'.
-
-            return prefix_destructure_assignment();
-        }
         the_brace.expression = [];
         if (token_nxt.id !== "}") {
 
@@ -7069,13 +6993,26 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_lbracket() {
-        const the_token = token_now;
+        let element;
+        let the_token = token_now;
         the_token.expression = [];
         if (the_token.assignment) {
+            the_token = token_now.assignment;
+            the_token.name_list = [];   // 3. name_list for "[aa] = ..."
 
 // PR-500 - Unify ES2015-destructure-logic. - [aa] = ...;
 
-            return prefix_destructure_assignment();
+            element = prefix_destructure(
+                undefined,              // scope_declared
+                "variable",             // role
+                false,                  // readonly
+                the_token.name_list,    // name_list
+                undefined,              // the_function
+                false                   // the_function_toplevel
+            );
+            advance("=");
+            symbol("=").led_infix(element);
+            return the_token;
         }
         if (token_nxt.id !== "]") {
 
@@ -7255,6 +7192,13 @@ function jslint_phase3_parse(state) {
         the_break.disrupt = true;
         if (token_nxt.identifier && token_now.line === token_nxt.line) {
             block_stack.some(function (scope_block) {
+
+// PR-xxx - Bugfix - Stop at the function boundary, since 'break aa' cannot
+// reach a label in an enclosing function, which is a SyntaxError.
+
+                if (scope_block === scope_function) {
+                    return true;
+                }
                 the_label = scope_block.context[token_nxt.id];
                 if (the_label?.role !== "label") {
                     the_label = undefined;
@@ -7267,6 +7211,9 @@ function jslint_phase3_parse(state) {
             if (!the_label) {
 
 // test_cause:
+// ["
+// aa:while(0){(function(){while(0){break aa}}())}
+// ", "stmt_break", "not_label_a", "aa", 40]
 // ["aa:while(0){}break aa", "stmt_break", "not_label_a", "aa", 20]
 // ["break aa", "stmt_break", "not_label_a", "aa", 7]
 
@@ -8946,6 +8893,7 @@ function jslint_phase4_walk(state) {
 // <the_variable> in current context from given <thing>.id.
 
         const id = thing.id;
+        const ii_function = block_stack.indexOf(scope_function);
         let the_variable;
 
 // PR-510 - deadcode-confirmed - Both callers pass a token already known to be
@@ -8971,11 +8919,15 @@ function jslint_phase4_walk(state) {
 
         block_stack.some(function (scope_block, ii) {
             the_variable = scope_block.context[id];
-            if (the_variable && ii > 0) {
+            if (the_variable && ii > ii_function) {
 
-// If found outside current-scope, mark as closure.
+// PR-xxx - Bugfix - Mark closure only if found outside the current function,
+// not merely outside the current scope_block, and record it for the report.
 
                 the_variable.closure = true;
+                if (!scope_function.context_report[id]) {
+                    scope_function.context_report[id] = the_variable;
+                }
             }
             return the_variable;
         });
@@ -9018,6 +8970,7 @@ function jslint_phase4_walk(state) {
 // 3.glo.1 - Mark 'declared', the global-variable, immediately.
 
             token_global.context[id] = the_variable;
+            scope_function.context_report[id] = the_variable;
         }
         if (the_variable.role === "label") {
 
@@ -9038,6 +8991,7 @@ function jslint_phase4_walk(state) {
 
 // test_cause:
 // ["(aa=aa)=>0", "name_lookup", "temporal_dead_zone_a", "aa", 5]
+// ["for(const [aa] of aa){}", "name_lookup", "temporal_dead_zone_a", "aa", 19]
 // ["let [aa]=aa", "name_lookup", "temporal_dead_zone_a", "aa", 10]
 // ["let aa=()=>aa", "name_lookup", "temporal_dead_zone_a", "aa", 12]
 // ["let aa=aa", "name_lookup", "temporal_dead_zone_a", "aa", 8]
@@ -9825,6 +9779,12 @@ function jslint_phase4_walk(state) {
             case "const":
             case "let":
             case "var":
+
+// PR-xxx - Bugfix - Walk the iterable of destructured 'for (const [aa] of bb)',
+// which <stmt_var> keeps in <expression>, and <post_s_var> does not walk. Walk
+// it before <post_s_var> marks the names alive, to catch temporal_dead_zone_a.
+
+                walk_expression(thing.for_of.expression);
                 post_s_var(thing.for_of);
                 break;
             default:
@@ -11406,7 +11366,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     }
     functions.forEach(function (the_function) {
         let {
-            context,
+            context_report: context,
             from,
             id,
             level,
@@ -11415,7 +11375,16 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
             name_list = [],
             signature
         } = the_function;
-        let list = Object.keys(context);
+
+// PR-xxx - Bugfix - <context_report> mixes own and outer names, so own rows
+// check <scope_function>.
+
+        let list = Object.keys(context).sort().filter(function (id) {
+            return context[id].scope_function === the_function;
+        });
+        let list_outer = Object.keys(context).sort().filter(function (id) {
+            return context[id].scope_function !== the_function;
+        });
         html += (
             "<div class=\"level level" + htmlEscape(level) + "\">" +
             address(line, from + 1) +
@@ -11438,7 +11407,6 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         html += detail("parameter", name_list.map(function ({id}) {
             return id;
         }).sort());
-        list.sort();
         html += detail("variable", list.filter(function (id) {
             return context[id].role === "variable";
         }));
@@ -11446,18 +11414,12 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
             return context[id].role === "exception";
         }));
         html += detail("closure", list.filter(function (id) {
-            return (
-                context[id].closure === true &&
-                context[id].scope_declared === the_function
-            );
+            return context[id].closure === true;
         }));
-        html += detail("outer", list.filter(function (id) {
-            return (
-                context[id].scope_declared.id !== "(global)" &&
-                context[id].scope_declared !== the_function
-            );
+        html += detail("outer", list_outer.filter(function (id) {
+            return context[id].scope_declared.id !== "(global)";
         }));
-        html += detail(module, list.filter(function (id) {
+        html += detail(module, list_outer.filter(function (id) {
             return context[id].scope_declared.id === "(global)";
         }));
         html += detail("label", list.filter(function (id) {

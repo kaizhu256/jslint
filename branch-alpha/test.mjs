@@ -962,6 +962,48 @@ aa(dd(0), 0);
         );
     });
     jstestIt((
+        "test report-function handling-behavior"
+    ), function () {
+
+// PR-xxx - Bugfix - The report's function details list block-scoped names and
+// catch-variables, and mark closure only across a function boundary.
+
+        const html = jslint.jslint_report(jslint.jslint(String(`
+let ee = 0;
+function aa(gg) {
+    let bb = 0;
+    let ff = 0;
+    if (aa) {
+        let cc = 1;
+        aa(bb, cc, ee, gg);
+    }
+    try {
+        aa();
+    } catch (err) {
+        aa(err);
+    }
+    return function () {
+        return ff;
+    };
+}
+aa();
+        `).trim() + "\n", {}));
+        const result = html.slice(
+            html.indexOf("<div class=\"level level1\">"),
+            html.lastIndexOf("</div>\n</fieldset>")
+        ).replace((/<dl>/g), "\n<dl>");
+        assertOrThrow(result === String(`
+<div class="level level1"><address>2: 1</address><dfn>aa(gg)</dfn>
+<dl><dt>parameter</dt><dd>gg</dd></dl>
+<dl><dt>variable</dt><dd>bb, cc, ff</dd></dl>
+<dl><dt>exception</dt><dd>err</dd></dl>
+<dl><dt>closure</dt><dd>ff</dd></dl>
+<dl><dt>global</dt><dd>aa, ee</dd></dl></div>
+<div class="level level2"><address>14: 12</address><dfn>«return»()</dfn>
+<dl><dt>outer</dt><dd>ff</dd></dl></div>
+        `).trim() + "\n", result);
+    });
+    jstestIt((
         "test autofix-report handling-behavior"
     ), function () {
         let result;
@@ -1479,24 +1521,6 @@ aa(bb, cc, dd, ee, ff, gg);
                     return source;
                 }),
 
-// PR-xxx - Fixes issue #512 - Allow member-expression like 'aa.bb' or 'aa[bb]'
-// as target in array-destructuring-assignment.
-
-                (`
-let aa = [0, 1];
-let bb = {};
-[aa[0], aa[1]] = [aa[1], aa[0]];
-[bb.cc, [...bb.dd]] = aa;
-[
-    bb.ee = aa[0],
-    bb.ff
-] = aa;
-({
-    bb: bb.gg,
-    cc: aa[0] = bb.hh
-} = bb);
-                `),
-
 // PR-459 - Allow destructuring-assignment after function-definition.
 
                 (`
@@ -1601,6 +1625,36 @@ async function aa(bb, cc) {
     }
     for (const ii of await (bb())) {
         bb(cc, ii);
+    }
+}
+aa();
+                `),
+
+// PR-xxx - Bugfix - Walk the iterable of destructured for..of.
+
+                (`
+function aa(bb) {
+    for (const [cc, dd] of bb) {
+        cc(dd);
+    }
+    for (const {ee} of bb) {
+        ee();
+    }
+}
+aa();
+                `),
+
+// PR-xxx - Bugfix - A ';' in a method-body inside a for-loop-head is not a
+// for-loop-semicolon.
+
+                (`
+function aa(bb) {
+    for (const cc in { //jslint-ignore-line
+        dd() {
+            return;
+        }
+    }) {
+        bb(cc);
     }
 }
 aa();
@@ -1812,7 +1866,11 @@ if (String) {
     var aa = 0; //jslint-ignore-line
 }
 aa();
-                `)
+                `),
+
+// PR-xxx - Bugfix - 'of' is not reserved.
+
+                "let of = 0;\nof();"
             ],
             ternary: [
                 (`
