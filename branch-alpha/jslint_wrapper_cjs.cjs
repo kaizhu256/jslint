@@ -37,17 +37,21 @@
 const fileJslint = __dirname + "/jslint.mjs";
 const jslintRun = require("vm").runInThisContext(
     "(function (import_cjs, module) {\"use strict\";" +
-    require("fs").readFileSync(fileJslint, "utf8").replace(
-        "\nexport default Object.freeze(jslint_export);",
-        "\nmodule.exports = jslint_export;"
-    ).replace(
-        "\njslint_import_meta_url = import.meta.url;",
-        "\njslint_import_meta_url = " + JSON.stringify(
-            require("url").pathToFileURL(fileJslint).href
-        ) + ";"
-    ).replace((
-        / import\(/g
-    ), " import_cjs(") +
+    require("fs")
+        .readFileSync(fileJslint, "utf8")
+        .replace(
+            "\nexport default Object.freeze(jslint_export);",
+            "\nmodule.exports = jslint_export;"
+        )
+        .replace(
+            "\njslint_import_meta_url = import.meta.url;",
+            (
+                "\njslint_import_meta_url = " +
+                JSON.stringify(require("url").pathToFileURL(fileJslint).href) +
+                ";"
+            )
+        )
+        .replace((/ import\(/g), " import_cjs(") +
     "\n})"
 );
 jslintRun(function (specifier) {
