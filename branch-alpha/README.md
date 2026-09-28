@@ -78,6 +78,7 @@ Douglas Crockford <douglas@crockford.com>
     - [pull-request merge](#pull-request-merge)
     - [branch-master commit](#branch-master-commit)
     - [branch-master publish](#branch-master-publish)
+    - [vscode-jslint development](#vscode-jslint-development)
     - [vscode-jslint publish](#vscode-jslint-publish)
 
 
@@ -1226,6 +1227,21 @@ if (false) {
     - click `Publish release`
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
         - verify email-notification `Successfully published @kaizhu256/jslint@20yy.mm.dd`
+
+
+<br><br>
+
+### vscode-jslint development
+```shell
+
+# Build vscode-jslint.
+sh jslint_ci.sh shCiVscePackageJslintWrapperVscode
+
+# Open vscode with vscode-jslint, and press F5 to debug.
+code \
+    --disable-extensions \
+    --extensionDevelopmentPath=.artifact/jslint_wrapper_vscode
+```
 
 
 <br><br>

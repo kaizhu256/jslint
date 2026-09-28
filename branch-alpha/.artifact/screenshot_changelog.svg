@@ -125,7 +125,7 @@
     textLength="768"
     x="10"
     y="450"
->- jslint-vscode - Add extra contextmenu command "JSLint - Autofix Whitespace", with keybinding c\</tspan>
+>- jslint-vscode - Add extra contextmenu command 'JSLint - Autofix Whitespace', with keybinding c\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
