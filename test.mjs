@@ -1487,6 +1487,10 @@ let aa = [0, 1];
 let bb = {};
 [aa[0], aa[1]] = [aa[1], aa[0]];
 [bb.cc, [...bb.dd]] = aa;
+[
+    bb.ee = aa[0],
+    bb.ff
+] = aa;
                 `),
 
 // PR-459 - Allow destructuring-assignment after function-definition.

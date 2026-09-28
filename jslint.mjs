@@ -6391,8 +6391,7 @@ function jslint_phase3_parse(state) {
 
 // PR-xxx - Fixes issue #512 - Allow member-expression like 'aa.bb' or 'aa[bb]'
 // as target in array-destructuring-assignment '[aa.bb] = ...'. Only this
-// caller passes no <scope_declared>, since it declares nothing. A default on a
-// member-target like '[aa.bb = 0] = ...' still stops.
+// caller passes no <scope_declared>, since it declares nothing.
 
                 name = parse_expression(20);
                 if (name.arity !== "variable") {
@@ -6408,6 +6407,21 @@ function jslint_phase3_parse(state) {
 
                         test_cause("member", name.id);
                         sub_list.push(name);
+                    }
+                    if (token_nxt.id === "=") {
+
+// PR-xxx - Fixes issue #512 - Default on member-target '[aa.bb = 0] = ...'.
+// It is pushed wrapped in an array, which has no <arity>, so <prefix_lbracket>
+// walks it with the member-targets, and a variable default like 'cc' is never
+// looked up as a target.
+
+// test_cause:
+// [";[aa.bb=0]=0", "name_parse", "member_default", "", 0]
+
+                        test_cause("member_default");
+                        advance("=");
+                        the_destructure.open = true;
+                        sub_list.push([parse_expression(0)]);
                     }
                     return;
                 }
@@ -6992,8 +7006,9 @@ function jslint_phase3_parse(state) {
                 false                   // the_function_toplevel
             );
 
-// PR-xxx - Fixes issue #512 - Walk member-targets like 'aa.bb' as expressions,
-// and leave only variables in <name_list> for <post_a_assignment> to look up.
+// PR-xxx - Fixes issue #512 - Walk member-targets like 'aa.bb' and their
+// defaults as expressions, and leave only variables in <name_list> for
+// <post_a_assignment> to look up.
 
             element.expression = the_token.name_list.filter(function (name) {
                 return name.arity !== "variable";
