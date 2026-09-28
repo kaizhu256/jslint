@@ -1025,6 +1025,47 @@ String({
         }), ["aa", "get bb", "dd"]);
     });
     jstestIt((
+        "test report-function-owner handling-behavior"
+    ), function () {
+
+// PR-xxx - Bugfix - A named function expression owns its own name, and a
+// function lists an outer 'bb' even beside its own block-scoped 'bb'.
+
+        const html = jslint.jslint_report(jslint.jslint(String(`
+function aa() {
+    let bb = 0;
+    function cc() {
+        if (cc) {
+            cc(bb);
+        }
+        if (cc) {
+            let bb = 1;
+            cc(bb);
+        }
+    }
+    return function dd() {
+        return dd(cc);
+    };
+}
+aa();
+        `).trim() + "\n", {}));
+        const result = html.slice(
+            html.indexOf("<div class=\"level level1\">"),
+            html.lastIndexOf("</div>\n</fieldset>")
+        ).replace((/<dl>/g), "\n<dl>");
+        assertOrThrow(result === String(`
+<div class="level level1"><address>1: 1</address><dfn>aa()</dfn>
+<dl><dt>variable</dt><dd>bb, cc</dd></dl>
+<dl><dt>closure</dt><dd>bb, cc</dd></dl></div>
+<div class="level level2"><address>3: 5</address><dfn>cc()</dfn>
+<dl><dt>variable</dt><dd>bb</dd></dl>
+<dl><dt>outer</dt><dd>bb, cc</dd></dl></div>
+<div class="level level2"><address>12: 12</address><dfn>dd()</dfn>
+<dl><dt>variable</dt><dd>dd</dd></dl>
+<dl><dt>outer</dt><dd>cc</dd></dl></div>
+        `).trim() + "\n", result);
+    });
+    jstestIt((
         "test autofix-report handling-behavior"
     ), function () {
         let result;
@@ -1679,6 +1720,20 @@ function aa(bb) {
     }
 }
 aa();
+                `),
+
+// PR-xxx - Bugfix - The '}' of a '${' does not pop the '{' of a function-body
+// in a for-loop-head, since '${' is pushed too.
+
+                (`
+function aa(bb) {
+    for (const cc of function () {
+        return \`\${bb}\`;
+    }()) { //jslint-ignore-line
+        bb(cc);
+    }
+}
+aa();
                 `)
             ],
             import: [
@@ -1996,7 +2051,7 @@ jstestDescribe((
 
         [{eval: true, evil: true}, "new Function();\neval();"],
 
-// PR-xxx - Bugfix - A quoted key "get aa" is not a duplicate of 'get aa()'.
+// PR-xxx - Bugfix - A string-key named get aa does not duplicate an accessor.
 
         [{getset: true}, String(`
 String({

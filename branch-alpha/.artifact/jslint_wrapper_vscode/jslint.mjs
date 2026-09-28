@@ -339,6 +339,7 @@
     scope_function,
     scope_function_pop,
     scope_function_push,
+    scope_report_push,
     scriptId,
     search,
     set,
@@ -1383,19 +1384,29 @@ function jslint(
     }
 
     function scope_function_push(value, list_push) {
-
-// PR-xxx - Bugfix - <context_report> holds what <jslint_report> lists for a
-// function, which are the names it declares and the outer names it uses. It
-// is kept apart from <context>, which is a scope_block and holds parameters.
-
-        if (!value.context_report) {
-            value.context_report = empty();
-        }
         function_stack.unshift(value);
         if (list_push) {
             function_list.push(value);
         }
         return value;
+    }
+
+    function scope_report_push(the_function, name) {
+
+// PR-xxx - Bugfix - This function will push <name> to what <jslint_report>
+// lists for <the_function>, which are the names it declares and the outer
+// names it uses. A list per id keeps an own 'bb' and an outer 'bb' apart.
+
+        const {id} = name;
+        if (!the_function.context_report) {
+            the_function.context_report = empty();
+        }
+        if (!the_function.context_report[id]) {
+            the_function.context_report[id] = [];
+        }
+        if (!the_function.context_report[id].includes(name)) {
+            the_function.context_report[id].push(name);
+        }
     }
 
     function stop(code, the_token, a, b, c, d) {
@@ -1894,6 +1905,7 @@ function jslint(
                 scope_block_push,
                 scope_function_pop,
                 scope_function_push,
+                scope_report_push,
                 source,
                 stop,
                 stop_at,
@@ -4745,6 +4757,7 @@ function jslint_phase3_parse(state) {
         scope_block_push,
         scope_function_pop,
         scope_function_push,
+        scope_report_push,
         stop,
         syntax_dict,
         tenure,
@@ -5779,10 +5792,15 @@ function jslint_phase3_parse(state) {
         name.scope_declared = scope_declared;
 
 // PR-xxx - Bugfix - Record the function that owns <name>, since a let/const
-// <scope_declared> may be a block inside it.
+// <scope_declared> may be a block inside it. A named function expression
+// declares its name into itself before <scope_function> is pushed.
 
-        name.scope_function = scope_function;
-        scope_function.context_report[id] = name;
+        name.scope_function = (
+            (scope_declared.id === "function" || scope_declared.id === "=>")
+            ? scope_declared
+            : scope_function
+        );
+        scope_report_push(name.scope_function, name);
 
 // Warn about variable redefinition.
 
@@ -6826,7 +6844,7 @@ function jslint_phase3_parse(state) {
 
 // PR-xxx - Bugfix - <seen> maps a property-name to true, or to false if only
 // an accessor has it. Accessor-keys like 'get aa' live apart in
-// <seen_accessor>, so a quoted key "get aa" cannot collide with them.
+// <seen_accessor>, so a string-key named get aa cannot collide with them.
 
         const seen = empty();
         const seen_accessor = empty();
@@ -8812,6 +8830,7 @@ function jslint_phase4_walk(state) {
         scope_block_push,
         scope_function_pop,
         scope_function_push,
+        scope_report_push,
         syntax_dict,
         test_cause,
         token_global,
@@ -8941,9 +8960,7 @@ function jslint_phase4_walk(state) {
 // not merely outside the current scope_block, and record it for the report.
 
                 the_variable.closure = true;
-                if (!scope_function.context_report[id]) {
-                    scope_function.context_report[id] = the_variable;
-                }
+                scope_report_push(scope_function, the_variable);
             }
             return the_variable;
         });
@@ -8986,7 +9003,7 @@ function jslint_phase4_walk(state) {
 // 3.glo.1 - Mark 'declared', the global-variable, immediately.
 
             token_global.context[id] = the_variable;
-            scope_function.context_report[id] = the_variable;
+            scope_report_push(scope_function, the_variable);
         }
         if (the_variable.role === "label") {
 
@@ -9845,7 +9862,7 @@ function jslint_phase4_walk(state) {
 
 // PR-xxx - Bugfix - A setter's one parameter cannot be a rest-parameter, a
 // SyntaxError. Read <signature>, since <name_list> flattens destructuring and
-// cannot tell 'set aa(...bb)' from the valid 'set aa([...bb])'.
+// cannot tell a rest-parameter from a valid rest-element inside a destructure.
 
             if (
                 thing.parameter_count !== 1 ||
@@ -11424,8 +11441,8 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         html += "</div>\n";
     }
     functions.forEach(function (the_function) {
-        let {
-            context_report: context,
+        const {
+            context_report = empty(),
             from,
             id,
             level,
@@ -11435,14 +11452,22 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
             signature
         } = the_function;
 
-// PR-xxx - Bugfix - <context_report> mixes own and outer names, so own rows
-// check <scope_function>.
+// PR-xxx - Bugfix - <context_report> holds a list of names per id, which mixes
+// own and outer names, so each row checks <scope_function>.
 
-        let list = Object.keys(context).sort().filter(function (id) {
-            return context[id].scope_function === the_function;
-        });
-        let list_outer = Object.keys(context).sort().filter(function (id) {
-            return context[id].scope_function !== the_function;
+        const entry_list = [];
+        function id_list(filter) {
+            return entry_list.filter(filter).map(function ({id}) {
+                return id;
+            }).filter(function (id, ii, list) {
+                return list.indexOf(id) === ii;
+            }).sort();
+        }
+        function is_own({scope_function}) {
+            return scope_function === the_function;
+        }
+        Object.keys(context_report).forEach(function (key) {
+            entry_list.push(...context_report[key]);
         });
         html += (
             "<div class=\"level level" + htmlEscape(level) + "\">" +
@@ -11466,23 +11491,23 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         html += detail("parameter", name_list.map(function ({id}) {
             return id;
         }).sort());
-        html += detail("variable", list.filter(function (id) {
-            return context[id].role === "variable";
+        html += detail("variable", id_list(function (entry) {
+            return is_own(entry) && entry.role === "variable";
         }));
-        html += detail("exception", list.filter(function (id) {
-            return context[id].role === "exception";
+        html += detail("exception", id_list(function (entry) {
+            return is_own(entry) && entry.role === "exception";
         }));
-        html += detail("closure", list.filter(function (id) {
-            return context[id].closure === true;
+        html += detail("closure", id_list(function (entry) {
+            return is_own(entry) && entry.closure === true;
         }));
-        html += detail("outer", list_outer.filter(function (id) {
-            return context[id].scope_declared.id !== "(global)";
+        html += detail("outer", id_list(function (entry) {
+            return !is_own(entry) && entry.scope_declared.id !== "(global)";
         }));
-        html += detail(module, list_outer.filter(function (id) {
-            return context[id].scope_declared.id === "(global)";
+        html += detail(module, id_list(function (entry) {
+            return !is_own(entry) && entry.scope_declared.id === "(global)";
         }));
-        html += detail("label", list.filter(function (id) {
-            return context[id].role === "label";
+        html += detail("label", id_list(function (entry) {
+            return is_own(entry) && entry.role === "label";
         }));
         html += "</div>\n";
     });
