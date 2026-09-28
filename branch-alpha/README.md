@@ -1237,7 +1237,7 @@ if (false) {
 # Build vscode-jslint.
 sh jslint_ci.sh shCiVscePackageJslintWrapperVscode
 
-# Open vscode and debug with vscode-jslint.
+# Open vscode and debug vscode-jslint.
 code \
     --disable-extensions \
     --extensionDevelopmentPath=\
