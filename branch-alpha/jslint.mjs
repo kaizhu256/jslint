@@ -1255,9 +1255,9 @@ function jslint(
         if (is_weird(aa) || is_weird(bb)) {
 
 // test_cause:
-// ["aa(/./)||{}", "is_equal", "false", "", 0]
+// ["aa(/./)||{}", "is_equal", "weird", "", 0]
 
-            test_cause("false");
+            test_cause("weird");
             return false;
         }
         if (aa.arity === bb.arity && aa.id === bb.id) {
@@ -6565,6 +6565,19 @@ function jslint_phase3_parse(state) {
                     the_destructure.open = true;
                 }
                 name.expression = parse_expression(0);
+                if (scope_declared === undefined) {
+
+// PR-xxx - Bugfix - Walk a default in destructuring-assignment
+// '[aa = bb] = ...', which no <post_s_var> walks, so 'bb' was never used. It
+// is pushed wrapped in an array, which has no <arity>, so <prefix_lbracket>
+// walks it and never looks it up as a target.
+
+// test_cause:
+// [";[aa=0]=0", "name_parse", "default", "", 0]
+
+                    test_cause("default");
+                    name_list.push([name.expression]);
+                }
 
 // test_cause:
 // ["function aa([aa=aa]){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
@@ -7107,6 +7120,16 @@ function jslint_phase3_parse(state) {
                 undefined,              // the_function
                 false                   // the_function_toplevel
             );
+
+// PR-xxx - Walk defaults as expressions, and leave only variables in
+// <name_list> for <post_a_assignment> to look up.
+
+            element.expression = the_token.name_list.filter(function (name) {
+                return name.arity !== "variable";
+            });
+            the_token.name_list = the_token.name_list.filter(function (name) {
+                return name.arity === "variable";
+            });
             advance("=");
             symbol("=").led_infix(element);
             return the_token;

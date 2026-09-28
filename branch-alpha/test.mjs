@@ -1666,6 +1666,20 @@ function cc() {
 }
 [aa, bb] = cc();
 aa(bb, cc);
+                `),
+
+// PR-xxx - Bugfix - Walk a default in destructuring-assignment, so 'cc' is
+// used.
+
+                (`
+let aa;
+let cc = 0;
+[
+    [
+        aa = cc
+    ]
+] = [];
+aa();
                 `)
             ],
             directive: [
