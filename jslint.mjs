@@ -2899,10 +2899,12 @@ function jslint_phase2_lex(state) {
         warn_at,
         warning_list
     } = state;
+    const brace_stack = [];     // Stack of opener tokens: {, ${.
     const mode_digits_numeric_separator = 1;
     const mode_digits_regexp_quantifier = 2;
     const mode_digits_unicode_escape = 3;
     const opener_stack = [];    // Stack of opener tokens: (, [.
+    let brace_popped = empty();         // Last token popped from brace_stack.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
     let from;                   // The starting column number of the token.
@@ -4565,6 +4567,10 @@ function jslint_phase2_lex(state) {
 // current depth is marked as a fart.
 
         switch (id) {
+        case "${":
+        case "{":
+            brace_stack.unshift(the_token);
+            break;
         case "(":
         case "[":
             opener_stack.unshift(the_token);
@@ -4619,6 +4625,9 @@ function jslint_phase2_lex(state) {
                 token_prv_expr.fart = the_token;
             }
             break;
+        case "}":
+            brace_popped = brace_stack.shift() || empty();
+            break;
         }
         switch (token_prv_expr.id + " " + id) {
         case ") =>":
@@ -4642,6 +4651,13 @@ function jslint_phase2_lex(state) {
 
         case "for await":
             the_token.for_loop = token_prv_expr;
+            break;
+
+// PR-xxx - Fixes issue #512 - Mark '{' of object-destructuring-assignment
+// '({aa} = ...)', as "] =" marks '['.
+
+        case "} =":
+            brace_popped.assignment = the_token;
             break;
         }
 
@@ -6145,7 +6161,15 @@ function jslint_phase3_parse(state) {
 // It is an expression statement.
 
             the_statement = parse_expression(0, true);
-            if (the_statement.wrapped && the_statement.id !== "(") {
+
+// PR-xxx - Fixes issue #512 - Object-destructuring-assignment '({aa} = ...);'
+// needs its parens.
+
+            if (
+                the_statement.wrapped &&
+                the_statement.id !== "(" &&
+                the_statement.expression?.[0]?.id !== "{"
+            ) {
 
 // test_cause:
 // [" (0)", "parse_statement_single", "unexpected_a", "(", 2]
@@ -6306,6 +6330,45 @@ function jslint_phase3_parse(state) {
                 }
             }
         }
+        function member_parse() {
+
+// PR-xxx - Fixes issue #512 - Allow member-expression like 'aa.bb' or 'aa[bb]'
+// as target in destructuring-assignment '[aa.bb] = ...'. Only that caller
+// passes no <scope_declared>, since it declares nothing. This function will
+// return a variable-target, else push a member-target to <name_list>.
+
+            const target = parse_expression(20);
+            if (target.arity === "variable") {
+                return target;
+            }
+
+// test_cause:
+// [";[aa()]=0", "check_mutation", "bad_assignment_a", "(", 5]
+
+            if (check_mutation(target)) {
+
+// test_cause:
+// [";[aa.bb]=0", "member_parse", "member", ".", 0]
+// [";[aa[0]]=0", "member_parse", "member", "[", 0]
+
+                test_cause("member", target.id);
+                name_list.push(target);
+            }
+            if (token_nxt.id === "=") {
+
+// PR-xxx - A default is pushed wrapped in an array, which has no <arity>, so
+// <prefix_destructure_assignment> walks it, and a variable default like 'cc'
+// is never looked up as a target.
+
+// test_cause:
+// [";[aa.bb=0]=0", "member_parse", "default", "", 0]
+
+                test_cause("default");
+                advance("=");
+                the_destructure.open = true;
+                name_list.push([parse_expression(0)]);
+            }
+        }
         function name_parse() {
             let name = token_nxt;
             switch (name.id) {
@@ -6388,41 +6451,8 @@ function jslint_phase3_parse(state) {
                 survey(name);
             }
             if (!is_lbrace && scope_declared === undefined) {
-
-// PR-xxx - Fixes issue #512 - Allow member-expression like 'aa.bb' or 'aa[bb]'
-// as target in array-destructuring-assignment '[aa.bb] = ...'. Only this
-// caller passes no <scope_declared>, since it declares nothing.
-
-                name = parse_expression(20);
-                if (name.arity !== "variable") {
-
-// test_cause:
-// [";[aa()]=0", "check_mutation", "bad_assignment_a", "(", 5]
-
-                    if (check_mutation(name)) {
-
-// test_cause:
-// [";[aa.bb]=0", "name_parse", "member", ".", 0]
-// [";[aa[0]]=0", "name_parse", "member", "[", 0]
-
-                        test_cause("member", name.id);
-                        sub_list.push(name);
-                    }
-                    if (token_nxt.id === "=") {
-
-// PR-xxx - Fixes issue #512 - Default on member-target '[aa.bb = 0] = ...'.
-// It is pushed wrapped in an array, which has no <arity>, so <prefix_lbracket>
-// walks it with the member-targets, and a variable default like 'cc' is never
-// looked up as a target.
-
-// test_cause:
-// [";[aa.bb=0]=0", "name_parse", "member_default", "", 0]
-
-                        test_cause("member_default");
-                        advance("=");
-                        the_destructure.open = true;
-                        sub_list.push([parse_expression(0)]);
-                    }
+                name = member_parse();
+                if (!name) {
                     return;
                 }
             } else {
@@ -6451,17 +6481,19 @@ function jslint_phase3_parse(state) {
                     return;
                 }
                 token_nxt.name_alias = name;
-                name = token_nxt;
-                name_declare(
-                    scope_declared,     // scope_declared
-                    role,               // role
-                    readonly,           // readonly
-                    sub_list,           // name_list
-                    name,               // name
-                    true                // assigned
-                );
-                advance_and_signature_push(token_nxt.id);
-                return;
+                if (scope_declared === undefined) {
+                    name = member_parse();
+                    if (!name) {
+                        return;
+                    }
+                } else {
+                    name = token_nxt;
+                    advance_and_signature_push(token_nxt.id);
+                }
+
+// PR-xxx - Fall through, so an aliased name takes a default, as in
+// 'let {aa: bb = 0} = ...'.
+
             }
             name_declare(
                 scope_declared,         // scope_declared
@@ -6478,6 +6510,17 @@ function jslint_phase3_parse(state) {
                     the_destructure.open = true;
                 }
                 name.expression = parse_expression(0);
+                if (scope_declared === undefined) {
+
+// PR-xxx - Bugfix - Walk a default in destructuring-assignment
+// '[aa = bb] = ...', which no <post_s_var> walks, so 'bb' was never used.
+
+// test_cause:
+// [";[aa=0]=0", "name_parse", "default", "", 0]
+
+                    test_cause("default");
+                    name_list.push([name.expression]);
+                }
 
 // test_cause:
 // ["function aa([aa=aa]){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
@@ -6546,6 +6589,37 @@ function jslint_phase3_parse(state) {
         }
         advance_and_signature_push("]");
         return the_destructure;
+    }
+
+    function prefix_destructure_assignment() {
+
+// This function will parse destructuring-assignment '[aa] = ...' or
+// '({aa} = ...)', whose opener phase 2 marked with its '=' token.
+
+        const name_list = [];   // 3. name_list for "[aa] = ..."
+        const the_assignment = token_now.assignment;
+        const the_destructure = prefix_destructure(
+            undefined,          // scope_declared
+            "variable",         // role
+            false,              // readonly
+            name_list,          // name_list
+            undefined,          // the_function
+            false               // the_function_toplevel
+        );
+
+// PR-xxx - Fixes issue #512 - Walk member-targets like 'aa.bb' and defaults as
+// expressions, and leave only variables in <name_list> for <post_a_assignment>
+// to look up.
+
+        the_destructure.expression = name_list.filter(function (name) {
+            return name.arity !== "variable";
+        });
+        the_assignment.name_list = name_list.filter(function (name) {
+            return name.arity === "variable";
+        });
+        advance("=");
+        symbol("=").led_infix(the_destructure);
+        return the_assignment;
     }
 
     function prefix_ellipsis() {
@@ -6950,6 +7024,13 @@ function jslint_phase3_parse(state) {
             }
             return value;
         }
+        if (the_brace.assignment) {
+
+// PR-xxx - Fixes issue #512 - Parse object-destructuring-assignment
+// '({aa} = ...)'.
+
+            return prefix_destructure_assignment();
+        }
         the_brace.expression = [];
         if (token_nxt.id !== "}") {
 
@@ -6988,37 +7069,13 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_lbracket() {
-        let element;
-        let the_token = token_now;
+        const the_token = token_now;
         the_token.expression = [];
         if (the_token.assignment) {
-            the_token = token_now.assignment;
-            the_token.name_list = [];   // 3. name_list for "[aa] = ..."
 
 // PR-500 - Unify ES2015-destructure-logic. - [aa] = ...;
 
-            element = prefix_destructure(
-                undefined,              // scope_declared
-                "variable",             // role
-                false,                  // readonly
-                the_token.name_list,    // name_list
-                undefined,              // the_function
-                false                   // the_function_toplevel
-            );
-
-// PR-xxx - Fixes issue #512 - Walk member-targets like 'aa.bb' and their
-// defaults as expressions, and leave only variables in <name_list> for
-// <post_a_assignment> to look up.
-
-            element.expression = the_token.name_list.filter(function (name) {
-                return name.arity !== "variable";
-            });
-            the_token.name_list = the_token.name_list.filter(function (name) {
-                return name.arity === "variable";
-            });
-            advance("=");
-            symbol("=").led_infix(element);
-            return the_token;
+            return prefix_destructure_assignment();
         }
         if (token_nxt.id !== "]") {
 
