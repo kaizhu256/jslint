@@ -7373,8 +7373,15 @@ function jslint_phase3_parse(state) {
     function stmt_delete() {
         const the_token = token_now;
         const the_value = parse_expression(0);
+
+// PR-xxx - Bugfix - Allow 'delete aa?.bb', a valid optional-chain operand.
+
         if (
-            (the_value.id !== "." && the_value.id !== "[") ||
+            (
+                the_value.id !== "." &&
+                the_value.id !== "?." &&
+                the_value.id !== "["
+            ) ||
             the_value.arity !== "binary"
         ) {
 
