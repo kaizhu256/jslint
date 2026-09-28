@@ -582,6 +582,36 @@ jstestDescribe((
             "function aa(bb) {\r\n    return bb;\r\n}\r\naa();\r\n"
         ), "function aa(bb) { return bb; }\r\naa();");
 
+// A used label warns only its placement, so a mid-line label reaches phase 6,
+// which splits it onto its own line at column 1.
+
+        assertAutofix(
+            String(`
+function aa(bb) {
+    bb();
+cc:
+    while (bb) {
+        if (bb()) {
+            break cc;
+        }
+        bb();
+    }
+}
+aa();
+            `).trim() + "\n",
+            String(`
+function aa(bb) {
+    bb(); cc: while (bb) {
+        if (bb()) {
+            break cc;
+        }
+        bb();
+    }
+}
+aa();
+            `).trim() + "\n"
+        );
+
 // A whitespace-run reaching column 0 is INDENTATION or a line-join, not a gap
 // between two tokens on one line, so the fix is DECLINED and the warning is
 // reported against a byte-identical file. Here the run is the whole indent of
@@ -1927,6 +1957,9 @@ export default Object.freeze(async function () {
                 `import aa from "aa";\naa();`,
                 `import aa, {aa as bb, cc} from "aa";\naa(bb, cc);`,
                 `import {} from "aa";`
+            ],
+            new: [
+                "new String`aa`();"
             ],
             number: [
                 "String(0.0e0);",

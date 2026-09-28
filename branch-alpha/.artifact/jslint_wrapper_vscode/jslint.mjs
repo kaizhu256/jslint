@@ -5493,6 +5493,7 @@ function jslint_phase3_parse(state) {
 // ["\"\".aa", "check_left", "unexpected_a", ".", 3]
 // ["\"aa\"?.0", "check_left", "unexpected_a", "?.", 5]
 // ["aa=[]?.aa", "check_left", "unexpected_a", "?.", 6]
+// ["new aa``.aa()", "check_left", "unexpected_a", ".", 9]
 
             check_left(left, the_token);
         }
@@ -7026,9 +7027,9 @@ function jslint_phase3_parse(state) {
                 if (typeof extra === "string") {
 
 // test_cause:
-// ["aa={get aa.aa}", "property_parse", "paren", "", 0]
+// ["aa={get aa.aa}", "property_parse", "getset_no_paren", "", 0]
 
-                    test_cause("paren");
+                    test_cause("getset_no_paren");
                     advance("(");
                 }
                 the_colon = token_nxt;
@@ -7178,6 +7179,19 @@ function jslint_phase3_parse(state) {
         const the_new = token_now;
         let right;
         right = parse_expression(160);
+
+// PR-xxx - Bugfix - In 'new aa`bb`()' the tagged-megastring belongs to the
+// callee, 'new (aa`bb`)()', but '`' shares lbp 160 with the call's '(', so rbp
+// 160 stops before it. Parse it, and any member after it, into the callee.
+
+        while (token_nxt.id === "`") {
+            advance("`");
+            right = infix_grave(right);
+            while ([".", "?.", "["].includes(token_nxt.id)) {
+                advance();
+                right = syntax_dict[token_now.id].led_infix(right);
+            }
+        }
         if (optional_chain(right)) {
 
 // PR-xxx - Bugfix - The callee of 'new' cannot be an optional-chain, a
@@ -10947,13 +10961,10 @@ function jslint_phase6_autofix(state) {
         switch (code) {
         case "expected_a_at_b_c":
 
-// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FOUR
-// callers, not one: at_margin and one_space warn a token that already belongs
-// at a margin, so the target column belongs to the warned line itself. The
-// other two pass 0, are LABEL placement, and DO warn a mid-line token -
-// unreachable here only because a label always co-raises weird_loop or
-// unused_a, which blocks the pass. So do NOT read "always at a margin" as
-// licence to drop the mid-line branch below.
+// expected_a_at_b_c is indentation. Of the four callers of <expected_at>,
+// <at_margin> and <one_space> warn a token that belongs at a margin. The two
+// label callers pass 0 and warn a mid-line label too, such as 'cc:' after
+// 'bb();' on one line. That reaches here, so keep the mid-line branch below.
 
             indentage_at = line_source.length - line_source.trimStart().length;
 
