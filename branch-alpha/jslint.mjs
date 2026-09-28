@@ -294,6 +294,7 @@
     on,
     open,
     opening,
+    optional,
     operator,
     option,
     option_dict,
@@ -1817,6 +1818,9 @@ function jslint(
             break;
         case "weird_relation_a":
             mm = `Weird relation '${a}'.`;
+            break;
+        case "wrap_coalesce_a":
+            mm = `Wrap the '${a}' subexpression beside '??' in parens.`;
             break;
         case "wrap_condition":
             mm = `Wrap the condition in parens.`;
@@ -5002,6 +5006,7 @@ function jslint_phase3_parse(state) {
 //      [destructure]
 //      {destructure}
 
+        const the_optional = optional_chain(the_thing);
         if (
             the_thing.arity !== "variable" &&
             the_thing.id !== "." &&
@@ -5014,6 +5019,19 @@ function jslint_phase3_parse(state) {
 // ["0=0", "check_mutation", "bad_assignment_a", "0", 1]
 
             warn("bad_assignment_a", the_thing);
+            return false;
+        }
+
+// PR-xxx - Bugfix - An optional-chain is never an assignment target, so
+// 'aa?.bb.cc = 0' and 'aa?.[bb] = 0' are SyntaxErrors too.
+
+        if (the_optional) {
+
+// test_cause:
+// ["aa?.[aa]=0", "check_mutation", "bad_assignment_a", "?.", 5]
+// ["aa?.aa.aa=0", "check_mutation", "bad_assignment_a", "?.", 3]
+
+            warn("bad_assignment_a", the_optional, "?.");
             return false;
         }
         return true;
@@ -5491,6 +5509,11 @@ function jslint_phase3_parse(state) {
 // ["aa?.[bb]", "infix_dot", "dyn_prop_or_call", "", 0]
 
             test_cause("dyn_prop_or_call");
+
+// PR-xxx - Bugfix - The '?.' token leaves the tree here, so mark the '[' or '('
+// that follows it, for <optional_chain>.
+
+            name.optional = true;
             return left;
         }
         if (!name.identifier) {
@@ -5530,7 +5553,18 @@ function jslint_phase3_parse(state) {
     }
 
     function infix_grave(left) {
+        const the_optional = optional_chain(left);
         const the_tick = prefix_tick(true);
+        if (the_optional) {
+
+// PR-xxx - Bugfix - A tagged-megastring cannot follow an optional-chain, a
+// SyntaxError.
+
+// test_cause:
+// ["aa?.aa``", "infix_grave", "unexpected_a", "?.", 3]
+
+            warn("unexpected_a", the_optional, "?.");
+        }
 
 // test_cause:
 // ["0``", "check_left", "unexpected_a", "`", 2]
@@ -5850,6 +5884,34 @@ function jslint_phase3_parse(state) {
 
             warn("redefinition_global_a_b", name, global_dict[id], id);
             return;
+        }
+    }
+
+    function optional_chain(thing) {
+
+// PR-xxx - This function will return the '?.' token, or the '[' or '(' token
+// marked <optional> after a '?.', of an unwrapped optional-chain ending at
+// <thing>. The spec forbids such a chain as an assignment target, the callee
+// of 'new' and the tag of a template.
+
+        while (thing && !thing.wrapped) {
+            if (thing.id === "?." || thing.optional === true) {
+                return thing;
+            }
+            if (thing.arity !== "binary") {
+                return;
+            }
+            switch (thing.id) {
+            case "(":
+            case "[":
+                thing = thing.expression[0];
+                break;
+            case ".":
+                thing = thing.expression;
+                break;
+            default:
+                return;
+            }
         }
     }
 
@@ -6227,7 +6289,7 @@ function jslint_phase3_parse(state) {
 
 // Create one of the postassign operators.
 
-        const the_symbol = symbol(id, 150);
+        const the_symbol = symbol(id, 155);
         the_symbol.led_infix = function (left) {
             token_now.expression = left;
             token_now.arity = "postassign";
@@ -7116,6 +7178,16 @@ function jslint_phase3_parse(state) {
         const the_new = token_now;
         let right;
         right = parse_expression(160);
+        if (optional_chain(right)) {
+
+// PR-xxx - Bugfix - The callee of 'new' cannot be an optional-chain, a
+// SyntaxError that rbp 160 let in, since '?.' binds at 170.
+
+// test_cause:
+// ["new aa?.aa()", "prefix_new", "unexpected_a", "?.", 7]
+
+            warn("unexpected_a", optional_chain(right), "?.");
+        }
         if (token_nxt.id !== "(") {
 
 // test_cause:
@@ -7167,7 +7239,12 @@ function jslint_phase3_parse(state) {
 // ["void", "prefix_void", "unexpected_a", "void", 1]
 
         warn("unexpected_a", the_void);
-        the_void.expression = parse_expression(0);
+
+// PR-xxx - Bugfix - Parse the operand at rbp 150, like every unary operator,
+// since the spec reads 'void UnaryExpression'. At rbp 0, 'void aa ** 2', a
+// SyntaxError, parsed as 'void (aa ** 2)'.
+
+        the_void.expression = parse_expression(150);
         return the_void;
     }
 
@@ -7625,9 +7702,27 @@ function jslint_phase3_parse(state) {
                 the_operator = the_variable.operator;
                 break;
             default:
-                the_variable = parse_expression(0);
+
+// PR-xxx - Bugfix - Parse the target at rbp 110, which stops before 'in' and
+// 'of', then their right side at rbp 0, as the spec does. Parsing the whole
+// head at rbp 0 let a looser operator like '||' in 'for (aa in bb || cc)'
+// wrap the 'in' node, and the lint stopped.
+
+                the_variable = parse_expression(110);
+                if (token_nxt.id !== "in" && token_nxt.id !== "of") {
+                    return stop(
+                        "expected_a_b",
+                        token_nxt,
+                        "of",
+                        token_nxt.id
+                    );
+                }
+                advance();
+                the_operator = token_now;
+                the_operator.arity = "binary";
+                the_operator.expression = [the_variable, parse_expression(0)];
+                the_variable = the_operator;
                 the_for.for_of = the_variable;
-                the_operator = the_variable;
             }
             the_variable.for_init = true;
             switch (the_operator.id) {
@@ -7655,6 +7750,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["for(aa of aa){}", "stmt_for", "of", "of", 0]
+// ["for(aa of aa||aa){}", "stmt_for", "of", "of", 0]
 // ["for(const aa of aa){}", "stmt_for", "of", "of", 0]
 // ["for(let aa of aa){}", "stmt_for", "of", "of", 0]
 // ["for(var aa of aa){}", "stmt_for", "of", "of", 0]
@@ -8592,7 +8688,11 @@ function jslint_phase3_parse(state) {
         the_symbol.led_infix = function parse_ternary_led(left) {
             const the_token = token_now;
             let second;
-            second = parse_expression(20);
+
+// PR-xxx - Bugfix - Both branches are an AssignmentExpression in the spec, so
+// parse the second like the third. 'aa ? bb = 0 : cc' used to stop at '='.
+
+            second = parse_expression(10);
             advance(id2);
             token_now.arity = "ternary";
             the_token.arity = "ternary";
@@ -8601,6 +8701,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["0?0:0", "parse_ternary_led", "use_open", "?", 2]
+// ["aa=0?aa=0:0", "parse_ternary_led", "use_open", "?", 5]
 
                 warn("use_open", the_token);
             }
@@ -9242,6 +9343,45 @@ function jslint_phase4_walk(state) {
 // ["0- -0", "post_b_binary", "wrap_unary", "-", 4]
 
                 warn("wrap_unary", right);
+            }
+
+// PR-xxx - Bugfix - A unary operator before '**' is a SyntaxError, since the
+// spec's ExponentiationExpression takes an UpdateExpression on its left. So
+// '-aa ** 2' needs parens, while '[aa] ** 2' and '++aa ** 2' do not.
+
+            if (
+                thing.id === "**" &&
+                thing.expression[0].arity === "unary" &&
+                !thing.expression[0].wrapped &&
+                [
+                    "!", "!!", "+", "-", "await", "typeof", "void", "~"
+                ].includes(thing.expression[0].id)
+            ) {
+
+// test_cause:
+// ["aa=-0**0", "post_b_binary", "wrap_unary", "-", 4]
+
+                warn("wrap_unary", thing.expression[0]);
+            }
+
+// PR-xxx - Bugfix - An unwrapped '&&' or '||' operand of '??' is a SyntaxError,
+// since the spec's CoalesceExpression takes a BitwiseORExpression on each side.
+// '??' binds loosest of the three, so only a '??' node can hold one.
+
+            if (thing.id === "??") {
+                thing.expression.forEach(function (thang) {
+                    if (
+                        (thang.id === "&&" || thang.id === "||") &&
+                        !thang.wrapped
+                    ) {
+
+// test_cause:
+// ["0&&0??0", "post_b_binary", "wrap_coalesce_a", "&&", 2]
+// ["0??0||0", "post_b_binary", "wrap_coalesce_a", "||", 5]
+
+                        warn("wrap_coalesce_a", thang, thang.id);
+                    }
+                });
             }
             if (
                 thing.expression[0].constant === true &&

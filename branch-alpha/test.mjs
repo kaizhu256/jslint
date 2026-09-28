@@ -962,6 +962,49 @@ aa(dd(0), 0);
         );
     });
     jstestIt((
+        "test binding-power handling-behavior"
+    ), function () {
+
+// PR-xxx - Bugfix - Binding-powers follow the spec's grammar, as tabled in
+// MDN Operator precedence. Each source returns the expression beside the
+// parameters, so none is unused, and lists the warning codes it must raise.
+
+        [
+            ["(-aa) ** 2", []],
+            ["-aa ** 2", ["wrap_unary"]],
+            ["-aa++", ["unexpected_a"]],
+            ["[aa] ** 2", []],
+            ["aa ** -2", []],
+            ["aa ?? (bb || cc)", []],
+            ["aa ?? bb && cc", ["wrap_coalesce_a"]],
+            ["aa ?? bb ?? cc", []],
+            ["aa || bb ?? cc", ["wrap_coalesce_a"]],
+            ["typeof aa ** 2", ["wrap_unary"]]
+        ].forEach(function ([expression, expect]) {
+            const result = jslint.jslint(String(`
+function ff(aa, bb, cc) {
+    return [aa, bb, cc, ${expression}];
+}
+ff();
+            `).trim() + "\n");
+            assertJsonEqual(result.warnings.map(function ({code}) {
+                return code;
+            }), expect, expression);
+        });
+
+// PR-xxx - Bugfix - The operand of 'void' is parsed at rbp 150, like every
+// unary operator, so 'void 0 + 0' is '(void 0) + 0'.
+
+        assertOrThrow(
+            jslint.jslint("String(void 0 + 0);\n").tokens.find(function ({
+                id
+            }) {
+                return id === "+";
+            }).expression[0].id === "void",
+            "void 0 + 0"
+        );
+    });
+    jstestIt((
         "test report-function handling-behavior"
     ), function () {
 
