@@ -1002,6 +1002,27 @@ aa();
 <div class="level level2"><address>14: 12</address><dfn>«return»()</dfn>
 <dl><dt>outer</dt><dd>ff</dd></dl></div>
         `).trim() + "\n", result);
+
+// PR-xxx - Bugfix - A method or accessor is named after its property, not
+// after the identifier before it.
+
+        assertJsonEqual(jslint.jslint(String(`
+/*jslint getset*/
+String({
+    aa() {
+        return;
+    },
+    get bb() {
+        return;
+    },
+    cc: 0,
+    dd() {
+        return;
+    }
+});
+        `).trim() + "\n").functions.map(function ({name}) {
+            return name;
+        }), ["aa", "get bb", "dd"]);
     });
     jstestIt((
         "test autofix-report handling-behavior"
@@ -1974,6 +1995,17 @@ jstestDescribe((
 // PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
 
         [{eval: true, evil: true}, "new Function();\neval();"],
+
+// PR-xxx - Bugfix - A quoted key "get aa" is not a duplicate of 'get aa()'.
+
+        [{getset: true}, String(`
+String({
+    get aa() {
+        return;
+    },
+    "get aa": 0
+});
+        `).trim()],
         [{getset: true}, "String({get aa() {\n    return;\n}});"],
         [{getset: true}, "String({set aa(aa) {\n    return aa;\n}});"],
         [{indent2: true}, sourceJslintMjs.replace((/    /g), "  ")],

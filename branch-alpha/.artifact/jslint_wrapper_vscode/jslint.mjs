@@ -94,6 +94,7 @@
 /*property
     JSLINT_BETA,
     NODE_V8_COVERAGE,
+    accessor,
     alive,
     all,
     argv,
@@ -6634,8 +6635,13 @@ function jslint_phase3_parse(state) {
         the_function.finally = 0;
         the_function.level = scope_function.level + 1;
         the_function.loop = 0;
+
+// PR-xxx - Bugfix - Keep the name <property_parse> gives a method or accessor,
+// 'aa' or 'get aa'. Else <anon> named it after the previous identifier.
+
         the_function.name = (
             name ||
+            the_function.name ||
             (
                 mode_fart_unwrapped
                 ? "anonymous"
@@ -6817,7 +6823,13 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_lbrace() {
+
+// PR-xxx - Bugfix - <seen> maps a property-name to true, or to false if only
+// an accessor has it. Accessor-keys like 'get aa' live apart in
+// <seen_accessor>, so a quoted key "get aa" cannot collide with them.
+
         const seen = empty();
+        const seen_accessor = empty();
         const the_brace = token_now;
         function property_parse() {
             let extra;
@@ -6859,10 +6871,11 @@ function jslint_phase3_parse(state) {
                 }
                 extra = name.id;
                 full = extra + " " + token_nxt.id;
+                name.accessor = true;
                 name = token_nxt;
                 advance();
                 id = survey(name);
-                if (seen[full] === true || seen[id] === true) {
+                if (seen_accessor[full] === true || seen[id] === true) {
 
 // test_cause:
 // ["aa={get aa(){},get aa(){}}", "property_parse", "duplicate_a", "aa", 20]
@@ -6870,7 +6883,7 @@ function jslint_phase3_parse(state) {
                     warn("duplicate_a", name);
                 }
                 seen[id] = false;
-                seen[full] = true;
+                seen_accessor[full] = true;
             } else {
                 id = survey(name);
                 if (typeof seen[id] === "boolean") {
@@ -6910,6 +6923,9 @@ function jslint_phase3_parse(state) {
 // ["aa={get aa(){}}", "property_parse", "paren", "", 0]
 
                 test_cause("paren");
+
+// PR-xxx - Bugfix - Name an accessor 'get aa' in the report, not 'get'.
+
                 value = prefix_function(
                     {
                         arity: "unary",
@@ -6918,7 +6934,7 @@ function jslint_phase3_parse(state) {
                         line: name.line,
                         name: (
                             typeof extra === "string"
-                            ? extra
+                            ? full
                             : id
                         ),
                         thru: name.from
@@ -9826,12 +9842,24 @@ function jslint_phase4_walk(state) {
                 warn("bad_get", thing);
             }
         } else if (thing.extra === "set") {
-            if (thing.parameter_count !== 1) {
+
+// PR-xxx - Bugfix - A setter's one parameter cannot be a rest-parameter, a
+// SyntaxError. Read <signature>, since <name_list> flattens destructuring and
+// cannot tell 'set aa(...bb)' from the valid 'set aa([...bb])'.
+
+            if (
+                thing.parameter_count !== 1 ||
+                thing.signature.startsWith("(...")
+            ) {
 
 // test_cause:
 // ["
 // /*jslint getset*/
 // aa={set aa(){}}
+// ", "pre_s_function", "bad_set", "function", 9]
+// ["
+// /*jslint getset*/
+// aa={set aa(...aa){}}
 // ", "pre_s_function", "bad_set", "function", 9]
 
                 warn("bad_set", thing);
@@ -10412,6 +10440,37 @@ function jslint_phase5_whitage(state) {
 
                 test_cause("for(;;)", left.id);
                 at_margin(0);
+            }
+            return;
+        }
+        if (left.accessor === true) {
+
+// PR-xxx - Bugfix - The 'get' or 'set' of an accessor takes one space before
+// its name, and no line break. On one line, <one_space> still lets a comment
+// sit between them.
+
+// test_cause:
+// ["
+// /*jslint getset*/
+// String({
+//     get
+//     aa() {
+//         return;
+//     }
+// });
+// ", "one_space_only", "expected_space_a_b", "aa", 5]
+// ["
+// /*jslint getset*/
+// String({get aa() {
+//     return;
+// }});
+// ", "whitage_default", "accessor", "", 0]
+
+            test_cause("accessor");
+            if (left.line === right.line) {
+                one_space();
+            } else {
+                one_space_only();
             }
             return;
         }
