@@ -6387,7 +6387,33 @@ function jslint_phase3_parse(state) {
             if (is_lbrace) {
                 survey(name);
             }
-            advance_and_signature_push(token_nxt.id);
+            if (!is_lbrace && scope_declared === undefined) {
+
+// PR-xxx - Fixes issue #512 - Allow member-expression like 'aa.bb' or 'aa[bb]'
+// as target in array-destructuring-assignment '[aa.bb] = ...'. Only this
+// caller passes no <scope_declared>, since it declares nothing. A default on a
+// member-target like '[aa.bb = 0] = ...' still stops.
+
+                name = parse_expression(20);
+                if (name.arity !== "variable") {
+
+// test_cause:
+// [";[aa()]=0", "check_mutation", "bad_assignment_a", "(", 5]
+
+                    if (check_mutation(name)) {
+
+// test_cause:
+// [";[aa.bb]=0", "name_parse", "member", ".", 0]
+// [";[aa[0]]=0", "name_parse", "member", "[", 0]
+
+                        test_cause("member", name.id);
+                        sub_list.push(name);
+                    }
+                    return;
+                }
+            } else {
+                advance_and_signature_push(token_nxt.id);
+            }
             if (is_lbrace && token_nxt.id === ":") {
                 advance_and_signature_push(":");
                 if (!the_function_toplevel) {
@@ -6965,6 +6991,16 @@ function jslint_phase3_parse(state) {
                 undefined,              // the_function
                 false                   // the_function_toplevel
             );
+
+// PR-xxx - Fixes issue #512 - Walk member-targets like 'aa.bb' as expressions,
+// and leave only variables in <name_list> for <post_a_assignment> to look up.
+
+            element.expression = the_token.name_list.filter(function (name) {
+                return name.arity !== "variable";
+            });
+            the_token.name_list = the_token.name_list.filter(function (name) {
+                return name.arity === "variable";
+            });
             advance("=");
             symbol("=").led_infix(element);
             return the_token;

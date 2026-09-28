@@ -1479,6 +1479,16 @@ aa(bb, cc, dd, ee, ff, gg);
                     return source;
                 }),
 
+// PR-xxx - Fixes issue #512 - Allow member-expression like 'aa.bb' or 'aa[bb]'
+// as target in array-destructuring-assignment.
+
+                (`
+let aa = [0, 1];
+let bb = {};
+[aa[0], aa[1]] = [aa[1], aa[0]];
+[bb.cc, [...bb.dd]] = aa;
+                `),
+
 // PR-459 - Allow destructuring-assignment after function-definition.
 
                 (`
