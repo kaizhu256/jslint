@@ -1024,19 +1024,19 @@ body {
 <pre><span class="lineno"><a href="#line_859" id="line_859">  859.</a></span><span class="count                ">     95</span><span>// Try writing to pathname.</span></pre>
 <pre><span class="lineno"><a href="#line_860" id="line_860">  860.</a></span><span class="count                ">     95</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_861" id="line_861">  861.</a></span><span class="count                ">     95</span><span>    try {</span></pre>
-<pre><span class="lineno"><a href="#line_862" id="line_862">  862.</a></span><span class="count                ">     72</span><span>        await moduleFs.promises.writeFile(pathname, data);</span></pre>
-<pre><span class="lineno"><a href="#line_863" id="line_863">  863.</a></span><span class="count                ">     72</span><span>    } catch (ignore) {</span></pre>
-<pre><span class="lineno"><a href="#line_864" id="line_864">  864.</a></span><span class="count                ">     23</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_865" id="line_865">  865.</a></span><span class="count                ">     23</span><span>// Lazy mkdirp.</span></pre>
-<pre><span class="lineno"><a href="#line_866" id="line_866">  866.</a></span><span class="count                ">     23</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_867" id="line_867">  867.</a></span><span class="count                ">     23</span><span>        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {</span></pre>
-<pre><span class="lineno"><a href="#line_868" id="line_868">  868.</a></span><span class="count                ">     23</span><span>            recursive: true</span></pre>
-<pre><span class="lineno"><a href="#line_869" id="line_869">  869.</a></span><span class="count                ">     23</span><span>        });</span></pre>
-<pre><span class="lineno"><a href="#line_870" id="line_870">  870.</a></span><span class="count                ">     23</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_871" id="line_871">  871.</a></span><span class="count                ">     23</span><span>// Retry writing to pathname.</span></pre>
-<pre><span class="lineno"><a href="#line_872" id="line_872">  872.</a></span><span class="count                ">     23</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_873" id="line_873">  873.</a></span><span class="count                ">     23</span><span>        await moduleFs.promises.writeFile(pathname, data);</span></pre>
-<pre><span class="lineno"><a href="#line_874" id="line_874">  874.</a></span><span class="count                ">     23</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_862" id="line_862">  862.</a></span><span class="count                ">     80</span><span>        await moduleFs.promises.writeFile(pathname, data);</span></pre>
+<pre><span class="lineno"><a href="#line_863" id="line_863">  863.</a></span><span class="count                ">     80</span><span>    } catch (ignore) {</span></pre>
+<pre><span class="lineno"><a href="#line_864" id="line_864">  864.</a></span><span class="count                ">     15</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_865" id="line_865">  865.</a></span><span class="count                ">     15</span><span>// Lazy mkdirp.</span></pre>
+<pre><span class="lineno"><a href="#line_866" id="line_866">  866.</a></span><span class="count                ">     15</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_867" id="line_867">  867.</a></span><span class="count                ">     15</span><span>        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {</span></pre>
+<pre><span class="lineno"><a href="#line_868" id="line_868">  868.</a></span><span class="count                ">     15</span><span>            recursive: true</span></pre>
+<pre><span class="lineno"><a href="#line_869" id="line_869">  869.</a></span><span class="count                ">     15</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_870" id="line_870">  870.</a></span><span class="count                ">     15</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_871" id="line_871">  871.</a></span><span class="count                ">     15</span><span>// Retry writing to pathname.</span></pre>
+<pre><span class="lineno"><a href="#line_872" id="line_872">  872.</a></span><span class="count                ">     15</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_873" id="line_873">  873.</a></span><span class="count                ">     15</span><span>        await moduleFs.promises.writeFile(pathname, data);</span></pre>
+<pre><span class="lineno"><a href="#line_874" id="line_874">  874.</a></span><span class="count                ">     15</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_875" id="line_875">  875.</a></span><span class="count                ">     95</span><span>    console.error("wrote file " + pathname);</span></pre>
 <pre><span class="lineno"><a href="#line_876" id="line_876">  876.</a></span><span class="count                ">     95</span><span>}</span></pre>
 <pre><span class="lineno"><a href="#line_877" id="line_877">  877.</a></span><span class="count                ">      1</span><span></span></pre>
