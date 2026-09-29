@@ -5712,15 +5712,23 @@ function jslint_phase3_parse(state) {
 //   temporal_dead_zone_a, though imports are hoisted.
 // - 2.fun.1 - Kept. 'let aa;(function aa(){})' warns redefinition_a_b, but
 //   the reverse order does not. ESLint no-shadow is off by default.
+// - 2.fun.1 - Fixed. A function-declaration directly in a case warns
+//   var_switch, as ESLint no-case-declarations.
 // - 2.fun.4 - Kept. Reassigning a function warns, as ESLint no-func-assign.
 // - 3.cat.1 - Todo. A destructured catch-variable 'catch ({aa})' stops.
 // - 3.cat.4 - Kept. Reassigning a catch-variable warns, as ESLint no-ex-assign.
 // - 3.glo.4 - Kept. Reassigning a global warns, as ESLint no-global-assign.
+// - 3.var.1 - Kept. A switch has no block scope, so a 'let' in a case is seen
+//   after the switch. It is moot, since var_switch warns that 'let'.
+// - 3.var.2 - Fixed. The finally-block is walked after the catch-block, so a
+//   'var' from the catch-block is alive in it.
 // - 3.var.2 - Kept. A 'var' read above its declaration warns
 //   temporal_dead_zone_a, though its hoisted value 'undefined' is valid.
 // - 3.var.2 - Kept. A function reading a 'let' declared below it warns, see
 //   the note in <name_lookup>.
 // - 3.var.4 - Todo. A const reassigned by '({aa} = {})' does not warn.
+// - 4.par.1 - Todo. A parameter-default reading a body 'var' warns
+//   temporal_dead_zone_a, where the spec makes it undeclared.
 // - 5.lab.1 - Kept. A label shares the variable namespace, so a same-named
 //   variable warns redefinition_a_b, as ESLint no-label-var.
 // - 5.lab.1 - Kept. A label is allowed only on do, for, switch and while.
@@ -6654,7 +6662,6 @@ function jslint_phase3_parse(state) {
 
     function prefix_function(the_function, mode_fart, mode_fart_unwrapped) {
         const name = !mode_fart && token_nxt.identifier && token_nxt;
-        let role = "variable";
 
 // PR-504 - Change scope from scope_function to scope_block:
 // - function-declaration
@@ -6675,6 +6682,20 @@ function jslint_phase3_parse(state) {
 
                 return stop("expected_identifier_a", token_nxt);
             }
+
+// PR-xxx - Warn a function-declaration directly in a case, as ESLint
+// no-case-declarations does. One nested in a block of the case already warns
+// unexpected_a in <pre_s_function>.
+
+            if (scope_function.switch > 0 && scope_block.function_body) {
+
+// test_cause:
+// ["
+// switch(0){case 0:function aa(){}}
+// ", "prefix_function", "var_switch", "function", 18]
+
+                warn("var_switch", the_function);
+            }
         } else if (name) {
 
 // A function expression may have an optional name.
@@ -6693,7 +6714,7 @@ function jslint_phase3_parse(state) {
 // 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
 
                 scope_declared,         // scope_declared
-                role,                   // role
+                "variable",             // role
 
 // 2.fun.4 - Mark 'readonly', the function-name, during function-declaration.
 // PR-xxx - Bugfix - Mark it readonly, so reassigning a function warns, as
@@ -6877,23 +6898,36 @@ function jslint_phase3_parse(state) {
 
                 warn("unexpected_a");
             }
+        }
 
 // Check functions are ordered.
 
-            check_ordered(
-                "function",
-                function_list.slice(
-                    function_list.indexOf(the_function) + 1
-                ).map(function ({
-                    level,
+// PR-xxx - Bugfix - Check only function-declarations, since a named
+// function-expression is not hoisted. Check an arrow-function's block-body too.
+
+// test_cause:
+// ["
+// ()=>{function bb(){}function aa(){}}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 30]
+
+        check_ordered(
+            "function",
+            function_list.slice(
+                function_list.indexOf(the_function) + 1
+            ).map(function ({
+                arity,
+                level,
+                name
+            }) {
+                return (
+                    arity === "statement" &&
+                    level === the_function.level + 1 &&
                     name
-                }) {
-                    return (level === the_function.level + 1) && name;
-                }).filter(function (name) {
-                    return option_dict.beta && name && name.id;
-                })
-            );
-        }
+                );
+            }).filter(function (name) {
+                return option_dict.beta && name && name.id;
+            })
+        );
 
 // Restore the previous context.
 
@@ -8434,8 +8468,8 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id !== "{") {
                 return stop("expected_a_b", token_nxt, "{", artifact());
             }
-            the_try.else = block();
-            the_disrupt = the_try.else.disrupt;
+            the_try.finally = block();
+            the_disrupt = the_try.finally.disrupt;
             scope_function.finally -= 1;
         }
         the_try.disrupt = the_disrupt;
@@ -8515,6 +8549,10 @@ function jslint_phase3_parse(state) {
         }
 
 // We don't expect to see variables created in switch statements.
+
+// PR-xxx - Kept 2026-09-29, broader than ESLint no-case-declarations. This
+// also warns a 'var', a braced 'case 0: {let aa}' and a 'let' nested in a
+// block of the case, all of which ESLint allows.
 
         if (scope_function.switch > 0) {
 
@@ -8946,10 +8984,11 @@ function jslint_phase3_parse(state) {
     check_ordered(
         "function",
         function_list.map(function ({
+            arity,
             level,
             name
         }) {
-            return (level === 1) && name;
+            return arity === "statement" && level === 1 && name;
         }).filter(function (name) {
             return option_dict.beta && name && name.id;
         })
@@ -9720,6 +9759,13 @@ function jslint_phase4_walk(state) {
 
             scope_block = scope_block_pop();
         }
+
+// PR-xxx - Bugfix - Walk the finally-block after the catch-block, as parsed.
+// Else a 'var' from the catch-block warned temporal_dead_zone_a in it.
+
+// Recurse walk_statement.
+
+        walk_statement(thing.finally);
     }
 
     function post_s_var(thing) {
@@ -10366,10 +10412,10 @@ function jslint_phase5_whitage(state) {
         }
     }
 
-    function delve(the_function) {
-        Object.keys(the_function.context).forEach(function (id) {
-            const name = the_function.context[id];
-            if (id !== "ignore" && name.scope_declared === the_function) {
+    function delve(the_block) {
+        Object.keys(the_block.context).forEach(function (id) {
+            const name = the_block.context[id];
+            if (id !== "ignore" && name.scope_declared === the_block) {
 
 // test_cause:
 // ["function aa(aa) {return aa;}", "delve", "id", "", 0]
