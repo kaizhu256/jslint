@@ -5712,7 +5712,7 @@ function jslint_phase3_parse(state) {
         }
 
 // Declare a name into the current scope_declared's context. The role can be
-// exception, function, label, parameter, or variable. We look for variable
+// exception, label, parameter, or variable. We look for variable
 // redefinition because it causes confusion.
 
 // Reserved words may not be declared.
@@ -5794,7 +5794,7 @@ function jslint_phase3_parse(state) {
         }
         if (
             earlier &&
-            role !== "parameter" && role !== "function" &&
+            role !== "parameter" &&
             (role !== "exception" || earlier.role !== "exception")
         ) {
 
@@ -7267,6 +7267,13 @@ function jslint_phase3_parse(state) {
         the_break.disrupt = true;
         if (token_nxt.identifier && token_now.line === token_nxt.line) {
             block_stack.some(function (scope_block) {
+
+// PR-xxx - Bugfix - Stop at the function boundary, since a label is not
+// visible inside a nested function.
+
+                if (scope_block === scope_function) {
+                    return true;
+                }
                 the_label = scope_block.context[token_nxt.id];
                 if (the_label?.role !== "label") {
                     the_label = undefined;
@@ -7279,6 +7286,9 @@ function jslint_phase3_parse(state) {
             if (!the_label) {
 
 // test_cause:
+// ["
+// aa:while(0){(function(){while(0){break aa;}}());}
+// ", "stmt_break", "not_label_a", "aa", 40]
 // ["aa:while(0){}break aa", "stmt_break", "not_label_a", "aa", 20]
 // ["break aa", "stmt_break", "not_label_a", "aa", 7]
 
@@ -7881,6 +7891,13 @@ function jslint_phase3_parse(state) {
                         advance();
                         if (token_nxt.id === "as") {
                             advance("as");
+                            if (!token_nxt.identifier) {
+
+// test_cause:
+// ["import {aa as 0}", "stmt_import", "expected_identifier_a", "0", 15]
+
+                                return stop("expected_identifier_a", token_nxt);
+                            }
                             name = token_nxt;
                             advance();
                         }
@@ -9035,6 +9052,7 @@ function jslint_phase4_walk(state) {
 // <the_variable> in current context from given <thing>.id.
 
         const id = thing.id;
+        let the_label;
         let the_variable;
 
 // PR-510 - deadcode-confirmed - Both callers pass a token already known to be
@@ -9060,6 +9078,22 @@ function jslint_phase4_walk(state) {
 
         block_stack.some(function (scope_block, ii) {
             the_variable = scope_block.context[id];
+
+// PR-xxx - Bugfix - Skip a label, so a same-named variable, function or global
+// in an outer scope is still found.
+
+            if (the_variable?.role === "label") {
+
+// test_cause:
+// ["aa:while(0){aa}", "name_lookup", "skip_label", "aa", 0]
+// ["
+// function aa(){aa:while(aa){break aa;}}
+// ", "name_lookup", "skip_label", "aa", 0]
+
+                test_cause("skip_label", id);
+                the_label = the_variable;
+                the_variable = undefined;
+            }
             if (the_variable && ii > 0) {
 
 // If found outside current-scope, mark as closure.
@@ -9069,6 +9103,14 @@ function jslint_phase4_walk(state) {
             return the_variable;
         });
         if (!the_variable && global_dict[id] === undefined) {
+            if (the_label) {
+
+// test_cause:
+// ["aa:while(0){aa}", "name_lookup", "label_a", "aa", 13]
+
+                warn("label_a", thing);
+                return the_label;
+            }
 
 // test_cause:
 // ["(function aa(){})aa", "name_lookup", "undeclared_a", "aa", 18]
@@ -9108,13 +9150,7 @@ function jslint_phase4_walk(state) {
 
             token_global.context[id] = the_variable;
         }
-        if (the_variable.role === "label") {
-
-// test_cause:
-// ["aa:while(0){aa}", "name_lookup", "label_a", "aa", 13]
-
-            warn("label_a", thing);
-        } else if (
+        if (
             (
                 !the_variable.calls ||
                 !scope_function.name ||
