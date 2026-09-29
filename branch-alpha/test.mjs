@@ -969,7 +969,7 @@ aa(dd(0), 0);
 // MDN Operator precedence. Each source returns the expression beside the
 // parameters, so none is unused, and lists the warning codes it must raise.
 
-        [
+        for (const [expression, expect] of [
             ["(-aa) ** 2", []],
             ["-aa ** 2", ["wrap_subexpression_a_b"]],
             ["-aa++", ["unexpected_a"]],
@@ -980,7 +980,7 @@ aa(dd(0), 0);
             ["aa ?? bb ?? cc", []],
             ["aa || bb ?? cc", ["wrap_subexpression_a_b"]],
             ["typeof aa ** 2", ["wrap_subexpression_a_b"]]
-        ].forEach(function ([expression, expect]) {
+        ]) {
             const result = jslint.jslint(String(`
 function ff(aa, bb, cc) {
     return [aa, bb, cc, ${expression}];
@@ -990,7 +990,7 @@ ff();
             assertJsonEqual(result.warnings.map(function ({code}) {
                 return code;
             }), expect, expression);
-        });
+        }
 
 // PR-xxx - Bugfix - The operand of 'void' is parsed at rbp 150, like every
 // unary operator, so 'void 0 + 0' is '(void 0) + 0'.

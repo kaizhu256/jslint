@@ -1134,7 +1134,7 @@ body {
 <pre><span class="lineno"><a href="#line_969" id="line_969">  969.</a></span><span class="count                ">      1</span><span>// MDN Operator precedence. Each source returns the expression beside the</span></pre>
 <pre><span class="lineno"><a href="#line_970" id="line_970">  970.</a></span><span class="count                ">      1</span><span>// parameters, so none is unused, and lists the warning codes it must raise.</span></pre>
 <pre><span class="lineno"><a href="#line_971" id="line_971">  971.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_972" id="line_972">  972.</a></span><span class="count                ">      1</span><span>        [</span></pre>
+<pre><span class="lineno"><a href="#line_972" id="line_972">  972.</a></span><span class="count                ">      1</span><span>        for (const [expression, expect] of [</span></pre>
 <pre><span class="lineno"><a href="#line_973" id="line_973">  973.</a></span><span class="count                ">      1</span><span>            ["(-aa) ** 2", []],</span></pre>
 <pre><span class="lineno"><a href="#line_974" id="line_974">  974.</a></span><span class="count                ">      1</span><span>            ["-aa ** 2", ["wrap_subexpression_a_b"]],</span></pre>
 <pre><span class="lineno"><a href="#line_975" id="line_975">  975.</a></span><span class="count                ">      1</span><span>            ["-aa++", ["unexpected_a"]],</span></pre>
@@ -1145,17 +1145,17 @@ body {
 <pre><span class="lineno"><a href="#line_980" id="line_980">  980.</a></span><span class="count                ">      1</span><span>            ["aa ?? bb ?? cc", []],</span></pre>
 <pre><span class="lineno"><a href="#line_981" id="line_981">  981.</a></span><span class="count                ">      1</span><span>            ["aa || bb ?? cc", ["wrap_subexpression_a_b"]],</span></pre>
 <pre><span class="lineno"><a href="#line_982" id="line_982">  982.</a></span><span class="count                ">      1</span><span>            ["typeof aa ** 2", ["wrap_subexpression_a_b"]]</span></pre>
-<pre><span class="lineno"><a href="#line_983" id="line_983">  983.</a></span><span class="count                ">     10</span><span>        ].forEach(function ([expression, expect]) {</span></pre>
+<pre><span class="lineno"><a href="#line_983" id="line_983">  983.</a></span><span class="count                ">     10</span><span>        ]) {</span></pre>
 <pre><span class="lineno"><a href="#line_984" id="line_984">  984.</a></span><span class="count                ">     10</span><span>            const result = jslint.jslint(String(`</span></pre>
 <pre><span class="lineno"><a href="#line_985" id="line_985">  985.</a></span><span class="count                ">     10</span><span>function ff(aa, bb, cc) {</span></pre>
 <pre><span class="lineno"><a href="#line_986" id="line_986">  986.</a></span><span class="count                ">     10</span><span>    return [aa, bb, cc, ${expression}];</span></pre>
 <pre><span class="lineno"><a href="#line_987" id="line_987">  987.</a></span><span class="count                ">     10</span><span>}</span></pre>
 <pre><span class="lineno"><a href="#line_988" id="line_988">  988.</a></span><span class="count                ">     10</span><span>ff();</span></pre>
 <pre><span class="lineno"><a href="#line_989" id="line_989">  989.</a></span><span class="count                ">     10</span><span>            `).trim() + "\n");</span></pre>
-<pre><span class="lineno"><a href="#line_990" id="line_990">  990.</a></span><span class="count                ">      5</span><span>            assertJsonEqual(result.warnings.map(function ({code}) {</span></pre>
-<pre><span class="lineno"><a href="#line_991" id="line_991">  991.</a></span><span class="count                ">      5</span><span>                return code;</span></pre>
-<pre><span class="lineno"><a href="#line_992" id="line_992">  992.</a></span><span class="count                ">      5</span><span>            }), expect, expression);</span></pre>
-<pre><span class="lineno"><a href="#line_993" id="line_993">  993.</a></span><span class="count                ">     10</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_990" id="line_990">  990.</a></span><span class="count                ">     10</span><span>            assertJsonEqual(result.warnings.map(function ({code}) {</span></pre>
+<pre><span class="lineno"><a href="#line_991" id="line_991">  991.</a></span><span class="count                ">     10</span><span>                return code;</span></pre>
+<pre><span class="lineno"><a href="#line_992" id="line_992">  992.</a></span><span class="count                ">     10</span><span>            }), expect, expression);</span></pre>
+<pre><span class="lineno"><a href="#line_993" id="line_993">  993.</a></span><span class="count                ">     10</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_994" id="line_994">  994.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_995" id="line_995">  995.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - The operand of 'void' is parsed at rbp 150, like every</span></pre>
 <pre><span class="lineno"><a href="#line_996" id="line_996">  996.</a></span><span class="count                ">      1</span><span>// unary operator, so 'void 0 + 0' is '(void 0) + 0'.</span></pre>
