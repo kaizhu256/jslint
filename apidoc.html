@@ -1077,7 +1077,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     const mode_digits_numeric_separator = 1;
     const mode_digits_regexp_quantifier = 2;
     const mode_digits_unicode_escape = 3;
-    const opener_stack = [];    // Stack of opener tokens: (, [.
+    const opener_stack = [];    // Stack of opener tokens: (, [, {, ${.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
     let from;                   // The starting column number of the token.
@@ -1098,7 +1098,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     let token_prv = token_global;       // The previous token including
                                         // ... comments.
     let token_prv_expr = token_global;  // The previous token excluding
-                                        // ...
+                                    ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1361,7 +1361,11 @@ if (
         "!=", "!==",
         "%", "%=",
         "&amp;", "&amp;&amp;", "&amp;&amp;=", "&amp;=",
-        "*", "*=",
+
+// PR-xxx - Add Exponentiation-assignment-operator '**=' support, and space
+// '**' like '*'.
+
+        "*", "**", "**=", "*=",
         "+=",
         "-=",
         "/", "/=",
@@ -1394,13 +1398,7 @@ if (
 // test_cause:
 // ["function aa(bb){return;}", "delve", "unused_a", "bb", 13]
 // ["let aa;", "delve", "unused_a", "aa", 5]
-// ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]
-
-                    warn("unused_a", name);
-                } else if (!name.assigned) {
-
-// test_cause:
-//...
+// ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
