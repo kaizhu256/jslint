@@ -1088,7 +1088,7 @@ if (false) {
     - add each item this pull-request ships under the top `# v20yy.mm.dd` section, anywhere, ordered by impact.
     - `shGithubPrCreate` takes the items this pull-request adds, those whose first line is not in `CHANGELOG.md` of the previous pull-request at local branch `__pr_beta`, in `CHANGELOG.md` order.
         - `<CHANGELOG.md entry #1>` is the highest of them, and `<CHANGELOG.md entry extra>` the rest.
-        - if none is added, it takes the first item of the section, as before.
+        - if none is added, it takes the first item of the section.
         - reordering the section by impact does not change which items it takes, but rewording an item makes it look added.
     - run
         ```shell
