@@ -1841,6 +1841,25 @@ aa();
                 "String(`\\u{10FFFF}`);"
             ],
             logical_assignment: [
+
+// PR-xxx - Bugfix - '??=' and '||=' assign an unassigned variable.
+
+                (`
+function aa(bb) {
+    let cc;
+    cc ??= bb;
+    return cc;
+}
+aa();
+                `),
+                (`
+function aa(bb) {
+    let cc;
+    cc ||= bb;
+    return cc;
+}
+aa();
+                `),
                 "let aa = 0;\naa &&= 0;",
                 "let aa = 0;\naa ??= 0;",
                 "let aa = 0;\naa ||= 0;"

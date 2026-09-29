@@ -94,7 +94,6 @@
 /*property
     JSLINT_BETA,
     NODE_V8_COVERAGE,
-    accessor,
     alive,
     all,
     argv,
@@ -6953,10 +6952,10 @@ function jslint_phase3_parse(state) {
 
 // PR-xxx - Bugfix - <seen> maps a property-name to true, or to false if only
 // an accessor has it. Accessor-keys like 'get aa' live apart in
-// <seen_accessor>, so a string-key named get aa cannot collide with them.
+// <seen_getset>, so a string-key named get aa cannot collide with them.
 
         const seen = empty();
-        const seen_accessor = empty();
+        const seen_getset = empty();
         const the_brace = token_now;
         function property_parse() {
             let extra;
@@ -6998,11 +6997,11 @@ function jslint_phase3_parse(state) {
                 }
                 extra = name.id;
                 full = extra + " " + token_nxt.id;
-                name.accessor = true;
+                name.getset = true;
                 name = token_nxt;
                 advance();
                 id = survey(name);
-                if (seen_accessor[full] === true || seen[id] === true) {
+                if (seen_getset[full] === true || seen[id] === true) {
 
 // test_cause:
 // ["aa={get aa(){},get aa(){}}", "property_parse", "duplicate_a", "aa", 20]
@@ -7010,7 +7009,7 @@ function jslint_phase3_parse(state) {
                     warn("duplicate_a", name);
                 }
                 seen[id] = false;
-                seen_accessor[full] = true;
+                seen_getset[full] = true;
             } else {
                 id = survey(name);
                 if (typeof seen[id] === "boolean") {
@@ -9171,8 +9170,8 @@ function jslint_phase4_walk(state) {
 
     function name_lookup(thing) {
 
-// This function will lookup and return variable or function-parameter
-// <the_variable> in current context from given <thing>.id.
+// This function will look up <thing>.id from the current scope outward, and
+// return its variable, parameter, label or global, or undefined if undeclared.
 
         const id = thing.id;
         let the_label;
@@ -9278,7 +9277,7 @@ function jslint_phase4_walk(state) {
         }
         if (!the_variable.alive) {
 
-// Warn variable is 'out-of-scope'.
+// Warn variable is in its temporal-dead-zone.
 
 // PR-xxx - Deviation kept 2026-09-29. A function reading a 'let' declared
 // below it warns, though valid when called later. This matches ESLint
@@ -9300,15 +9299,24 @@ function jslint_phase4_walk(state) {
 
     function post_a_assignment(thing) {
 
-// Assignment using = sets the assigned property of a variable. No other
-// assignment operator can do this. A = token keeps that variable (or array of
-// variables in case of destructuring) in its name property.
+// Assignment using = sets the assigned property of a variable, and so do '??='
+// and '||=' below. A = token keeps that variable, or the variables of a
+// destructuring, in its name_list property.
 
         const lvalue = thing.expression[0];
         let right;
         if (thing.id !== "=") {
-            if (lvalue.arity === "variable") {
-                check_assignable(lvalue, lvalue.variable);
+            if (
+                lvalue.arity === "variable" &&
+                check_assignable(lvalue, lvalue.variable) &&
+                (thing.id === "??=" || thing.id === "||=")
+            ) {
+
+// PR-xxx - Bugfix - '??=' and '||=' assign an unassigned variable, since its
+// 'undefined' is nullish and falsy, so it counts as assigned. '&&=' does not
+// assign it, and still warns unassigned_var_a.
+
+                lvalue.variable.assigned = true;
             }
             right = syntax_dict[thing.expression[1].id];
             if (
@@ -10481,6 +10489,7 @@ function jslint_phase5_whitage(state) {
                 } else if (!name.assigned) {
 
 // test_cause:
+// ["let aa;aa&&=0;aa();", "delve", "unassigned_var_a", "aa", 5]
 // ["let aa;aa();", "delve", "unassigned_var_a", "aa", 5]
 
                     warn("unassigned_var_a", name);
@@ -10779,7 +10788,7 @@ function jslint_phase5_whitage(state) {
             }
             return;
         }
-        if (left.accessor === true) {
+        if (left.getset === true) {
 
 // PR-xxx - Bugfix - The 'get' or 'set' of an accessor takes one space before
 // its name, and no line break. On one line, <one_space> still lets a comment
@@ -10800,9 +10809,9 @@ function jslint_phase5_whitage(state) {
 // String({get aa() {
 //     return;
 // }});
-// ", "whitage_default", "accessor", "", 0]
+// ", "whitage_default", "getset", "", 0]
 
-            test_cause("accessor");
+            test_cause("getset");
             if (left.line === right.line) {
                 one_space();
             } else {
