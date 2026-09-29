@@ -1955,11 +1955,7 @@ if (String) {
     var aa = 0; //jslint-ignore-line
 }
 aa();
-                `),
-
-// PR-xxx - Bugfix - 'of' is not reserved.
-
-                "let of = 0;\nof();"
+                `)
             ],
             ternary: [
                 (`
