@@ -1932,6 +1932,21 @@ aa();
             ],
             scope: [
                 "(function aa(bb = aa) {\n    aa(bb);\n}());",
+
+// PR-xxx - Bugfix - A 'var' redeclared in a nested block keeps the first one,
+// so a use between the two does not warn temporal_dead_zone_a.
+
+                (`
+function aa() {
+    var bb = 0;
+    bb();
+    if (aa) {
+        var bb = 1; //jslint-ignore-line
+        bb();
+    }
+}
+aa();
+                `),
                 "function aa(bb = aa) {\n    aa(bb);\n}\naa();",
                 (`
 function bb(cc) {
