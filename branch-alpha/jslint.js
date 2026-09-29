@@ -5727,8 +5727,9 @@ function jslint_phase3_parse(state) {
 // - 3.var.2 - Kept. A function reading a 'let' declared below it warns, see
 //   the note in <name_lookup>.
 // - 3.var.4 - Todo. A const reassigned by '({aa} = {})' does not warn.
-// - 4.par.1 - Todo. A parameter-default reading a body 'var' warns
-//   temporal_dead_zone_a, where the spec makes it undeclared.
+// - 4.par.1 - Kept. A parameter-default reading a body 'var' warns
+//   temporal_dead_zone_a, where the spec makes it undeclared. It still warns,
+//   and ESLint no-use-before-define likely does the same.
 // - 5.lab.1 - Kept. A label shares the variable namespace, so a same-named
 //   variable warns redefinition_a_b, as ESLint no-label-var.
 // - 5.lab.1 - Kept. A label is allowed only on do, for, switch and while.

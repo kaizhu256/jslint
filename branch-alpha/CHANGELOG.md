@@ -2,7 +2,6 @@
 
 # Todo
 - jslint - Report - Stop naming an anonymous function after a keyword, e.g. '«return»' for 'return function () {}'.
-- jslint - Warn undeclared_a, not temporal_dead_zone_a, for a parameter-default reading a body var, e.g. 'function aa(bb = cc) {var cc;}'.
 - jslint - Destructuring - Allow catch-variable 'catch ({aa})', valid ES2015 but a stop now, and maybe warn a const reassigned by '({aa} = {})'.
 - jslint - Add warning for 'aa.hasOwnProperty(bb)' and 'Object.prototype.hasOwnProperty.call(aa, bb)', suggesting 'Object.hasOwn(aa, bb)'.
 - jslint - Warn arrow-function 'aa || bb => cc' as a SyntaxError, not with warning wrap_fart_parameter, whose fix is still invalid.
