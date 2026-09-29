@@ -5853,6 +5853,11 @@ function jslint_phase3_parse(state) {
                 thing = thing.expression;
                 break;
             default:
+
+// test_cause:
+// ["aa+aa=0", "optional_chain", "default", "", 0]
+
+                test_cause("default");
                 return;
             }
         }
