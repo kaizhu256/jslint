@@ -21,6 +21,7 @@
 - jslint - Check escapes in untagged megastrings via \<char_after_escape>.
 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
+- jslint-ecma - Add Exponentiation operator-assignment '**=' support.
 - jslint - Move column-fudging into warn_at(); callers pass 0-based column.
 - jslint - Remove dead token-property 'free' from parser and whitage.
 - jslint - Improve parser to parse jquery.js without stopping - for-init comma, numeric object-key.

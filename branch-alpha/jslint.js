@@ -748,7 +748,7 @@ const jslint_rgx_token = new RegExp(
     "|=(?:==?|>)?" +
     "|\\.+" +
 
-// PR-xxx - Bugfix - Lex '**=' as one token, not '**' then '='.
+// PR-xxx - Add Exponentiation operator-assignment '**=' support.
 
     "|\\*(?:\\*=?|[\\/=])?" +
     "|\\/[*\\/]?" +
