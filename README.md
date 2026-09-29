@@ -1085,7 +1085,11 @@ if (false) {
 1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
     - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
 1. update `CHANGELOG.md`
-    - verify `<CHANGELOG.md entry #1>` is most-relevant to pull-request.
+    - add each item this pull-request ships under the top `# v20yy.mm.dd` section, anywhere, ordered by impact.
+    - `shGithubPrCreate` takes the items this pull-request adds, those whose first line is not in `CHANGELOG.md` of the previous pull-request at local branch `__pr_beta`, in `CHANGELOG.md` order.
+        - `<CHANGELOG.md entry #1>` is the highest of them, and `<CHANGELOG.md entry extra>` the rest.
+        - if none is added, it takes the first item of the section, as before.
+        - reordering the section by impact does not change which items it takes, but rewording an item makes it look added.
     - run
         ```shell
         # re-run until version propagates
@@ -1141,7 +1145,7 @@ if (false) {
 1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
     - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
 1. update `CHANGELOG.md`
-    - verify `<CHANGELOG.md entry #1>` is most-relevant to pull-request.
+    - verify the top `# v20yy.mm.dd` section is ordered by impact, since `shGithubPrCreate` takes the whole section, and it becomes the body of the commit to `master` under header `# v20yy.mm.dd`.
     - run
         ```shell
         # re-run until version propagates
