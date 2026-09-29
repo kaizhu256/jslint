@@ -1952,6 +1952,22 @@ aa();
             scope: [
                 "(function aa(bb = aa) {\n    aa(bb);\n}());",
 
+// PR-xxx - Bugfix - A 'var' named after its named function expression is a new
+// writable binding, so assigning it does not warn bad_assignment_a.
+
+                (`
+String(function aa() {
+    var aa = 0; //jslint-ignore-line
+    aa = 1;
+    return aa;
+});
+                `),
+
+// PR-xxx - A parameter named after its named function expression shadows the
+// name, like any parameter shadowing an outer name, so it does not warn.
+
+                "String(function aa(aa) {\n    return aa;\n});",
+
 // PR-xxx - Bugfix - A 'var' redeclared in a nested block keeps the first one,
 // so a use between the two does not warn temporal_dead_zone_a.
 

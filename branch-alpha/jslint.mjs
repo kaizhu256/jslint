@@ -336,6 +336,7 @@
     scope_declared,
     scope_function_pop,
     scope_function_push,
+    scope_name,
     scriptId,
     search,
     set,
@@ -397,6 +398,7 @@
     v8CoverageListMerge,
     v8CoverageReportCreate,
     value,
+    values,
     variable,
     variable_prv,
     version,
@@ -5703,7 +5705,7 @@ function jslint_phase3_parse(state) {
 // 5.lab.4 - Mark 'readonly', the label-name, before control-flow-block.
 //
 // The 2.fun tags also cover a named function-expression, whose name is
-// declared in its own function-body.
+// declared in <scope_name>, a scope outside its function.
 //
 // PR-xxx - Deviations from the spec, reviewed 2026-09-29, each kept. A fixed
 // one is commented at its site, and a Todo is in CHANGELOG.md.
@@ -6685,6 +6687,9 @@ function jslint_phase3_parse(state) {
 
         let scope_declared = scope_block;
         the_function = the_function || token_now;
+        the_function.scope_name = {
+            context: empty()
+        };
         if (mode_fart) {
             the_function.arity = "binary";
         }
@@ -6713,16 +6718,14 @@ function jslint_phase3_parse(state) {
 
                 warn("var_switch", the_function);
             }
-        } else if (name) {
+        } else {
 
 // A function expression may have an optional name.
 
-// PR-504 - Restrict scope from scope_function to its own function_body:
-// - named-function-expression
+// PR-xxx - Bugfix - Declare the name in <scope_name>, outside the function as
+// in the spec, so a 'var' of that name in the body is a new binding.
 
-            scope_declared = the_function;
-            name.used = true;
-            the_function.context = empty();
+            scope_declared = the_function.scope_name;
         }
         if (name) {
             advance();
@@ -6790,6 +6793,7 @@ function jslint_phase3_parse(state) {
 
 // Push the current function context and establish a new one.
 
+        scope_block = scope_block_push(the_function.scope_name, false);
         scope_block = scope_block_push(the_function, true);
         scope_function = scope_function_push(the_function, true);
 
@@ -6948,6 +6952,7 @@ function jslint_phase3_parse(state) {
 
 // Restore the previous context.
 
+        scope_block = scope_block_pop();
         scope_block = scope_block_pop();
         scope_function = scope_function_pop();
         return the_function;
@@ -9015,14 +9020,36 @@ function jslint_phase3_parse(state) {
 
 // Check global functions are ordered.
 
+// PR-xxx - Bugfix - Also check an exported function-declaration, which is
+// hoisted too, though <stmt_export> resets its arity to 'unary'.
+
+// test_cause:
+// ["
+// export async function bb(){}export async function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 51]
+// ["
+// export function bb(){}export default function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 47]
+// ["
+// export function bb(){}export function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 39]
+
     check_ordered(
         "function",
-        function_list.map(function ({
-            arity,
-            level,
-            name
-        }) {
-            return arity === "statement" && level === 1 && name;
+        function_list.map(function (the_function) {
+            const {
+                arity,
+                level,
+                name
+            } = the_function;
+            return (
+                (
+                    arity === "statement" ||
+                    Object.values(export_dict).includes(the_function)
+                ) &&
+                level === 1 &&
+                name
+            );
         }).filter(function (name) {
             return option_dict.beta && name && name.id;
         })
@@ -9303,6 +9330,9 @@ function jslint_phase4_walk(state) {
 
 // test_cause:
 // ["(aa=aa)=>0", "name_lookup", "temporal_dead_zone_a", "aa", 5]
+// ["
+// (function aa(){aa();var aa})
+// ", "name_lookup", "temporal_dead_zone_a", "aa", 16]
 // ["for(const [aa] of aa){}", "name_lookup", "temporal_dead_zone_a", "aa", 19]
 // ["let [aa]=aa", "name_lookup", "temporal_dead_zone_a", "aa", 10]
 // ["let aa=()=>aa", "name_lookup", "temporal_dead_zone_a", "aa", 12]
@@ -9788,6 +9818,7 @@ function jslint_phase4_walk(state) {
             warn("unexpected_parens", thing);
         }
         scope_block = scope_block_pop();
+        scope_block = scope_block_pop();
         scope_function = scope_function_pop();
     }
 
@@ -10183,6 +10214,7 @@ function jslint_phase4_walk(state) {
 // PR-504 - Add hidden scope_block for:
 // - function-parameter
 
+        scope_block = scope_block_push(thing.scope_name, false);
         scope_block = scope_block_push(thing, false);
         scope_function = scope_function_push(thing, false);
         if (thing.extra === "get") {
