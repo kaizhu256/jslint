@@ -94,7 +94,6 @@
 /*property
     JSLINT_BETA,
     NODE_V8_COVERAGE,
-    accessor,
     alive,
     all,
     argv,
@@ -131,7 +130,6 @@
     console_log,
     constant,
     context,
-    context_report,
     convert,
     count,
     coverageDir,
@@ -294,7 +292,6 @@
     on,
     open,
     opening,
-    optional,
     operator,
     option,
     option_dict,
@@ -337,10 +334,8 @@
     scope_block_pop,
     scope_block_push,
     scope_declared,
-    scope_function,
     scope_function_pop,
     scope_function_push,
-    scope_report_push,
     scriptId,
     search,
     set,
@@ -1255,9 +1250,9 @@ function jslint(
         if (is_weird(aa) || is_weird(bb)) {
 
 // test_cause:
-// ["aa(/./)||{}", "is_equal", "weird", "", 0]
+// ["aa(/./)||{}", "is_equal", "false", "", 0]
 
-            test_cause("weird");
+            test_cause("false");
             return false;
         }
         if (aa.arity === bb.arity && aa.id === bb.id) {
@@ -1392,24 +1387,6 @@ function jslint(
         return value;
     }
 
-    function scope_report_push(the_function, name) {
-
-// PR-xxx - Bugfix - This function will push <name> to what <jslint_report>
-// lists for <the_function>, which are the names it declares and the outer
-// names it uses. A list per id keeps an own 'bb' and an outer 'bb' apart.
-
-        const {id} = name;
-        if (!the_function.context_report) {
-            the_function.context_report = empty();
-        }
-        if (!the_function.context_report[id]) {
-            the_function.context_report[id] = [];
-        }
-        if (!the_function.context_report[id].includes(name)) {
-            the_function.context_report[id].push(name);
-        }
-    }
-
     function stop(code, the_token, a, b, c, d) {
 
 // Similar to warn and stop_at. If the token already had a warning, that
@@ -1532,9 +1509,6 @@ function jslint(
 // wound the inner child. But if you accept it as sound advice rather than as
 // personal criticism, it can make your programs better.
 
-        case "and":
-            mm = `The '&&' subexpression should be wrapped in parens.`;
-            break;
         case "bad_assignment_a":
             mm = `Bad assignment to '${a}'.`;
             break;
@@ -1819,12 +1793,6 @@ function jslint(
         case "weird_relation_a":
             mm = `Weird relation '${a}'.`;
             break;
-        case "wrap_coalesce_a":
-            mm = `Wrap the '${a}' subexpression beside '??' in parens.`;
-            break;
-        case "wrap_condition":
-            mm = `Wrap the condition in parens.`;
-            break;
 
 // PR-386 - Fix issue #382 - Make fart-related warnings more readable.
 
@@ -1841,8 +1809,8 @@ function jslint(
         case "wrap_regexp":
             mm = `Wrap this regexp in parens to avoid confusion.`;
             break;
-        case "wrap_unary":
-            mm = `Wrap the unary expression in parens.`;
+        case "wrap_subexpression_a_b":
+            mm = `Wrap the '${a}' subexpression beside '${b}' in parens.`;
             break;
         default:
             jslint_assert(undefined, `unknown_warning_code=${code}`);
@@ -1909,7 +1877,6 @@ function jslint(
                 scope_block_push,
                 scope_function_pop,
                 scope_function_push,
-                scope_report_push,
                 source,
                 stop,
                 stop_at,
@@ -4654,9 +4621,6 @@ function jslint_phase2_lex(state) {
             }
             break;
         case "}":
-
-// Pop only a '{' or '${', and leave a dangling '}' to the parser.
-
             if (opener_stack[0]?.id === "{" || opener_stack[0]?.id === "${") {
                 opener_stack.shift();
             }
@@ -4761,7 +4725,6 @@ function jslint_phase3_parse(state) {
         scope_block_push,
         scope_function_pop,
         scope_function_push,
-        scope_report_push,
         stop,
         syntax_dict,
         tenure,
@@ -5006,7 +4969,6 @@ function jslint_phase3_parse(state) {
 //      [destructure]
 //      {destructure}
 
-        const the_optional = optional_chain(the_thing);
         if (
             the_thing.arity !== "variable" &&
             the_thing.id !== "." &&
@@ -5019,19 +4981,6 @@ function jslint_phase3_parse(state) {
 // ["0=0", "check_mutation", "bad_assignment_a", "0", 1]
 
             warn("bad_assignment_a", the_thing);
-            return false;
-        }
-
-// PR-xxx - Bugfix - An optional-chain is never an assignment target, so
-// 'aa?.bb.cc = 0' and 'aa?.[bb] = 0' are SyntaxErrors too.
-
-        if (the_optional) {
-
-// test_cause:
-// ["aa?.[aa]=0", "check_mutation", "bad_assignment_a", "?.", 5]
-// ["aa?.aa.aa=0", "check_mutation", "bad_assignment_a", "?.", 3]
-
-            warn("bad_assignment_a", the_optional, "?.");
             return false;
         }
         return true;
@@ -5493,7 +5442,6 @@ function jslint_phase3_parse(state) {
 // ["\"\".aa", "check_left", "unexpected_a", ".", 3]
 // ["\"aa\"?.0", "check_left", "unexpected_a", "?.", 5]
 // ["aa=[]?.aa", "check_left", "unexpected_a", "?.", 6]
-// ["new aa``.aa()", "check_left", "unexpected_a", ".", 9]
 
             check_left(left, the_token);
         }
@@ -5510,11 +5458,6 @@ function jslint_phase3_parse(state) {
 // ["aa?.[bb]", "infix_dot", "dyn_prop_or_call", "", 0]
 
             test_cause("dyn_prop_or_call");
-
-// PR-xxx - Bugfix - The '?.' token leaves the tree here, so mark the '[' or '('
-// that follows it, for <optional_chain>.
-
-            name.optional = true;
             return left;
         }
         if (!name.identifier) {
@@ -5554,18 +5497,7 @@ function jslint_phase3_parse(state) {
     }
 
     function infix_grave(left) {
-        const the_optional = optional_chain(left);
         const the_tick = prefix_tick(true);
-        if (the_optional) {
-
-// PR-xxx - Bugfix - A tagged-megastring cannot follow an optional-chain, a
-// SyntaxError.
-
-// test_cause:
-// ["aa?.aa``", "infix_grave", "unexpected_a", "?.", 3]
-
-            warn("unexpected_a", the_optional, "?.");
-        }
 
 // test_cause:
 // ["0``", "check_left", "unexpected_a", "`", 2]
@@ -5750,14 +5682,7 @@ function jslint_phase3_parse(state) {
 
 // Reserved words may not be declared.
 
-// PR-xxx - Bugfix - 'of' is in <syntax_dict> only as the for..of operator,
-// and is not reserved, so 'let of = 0;' must not warn reserved_a.
-
-        if (
-            syntax_dict[id] !== undefined &&
-            id !== "ignore" &&
-            id !== "of"
-        ) {
+        if (syntax_dict[id] !== undefined && id !== "ignore") {
 
 // test_cause:
 // ["let undefined", "name_declare", "reserved_a", "undefined", 5]
@@ -5768,12 +5693,7 @@ function jslint_phase3_parse(state) {
 
 // Has the name been declared in this context?
 
-// PR-xxx - Bugfix - Also check <scope_declared>, which differs from
-// <scope_block> for a var in a nested block. Else 'var bb' in an if-block
-// replaced an earlier 'var bb', and a use between them warned
-// temporal_dead_zone_a.
-
-        earlier = scope_block.context[id] || scope_declared.context[id];
+        earlier = scope_block.context[id];
         if (earlier) {
 
 // test_cause:
@@ -5781,8 +5701,6 @@ function jslint_phase3_parse(state) {
 // ["let aa;function aa(){}", "name_declare", "scope_current", "aa", 0]
 // ["let aa;let aa", "name_declare", "redefinition_a_b", "1", 12]
 // ["let aa;let aa", "name_declare", "scope_current", "aa", 0]
-// ["var aa;if(0){var aa}", "name_declare", "redefinition_a_b", "1", 18]
-// ["var aa;if(0){var aa}", "name_declare", "scope_current", "aa", 0]
 
             test_cause("scope_current", id);
             warn("redefinition_a_b", name, id, earlier.line);
@@ -5825,17 +5743,6 @@ function jslint_phase3_parse(state) {
 
         scope_declared.context[id] = name;
         name.scope_declared = scope_declared;
-
-// PR-xxx - Bugfix - Record the function that owns <name>, since a let/const
-// <scope_declared> may be a block inside it. A named function expression
-// declares its name into itself before <scope_function> is pushed.
-
-        name.scope_function = (
-            (scope_declared.id === "function" || scope_declared.id === "=>")
-            ? scope_declared
-            : scope_function
-        );
-        scope_report_push(name.scope_function, name);
 
 // Warn about variable redefinition.
 
@@ -5885,34 +5792,6 @@ function jslint_phase3_parse(state) {
 
             warn("redefinition_global_a_b", name, global_dict[id], id);
             return;
-        }
-    }
-
-    function optional_chain(thing) {
-
-// PR-xxx - This function will return the '?.' token, or the '[' or '(' token
-// marked <optional> after a '?.', of an unwrapped optional-chain ending at
-// <thing>. The spec forbids such a chain as an assignment target, the callee
-// of 'new' and the tag of a template.
-
-        while (thing && !thing.wrapped) {
-            if (thing.id === "?." || thing.optional === true) {
-                return thing;
-            }
-            if (thing.arity !== "binary") {
-                return;
-            }
-            switch (thing.id) {
-            case "(":
-            case "[":
-                thing = thing.expression[0];
-                break;
-            case ".":
-                thing = thing.expression;
-                break;
-            default:
-                return;
-            }
         }
     }
 
@@ -6565,19 +6444,6 @@ function jslint_phase3_parse(state) {
                     the_destructure.open = true;
                 }
                 name.expression = parse_expression(0);
-                if (scope_declared === undefined) {
-
-// PR-xxx - Bugfix - Walk a default in destructuring-assignment
-// '[aa = bb] = ...', which no <post_s_var> walks, so 'bb' was never used. It
-// is pushed wrapped in an array, which has no <arity>, so <prefix_lbracket>
-// walks it and never looks it up as a target.
-
-// test_cause:
-// [";[aa=0]=0", "name_parse", "default", "", 0]
-
-                    test_cause("default");
-                    name_list.push([name.expression]);
-                }
 
 // test_cause:
 // ["function aa([aa=aa]){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
@@ -6729,13 +6595,8 @@ function jslint_phase3_parse(state) {
         the_function.finally = 0;
         the_function.level = scope_function.level + 1;
         the_function.loop = 0;
-
-// PR-xxx - Bugfix - Keep the name <property_parse> gives a method or accessor,
-// 'aa' or 'get aa'. Else <anon> named it after the previous identifier.
-
         the_function.name = (
             name ||
-            the_function.name ||
             (
                 mode_fart_unwrapped
                 ? "anonymous"
@@ -6917,13 +6778,7 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_lbrace() {
-
-// PR-xxx - Bugfix - <seen> maps a property-name to true, or to false if only
-// an accessor has it. Accessor-keys like 'get aa' live apart in
-// <seen_accessor>, so a string-key named get aa cannot collide with them.
-
         const seen = empty();
-        const seen_accessor = empty();
         const the_brace = token_now;
         function property_parse() {
             let extra;
@@ -6965,11 +6820,10 @@ function jslint_phase3_parse(state) {
                 }
                 extra = name.id;
                 full = extra + " " + token_nxt.id;
-                name.accessor = true;
                 name = token_nxt;
                 advance();
                 id = survey(name);
-                if (seen_accessor[full] === true || seen[id] === true) {
+                if (seen[full] === true || seen[id] === true) {
 
 // test_cause:
 // ["aa={get aa(){},get aa(){}}", "property_parse", "duplicate_a", "aa", 20]
@@ -6977,7 +6831,7 @@ function jslint_phase3_parse(state) {
                     warn("duplicate_a", name);
                 }
                 seen[id] = false;
-                seen_accessor[full] = true;
+                seen[full] = true;
             } else {
                 id = survey(name);
                 if (typeof seen[id] === "boolean") {
@@ -7017,9 +6871,6 @@ function jslint_phase3_parse(state) {
 // ["aa={get aa(){}}", "property_parse", "paren", "", 0]
 
                 test_cause("paren");
-
-// PR-xxx - Bugfix - Name an accessor 'get aa' in the report, not 'get'.
-
                 value = prefix_function(
                     {
                         arity: "unary",
@@ -7028,7 +6879,7 @@ function jslint_phase3_parse(state) {
                         line: name.line,
                         name: (
                             typeof extra === "string"
-                            ? full
+                            ? extra
                             : id
                         ),
                         thru: name.from
@@ -7040,9 +6891,9 @@ function jslint_phase3_parse(state) {
                 if (typeof extra === "string") {
 
 // test_cause:
-// ["aa={get aa.aa}", "property_parse", "getset_no_paren", "", 0]
+// ["aa={get aa.aa}", "property_parse", "paren", "", 0]
 
-                    test_cause("getset_no_paren");
+                    test_cause("paren");
                     advance("(");
                 }
                 the_colon = token_nxt;
@@ -7120,16 +6971,6 @@ function jslint_phase3_parse(state) {
                 undefined,              // the_function
                 false                   // the_function_toplevel
             );
-
-// PR-xxx - Walk defaults as expressions, and leave only variables in
-// <name_list> for <post_a_assignment> to look up.
-
-            element.expression = the_token.name_list.filter(function (name) {
-                return name.arity !== "variable";
-            });
-            the_token.name_list = the_token.name_list.filter(function (name) {
-                return name.arity === "variable";
-            });
             advance("=");
             symbol("=").led_infix(element);
             return the_token;
@@ -7202,29 +7043,6 @@ function jslint_phase3_parse(state) {
         const the_new = token_now;
         let right;
         right = parse_expression(160);
-
-// PR-xxx - Bugfix - In 'new aa`bb`()' the tagged-megastring belongs to the
-// callee, 'new (aa`bb`)()', but '`' shares lbp 160 with the call's '(', so rbp
-// 160 stops before it. Parse it, and any member after it, into the callee.
-
-        while (token_nxt.id === "`") {
-            advance("`");
-            right = infix_grave(right);
-            while ([".", "?.", "["].includes(token_nxt.id)) {
-                advance();
-                right = syntax_dict[token_now.id].led_infix(right);
-            }
-        }
-        if (optional_chain(right)) {
-
-// PR-xxx - Bugfix - The callee of 'new' cannot be an optional-chain, a
-// SyntaxError that rbp 160 let in, since '?.' binds at 170.
-
-// test_cause:
-// ["new aa?.aa()", "prefix_new", "unexpected_a", "?.", 7]
-
-            warn("unexpected_a", optional_chain(right), "?.");
-        }
         if (token_nxt.id !== "(") {
 
 // test_cause:
@@ -7340,13 +7158,6 @@ function jslint_phase3_parse(state) {
         the_break.disrupt = true;
         if (token_nxt.identifier && token_now.line === token_nxt.line) {
             block_stack.some(function (scope_block) {
-
-// PR-xxx - Bugfix - Stop at the function boundary, since 'break aa' cannot
-// reach a label in an enclosing function, which is a SyntaxError.
-
-                if (scope_block === scope_function) {
-                    return true;
-                }
                 the_label = scope_block.context[token_nxt.id];
                 if (the_label?.role !== "label") {
                     the_label = undefined;
@@ -7359,9 +7170,6 @@ function jslint_phase3_parse(state) {
             if (!the_label) {
 
 // test_cause:
-// ["
-// aa:while(0){(function(){while(0){break aa}}())}
-// ", "stmt_break", "not_label_a", "aa", 40]
 // ["aa:while(0){}break aa", "stmt_break", "not_label_a", "aa", 20]
 // ["break aa", "stmt_break", "not_label_a", "aa", 7]
 
@@ -7410,28 +7218,8 @@ function jslint_phase3_parse(state) {
     function stmt_delete() {
         const the_token = token_now;
         const the_value = parse_expression(0);
-
-// PR-xxx - Bugfix - Allow 'delete aa?.bb', a valid optional-chain operand.
-// PR-xxx - Bugfix - In 'delete aa[bb] || cc', the parse at rbp 0 swallows the
-// '||'. Warn on the operator, not on a missing '.'. Rbp 150 would stop the
-// lint on the leftover '|| cc'.
-
         if (
-            ["&&", "??", "||"].includes(the_value.id) &&
-            [".", "?.", "["].includes(the_value.expression[0].id) &&
-            the_value.expression[0].arity === "binary"
-        ) {
-
-// test_cause:
-// ["delete aa[aa]||aa", "stmt_delete", "unexpected_a", "||", 14]
-
-            warn("unexpected_a", the_value);
-        } else if (
-            (
-                the_value.id !== "." &&
-                the_value.id !== "?." &&
-                the_value.id !== "["
-            ) ||
+            (the_value.id !== "." && the_value.id !== "[") ||
             the_value.arity !== "binary"
         ) {
 
@@ -8988,7 +8776,6 @@ function jslint_phase4_walk(state) {
         scope_block_push,
         scope_function_pop,
         scope_function_push,
-        scope_report_push,
         syntax_dict,
         test_cause,
         token_global,
@@ -9086,7 +8873,6 @@ function jslint_phase4_walk(state) {
 // <the_variable> in current context from given <thing>.id.
 
         const id = thing.id;
-        const ii_function = block_stack.indexOf(scope_function);
         let the_variable;
 
 // PR-510 - deadcode-confirmed - Both callers pass a token already known to be
@@ -9112,13 +8898,11 @@ function jslint_phase4_walk(state) {
 
         block_stack.some(function (scope_block, ii) {
             the_variable = scope_block.context[id];
-            if (the_variable && ii > ii_function) {
+            if (the_variable && ii > 0) {
 
-// PR-xxx - Bugfix - Mark closure only if found outside the current function,
-// not merely outside the current scope_block, and record it for the report.
+// If found outside current-scope, mark as closure.
 
                 the_variable.closure = true;
-                scope_report_push(scope_function, the_variable);
             }
             return the_variable;
         });
@@ -9161,7 +8945,6 @@ function jslint_phase4_walk(state) {
 // 3.glo.1 - Mark 'declared', the global-variable, immediately.
 
             token_global.context[id] = the_variable;
-            scope_report_push(scope_function, the_variable);
         }
         if (the_variable.role === "label") {
 
@@ -9182,7 +8965,6 @@ function jslint_phase4_walk(state) {
 
 // test_cause:
 // ["(aa=aa)=>0", "name_lookup", "temporal_dead_zone_a", "aa", 5]
-// ["for(const [aa] of aa){}", "name_lookup", "temporal_dead_zone_a", "aa", 19]
 // ["let [aa]=aa", "name_lookup", "temporal_dead_zone_a", "aa", 10]
 // ["let aa=()=>aa", "name_lookup", "temporal_dead_zone_a", "aa", 12]
 // ["let aa=aa", "name_lookup", "temporal_dead_zone_a", "aa", 8]
@@ -9397,9 +9179,9 @@ function jslint_phase4_walk(state) {
             ) {
 
 // test_cause:
-// ["0- -0", "post_b_binary", "wrap_unary", "-", 4]
+// ["0- -0", "post_b_binary", "wrap_subexpression_a_b", "-", 4]
 
-                warn("wrap_unary", right);
+                warn("wrap_subexpression_a_b", right, right.id, thing.id);
             }
 
 // PR-xxx - Bugfix - A unary operator before '**' is a SyntaxError, since the
@@ -9416,9 +9198,14 @@ function jslint_phase4_walk(state) {
             ) {
 
 // test_cause:
-// ["aa=-0**0", "post_b_binary", "wrap_unary", "-", 4]
+// ["aa=-0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
 
-                warn("wrap_unary", thing.expression[0]);
+                warn(
+                    "wrap_subexpression_a_b",
+                    thing.expression[0],
+                    thing.expression[0].id,
+                    "**"
+                );
             }
 
 // PR-xxx - Bugfix - An unwrapped '&&' or '||' operand of '??' is a SyntaxError,
@@ -9433,10 +9220,10 @@ function jslint_phase4_walk(state) {
                     ) {
 
 // test_cause:
-// ["0&&0??0", "post_b_binary", "wrap_coalesce_a", "&&", 2]
-// ["0??0||0", "post_b_binary", "wrap_coalesce_a", "||", 5]
+// ["0&&0??0", "post_b_binary", "wrap_subexpression_a_b", "??", 2]
+// ["0??0||0", "post_b_binary", "wrap_subexpression_a_b", "??", 5]
 
-                        warn("wrap_coalesce_a", thang, thang.id);
+                        warn("wrap_subexpression_a_b", thang, thang.id, "??");
                     }
                 });
             }
@@ -9770,9 +9557,14 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["(aa&&!aa?0:1)", "post_t_ternary", "wrap_condition", "&&", 4]
+// ["(aa&&!aa?0:1)", "post_t_ternary", "wrap_subexpression_a_b", "?", 4]
 
-            warn("wrap_condition", thing.expression[0]);
+            warn(
+                "wrap_subexpression_a_b",
+                thing.expression[0],
+                thing.expression[0].id,
+                "?"
+            );
         }
     }
 
@@ -9987,9 +9779,9 @@ function jslint_phase4_walk(state) {
             if (thang.id === "&&" && !thang.wrapped) {
 
 // test_cause:
-// ["0&&0||0", "pre_b_or", "and", "&&", 2]
+// ["0&&0||0", "pre_b_or", "wrap_subexpression_a_b", "||", 2]
 
-                warn("and", thang);
+                warn("wrap_subexpression_a_b", thang, "&&", "||");
             }
         });
     }
@@ -10009,12 +9801,6 @@ function jslint_phase4_walk(state) {
             case "const":
             case "let":
             case "var":
-
-// PR-xxx - Bugfix - Walk the iterable of destructured 'for (const [aa] of bb)',
-// which <stmt_var> keeps in <expression>, and <post_s_var> does not walk. Walk
-// it before <post_s_var> marks the names alive, to catch temporal_dead_zone_a.
-
-                walk_expression(thing.for_of.expression);
                 post_s_var(thing.for_of);
                 break;
             default:
@@ -10056,24 +9842,12 @@ function jslint_phase4_walk(state) {
                 warn("bad_get", thing);
             }
         } else if (thing.extra === "set") {
-
-// PR-xxx - Bugfix - A setter's one parameter cannot be a rest-parameter, a
-// SyntaxError. Read <signature>, since <name_list> flattens destructuring and
-// cannot tell a rest-parameter from a valid rest-element inside a destructure.
-
-            if (
-                thing.parameter_count !== 1 ||
-                thing.signature.startsWith("(...")
-            ) {
+            if (thing.parameter_count !== 1) {
 
 // test_cause:
 // ["
 // /*jslint getset*/
 // aa={set aa(){}}
-// ", "pre_s_function", "bad_set", "function", 9]
-// ["
-// /*jslint getset*/
-// aa={set aa(...aa){}}
 // ", "pre_s_function", "bad_set", "function", 9]
 
                 warn("bad_set", thing);
@@ -10657,37 +10431,6 @@ function jslint_phase5_whitage(state) {
             }
             return;
         }
-        if (left.accessor === true) {
-
-// PR-xxx - Bugfix - The 'get' or 'set' of an accessor takes one space before
-// its name, and no line break. On one line, <one_space> still lets a comment
-// sit between them.
-
-// test_cause:
-// ["
-// /*jslint getset*/
-// String({
-//     get
-//     aa() {
-//         return;
-//     }
-// });
-// ", "one_space_only", "expected_space_a_b", "aa", 5]
-// ["
-// /*jslint getset*/
-// String({get aa() {
-//     return;
-// }});
-// ", "whitage_default", "accessor", "", 0]
-
-            test_cause("accessor");
-            if (left.line === right.line) {
-                one_space();
-            } else {
-                one_space_only();
-            }
-            return;
-        }
         if (
             left.arity === "ternary" ||
             left.id === "case" ||
@@ -10984,10 +10727,13 @@ function jslint_phase6_autofix(state) {
         switch (code) {
         case "expected_a_at_b_c":
 
-// expected_a_at_b_c is indentation. Of the four callers of <expected_at>,
-// <at_margin> and <one_space> warn a token that belongs at a margin. The two
-// label callers pass 0 and warn a mid-line label too, such as 'cc:' after
-// 'bb();' on one line. That reaches here, so keep the mid-line branch below.
+// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FOUR
+// callers, not one: at_margin and one_space warn a token that already belongs
+// at a margin, so the target column belongs to the warned line itself. The
+// other two pass 0, are LABEL placement, and DO warn a mid-line token -
+// unreachable here only because a label always co-raises weird_loop or
+// unused_a, which blocks the pass. So do NOT read "always at a margin" as
+// licence to drop the mid-line branch below.
 
             indentage_at = line_source.length - line_source.trimStart().length;
 
@@ -11635,8 +11381,8 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         html += "</div>\n";
     }
     functions.forEach(function (the_function) {
-        const {
-            context_report = empty(),
+        let {
+            context,
             from,
             id,
             level,
@@ -11645,24 +11391,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
             name_list = [],
             signature
         } = the_function;
-
-// PR-xxx - Bugfix - <context_report> holds a list of names per id, which mixes
-// own and outer names, so each row checks <scope_function>.
-
-        const entry_list = [];
-        function id_list(filter) {
-            return entry_list.filter(filter).map(function ({id}) {
-                return id;
-            }).filter(function (id, ii, list) {
-                return list.indexOf(id) === ii;
-            }).sort();
-        }
-        function is_own({scope_function}) {
-            return scope_function === the_function;
-        }
-        Object.keys(context_report).forEach(function (key) {
-            entry_list.push(...context_report[key]);
-        });
+        let list = Object.keys(context);
         html += (
             "<div class=\"level level" + htmlEscape(level) + "\">" +
             address(line, from + 1) +
@@ -11685,23 +11414,30 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         html += detail("parameter", name_list.map(function ({id}) {
             return id;
         }).sort());
-        html += detail("variable", id_list(function (entry) {
-            return is_own(entry) && entry.role === "variable";
+        list.sort();
+        html += detail("variable", list.filter(function (id) {
+            return context[id].role === "variable";
         }));
-        html += detail("exception", id_list(function (entry) {
-            return is_own(entry) && entry.role === "exception";
+        html += detail("exception", list.filter(function (id) {
+            return context[id].role === "exception";
         }));
-        html += detail("closure", id_list(function (entry) {
-            return is_own(entry) && entry.closure === true;
+        html += detail("closure", list.filter(function (id) {
+            return (
+                context[id].closure === true &&
+                context[id].scope_declared === the_function
+            );
         }));
-        html += detail("outer", id_list(function (entry) {
-            return !is_own(entry) && entry.scope_declared.id !== "(global)";
+        html += detail("outer", list.filter(function (id) {
+            return (
+                context[id].scope_declared.id !== "(global)" &&
+                context[id].scope_declared !== the_function
+            );
         }));
-        html += detail(module, id_list(function (entry) {
-            return !is_own(entry) && entry.scope_declared.id === "(global)";
+        html += detail(module, list.filter(function (id) {
+            return context[id].scope_declared.id === "(global)";
         }));
-        html += detail("label", id_list(function (entry) {
-            return is_own(entry) && entry.role === "label";
+        html += detail("label", list.filter(function (id) {
+            return context[id].role === "label";
         }));
         html += "</div>\n";
     });

@@ -582,36 +582,6 @@ jstestDescribe((
             "function aa(bb) {\r\n    return bb;\r\n}\r\naa();\r\n"
         ), "function aa(bb) { return bb; }\r\naa();");
 
-// A used label warns only its placement, so a mid-line label reaches phase 6,
-// which splits it onto its own line at column 1.
-
-        assertAutofix(
-            String(`
-function aa(bb) {
-    bb();
-cc:
-    while (bb) {
-        if (bb()) {
-            break cc;
-        }
-        bb();
-    }
-}
-aa();
-            `).trim() + "\n",
-            String(`
-function aa(bb) {
-    bb(); cc: while (bb) {
-        if (bb()) {
-            break cc;
-        }
-        bb();
-    }
-}
-aa();
-            `).trim() + "\n"
-        );
-
 // A whitespace-run reaching column 0 is INDENTATION or a line-join, not a gap
 // between two tokens on one line, so the fix is DECLINED and the warning is
 // reported against a byte-identical file. Here the run is the whole indent of
@@ -1001,15 +971,15 @@ aa(dd(0), 0);
 
         [
             ["(-aa) ** 2", []],
-            ["-aa ** 2", ["wrap_unary"]],
+            ["-aa ** 2", ["wrap_subexpression_a_b"]],
             ["-aa++", ["unexpected_a"]],
             ["[aa] ** 2", []],
             ["aa ** -2", []],
             ["aa ?? (bb || cc)", []],
-            ["aa ?? bb && cc", ["wrap_coalesce_a"]],
+            ["aa ?? bb && cc", ["wrap_subexpression_a_b"]],
             ["aa ?? bb ?? cc", []],
-            ["aa || bb ?? cc", ["wrap_coalesce_a"]],
-            ["typeof aa ** 2", ["wrap_unary"]]
+            ["aa || bb ?? cc", ["wrap_subexpression_a_b"]],
+            ["typeof aa ** 2", ["wrap_subexpression_a_b"]]
         ].forEach(function ([expression, expect]) {
             const result = jslint.jslint(String(`
 function ff(aa, bb, cc) {
@@ -1033,110 +1003,6 @@ ff();
             }).expression[0].id === "void",
             "void 0 + 0"
         );
-    });
-    jstestIt((
-        "test report-function handling-behavior"
-    ), function () {
-
-// PR-xxx - Bugfix - The report's function details list block-scoped names and
-// catch-variables, and mark closure only across a function boundary.
-
-        const html = jslint.jslint_report(jslint.jslint(String(`
-let ee = 0;
-function aa(gg) {
-    let bb = 0;
-    let ff = 0;
-    if (aa) {
-        let cc = 1;
-        aa(bb, cc, ee, gg);
-    }
-    try {
-        aa();
-    } catch (err) {
-        aa(err);
-    }
-    return function () {
-        return ff;
-    };
-}
-aa();
-        `).trim() + "\n", {}));
-        const result = html.slice(
-            html.indexOf("<div class=\"level level1\">"),
-            html.lastIndexOf("</div>\n</fieldset>")
-        ).replace((/<dl>/g), "\n<dl>");
-        assertOrThrow(result === String(`
-<div class="level level1"><address>2: 1</address><dfn>aa(gg)</dfn>
-<dl><dt>parameter</dt><dd>gg</dd></dl>
-<dl><dt>variable</dt><dd>bb, cc, ff</dd></dl>
-<dl><dt>exception</dt><dd>err</dd></dl>
-<dl><dt>closure</dt><dd>ff</dd></dl>
-<dl><dt>global</dt><dd>aa, ee</dd></dl></div>
-<div class="level level2"><address>14: 12</address><dfn>«return»()</dfn>
-<dl><dt>outer</dt><dd>ff</dd></dl></div>
-        `).trim() + "\n", result);
-
-// PR-xxx - Bugfix - A method or accessor is named after its property, not
-// after the identifier before it.
-
-        assertJsonEqual(jslint.jslint(String(`
-/*jslint getset*/
-String({
-    aa() {
-        return;
-    },
-    get bb() {
-        return;
-    },
-    cc: 0,
-    dd() {
-        return;
-    }
-});
-        `).trim() + "\n").functions.map(function ({name}) {
-            return name;
-        }), ["aa", "get bb", "dd"]);
-    });
-    jstestIt((
-        "test report-function-owner handling-behavior"
-    ), function () {
-
-// PR-xxx - Bugfix - A named function expression owns its own name, and a
-// function lists an outer 'bb' even beside its own block-scoped 'bb'.
-
-        const html = jslint.jslint_report(jslint.jslint(String(`
-function aa() {
-    let bb = 0;
-    function cc() {
-        if (cc) {
-            cc(bb);
-        }
-        if (cc) {
-            let bb = 1;
-            cc(bb);
-        }
-    }
-    return function dd() {
-        return dd(cc);
-    };
-}
-aa();
-        `).trim() + "\n", {}));
-        const result = html.slice(
-            html.indexOf("<div class=\"level level1\">"),
-            html.lastIndexOf("</div>\n</fieldset>")
-        ).replace((/<dl>/g), "\n<dl>");
-        assertOrThrow(result === String(`
-<div class="level level1"><address>1: 1</address><dfn>aa()</dfn>
-<dl><dt>variable</dt><dd>bb, cc</dd></dl>
-<dl><dt>closure</dt><dd>bb, cc</dd></dl></div>
-<div class="level level2"><address>3: 5</address><dfn>cc()</dfn>
-<dl><dt>variable</dt><dd>bb</dd></dl>
-<dl><dt>outer</dt><dd>bb, cc</dd></dl></div>
-<div class="level level2"><address>12: 12</address><dfn>dd()</dfn>
-<dl><dt>variable</dt><dd>dd</dd></dl>
-<dl><dt>outer</dt><dd>cc</dd></dl></div>
-        `).trim() + "\n", result);
     });
     jstestIt((
         "test autofix-report handling-behavior"
@@ -1666,20 +1532,6 @@ function cc() {
 }
 [aa, bb] = cc();
 aa(bb, cc);
-                `),
-
-// PR-xxx - Bugfix - Walk a default in destructuring-assignment, so 'cc' is
-// used.
-
-                (`
-let aa;
-let cc = 0;
-[
-    [
-        aa = cc
-    ]
-] = [];
-aa();
                 `)
             ],
             directive: [
@@ -1779,20 +1631,6 @@ async function aa(bb, cc) {
 aa();
                 `),
 
-// PR-xxx - Bugfix - Walk the iterable of destructured for..of.
-
-                (`
-function aa(bb) {
-    for (const [cc, dd] of bb) {
-        cc(dd);
-    }
-    for (const {ee} of bb) {
-        ee();
-    }
-}
-aa();
-                `),
-
 // PR-xxx - Bugfix - A ';' in a method-body inside a for-loop-head is not a
 // for-loop-semicolon.
 
@@ -1803,20 +1641,6 @@ function aa(bb) {
             return;
         }
     }) {
-        bb(cc);
-    }
-}
-aa();
-                `),
-
-// PR-xxx - Bugfix - The '}' of a '${' does not pop the '{' of a function-body
-// in a for-loop-head, since '${' is pushed too.
-
-                (`
-function aa(bb) {
-    for (const cc of function () {
-        return \`\${bb}\`;
-    }()) { //jslint-ignore-line
         bb(cc);
     }
 }
@@ -1972,9 +1796,6 @@ export default Object.freeze(async function () {
                 `import aa, {aa as bb, cc} from "aa";\naa(bb, cc);`,
                 `import {} from "aa";`
             ],
-            new: [
-                "new String`aa`();"
-            ],
             number: [
                 "String(0.0e0);",
                 "String(0b0);",
@@ -1992,9 +1813,7 @@ export default Object.freeze(async function () {
                 "String(1_234_234.1_234_234E1_234_234);"
             ],
             optional_chaining: [
-                "String().aa?.bb?.cc();",
-                "delete String?.[0];",
-                "delete String?.aa;"
+                "String().aa?.bb?.cc();"
             ],
             param: [
                 "function aa({aa, bb}) {\n    return {aa, bb};\n}\naa();",
@@ -2034,11 +1853,7 @@ if (String) {
     var aa = 0; //jslint-ignore-line
 }
 aa();
-                `),
-
-// PR-xxx - Bugfix - 'of' is not reserved.
-
-                "let of = 0;\nof();"
+                `)
             ],
             ternary: [
                 (`
@@ -2142,17 +1957,6 @@ jstestDescribe((
 // PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
 
         [{eval: true, evil: true}, "new Function();\neval();"],
-
-// PR-xxx - Bugfix - A string-key named get aa does not duplicate an accessor.
-
-        [{getset: true}, String(`
-String({
-    get aa() {
-        return;
-    },
-    "get aa": 0
-});
-        `).trim()],
         [{getset: true}, "String({get aa() {\n    return;\n}});"],
         [{getset: true}, "String({set aa(aa) {\n    return aa;\n}});"],
         [{indent2: true}, sourceJslintMjs.replace((/    /g), "  ")],
