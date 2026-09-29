@@ -5721,12 +5721,17 @@ function jslint_phase3_parse(state) {
 //   temporal_dead_zone_a, though its hoisted value 'undefined' is valid.
 // - 3.var.2 - Kept. A function reading a 'let' declared below it warns, see
 //   the note in <name_lookup>.
+// - 3.var.3 - Kept. '&&=' and '+=' do not assign an unassigned variable, which
+//   stays undefined or becomes NaN, so it warns unassigned_var_a. ESLint
+//   no-unassigned-vars counts every compound assignment as a write.
 // - 4.par.1 - Kept. A parameter-default reading a body 'var' warns
 //   temporal_dead_zone_a, where the spec makes it undeclared. It still warns,
 //   and ESLint no-use-before-define likely does the same.
 // - 5.lab.1 - Kept. A label shares the variable namespace, so a same-named
 //   variable warns redefinition_a_b, as ESLint no-label-var.
 // - 5.lab.1 - Kept. A label is allowed only on do, for, switch and while.
+// - 5.lab.1 - Kept. A label read as a variable warns label_a and counts as a
+//   use of the label, so it warns no unused_a as well.
 
         const id = name.id;
         let earlier;
@@ -9148,15 +9153,27 @@ function jslint_phase4_walk(state) {
 
     function check_assignable(name, the_variable) {
 
-// PR-xxx - This function will warn bad_assignment_a when <name> has no binding,
-// or a readonly one such as a const, an import, a catch variable or a
-// function name. The '=', compound, '++' and '--' forms all call it.
+// PR-xxx - This function will warn bad_assignment_a when <name> has a readonly
+// binding, such as a const, an import, a catch variable or a function name,
+// and return false for that or for no binding. The '=', compound, '++' and
+// '--' forms all call it.
 
-        if (!the_variable || the_variable.readonly) {
+        if (!the_variable) {
+
+// PR-xxx - An undeclared <name> returns false with no warning, since
+// <name_lookup> already warned undeclared_a on this token, and <warn> keeps
+// only the first warning of a token.
 
 // test_cause:
-// ["aa+=0", "check_assignable", "bad_assignment_a", "aa", 1]
-// ["aa=0", "check_assignable", "bad_assignment_a", "aa", 1]
+// ["aa+=0", "check_assignable", "undeclared", "", 0]
+// ["aa=0", "check_assignable", "undeclared", "", 0]
+
+            test_cause("undeclared");
+            return false;
+        }
+        if (the_variable.readonly) {
+
+// test_cause:
 // ["const aa=0;aa++", "check_assignable", "bad_assignment_a", "aa", 12]
 // ["const aa=0;aa+=0", "check_assignable", "bad_assignment_a", "aa", 12]
 // ["const aa=0;aa=0", "check_assignable", "bad_assignment_a", "aa", 12]
