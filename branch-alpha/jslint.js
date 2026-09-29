@@ -8584,6 +8584,9 @@ function jslint_phase3_parse(state) {
     assignment("%=");
     assignment("&&=");
     assignment("&=");
+
+// PR-xxx - Add Exponentiation operator-assignment '**=' support.
+
     assignment("**=");
     assignment("*=");
     assignment("+=");
@@ -10123,6 +10126,9 @@ function jslint_phase5_whitage(state) {
         "!=", "!==",
         "%", "%=",
         "&", "&&", "&&=", "&=",
+
+// PR-xxx - Add Exponentiation operator-assignment '**=' support.
+
         "*", "**", "**=", "*=",
         "+=",
         "-=",

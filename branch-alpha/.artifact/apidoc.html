@@ -1361,6 +1361,9 @@ if (
         "!=", "!==",
         "%", "%=",
         "&amp;", "&amp;&amp;", "&amp;&amp;=", "&amp;=",
+
+// PR-xxx - Add Exponentiation operator-assignment '**=' support.
+
         "*", "**", "**=", "*=",
         "+=",
         "-=",
@@ -1396,10 +1399,7 @@ if (
 // ["let aa;", "delve", "unused_a", "aa", 5]
 // ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]
 
-                    warn("unused_a", name);
-                } else if (!name.assigned) {
-
-// t...
+                    warn("...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
