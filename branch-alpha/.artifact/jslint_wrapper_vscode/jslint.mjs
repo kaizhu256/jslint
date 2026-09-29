@@ -747,7 +747,10 @@ const jslint_rgx_token = new RegExp(
     "|\\?[?.]?" +
     "|=(?:==?|>)?" +
     "|\\.+" +
-    "|\\*[*\\/=]?" +
+
+// PR-xxx - Bugfix - Lex '**=' as one token, not '**' then '='.
+
+    "|\\*(?:\\*=?|[\\/=])?" +
     "|\\/[*\\/]?" +
     "|\\+[=+]?" +
     "|-[=\\-]?" +
@@ -5909,6 +5912,22 @@ function jslint_phase3_parse(state) {
             ) {
                 break;
             }
+
+// PR-xxx - Bugfix - A line break before a postfix '++' or '--' ends the
+// expression, since the spec forbids one there and inserts a ';'. So 'aa' then
+// '++bb' on the next line is 'aa; ++bb', not 'aa++; bb'.
+
+            if (
+                (token_nxt.id === "++" || token_nxt.id === "--") &&
+                token_nxt.line !== token_now.line
+            ) {
+
+// test_cause:
+// ["aa\n++aa", "parse_expression", "postfix_line_break", "", 0]
+
+                test_cause("postfix_line_break");
+                break;
+            }
             advance();
             left = the_symbol.led_infix(left);
         }
@@ -7555,11 +7574,15 @@ function jslint_phase3_parse(state) {
 
                 the_variable = parse_expression(110);
                 if (token_nxt.id !== "in" && token_nxt.id !== "of") {
+
+// test_cause:
+// ["for(aa 0){}", "stmt_for", "expected_a_b", "0", 8]
+
                     return stop(
                         "expected_a_b",
                         token_nxt,
                         "of",
-                        token_nxt.id
+                        artifact(token_nxt)
                     );
                 }
                 advance();
@@ -8561,6 +8584,7 @@ function jslint_phase3_parse(state) {
     assignment("%=");
     assignment("&&=");
     assignment("&=");
+    assignment("**=");
     assignment("*=");
     assignment("+=");
     assignment("-=");
@@ -9657,11 +9681,16 @@ function jslint_phase4_walk(state) {
             warn("unexpected_a", thing);
             break;
         }
+
+// PR-xxx - Bugfix - Skip the 'of' or 'in' node of a for-loop-head, so
+// 'for (aa of bb < cc)' does not warn on its own 'of', like the const form.
+
         if (
             thing.id !== "(" &&
             thing.id !== "&&" &&
             thing.id !== "||" &&
             thing.id !== "=" &&
+            thing.for_init !== true &&
             Array.isArray(thing.expression) &&
             thing.expression.length === 2 &&
             (
@@ -10094,7 +10123,7 @@ function jslint_phase5_whitage(state) {
         "!=", "!==",
         "%", "%=",
         "&", "&&", "&&=", "&=",
-        "*", "*=",
+        "*", "**", "**=", "*=",
         "+=",
         "-=",
         "/", "/=",
