@@ -6650,10 +6650,12 @@ function jslint_phase3_parse(state) {
             name_declare(
 
 // 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
+// PR-xxx - Bugfix - Mark it readonly, so reassigning a function warns, as
+// ESLint no-func-assign does.
 
                 scope_declared,         // scope_declared
                 role,                   // role
-                false,                  // readonly
+                true,                   // readonly
                 [],                     // name_list
                 name,                   // name
 
@@ -9000,6 +9002,28 @@ function jslint_phase4_walk(state) {
         };
     }
 
+    function check_assignable(name, the_variable) {
+
+// PR-xxx - This function will warn bad_assignment_a when <name> has no binding,
+// or a readonly one such as a const, an import, a catch variable or a
+// function name. The '=', compound, '++' and '--' forms all call it.
+
+        if (!the_variable || the_variable.readonly) {
+
+// test_cause:
+// ["aa+=0", "check_assignable", "bad_assignment_a", "aa", 1]
+// ["aa=0", "check_assignable", "bad_assignment_a", "aa", 1]
+// ["const aa=0;aa++", "check_assignable", "bad_assignment_a", "aa", 12]
+// ["const aa=0;aa+=0", "check_assignable", "bad_assignment_a", "aa", 12]
+// ["const aa=0;aa=0", "check_assignable", "bad_assignment_a", "aa", 12]
+// ["function aa(){}aa=0", "check_assignable", "bad_assignment_a", "aa", 16]
+
+            warn("bad_assignment_a", name);
+            return false;
+        }
+        return true;
+    }
+
     function name_lookup(thing) {
 
 // This function will lookup and return variable or function-parameter
@@ -9117,19 +9141,8 @@ function jslint_phase4_walk(state) {
         const lvalue = thing.expression[0];
         let right;
         if (thing.id !== "=") {
-            if (
-                lvalue.arity === "variable" &&
-                (!lvalue.variable || lvalue.variable.readonly)
-            ) {
-
-// test_cause:
-// ["aa+=0", "post_a_assignment", "+=", "aa", 0]
-// ["aa+=0", "post_a_assignment", "bad_assignment_a", "aa", 1]
-// ["const aa=0;aa+=0", "post_a_assignment", "+=", "aa", 0]
-// ["const aa=0;aa+=0", "post_a_assignment", "bad_assignment_a", "aa", 12]
-
-                test_cause("+=", lvalue.id);
-                warn("bad_assignment_a", lvalue);
+            if (lvalue.arity === "variable") {
+                check_assignable(lvalue, lvalue.variable);
             }
             right = syntax_dict[thing.expression[1].id];
             if (
@@ -9153,25 +9166,15 @@ function jslint_phase4_walk(state) {
             return;
         }
         if (thing.name_list) {
-            thing.name_list.forEach(function (name) {
+            for (const name of thing.name_list) {
                 const the_variable = name_lookup(name);
-                if (the_variable && !the_variable.readonly) {
+                if (check_assignable(name, the_variable)) {
 
 // 3.var.3 - Mark 'assigned', the variable, after assignment.
 
                     the_variable.assigned = true;
-                    return;
                 }
-
-// test_cause:
-// ["aa=0", "post_a_assignment", "=", "aa", 0]
-// ["aa=0", "post_a_assignment", "bad_assignment_a", "aa", 1]
-// ["const aa=0;aa=0", "post_a_assignment", "=", "aa", 0]
-// ["const aa=0;aa=0", "post_a_assignment", "bad_assignment_a", "aa", 12]
-
-                test_cause("=", name.id);
-                warn("bad_assignment_a", name);
-            });
+            }
             return;
         }
         if (lvalue.id === "." && thing.expression[1].id === "undefined") {
@@ -9542,6 +9545,16 @@ function jslint_phase4_walk(state) {
 // ["aa=0||0", "post_b_or", "weird_condition_a", "||", 5]
 
             warn("weird_condition_a", thing);
+        }
+    }
+
+    function post_p_update(thing) {
+
+// PR-xxx - Bugfix - A '++' or '--' assigns too, so a const, an import or an
+// undeclared operand warns like 'aa += 1' does.
+
+        if (thing.expression.arity === "variable") {
+            check_assignable(thing.expression, thing.expression.variable);
         }
     }
 
@@ -10141,6 +10154,8 @@ function jslint_phase4_walk(state) {
     postaction("binary", "=>", post_s_function);
     postaction("binary", "[", post_b_lbracket);
     postaction("binary", "||", post_b_or);
+    postaction("postassign", "(all)", post_p_update);
+    postaction("preassign", "(all)", post_p_update);
     postaction("statement", "const", post_s_var);
     postaction("statement", "export", post_s_export_toplevel);
     postaction("statement", "for", post_s_for);
