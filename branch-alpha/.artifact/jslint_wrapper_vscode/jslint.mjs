@@ -7712,7 +7712,10 @@ function jslint_phase3_parse(state) {
 // ["for(let aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
 // ["for(var aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
 
-                warn("expected_a_b", the_for, "Object.keys", "for in");
+// PR-xxx - Suggest 'for...of Object.keys', since a plain object is not
+// iterable, so a bare 'for...of' would throw a TypeError.
+
+                warn("expected_a_b", the_for, "for...of Object.keys", "for in");
                 break;
 
 // PR-504 - Add ES2015-feature for..of.
