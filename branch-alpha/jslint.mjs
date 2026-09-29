@@ -5759,10 +5759,9 @@ function jslint_phase3_parse(state) {
 
 // Has the name been declared in this context?
 
-// PR-xxx - Bugfix - Also check <scope_declared>, which differs from
-// <scope_block> for a var in a nested block. Else 'var bb' in an if-block
-// replaced an earlier 'var bb', and a use between them warned
-// temporal_dead_zone_a.
+// PR-xxx - Bugfix - Check <scope_declared>, which differs from <scope_block>
+// for a var in a nested block. Else 'var bb' in an if-block replaced an
+// earlier 'var bb', and a use between them warned temporal_dead_zone_a.
 
         earlier = scope_block.context[id] || scope_declared.context[id];
         if (earlier) {
