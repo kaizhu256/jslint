@@ -29,13 +29,13 @@
     textLength="768"
     x="10"
     y="98"
->- jslint - Allow destructured catch-variable 'catch ({aa})', which stops the lint, but is valid \</tspan>
+>- jslint - Destructuring - Allow catch-variable 'catch ({aa})', valid ES2015 but a stop now, and\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="120"
->  ES2015.                                                                                        </tspan>
+>   maybe warn a const reassigned by '({aa} = {})'.                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

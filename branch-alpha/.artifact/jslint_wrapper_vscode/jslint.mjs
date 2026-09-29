@@ -114,7 +114,6 @@
     block_list,
     block_stack,
     browser,
-    calls,
     catch,
     causes,
     char,
@@ -5580,9 +5579,6 @@ function jslint_phase3_parse(state) {
 
             check_left(left, the_paren);
         }
-        if (scope_function.arity === "statement" && left.identifier) {
-            scope_function.name.calls[left.id] = left;
-        }
         the_paren.expression = [left];
         if (token_nxt.id !== ")") {
 
@@ -5659,11 +5655,11 @@ function jslint_phase3_parse(state) {
     ) {
 
 // This function will:
-// 1. Push variable or function-parameter <name> to <name_list>.
-// 2. Set <name>.assigned = true, if its an assigned-variable,
-//    a function-parameter, or existing variable assigned new value.
-// 3. Declare <name> in <scope_declared>.context, if its a declared-variable,
-//    or function-parameter.
+// 1. Push <name> to <name_list>.
+// 2. Set <name>.assigned, <name>.readonly and <name>.role from the arguments.
+//    An existing variable given a new value is marked by <post_a_assignment>.
+// 3. Declare <name> in <scope_declared>.context, unless <scope_declared> is
+//    undefined, as for the plain assignment 'aa = 0'.
 //
 // Most calls to name_declare() are commented regarding thing being declared,
 // and its lifecycle. Below is a copy of all such comments.
@@ -5671,32 +5667,65 @@ function jslint_phase3_parse(state) {
 // 1.imp.1 - Mark 'declared', the import-name, during import-statement.
 // 1.imp.2 - Mark 'alive', the import-name, after import-statement.
 // 1.imp.3 - Mark 'assigned', the import-name, during import-statement.
+// 1.imp.4 - Mark 'readonly', the import-name, during import-statement.
 //
 // 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
 // 2.fun.2 - Mark 'alive', the function-name, during function-declaration.
 // 2.fun.3 - Mark 'assigned', the function-name, during function-declaration.
+// 2.fun.4 - Mark 'readonly', the function-name, during function-declaration.
 //
 // 3.cat.1 - Mark 'declared', the catch-variable, before catch-block.
 // 3.cat.2 - Mark 'alive', the catch-variable, before catch-block.
 // 3.cat.3 - Mark 'assigned', the catch-variable, before catch-block.
+// 3.cat.4 - Mark 'readonly', the catch-variable, before catch-block.
 //
 // 3.glo.1 - Mark 'declared', the global-variable, immediately.
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
 // 3.glo.3 - Mark 'assigned', the global-variable, immediately.
+// 3.glo.4 - Mark 'readonly', the global-variable, immediately.
 //
 // 3.var.1 - Mark 'declared', the variable, during variable-declaration.
 // 3.var.2 - Mark 'alive', the variable, after variable-declaration.
 // 3.var.3 - Mark 'assigned', the variable, after assignment.
+// 3.var.3 - Mark 'assigned', the variable, during destructuring.
 // 3.var.3 - Mark 'assigned', the variable, during variable-declaration.
+// 3.var.4 - Mark 'readonly', the variable, if const.
 //
 // 4.par.1 - Mark 'declared', the function-parameter, during destructuring.
 // 4.par.1 - Mark 'declared', the function-parameter, if unwrapped.
 // 4.par.2 - Mark 'alive', the function-parameter, after destructuring.
+// 4.par.3 - Mark 'assigned', the function-parameter, during destructuring.
 // 4.par.3 - Mark 'assigned', the function-parameter, if unwrapped.
 //
 // 5.lab.1 - Mark 'declared', the label-name, before control-flow-block.
 // 5.lab.2 - Mark 'alive', the label-name, before control-flow-block.
 // 5.lab.3 - Mark 'assigned', the label-name, before control-flow-block.
+// 5.lab.4 - Mark 'readonly', the label-name, before control-flow-block.
+//
+// The 2.fun tags also cover a named function-expression, whose name is
+// declared in its own function-body.
+//
+// PR-xxx - Deviations from the spec, reviewed 2026-09-29, each kept, fixed
+// or left in Todo.
+//
+// - 1.imp.2 - Kept. An import used above its import-statement warns
+//   temporal_dead_zone_a, though imports are hoisted.
+// - 2.fun.1 - Kept. 'let aa;(function aa(){})' warns redefinition_a_b, but
+//   the reverse order does not. ESLint no-shadow is off by default.
+// - 2.fun.4 - Kept. Reassigning a function warns, as ESLint no-func-assign.
+// - 3.cat.1 - Todo. A destructured catch-variable 'catch ({aa})' stops.
+// - 3.cat.4 - Kept. Reassigning a catch-variable warns, as ESLint no-ex-assign.
+// - 3.glo.4 - Kept. Reassigning a global warns, as ESLint no-global-assign.
+// - 3.var.2 - Kept. A 'var' read above its declaration warns
+//   temporal_dead_zone_a, though its hoisted value 'undefined' is valid.
+// - 3.var.2 - Kept. A function reading a 'let' declared below it warns, see
+//   the note in <name_lookup>.
+// - 3.var.4 - Todo. A const reassigned by '({aa} = {})' does not warn.
+// - 5.lab.1 - Kept. A label shares the variable namespace, so a same-named
+//   variable warns redefinition_a_b, as ESLint no-label-var.
+// - 5.lab.1 - Kept. A label is allowed only on do, for, switch and while.
+// - 5.lab.2 - Fixed. <name_lookup> skips a label, and 'break' no longer finds
+//   one across a function boundary.
 
         const id = name.id;
         let earlier;
@@ -6508,6 +6537,10 @@ function jslint_phase3_parse(state) {
                     readonly,           // readonly
                     sub_list,           // name_list
                     name,               // name
+
+// 3.var.3 - Mark 'assigned', the variable, during destructuring.
+// 4.par.3 - Mark 'assigned', the function-parameter, during destructuring.
+
                     true                // assigned
                 );
                 advance_and_signature_push(token_nxt.id);
@@ -6519,6 +6552,10 @@ function jslint_phase3_parse(state) {
                 readonly,               // readonly
                 sub_list,               // name_list
                 name,                   // name
+
+// 3.var.3 - Mark 'assigned', the variable, during destructuring.
+// 4.par.3 - Mark 'assigned', the function-parameter, during destructuring.
+
                 true                    // assigned
             );
             if (token_nxt.id === "=") {
@@ -6638,7 +6675,6 @@ function jslint_phase3_parse(state) {
 
                 return stop("expected_identifier_a", token_nxt);
             }
-            name.calls = empty();
         } else if (name) {
 
 // A function expression may have an optional name.
@@ -6655,11 +6691,14 @@ function jslint_phase3_parse(state) {
             name_declare(
 
 // 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
-// PR-xxx - Bugfix - Mark it readonly, so reassigning a function warns, as
-// ESLint no-func-assign does.
 
                 scope_declared,         // scope_declared
                 role,                   // role
+
+// 2.fun.4 - Mark 'readonly', the function-name, during function-declaration.
+// PR-xxx - Bugfix - Mark it readonly, so reassigning a function warns, as
+// ESLint no-func-assign does.
+
                 true,                   // readonly
                 [],                     // name_list
                 name,                   // name
@@ -7868,6 +7907,9 @@ function jslint_phase3_parse(state) {
 
                     scope_function,     // scope_declared
                     "variable",         // role
+
+// 1.imp.4 - Mark 'readonly', the import-name, during import-statement.
+
                     true,               // readonly
                     the_import.name_list,       // name_list
                     name,               // name
@@ -7914,6 +7956,9 @@ function jslint_phase3_parse(state) {
 
                             scope_function,     // scope_declared
                             "variable", // role
+
+// 1.imp.4 - Mark 'readonly', the import-name, during import-statement.
+
                             true,       // readonly
                             the_import.name_list,       // name_list
                             name,       // name
@@ -8027,6 +8072,9 @@ function jslint_phase3_parse(state) {
 
             scope_block,        // scope_declared
             "label",            // role
+
+// 5.lab.4 - Mark 'readonly', the label-name, before control-flow-block.
+
             true,               // readonly
             [],                 // name_list
             the_label,          // name
@@ -8330,6 +8378,9 @@ function jslint_phase3_parse(state) {
 
                         scope_block,    // scope_declared
                         "exception",    // role
+
+// 3.cat.4 - Mark 'readonly', the catch-variable, before catch-block.
+
                         true,           // readonly
                         [],             // name_list
                         token_nxt,      // name
@@ -8524,6 +8575,9 @@ function jslint_phase3_parse(state) {
 
                     scope_declared,     // scope_declared
                     "variable",         // role
+
+// 3.var.4 - Mark 'readonly', the variable, if const.
+
                     readonly,           // readonly
                     the_variable.name_list,     // name_list
                     name,               // name
@@ -9141,6 +9195,9 @@ function jslint_phase4_walk(state) {
 
                 assigned: true,
                 id,
+
+// 3.glo.4 - Mark 'readonly', the global-variable, immediately.
+
                 readonly: true,
                 role: "variable",
                 scope_declared: token_global
@@ -9150,16 +9207,14 @@ function jslint_phase4_walk(state) {
 
             token_global.context[id] = the_variable;
         }
-        if (
-            (
-                !the_variable.calls ||
-                !scope_function.name ||
-                !the_variable.calls[scope_function.name.id]
-            ) &&
-            !the_variable.alive
-        ) {
+        if (!the_variable.alive) {
 
 // Warn variable is 'out-of-scope'.
+
+// PR-xxx - Deviation kept 2026-09-29. A function reading a 'let' declared
+// below it warns, though valid when called later. This matches ESLint
+// no-use-before-define. The removed <calls> exemption never fired, since a
+// function-statement name is alive from parse.
 
 // test_cause:
 // ["(aa=aa)=>0", "name_lookup", "temporal_dead_zone_a", "aa", 5]
@@ -10870,7 +10925,6 @@ function jslint_phase5_whitage(state) {
         nr_comments_skipped = 0;
         delete left.alive;
         delete left.assigned;
-        delete left.calls;
         delete left.open;
         delete left.used;
         left = right;
