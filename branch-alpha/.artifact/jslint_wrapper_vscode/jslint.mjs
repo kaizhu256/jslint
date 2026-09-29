@@ -748,7 +748,7 @@ const jslint_rgx_token = new RegExp(
     "|=(?:==?|>)?" +
     "|\\.+" +
 
-// PR-xxx - Add Exponentiation operator-assignment '**=' support.
+// PR-xxx - Add Exponentiation-assignment-operator '**=' support.
 
     "|\\*(?:\\*=?|[\\/=])?" +
     "|\\/[*\\/]?" +
@@ -8585,7 +8585,7 @@ function jslint_phase3_parse(state) {
     assignment("&&=");
     assignment("&=");
 
-// PR-xxx - Add Exponentiation operator-assignment '**=' support.
+// PR-xxx - Add Exponentiation-assignment-operator '**=' support.
 
     assignment("**=");
     assignment("*=");
@@ -10127,7 +10127,8 @@ function jslint_phase5_whitage(state) {
         "%", "%=",
         "&", "&&", "&&=", "&=",
 
-// PR-xxx - Add Exponentiation operator-assignment '**=' support.
+// PR-xxx - Add Exponentiation-assignment-operator '**=' support, and space
+// '**' like '*'.
 
         "*", "**", "**=", "*=",
         "+=",

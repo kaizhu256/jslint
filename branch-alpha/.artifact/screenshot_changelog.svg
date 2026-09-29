@@ -191,7 +191,7 @@
     textLength="768"
     x="10"
     y="692"
->- jslint-ecma - Add Exponentiation operator-assignment '**=' support.                            </tspan>
+>- jslint-ecma - Add Exponentiation-assignment-operator '**=' support.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

@@ -1362,7 +1362,8 @@ if (
         "%", "%=",
         "&amp;", "&amp;&amp;", "&amp;&amp;=", "&amp;=",
 
-// PR-xxx - Add Exponentiation operator-assignment '**=' support.
+// PR-xxx - Add Exponentiation-assignment-operator '**=' support, and space
+// '**' like '*'.
 
         "*", "**", "**=", "*=",
         "+=",
@@ -1397,9 +1398,7 @@ if (
 // test_cause:
 // ["function aa(bb){return;}", "delve", "unused_a", "bb", 13]
 // ["let aa;", "delve", "unused_a", "aa", 5]
-// ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]
-
-                    warn("...
+// ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
