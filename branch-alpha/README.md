@@ -1085,7 +1085,7 @@ if (false) {
 1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
     - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
 1. update `CHANGELOG.md`
-    - add each item this pull-request ships from commit messages to `CHANGELOG.md`.
+    - copy impactful `<commit entries>` to `<CHANGELOG.md entries>`
     - run
         ```shell
         # re-run until version propagates
@@ -1141,7 +1141,7 @@ if (false) {
 1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
     - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
 1. update `CHANGELOG.md`
-    - verify topmost `# v20yy.mm.dd` section is ordered by impact.
+    - verify `<CHANGELOG.md entries>` ordered by impact.
     - run
         ```shell
         # re-run until version propagates
