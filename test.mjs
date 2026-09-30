@@ -1082,6 +1082,109 @@ ff();
         }).autofixed, "let aa = 2;\naa = aa ** 2;\n");
     });
     jstestIt((
+        "test report-function handling-behavior"
+    ), function () {
+
+// PR-xxx - Bugfix - The report's function details list block-scoped names and
+// catch-variables, and mark closure only across a function boundary.
+
+        const html = jslint.jslint_report(jslint.jslint(String(`
+let ee = 0;
+function aa(gg) {
+    let bb = 0;
+    let ff = 0;
+    if (aa) {
+        let cc = 1;
+        aa(bb, cc, ee, gg);
+    }
+    try {
+        aa();
+    } catch (err) {
+        aa(err);
+    }
+    return function () {
+        return ff;
+    };
+}
+aa();
+        `).trim() + "\n", {}));
+        const result = html.slice(
+            html.indexOf("<div class=\"level level1\">"),
+            html.lastIndexOf("</div>\n</fieldset>")
+        ).replace((/<dl>/g), "\n<dl>");
+        assertOrThrow(result === String(`
+<div class="level level1"><address>2: 1</address><dfn>aa(gg)</dfn>
+<dl><dt>parameter</dt><dd>gg</dd></dl>
+<dl><dt>variable</dt><dd>bb, cc, ff</dd></dl>
+<dl><dt>exception</dt><dd>err</dd></dl>
+<dl><dt>closure</dt><dd>ff</dd></dl>
+<dl><dt>global</dt><dd>aa, ee</dd></dl></div>
+<div class="level level2"><address>14: 12</address><dfn>«return»()</dfn>
+<dl><dt>outer</dt><dd>ff</dd></dl></div>
+        `).trim() + "\n", result);
+
+// PR-xxx - Bugfix - A method or accessor is named after its property, not
+// after the identifier before it.
+
+        assertJsonEqual(jslint.jslint(String(`
+/*jslint getset*/
+String({
+    aa() {
+        return;
+    },
+    get bb() {
+        return;
+    },
+    cc: 0,
+    dd() {
+        return;
+    }
+});
+        `).trim() + "\n").functions.map(function ({name}) {
+            return name;
+        }), ["aa", "get bb", "dd"]);
+    });
+    jstestIt((
+        "test report-function-owner handling-behavior"
+    ), function () {
+
+// PR-xxx - Bugfix - A named function expression's name is in no row, and a
+// function lists an outer 'bb' even beside its own block-scoped 'bb'.
+
+        const html = jslint.jslint_report(jslint.jslint(String(`
+function aa() {
+    let bb = 0;
+    function cc() {
+        if (cc) {
+            cc(bb);
+        }
+        if (cc) {
+            let bb = 1;
+            cc(bb);
+        }
+    }
+    return function dd() {
+        return dd(cc);
+    };
+}
+aa();
+        `).trim() + "\n", {}));
+        const result = html.slice(
+            html.indexOf("<div class=\"level level1\">"),
+            html.lastIndexOf("</div>\n</fieldset>")
+        ).replace((/<dl>/g), "\n<dl>");
+        assertOrThrow(result === String(`
+<div class="level level1"><address>1: 1</address><dfn>aa()</dfn>
+<dl><dt>variable</dt><dd>bb, cc</dd></dl>
+<dl><dt>closure</dt><dd>bb, cc</dd></dl></div>
+<div class="level level2"><address>3: 5</address><dfn>cc()</dfn>
+<dl><dt>variable</dt><dd>bb</dd></dl>
+<dl><dt>outer</dt><dd>bb, cc</dd></dl></div>
+<div class="level level2"><address>12: 12</address><dfn>dd()</dfn>
+<dl><dt>outer</dt><dd>cc</dd></dl></div>
+        `).trim() + "\n", result);
+    });
+    jstestIt((
         "test autofix-report handling-behavior"
     ), function () {
         let result;
