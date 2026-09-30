@@ -6704,11 +6704,11 @@ function jslint_phase3_parse(state) {
                 return stop("expected_identifier_a", token_nxt);
             }
 
+            if (scope_function.switch > 0 && scope_block.function_body) {
+
 // PR-xxx - Warn a function-declaration directly in a case, as ESLint
 // no-case-declarations does. One nested in a block of the case already warns
 // unexpected_a in <pre_s_function>.
-
-            if (scope_function.switch > 0 && scope_block.function_body) {
 
 // test_cause:
 // ["
@@ -9538,10 +9538,6 @@ function jslint_phase4_walk(state) {
                 warn("wrap_subexpression_a_b", right, right.id, thing.id);
             }
 
-// PR-xxx - Bugfix - A unary operator before '**' is a SyntaxError, since the
-// spec's ExponentiationExpression takes an UpdateExpression on its left. So
-// '-aa ** 2' needs parens, while '[aa] ** 2' and '++aa ** 2' do not.
-
             if (
                 thing.id === "**" &&
                 thing.expression[0].arity === "unary" &&
@@ -9550,6 +9546,10 @@ function jslint_phase4_walk(state) {
                     "!", "!!", "+", "-", "await", "typeof", "void", "~"
                 ].includes(thing.expression[0].id)
             ) {
+
+// PR-xxx - Bugfix - A unary operator before '**' is a SyntaxError, since the
+// spec's ExponentiationExpression takes an UpdateExpression on its left. So
+// '-aa ** 2' needs parens, while '[aa] ** 2' and '++aa ** 2' do not.
 
 // test_cause:
 // ["aa=-0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
@@ -9562,11 +9562,12 @@ function jslint_phase4_walk(state) {
                 );
             }
 
+            if (thing.id === "??") {
+
 // PR-xxx - Bugfix - An unwrapped '&&' or '||' operand of '??' is a SyntaxError,
 // since the spec's CoalesceExpression takes a BitwiseORExpression on each side.
 // '??' binds loosest of the three, so only a '??' node can hold one.
 
-            if (thing.id === "??") {
                 thing.expression.forEach(function (thang) {
                     if (
                         (thang.id === "&&" || thang.id === "||") &&
