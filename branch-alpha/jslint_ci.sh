@@ -1256,33 +1256,6 @@ import moduleFs from "fs";
     let branchPull;
     let commitMessage;
     let data;
-    async function changelogItemAdded() {
-
-// This function will return the CHANGELOG.md items this pull-request adds,
-// those whose first line is not in the CHANGELOG.md of the previous
-// pull-request at local branch __pr_<branchMerge>, in CHANGELOG.md order.
-// Else it returns the first item of the top section, as before.
-
-        const itemList = (
-            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n([\S\s]+?)\n\n/
-        ).exec(data)[1].split(/\n(?=- )/);
-        const shippedList = await new Promise(function (resolve) {
-            moduleChildProcess.execFile(
-                "git",
-                ["show", `__pr_${branchMerge}:CHANGELOG.md`],
-                {encoding: "utf8"},
-                function (err, stdout) {
-                    resolve(!err && stdout.split("\n"));
-                }
-            );
-        });
-        return (
-            shippedList &&
-            itemList.filter(function (item) {
-                return !shippedList.includes(item.split("\n")[0]);
-            }).join("\n")
-        ) || itemList[0];
-    }
     version = version.replace((/-0?/g), ".").replace((/^v/), "");
     // security - sanitize branchXxx
     [
@@ -1309,7 +1282,10 @@ import moduleFs from "fs";
         break;
     default:
         version = `p${version}`;
-        commitMessage = `- shGithubPrCreate ${await changelogItemAdded()}`;
+        commitMessage = (
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)(?:\n- |\n\n)/
+        ).exec(data)[1];
+        commitMessage = `- shGithubPrCreate ${commitMessage}`;
     }
     branchPull = `branch-${version}`;
     // security - sanitize commitMessage
