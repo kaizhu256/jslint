@@ -1258,35 +1258,10 @@ import moduleFs from "fs";
         branchSquash = "HEAD"
     ] = process.argv;
     let branchPull;
+    let changelogNew;
+    let changelogOld;
     let commitMessage;
     let data;
-    async function changelogItemAdded() {
-
-// This function will return the CHANGELOG.md items this pull-request adds,
-// those whose first line is not in the CHANGELOG.md of local branch
-// <branchMerge>, in CHANGELOG.md order.
-// Else it returns the first item of the top section, as before.
-
-        const changelogNew = (
-            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n([\S\s]+?)\n\n/
-        ).exec(data)[1].split(/\n(?=- )/);
-        const changelogOld = await new Promise(function (resolve) {
-            moduleChildProcess.execFile(
-                "git",
-                ["show", `${branchMerge}:CHANGELOG.md`],
-                {encoding: "utf8"},
-                function (err, stdout) {
-                    resolve(!err && stdout.split("\n"));
-                }
-            );
-        });
-        return (
-            changelogOld &&
-            changelogNew.filter(function (item) {
-                return !changelogOld.includes(item.split("\n")[0]);
-            }).join("\n")
-        ) || changelogNew[0];
-    }
     version = version.replace((/-0?/g), ".").replace((/^v/), "");
     // security - sanitize branchXxx
     [
@@ -1313,7 +1288,31 @@ import moduleFs from "fs";
         break;
     default:
         version = `p${version}`;
-        commitMessage = `- shGithubPrCreate ${await changelogItemAdded()}`;
+        // Diff from <changelogOld> to <changelogNew>.
+        changelogNew = (
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n([\S\s]+?)\n\n/
+        ).exec(data)[1].split(/\n(?=- )/);
+        changelogOld = await new Promise(function (resolve) {
+            moduleChildProcess.execFile(
+                "git",
+                ["show", `${branchMerge}:CHANGELOG.md`],
+                {encoding: "utf8"},
+                function (ignore, stdout) {
+                    resolve(stdout?.split("\n") || []);
+                }
+            );
+        });
+        commitMessage = (
+            `- shGithubPrCreate ` +
+            (
+                changelogNew
+                    .filter(function (item) {
+                        return !changelogOld.includes(item.split("\n")[0]);
+                    })
+                    .join("\n") ||
+                changelogNew[0]
+            )
+        );
     }
     branchPull = `branch-${version}`;
     // security - sanitize commitMessage
@@ -1326,13 +1325,13 @@ import moduleFs from "fs";
 (set -e
     . ./jslint_ci.sh
     npm run test2
+    shDirHttplinkValidate
     git reset "${branchSquash}"
     git push . HEAD:__pr_"${branchMerge}"_pre -f
     shGitSquashPop "${branchCheckpoint}" \u0027${commitMessage}\u0027
     git --no-pager diff origin/"${branchPull}" || true
     git push origin alpha:"${branchPull}" -f
     git push origin alpha -f
-    shDirHttplinkValidate
     git push . HEAD:__pr_"${branchMerge}" -f
     printf "\n\n\n\n"
     git --no-pager log -n 4
