@@ -750,7 +750,7 @@ const jslint_rgx_token = new RegExp(
     "|=(?:==?|>)?" +
     "|\\.+" +
 
-// PR-514 - Add Exponentiation-assignment-operator '**=' support.
+// PR-xxx - Add Exponentiation-assignment-operator '**=' support.
 
     "|\\*(?:\\*=?|[\\/=])?" +
     "|\\/[*\\/]?" +
@@ -4565,7 +4565,7 @@ function jslint_phase2_lex(state) {
 
         switch (id) {
 
-// PR-514 - Bugfix - Also push '{' and '${', so a ';' in a function-body inside
+// PR-xxx - Bugfix - Also push '{' and '${', so a ';' in a function-body inside
 // a for-loop-head 'for (const aa of function () {...}())' is not mistaken for
 // a for-loop-semicolon.
 
@@ -4990,7 +4990,7 @@ function jslint_phase3_parse(state) {
             return false;
         }
 
-// PR-514 - Bugfix - An optional-chain is never an assignment target, so
+// PR-xxx - Bugfix - An optional-chain is never an assignment target, so
 // 'aa?.bb.cc = 0' and 'aa?.[bb] = 0' are SyntaxErrors too.
 
         if (the_optional) {
@@ -5479,7 +5479,7 @@ function jslint_phase3_parse(state) {
 
             test_cause("dyn_prop_or_call");
 
-// PR-514 - Bugfix - The '?.' token leaves the tree here, so mark the '[' or '('
+// PR-xxx - Bugfix - The '?.' token leaves the tree here, so mark the '[' or '('
 // that follows it, for <optional_chain>.
 
             name.optional = true;
@@ -5526,7 +5526,7 @@ function jslint_phase3_parse(state) {
         const the_tick = prefix_tick(true);
         if (the_optional) {
 
-// PR-514 - Bugfix - A tagged-megastring cannot follow an optional-chain, a
+// PR-xxx - Bugfix - A tagged-megastring cannot follow an optional-chain, a
 // SyntaxError.
 
 // test_cause:
@@ -5707,7 +5707,7 @@ function jslint_phase3_parse(state) {
 // The 2.fun tags also cover a named function-expression, whose name is
 // declared in <scope_name>, a scope outside its function.
 //
-// PR-514 - Deviations from the spec, reviewed 2026-09-29, each kept. A fixed
+// PR-xxx - Deviations from the spec, reviewed 2026-09-29, each kept. A fixed
 // one is commented at its site, and a Todo is in CHANGELOG.md.
 //
 // - 1.imp.2 - Kept. An import used above its import-statement warns
@@ -5765,7 +5765,7 @@ function jslint_phase3_parse(state) {
 
 // Has the name been declared in this context?
 
-// PR-514 - Bugfix - Check <scope_declared>, which differs from <scope_block>
+// PR-xxx - Bugfix - Check <scope_declared>, which differs from <scope_block>
 // for a var in a nested block. Else 'var bb' in an if-block replaced an
 // earlier 'var bb', and a use between them warned temporal_dead_zone_a.
 
@@ -5875,7 +5875,7 @@ function jslint_phase3_parse(state) {
 
     function optional_chain(thing) {
 
-// PR-514 - This function will return the '?.' token, or the '[' or '(' token
+// PR-xxx - This function will return the '?.' token, or the '[' or '(' token
 // marked <optional> after a '?.', of an unwrapped optional-chain ending at
 // <thing>. The spec forbids such a chain as an assignment target, the callee
 // of 'new' and the tag of a template.
@@ -6021,7 +6021,7 @@ function jslint_phase3_parse(state) {
                 break;
             }
 
-// PR-514 - Bugfix - A line break before a postfix '++' or '--' ends the
+// PR-xxx - Bugfix - A line break before a postfix '++' or '--' ends the
 // expression, since the spec forbids one there and inserts a ';'. So 'aa' then
 // '++bb' on the next line is 'aa; ++bb', not 'aa++; bb'.
 
@@ -6581,7 +6581,7 @@ function jslint_phase3_parse(state) {
                 name.expression = parse_expression(0);
                 if (scope_declared === undefined) {
 
-// PR-514 - Bugfix - Walk a default in destructuring-assignment
+// PR-xxx - Bugfix - Walk a default in destructuring-assignment
 // '[aa = bb] = ...', which no <post_s_var> walks, so 'bb' was never used. It
 // is pushed wrapped in an array, which has no <arity>, so <prefix_lbracket>
 // walks it and never looks it up as a target.
@@ -6705,7 +6705,7 @@ function jslint_phase3_parse(state) {
                 return stop("expected_identifier_a", token_nxt);
             }
 
-// PR-514 - Warn a function-declaration directly in a case, as ESLint
+// PR-xxx - Warn a function-declaration directly in a case, as ESLint
 // no-case-declarations does. One nested in a block of the case already warns
 // unexpected_a in <pre_s_function>.
 
@@ -6722,7 +6722,7 @@ function jslint_phase3_parse(state) {
 
 // A function expression may have an optional name.
 
-// PR-514 - Bugfix - Declare the name in <scope_name>, outside the function as
+// PR-xxx - Bugfix - Declare the name in <scope_name>, outside the function as
 // in the spec, so a 'var' of that name in the body is a new binding.
 
             scope_declared = the_function.scope_name;
@@ -6737,7 +6737,7 @@ function jslint_phase3_parse(state) {
                 "variable",             // role
 
 // 2.fun.4 - Mark 'readonly', the function-name, during function-declaration.
-// PR-514 - Bugfix - Mark it readonly, so reassigning a function warns, as
+// PR-xxx - Bugfix - Mark it readonly, so reassigning a function warns, as
 // ESLint no-func-assign does.
 
                 true,                   // readonly
@@ -6923,7 +6923,7 @@ function jslint_phase3_parse(state) {
 
 // Check functions are ordered.
 
-// PR-514 - Bugfix - Check only function-declarations, since a named
+// PR-xxx - Bugfix - Check only function-declarations, since a named
 // function-expression is not hoisted. Check an arrow-function's block-body too.
 
 // test_cause:
@@ -6960,7 +6960,7 @@ function jslint_phase3_parse(state) {
 
     function prefix_lbrace() {
 
-// PR-514 - Bugfix - <seen> maps a property-name to true, or to false if only
+// PR-xxx - Bugfix - <seen> maps a property-name to true, or to false if only
 // an accessor has it. Accessor-keys like 'get aa' live apart in
 // <seen_getset>, so a string-key named get aa cannot collide with them.
 
@@ -7160,7 +7160,7 @@ function jslint_phase3_parse(state) {
                 false                   // the_function_toplevel
             );
 
-// PR-514 - Walk defaults as expressions, and leave only variables in
+// PR-xxx - Walk defaults as expressions, and leave only variables in
 // <name_list> for <post_a_assignment> to look up.
 
             element.expression = the_token.name_list.filter(function (name) {
@@ -7242,7 +7242,7 @@ function jslint_phase3_parse(state) {
         let right;
         right = parse_expression(160);
 
-// PR-514 - Bugfix - In 'new aa`bb`()' the tagged-megastring belongs to the
+// PR-xxx - Bugfix - In 'new aa`bb`()' the tagged-megastring belongs to the
 // callee, 'new (aa`bb`)()', but '`' shares lbp 160 with the call's '(', so rbp
 // 160 stops before it. Parse it, and any member after it, into the callee.
 
@@ -7256,7 +7256,7 @@ function jslint_phase3_parse(state) {
         }
         if (optional_chain(right)) {
 
-// PR-514 - Bugfix - The callee of 'new' cannot be an optional-chain, a
+// PR-xxx - Bugfix - The callee of 'new' cannot be an optional-chain, a
 // SyntaxError that rbp 160 let in, since '?.' binds at 170.
 
 // test_cause:
@@ -7316,7 +7316,7 @@ function jslint_phase3_parse(state) {
 
         warn("unexpected_a", the_void);
 
-// PR-514 - Bugfix - Parse the operand at rbp 150, like every unary operator,
+// PR-xxx - Bugfix - Parse the operand at rbp 150, like every unary operator,
 // since the spec reads 'void UnaryExpression'. At rbp 0, 'void aa ** 2', a
 // SyntaxError, parsed as 'void (aa ** 2)'.
 
@@ -7380,7 +7380,7 @@ function jslint_phase3_parse(state) {
         if (token_nxt.identifier && token_now.line === token_nxt.line) {
             block_stack.some(function (scope_block) {
 
-// PR-514 - Bugfix - Stop at the function boundary, since 'break aa' cannot
+// PR-xxx - Bugfix - Stop at the function boundary, since 'break aa' cannot
 // reach a label in an enclosing function, which is a SyntaxError.
 
                 if (scope_block === scope_function) {
@@ -7450,8 +7450,8 @@ function jslint_phase3_parse(state) {
         const the_token = token_now;
         const the_value = parse_expression(0);
 
-// PR-514 - Bugfix - Allow 'delete aa?.bb', a valid optional-chain operand.
-// PR-514 - Bugfix - In 'delete aa[bb] || cc', the parse at rbp 0 swallows the
+// PR-xxx - Bugfix - Allow 'delete aa?.bb', a valid optional-chain operand.
+// PR-xxx - Bugfix - In 'delete aa[bb] || cc', the parse at rbp 0 swallows the
 // '||'. Warn on the operator, not on a missing '.'. Rbp 150 would stop the
 // lint on the leftover '|| cc'.
 
@@ -7799,7 +7799,7 @@ function jslint_phase3_parse(state) {
                 break;
             default:
 
-// PR-514 - Bugfix - Parse the target at rbp 110, which stops before 'in' and
+// PR-xxx - Bugfix - Parse the target at rbp 110, which stops before 'in' and
 // 'of', then their right side at rbp 0, as the spec does. Parsing the whole
 // head at rbp 0 let a looser operator like '||' in 'for (aa in bb || cc)'
 // wrap the 'in' node, and the lint stopped.
@@ -7841,7 +7841,7 @@ function jslint_phase3_parse(state) {
 // ["for(let aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
 // ["for(var aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
 
-// PR-514 - Suggest 'for...of Object.keys', since a plain object is not
+// PR-xxx - Suggest 'for...of Object.keys', since a plain object is not
 // iterable, so a bare 'for...of' would throw a TypeError.
 
                 warn("expected_a_b", the_for, "for...of Object.keys", "for in");
@@ -8589,7 +8589,7 @@ function jslint_phase3_parse(state) {
 
 // We don't expect to see variables created in switch statements.
 
-// PR-514 - Kept 2026-09-29, broader than ESLint no-case-declarations. This
+// PR-xxx - Kept 2026-09-29, broader than ESLint no-case-declarations. This
 // also warns a 'var', a braced 'case 0: {let aa}' and a 'let' nested in a
 // block of the case, all of which ESLint allows.
 
@@ -8818,7 +8818,7 @@ function jslint_phase3_parse(state) {
             const the_token = token_now;
             let second;
 
-// PR-514 - Bugfix - Both branches are an AssignmentExpression in the spec, so
+// PR-xxx - Bugfix - Both branches are an AssignmentExpression in the spec, so
 // parse the second like the third. 'aa ? bb = 0 : cc' used to stop at '='.
 
             second = parse_expression(10);
@@ -8846,7 +8846,7 @@ function jslint_phase3_parse(state) {
     assignment("&&=");
     assignment("&=");
 
-// PR-514 - Add Exponentiation-assignment-operator '**=' support.
+// PR-xxx - Add Exponentiation-assignment-operator '**=' support.
 
     assignment("**=");
     assignment("*=");
@@ -9020,7 +9020,7 @@ function jslint_phase3_parse(state) {
 
 // Check global functions are ordered.
 
-// PR-514 - Bugfix - Also check an exported function-declaration, which is
+// PR-xxx - Bugfix - Also check an exported function-declaration, which is
 // hoisted too, though <stmt_export> resets its arity to 'unary'.
 
 // test_cause:
@@ -9180,14 +9180,14 @@ function jslint_phase4_walk(state) {
 
     function check_assignable(name, the_variable) {
 
-// PR-514 - This function will warn bad_assignment_a when <name> has a readonly
+// PR-xxx - This function will warn bad_assignment_a when <name> has a readonly
 // binding, such as a const, an import, a catch variable or a function name,
 // and return false for that or for no binding. The '=', compound, '++' and
 // '--' forms all call it.
 
         if (!the_variable) {
 
-// PR-514 - An undeclared <name> returns false with no warning, since
+// PR-xxx - An undeclared <name> returns false with no warning, since
 // <name_lookup> already warned undeclared_a on this token, and <warn> keeps
 // only the first warning of a token.
 
@@ -9245,7 +9245,7 @@ function jslint_phase4_walk(state) {
         block_stack.some(function (scope_block, ii) {
             the_variable = scope_block.context[id];
 
-// PR-514 - Bugfix - Skip a label, so a same-named variable, function or global
+// PR-xxx - Bugfix - Skip a label, so a same-named variable, function or global
 // in an outer scope is still found.
 
             if (the_variable?.role === "label") {
@@ -9323,7 +9323,7 @@ function jslint_phase4_walk(state) {
 
 // Warn variable is in its temporal-dead-zone.
 
-// PR-514 - Deviation kept 2026-09-29. A function reading a 'let' declared
+// PR-xxx - Deviation kept 2026-09-29. A function reading a 'let' declared
 // below it warns, though valid when called later. This matches ESLint
 // no-use-before-define. The removed <calls> exemption never fired, since a
 // function-statement name is alive from parse.
@@ -9359,7 +9359,7 @@ function jslint_phase4_walk(state) {
                 (thing.id === "??=" || thing.id === "||=")
             ) {
 
-// PR-514 - Bugfix - '??=' and '||=' assign an unassigned variable, since its
+// PR-xxx - Bugfix - '??=' and '||=' assign an unassigned variable, since its
 // 'undefined' is nullish and falsy, so it counts as assigned. '&&=' does not
 // assign it, and still warns unassigned_var_a.
 
@@ -9541,7 +9541,7 @@ function jslint_phase4_walk(state) {
                 warn("wrap_subexpression_a_b", right, right.id, thing.id);
             }
 
-// PR-514 - Bugfix - A unary operator before '**' is a SyntaxError, since the
+// PR-xxx - Bugfix - A unary operator before '**' is a SyntaxError, since the
 // spec's ExponentiationExpression takes an UpdateExpression on its left. So
 // '-aa ** 2' needs parens, while '[aa] ** 2' and '++aa ** 2' do not.
 
@@ -9565,7 +9565,7 @@ function jslint_phase4_walk(state) {
                 );
             }
 
-// PR-514 - Bugfix - An unwrapped '&&' or '||' operand of '??' is a SyntaxError,
+// PR-xxx - Bugfix - An unwrapped '&&' or '||' operand of '??' is a SyntaxError,
 // since the spec's CoalesceExpression takes a BitwiseORExpression on each side.
 // '??' binds loosest of the three, so only a '??' node can hold one.
 
@@ -9771,7 +9771,7 @@ function jslint_phase4_walk(state) {
 
     function post_p_update(thing) {
 
-// PR-514 - Bugfix - A '++' or '--' assigns too, so a const, an import or an
+// PR-xxx - Bugfix - A '++' or '--' assigns too, so a const, an import or an
 // undeclared operand warns like 'aa += 1' does.
 
         if (thing.expression.arity === "variable") {
@@ -9847,7 +9847,7 @@ function jslint_phase4_walk(state) {
             scope_block = scope_block_pop();
         }
 
-// PR-514 - Bugfix - Walk the finally-block after the catch-block, as parsed.
+// PR-xxx - Bugfix - Walk the finally-block after the catch-block, as parsed.
 // Else a 'var' from the catch-block warned temporal_dead_zone_a in it.
 
 // Recurse walk_statement.
@@ -10033,7 +10033,7 @@ function jslint_phase4_walk(state) {
             break;
         }
 
-// PR-514 - Bugfix - Skip the 'of' or 'in' node of a for-loop-head, so
+// PR-xxx - Bugfix - Skip the 'of' or 'in' node of a for-loop-head, so
 // 'for (aa of bb < cc)' does not warn on its own 'of', like the const form.
 
         if (
@@ -10182,7 +10182,7 @@ function jslint_phase4_walk(state) {
             case "let":
             case "var":
 
-// PR-514 - Bugfix - Walk the iterable of destructured 'for (const [aa] of bb)',
+// PR-xxx - Bugfix - Walk the iterable of destructured 'for (const [aa] of bb)',
 // which <stmt_var> keeps in <expression>, and <post_s_var> does not walk. Walk
 // it before <post_s_var> marks the names alive, to catch temporal_dead_zone_a.
 
@@ -10230,7 +10230,7 @@ function jslint_phase4_walk(state) {
             }
         } else if (thing.extra === "set") {
 
-// PR-514 - Bugfix - A setter's one parameter cannot be a rest-parameter, a
+// PR-xxx - Bugfix - A setter's one parameter cannot be a rest-parameter, a
 // SyntaxError. Read <signature>, since <name_list> flattens destructuring and
 // cannot tell a rest-parameter from a valid rest-element inside a destructure.
 
@@ -10496,7 +10496,7 @@ function jslint_phase5_whitage(state) {
         "%", "%=",
         "&", "&&", "&&=", "&=",
 
-// PR-514 - Add Exponentiation-assignment-operator '**=' support, and space
+// PR-xxx - Add Exponentiation-assignment-operator '**=' support, and space
 // '**' like '*'.
 
         "*", "**", "**=", "*=",
@@ -10839,7 +10839,7 @@ function jslint_phase5_whitage(state) {
         }
         if (left.getset === true) {
 
-// PR-514 - Bugfix - The 'get' or 'set' of an accessor takes one space before
+// PR-xxx - Bugfix - The 'get' or 'set' of an accessor takes one space before
 // its name, and no line break. On one line, <one_space> still lets a comment
 // sit between them.
 
