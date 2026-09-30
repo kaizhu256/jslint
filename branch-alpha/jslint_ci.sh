@@ -696,10 +696,9 @@ import moduleFs from "fs";
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
         let data;
-        // Skip dotfiles, such as gitignored scratch files.
         if (
-            file.startsWith(".") ||
             file === "CHANGELOG.md" ||
+            file.startsWith(".") ||
             !(/.\.html$|.\.md$/m).test(file)
         ) {
             return;
