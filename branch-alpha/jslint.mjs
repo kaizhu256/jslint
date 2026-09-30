@@ -9002,6 +9002,9 @@ function jslint_phase3_parse(state) {
 
 // Check top-level functions are ordered.
 
+// PR-xxx - Bugfix - Also check an exported function-declaration, which is
+// hoisted too, though <stmt_export> resets its arity to 'unary'.
+
 // test_cause:
 // ["
 // export async function bb(){}export async function aa(){}
