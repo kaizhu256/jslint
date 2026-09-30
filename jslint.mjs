@@ -1255,9 +1255,9 @@ function jslint(
         if (is_weird(aa) || is_weird(bb)) {
 
 // test_cause:
-// ["aa(/./)||{}", "is_equal", "false", "", 0]
+// ["aa(/./)||{}", "is_equal", "weird", "", 0]
 
-            test_cause("false");
+            test_cause("weird");
             return false;
         }
         if (aa.arity === bb.arity && aa.id === bb.id) {
@@ -7079,9 +7079,9 @@ function jslint_phase3_parse(state) {
                 if (typeof extra === "string") {
 
 // test_cause:
-// ["aa={get aa.aa}", "property_parse", "paren", "", 0]
+// ["aa={get aa.aa}", "property_parse", "getset_no_paren", "", 0]
 
-                    test_cause("paren");
+                    test_cause("getset_no_paren");
                     advance("(");
                 }
                 the_colon = token_nxt;
@@ -11163,13 +11163,10 @@ function jslint_phase6_autofix(state) {
         switch (code) {
         case "expected_a_at_b_c":
 
-// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FOUR
-// callers, not one: at_margin and one_space warn a token that already belongs
-// at a margin, so the target column belongs to the warned line itself. The
-// other two pass 0, are LABEL placement, and DO warn a mid-line token -
-// unreachable here only because a label always co-raises weird_loop or
-// unused_a, which blocks the pass. So do NOT read "always at a margin" as
-// licence to drop the mid-line branch below.
+// expected_a_at_b_c is indentation. Of the four callers of <expected_at>,
+// <at_margin> and <one_space> warn a token that belongs at a margin. The two
+// label callers pass 0 and warn a mid-line label too, such as 'cc:' after
+// 'bb();' on one line. That reaches here, so keep the mid-line branch below.
 
             indentage_at = line_source.length - line_source.trimStart().length;
 
