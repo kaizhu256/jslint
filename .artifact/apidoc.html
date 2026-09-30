@@ -887,9 +887,9 @@ ${String(message).slice(0, 2000)}`
     throw error;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-        nr_comments_skipped = 0;
         delete left.alive;
         delete left.assigned;
+        delete left.calls;
         delete left.open;
         delete left.used;
         left = right;
@@ -1077,7 +1077,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     const mode_digits_numeric_separator = 1;
     const mode_digits_regexp_quantifier = 2;
     const mode_digits_unicode_escape = 3;
-    const opener_stack = [];    // Stack of opener tokens: (, [, {, ${.
+    const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
     let from;                   // The starting column number of the token.
@@ -1098,7 +1098,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     let token_prv = token_global;       // The previous token including
                                         // ... comments.
     let token_prv_expr = token_global;  // The previous token excluding
-                                    ...
+                                        // ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1361,11 +1361,7 @@ if (
         "!=", "!==",
         "%", "%=",
         "&amp;", "&amp;&amp;", "&amp;&amp;=", "&amp;=",
-
-// PR-xxx - Add Exponentiation-assignment-operator '**=' support, and space
-// '**' like '*'.
-
-        "*", "**", "**=", "*=",
+        "*", "*=",
         "+=",
         "-=",
         "/", "/=",
@@ -1384,10 +1380,10 @@ if (
         }
     }
 
-    function delve(the_block) {
-        Object.keys(the_block.context).forEach(function (id) {
-            const name = the_block.context[id];
-            if (id !== "ignore" &amp;&amp; name.scope_declared === the_block) {
+    function delve(the_function) {
+        Object.keys(the_function.context).forEach(function (id) {
+            const name = the_function.context[id];
+            if (id !== "ignore" &amp;&amp; name.scope_declared === the_function) {
 
 // test_cause:
 // ["function aa(aa) {return aa;}", "delve", "id", "", 0]
@@ -1400,7 +1396,11 @@ if (
 // ["let aa;", "delve", "unused_a", "aa", 5]
 // ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]
 
-          ...
+                    warn("unused_a", name);
+                } else if (!name.assigned) {
+
+// test_cause:
+//...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
