@@ -5525,9 +5525,6 @@ function jslint_phase3_parse(state) {
         const the_tick = prefix_tick(true);
         if (the_optional) {
 
-// A tagged-megastring cannot follow an optional-chain, a
-// SyntaxError.
-
 // test_cause:
 // ["aa?.aa``", "infix_grave", "unexpected_a", "?.", 3]
 
@@ -6422,6 +6419,7 @@ function jslint_phase3_parse(state) {
         the_function,
         the_function_toplevel
     ) {
+        const is_assignment = scope_declared === undefined;
         const is_lbrace = token_now.id === "{";
         const sub_list = [];
         const the_destructure = token_now;
@@ -6578,12 +6576,11 @@ function jslint_phase3_parse(state) {
                     the_destructure.open = true;
                 }
                 name.expression = parse_expression(0);
-                if (scope_declared === undefined) {
+                if (is_assignment) {
 
-// Walk a default in destructuring-assignment
-// '[aa = bb] = ...', which no <post_s_var> walks, so 'bb' was never used. It
-// is pushed wrapped in an array, which has no <arity>, so <prefix_lbracket>
-// walks it and never looks it up as a target.
+// No <post_s_var> walks a default in '[aa = bb] = ...', so 'bb' was never
+// used. It is pushed wrapped in an array, which has no <arity>, so
+// <prefix_lbracket> walks it and never looks it up as a target.
 
 // test_cause:
 // [";[aa=0]=0", "name_parse", "default", "", 0]
@@ -7253,8 +7250,7 @@ function jslint_phase3_parse(state) {
         }
         if (optional_chain(right)) {
 
-// The callee of 'new' cannot be an optional-chain, a
-// SyntaxError that rbp 160 let in, since '?.' binds at 170.
+// Rbp 160 lets an optional-chain into the callee, since '?.' binds at 170.
 
 // test_cause:
 // ["new aa?.aa()", "prefix_new", "unexpected_a", "?.", 7]
@@ -7376,10 +7372,6 @@ function jslint_phase3_parse(state) {
         the_break.disrupt = true;
         if (token_nxt.identifier && token_now.line === token_nxt.line) {
             block_stack.some(function (scope_block) {
-
-// Stop at the function boundary, since 'break aa' cannot
-// reach a label in an enclosing function, which is a SyntaxError.
-
                 if (scope_block === scope_function) {
                     return true;
                 }
@@ -7462,14 +7454,7 @@ function jslint_phase3_parse(state) {
 
             warn("unexpected_a", the_value);
         } else if (
-            (
-                the_value.id !== "." &&
-
-// Allow 'delete aa?.bb', a valid optional-chain operand.
-
-                the_value.id !== "?." &&
-                the_value.id !== "["
-            ) ||
+            ![".", "?.", "["].includes(the_value.id) ||
             the_value.arity !== "binary"
         ) {
 
@@ -9178,8 +9163,7 @@ function jslint_phase4_walk(state) {
 
 // This function will warn bad_assignment_a when <name> has a readonly
 // binding, such as a const, an import, a catch variable or a function name,
-// and return false for that or for no binding. The '=', compound, '++' and
-// '--' forms all call it.
+// and return false for that or for no binding.
 
         if (!the_variable) {
 
@@ -9318,12 +9302,9 @@ function jslint_phase4_walk(state) {
         }
         if (!the_variable.alive) {
 
-// Warn variable is in its temporal-dead-zone.
-
 // Deviation kept 2026-09-29. A function reading a 'let' declared
 // below it warns, though valid when called later. This matches ESLint
-// no-use-before-define. The removed <calls> exemption never fired, since a
-// function-statement name is alive from parse.
+// no-use-before-define.
 
 // test_cause:
 // ["(aa=aa)=>0", "name_lookup", "temporal_dead_zone_a", "aa", 5]
@@ -10026,15 +10007,15 @@ function jslint_phase4_walk(state) {
             warn("unexpected_a", thing);
             break;
         }
-
-// Skip the 'of' or 'in' node of a for-loop-head, so
-// 'for (aa of bb < cc)' does not warn on its own 'of', like the const form.
-
         if (
             thing.id !== "(" &&
             thing.id !== "&&" &&
             thing.id !== "||" &&
             thing.id !== "=" &&
+
+// Skip the 'of' or 'in' node of a for-loop-head, so
+// 'for (aa of bb < cc)' does not warn on its own 'of', like the const form.
+
             thing.for_init !== true &&
             Array.isArray(thing.expression) &&
             thing.expression.length === 2 &&
@@ -10829,9 +10810,8 @@ function jslint_phase5_whitage(state) {
         }
         if (left.getset === true) {
 
-// The 'get' or 'set' of an accessor takes one space before
-// its name, and no line break. On one line, <one_space> still lets a comment
-// sit between them.
+// On one line, <one_space> still lets a comment sit between the 'get' or 'set'
+// and its name.
 
 // test_cause:
 // ["
