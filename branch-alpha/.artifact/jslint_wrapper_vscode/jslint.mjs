@@ -5785,14 +5785,7 @@ function jslint_phase3_parse(state) {
 
 // Reserved words may not be declared.
 
-// PR-xxx - Bugfix - 'of' is in <syntax_dict> only as the for..of operator,
-// and is not reserved, so 'let of = 0;' must not warn reserved_a.
-
-        if (
-            syntax_dict[id] !== undefined &&
-            id !== "ignore" &&
-            id !== "of"
-        ) {
+        if (syntax_dict[id] !== undefined && id !== "ignore") {
 
 // test_cause:
 // ["let undefined", "name_declare", "reserved_a", "undefined", 5]
@@ -5803,10 +5796,9 @@ function jslint_phase3_parse(state) {
 
 // Has the name been declared in this context?
 
-// PR-xxx - Bugfix - Also check <scope_declared>, which differs from
-// <scope_block> for a var in a nested block. Else 'var bb' in an if-block
-// replaced an earlier 'var bb', and a use between them warned
-// temporal_dead_zone_a.
+// PR-xxx - Bugfix - Check <scope_declared>, which differs from <scope_block>
+// for a var in a nested block. Else 'var bb' in an if-block replaced an
+// earlier 'var bb', and a use between them warned temporal_dead_zone_a.
 
         earlier = scope_block.context[id] || scope_declared.context[id];
         if (earlier) {
