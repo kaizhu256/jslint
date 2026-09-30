@@ -696,7 +696,12 @@ import moduleFs from "fs";
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
         let data;
-        if (file === "CHANGELOG.md" || !(/.\.html$|.\.md$/m).test(file)) {
+        // Skip dotfiles, such as gitignored scratch files.
+        if (
+            file.startsWith(".") ||
+            file === "CHANGELOG.md" ||
+            !(/.\.html$|.\.md$/m).test(file)
+        ) {
             return;
         }
         data = await moduleFs.promises.readFile(file, "utf8");
@@ -1259,8 +1264,8 @@ import moduleFs from "fs";
     async function changelogItemAdded() {
 
 // This function will return the CHANGELOG.md items this pull-request adds,
-// those whose first line is not in the CHANGELOG.md of the previous
-// pull-request at local branch __pr_<branchMerge>, in CHANGELOG.md order.
+// those whose first line is not in the CHANGELOG.md of local branch
+// <branchMerge>, in CHANGELOG.md order.
 // Else it returns the first item of the top section, as before.
 
         const itemList = (
@@ -1269,7 +1274,7 @@ import moduleFs from "fs";
         const shippedList = await new Promise(function (resolve) {
             moduleChildProcess.execFile(
                 "git",
-                ["show", `__pr_${branchMerge}:CHANGELOG.md`],
+                ["show", `${branchMerge}:CHANGELOG.md`],
                 {encoding: "utf8"},
                 function (err, stdout) {
                     resolve(!err && stdout.split("\n"));

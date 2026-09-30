@@ -26,7 +26,9 @@
 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
 - jslint-ecma - Add Exponentiation-assignment-operator '**=' support.
+- jslint - Binding-power per spec, unary before '**', '??' mix, postfix, '?:'.
 - jslint - Move column-fudging into warn_at(); callers pass 0-based column.
+- jslint-ci - shGithubPrCreate takes the CHANGELOG items a pull-request adds.
 - jslint - Remove dead token-property 'free' from parser and whitage.
 - jslint - Improve parser to parse jquery.js without stopping - for-init comma, numeric object-key.
 - jslint-cli - Skip dotfiles when linting a directory.
