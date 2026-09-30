@@ -4565,7 +4565,7 @@ function jslint_phase2_lex(state) {
 
         switch (id) {
 
-// Also push '{' and '${', so a ';' in a function-body inside
+// Push '{' and '${', so a ';' in a function-body inside
 // a for-loop-head 'for (const aa of function () {...}())' is not mistaken for
 // a for-loop-semicolon.
 
@@ -8999,10 +8999,7 @@ function jslint_phase3_parse(state) {
     state.token_tree = parse_statement_block();
     advance("(end)");
 
-// Check global functions are ordered.
-
-// Also check an exported function-declaration, which is
-// hoisted too, though <stmt_export> resets its arity to 'unary'.
+// Check top-level functions are ordered.
 
 // test_cause:
 // ["
