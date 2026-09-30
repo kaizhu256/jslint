@@ -1187,7 +1187,7 @@ body {
 <pre><span class="lineno"><a href="#line_1022" id="line_1022"> 1022.</a></span><span class="count                ">     10</span><span>            }), expect, expression);</span></pre>
 <pre><span class="lineno"><a href="#line_1023" id="line_1023"> 1023.</a></span><span class="count                ">     10</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_1024" id="line_1024"> 1024.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1025" id="line_1025"> 1025.</a></span><span class="count                ">      1</span><span>// The operand of 'void' is parsed at rbp 150, like every</span></pre>
+<pre><span class="lineno"><a href="#line_1025" id="line_1025"> 1025.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - The operand of 'void' is parsed at rbp 150, like every</span></pre>
 <pre><span class="lineno"><a href="#line_1026" id="line_1026"> 1026.</a></span><span class="count                ">      1</span><span>// unary operator, so 'void 0 + 0' is '(void 0) + 0'.</span></pre>
 <pre><span class="lineno"><a href="#line_1027" id="line_1027"> 1027.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1028" id="line_1028"> 1028.</a></span><span class="count                ">      1</span><span>        assertOrThrow(</span></pre>
@@ -1199,7 +1199,7 @@ body {
 <pre><span class="lineno"><a href="#line_1034" id="line_1034"> 1034.</a></span><span class="count                ">      1</span><span>            "void 0 + 0"</span></pre>
 <pre><span class="lineno"><a href="#line_1035" id="line_1035"> 1035.</a></span><span class="count                ">      1</span><span>        );</span></pre>
 <pre><span class="lineno"><a href="#line_1036" id="line_1036"> 1036.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1037" id="line_1037"> 1037.</a></span><span class="count                ">      1</span><span>// A relational right side of a for-loop-head 'of' or 'in'</span></pre>
+<pre><span class="lineno"><a href="#line_1037" id="line_1037"> 1037.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - A relational right side of a for-loop-head 'of' or 'in'</span></pre>
 <pre><span class="lineno"><a href="#line_1038" id="line_1038"> 1038.</a></span><span class="count                ">      1</span><span>// does not warn on the head's own 'of' or 'in'.</span></pre>
 <pre><span class="lineno"><a href="#line_1039" id="line_1039"> 1039.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1040" id="line_1040"> 1040.</a></span><span class="count                ">      1</span><span>        for (const [operator, expect] of [</span></pre>
@@ -1218,7 +1218,7 @@ body {
 <pre><span class="lineno"><a href="#line_1053" id="line_1053"> 1053.</a></span><span class="count                ">      3</span><span>            }), expect, operator);</span></pre>
 <pre><span class="lineno"><a href="#line_1054" id="line_1054"> 1054.</a></span><span class="count                ">      2</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_1055" id="line_1055"> 1055.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1056" id="line_1056"> 1056.</a></span><span class="count                ">      1</span><span>// A 'for in' suggests 'for...of Object.keys', not 'Object.keys'.</span></pre>
+<pre><span class="lineno"><a href="#line_1056" id="line_1056"> 1056.</a></span><span class="count                ">      1</span><span>// PR-xxx - A 'for in' suggests 'for...of Object.keys', not 'Object.keys'.</span></pre>
 <pre><span class="lineno"><a href="#line_1057" id="line_1057"> 1057.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1058" id="line_1058"> 1058.</a></span><span class="count                ">      1</span><span>        assertJsonEqual(jslint.jslint(String(`</span></pre>
 <pre><span class="lineno"><a href="#line_1059" id="line_1059"> 1059.</a></span><span class="count                ">      1</span><span>function ff(aa) {</span></pre>
@@ -1231,7 +1231,7 @@ body {
 <pre><span class="lineno"><a href="#line_1066" id="line_1066"> 1066.</a></span><span class="count                ">      1</span><span>            return message;</span></pre>
 <pre><span class="lineno"><a href="#line_1067" id="line_1067"> 1067.</a></span><span class="count                ">      1</span><span>        }), ["Expected 'for...of Object.keys' and instead saw 'for in'."]);</span></pre>
 <pre><span class="lineno"><a href="#line_1068" id="line_1068"> 1068.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1069" id="line_1069"> 1069.</a></span><span class="count                ">      1</span><span>// '**=' is one assignment token, '**' takes a space on each</span></pre>
+<pre><span class="lineno"><a href="#line_1069" id="line_1069"> 1069.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - '**=' is one assignment token, '**' takes a space on each</span></pre>
 <pre><span class="lineno"><a href="#line_1070" id="line_1070"> 1070.</a></span><span class="count                ">      1</span><span>// side like '*', and a line break before a postfix '++' ends the expression.</span></pre>
 <pre><span class="lineno"><a href="#line_1071" id="line_1071"> 1071.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1072" id="line_1072"> 1072.</a></span><span class="count                ">      1</span><span>        for (const [source, expect] of [</span></pre>
@@ -1789,7 +1789,7 @@ body {
 <pre><span class="lineno"><a href="#line_1624" id="line_1624"> 1624.</a></span><span class="count                ">      1</span><span>aa(bb, cc);</span></pre>
 <pre><span class="lineno"><a href="#line_1625" id="line_1625"> 1625.</a></span><span class="count                ">      1</span><span>                `),</span></pre>
 <pre><span class="lineno"><a href="#line_1626" id="line_1626"> 1626.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1627" id="line_1627"> 1627.</a></span><span class="count                ">      1</span><span>// Walk a default in destructuring-assignment, so 'cc' is</span></pre>
+<pre><span class="lineno"><a href="#line_1627" id="line_1627"> 1627.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - Walk a default in destructuring-assignment, so 'cc' is</span></pre>
 <pre><span class="lineno"><a href="#line_1628" id="line_1628"> 1628.</a></span><span class="count                ">      1</span><span>// used.</span></pre>
 <pre><span class="lineno"><a href="#line_1629" id="line_1629"> 1629.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1630" id="line_1630"> 1630.</a></span><span class="count                ">      1</span><span>                (`</span></pre>
@@ -1900,7 +1900,7 @@ body {
 <pre><span class="lineno"><a href="#line_1735" id="line_1735"> 1735.</a></span><span class="count                ">      1</span><span>aa();</span></pre>
 <pre><span class="lineno"><a href="#line_1736" id="line_1736"> 1736.</a></span><span class="count                ">      1</span><span>                `),</span></pre>
 <pre><span class="lineno"><a href="#line_1737" id="line_1737"> 1737.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1738" id="line_1738"> 1738.</a></span><span class="count                ">      1</span><span>// Walk the iterable of destructured for..of.</span></pre>
+<pre><span class="lineno"><a href="#line_1738" id="line_1738"> 1738.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - Walk the iterable of destructured for..of.</span></pre>
 <pre><span class="lineno"><a href="#line_1739" id="line_1739"> 1739.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1740" id="line_1740"> 1740.</a></span><span class="count                ">      1</span><span>                (`</span></pre>
 <pre><span class="lineno"><a href="#line_1741" id="line_1741"> 1741.</a></span><span class="count                ">      1</span><span>function aa(bb) {</span></pre>
@@ -1914,7 +1914,7 @@ body {
 <pre><span class="lineno"><a href="#line_1749" id="line_1749"> 1749.</a></span><span class="count                ">      1</span><span>aa();</span></pre>
 <pre><span class="lineno"><a href="#line_1750" id="line_1750"> 1750.</a></span><span class="count                ">      1</span><span>                `),</span></pre>
 <pre><span class="lineno"><a href="#line_1751" id="line_1751"> 1751.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1752" id="line_1752"> 1752.</a></span><span class="count                ">      1</span><span>// A ';' in a method-body inside a for-loop-head is not a</span></pre>
+<pre><span class="lineno"><a href="#line_1752" id="line_1752"> 1752.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - A ';' in a method-body inside a for-loop-head is not a</span></pre>
 <pre><span class="lineno"><a href="#line_1753" id="line_1753"> 1753.</a></span><span class="count                ">      1</span><span>// for-loop-semicolon.</span></pre>
 <pre><span class="lineno"><a href="#line_1754" id="line_1754"> 1754.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1755" id="line_1755"> 1755.</a></span><span class="count                ">      1</span><span>                (`</span></pre>
@@ -1930,7 +1930,7 @@ body {
 <pre><span class="lineno"><a href="#line_1765" id="line_1765"> 1765.</a></span><span class="count                ">      1</span><span>aa();</span></pre>
 <pre><span class="lineno"><a href="#line_1766" id="line_1766"> 1766.</a></span><span class="count                ">      1</span><span>                `),</span></pre>
 <pre><span class="lineno"><a href="#line_1767" id="line_1767"> 1767.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1768" id="line_1768"> 1768.</a></span><span class="count                ">      1</span><span>// The '}' of a '${' does not pop the '{' of a function-body</span></pre>
+<pre><span class="lineno"><a href="#line_1768" id="line_1768"> 1768.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - The '}' of a '${' does not pop the '{' of a function-body</span></pre>
 <pre><span class="lineno"><a href="#line_1769" id="line_1769"> 1769.</a></span><span class="count                ">      1</span><span>// in a for-loop-head, since '${' is pushed too.</span></pre>
 <pre><span class="lineno"><a href="#line_1770" id="line_1770"> 1770.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1771" id="line_1771"> 1771.</a></span><span class="count                ">      1</span><span>                (`</span></pre>
@@ -2050,7 +2050,7 @@ body {
 <pre><span class="lineno"><a href="#line_1885" id="line_1885"> 1885.</a></span><span class="count                ">      1</span><span>            ],</span></pre>
 <pre><span class="lineno"><a href="#line_1886" id="line_1886"> 1886.</a></span><span class="count                ">      1</span><span>            logical_assignment: [</span></pre>
 <pre><span class="lineno"><a href="#line_1887" id="line_1887"> 1887.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1888" id="line_1888"> 1888.</a></span><span class="count                ">      1</span><span>// '??=' and '||=' assign an unassigned variable.</span></pre>
+<pre><span class="lineno"><a href="#line_1888" id="line_1888"> 1888.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - '??=' and '||=' assign an unassigned variable.</span></pre>
 <pre><span class="lineno"><a href="#line_1889" id="line_1889"> 1889.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1890" id="line_1890"> 1890.</a></span><span class="count                ">      1</span><span>                (`</span></pre>
 <pre><span class="lineno"><a href="#line_1891" id="line_1891"> 1891.</a></span><span class="count                ">      1</span><span>function aa(bb) {</span></pre>
@@ -2160,7 +2160,7 @@ body {
 <pre><span class="lineno"><a href="#line_1995" id="line_1995"> 1995.</a></span><span class="count                ">      1</span><span>            scope: [</span></pre>
 <pre><span class="lineno"><a href="#line_1996" id="line_1996"> 1996.</a></span><span class="count                ">      1</span><span>                "(function aa(bb = aa) {\n    aa(bb);\n}());",</span></pre>
 <pre><span class="lineno"><a href="#line_1997" id="line_1997"> 1997.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1998" id="line_1998"> 1998.</a></span><span class="count                ">      1</span><span>// A 'var' named after its named function expression is a new</span></pre>
+<pre><span class="lineno"><a href="#line_1998" id="line_1998"> 1998.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - A 'var' named after its named function expression is a new</span></pre>
 <pre><span class="lineno"><a href="#line_1999" id="line_1999"> 1999.</a></span><span class="count                ">      1</span><span>// writable binding, so assigning it does not warn bad_assignment_a.</span></pre>
 <pre><span class="lineno"><a href="#line_2000" id="line_2000"> 2000.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2001" id="line_2001"> 2001.</a></span><span class="count                ">      1</span><span>                (`</span></pre>
@@ -2171,12 +2171,12 @@ body {
 <pre><span class="lineno"><a href="#line_2006" id="line_2006"> 2006.</a></span><span class="count                ">      1</span><span>});</span></pre>
 <pre><span class="lineno"><a href="#line_2007" id="line_2007"> 2007.</a></span><span class="count                ">      1</span><span>                `),</span></pre>
 <pre><span class="lineno"><a href="#line_2008" id="line_2008"> 2008.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2009" id="line_2009"> 2009.</a></span><span class="count                ">      1</span><span>// A parameter named after its named function expression shadows the</span></pre>
+<pre><span class="lineno"><a href="#line_2009" id="line_2009"> 2009.</a></span><span class="count                ">      1</span><span>// PR-xxx - A parameter named after its named function expression shadows the</span></pre>
 <pre><span class="lineno"><a href="#line_2010" id="line_2010"> 2010.</a></span><span class="count                ">      1</span><span>// name, like any parameter shadowing an outer name, so it does not warn.</span></pre>
 <pre><span class="lineno"><a href="#line_2011" id="line_2011"> 2011.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2012" id="line_2012"> 2012.</a></span><span class="count                ">      1</span><span>                "String(function aa(aa) {\n    return aa;\n});",</span></pre>
 <pre><span class="lineno"><a href="#line_2013" id="line_2013"> 2013.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2014" id="line_2014"> 2014.</a></span><span class="count                ">      1</span><span>// A 'var' redeclared in a nested block keeps the first one,</span></pre>
+<pre><span class="lineno"><a href="#line_2014" id="line_2014"> 2014.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - A 'var' redeclared in a nested block keeps the first one,</span></pre>
 <pre><span class="lineno"><a href="#line_2015" id="line_2015"> 2015.</a></span><span class="count                ">      1</span><span>// so a use between the two does not warn temporal_dead_zone_a.</span></pre>
 <pre><span class="lineno"><a href="#line_2016" id="line_2016"> 2016.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2017" id="line_2017"> 2017.</a></span><span class="count                ">      1</span><span>                (`</span></pre>
@@ -2327,7 +2327,7 @@ body {
 <pre><span class="lineno"><a href="#line_2162" id="line_2162"> 2162.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2163" id="line_2163"> 2163.</a></span><span class="count                ">      1</span><span>        [{eval: true, evil: true}, "new Function();\neval();"],</span></pre>
 <pre><span class="lineno"><a href="#line_2164" id="line_2164"> 2164.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2165" id="line_2165"> 2165.</a></span><span class="count                ">      1</span><span>// A string-key named get aa does not duplicate an accessor.</span></pre>
+<pre><span class="lineno"><a href="#line_2165" id="line_2165"> 2165.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - A string-key named get aa does not duplicate an accessor.</span></pre>
 <pre><span class="lineno"><a href="#line_2166" id="line_2166"> 2166.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2167" id="line_2167"> 2167.</a></span><span class="count                ">      1</span><span>        [{getset: true}, String(`</span></pre>
 <pre><span class="lineno"><a href="#line_2168" id="line_2168"> 2168.</a></span><span class="count                ">      1</span><span>String({</span></pre>

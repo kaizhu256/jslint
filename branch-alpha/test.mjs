@@ -1022,7 +1022,7 @@ ff();
             }), expect, expression);
         }
 
-// The operand of 'void' is parsed at rbp 150, like every
+// PR-xxx - Bugfix - The operand of 'void' is parsed at rbp 150, like every
 // unary operator, so 'void 0 + 0' is '(void 0) + 0'.
 
         assertOrThrow(
@@ -1034,7 +1034,7 @@ ff();
             "void 0 + 0"
         );
 
-// A relational right side of a for-loop-head 'of' or 'in'
+// PR-xxx - Bugfix - A relational right side of a for-loop-head 'of' or 'in'
 // does not warn on the head's own 'of' or 'in'.
 
         for (const [operator, expect] of [
@@ -1053,7 +1053,7 @@ ff();
             }), expect, operator);
         }
 
-// A 'for in' suggests 'for...of Object.keys', not 'Object.keys'.
+// PR-xxx - A 'for in' suggests 'for...of Object.keys', not 'Object.keys'.
 
         assertJsonEqual(jslint.jslint(String(`
 function ff(aa) {
@@ -1066,7 +1066,7 @@ ff();
             return message;
         }), ["Expected 'for...of Object.keys' and instead saw 'for in'."]);
 
-// '**=' is one assignment token, '**' takes a space on each
+// PR-xxx - Bugfix - '**=' is one assignment token, '**' takes a space on each
 // side like '*', and a line break before a postfix '++' ends the expression.
 
         for (const [source, expect] of [
@@ -1624,7 +1624,7 @@ function cc() {
 aa(bb, cc);
                 `),
 
-// Walk a default in destructuring-assignment, so 'cc' is
+// PR-xxx - Bugfix - Walk a default in destructuring-assignment, so 'cc' is
 // used.
 
                 (`
@@ -1735,7 +1735,7 @@ async function aa(bb, cc) {
 aa();
                 `),
 
-// Walk the iterable of destructured for..of.
+// PR-xxx - Bugfix - Walk the iterable of destructured for..of.
 
                 (`
 function aa(bb) {
@@ -1749,7 +1749,7 @@ function aa(bb) {
 aa();
                 `),
 
-// A ';' in a method-body inside a for-loop-head is not a
+// PR-xxx - Bugfix - A ';' in a method-body inside a for-loop-head is not a
 // for-loop-semicolon.
 
                 (`
@@ -1765,7 +1765,7 @@ function aa(bb) {
 aa();
                 `),
 
-// The '}' of a '${' does not pop the '{' of a function-body
+// PR-xxx - Bugfix - The '}' of a '${' does not pop the '{' of a function-body
 // in a for-loop-head, since '${' is pushed too.
 
                 (`
@@ -1885,7 +1885,7 @@ aa();
             ],
             logical_assignment: [
 
-// '??=' and '||=' assign an unassigned variable.
+// PR-xxx - Bugfix - '??=' and '||=' assign an unassigned variable.
 
                 (`
 function aa(bb) {
@@ -1995,7 +1995,7 @@ aa();
             scope: [
                 "(function aa(bb = aa) {\n    aa(bb);\n}());",
 
-// A 'var' named after its named function expression is a new
+// PR-xxx - Bugfix - A 'var' named after its named function expression is a new
 // writable binding, so assigning it does not warn bad_assignment_a.
 
                 (`
@@ -2006,12 +2006,12 @@ String(function aa() {
 });
                 `),
 
-// A parameter named after its named function expression shadows the
+// PR-xxx - A parameter named after its named function expression shadows the
 // name, like any parameter shadowing an outer name, so it does not warn.
 
                 "String(function aa(aa) {\n    return aa;\n});",
 
-// A 'var' redeclared in a nested block keeps the first one,
+// PR-xxx - Bugfix - A 'var' redeclared in a nested block keeps the first one,
 // so a use between the two does not warn temporal_dead_zone_a.
 
                 (`
@@ -2162,7 +2162,7 @@ jstestDescribe((
 
         [{eval: true, evil: true}, "new Function();\neval();"],
 
-// A string-key named get aa does not duplicate an accessor.
+// PR-xxx - Bugfix - A string-key named get aa does not duplicate an accessor.
 
         [{getset: true}, String(`
 String({
