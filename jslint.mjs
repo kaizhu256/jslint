@@ -282,6 +282,7 @@
     name,
     name_alias,
     name_list,
+    name_only,
     node,
     nomen,
     noop,
@@ -1403,10 +1404,10 @@ function jslint(
 // names it uses. A list per id keeps an own 'bb' and an outer 'bb' apart.
 
         const {id} = name;
-        if (name.scope_declared.id === undefined) {
+        if (name.scope_declared.name_only === true) {
 
 // PR-xxx - Omit a named function expression's name. It sits in <scope_name>,
-// the one scope with no id, outside its function, so no function owns it.
+// a scope outside its function, so no function owns it.
 
             return;
         }
@@ -6725,7 +6726,8 @@ function jslint_phase3_parse(state) {
         let scope_declared = scope_block;
         the_function = the_function || token_now;
         the_function.scope_name = {
-            context: empty()
+            context: empty(),
+            name_only: true
         };
         if (mode_fart) {
             the_function.arity = "binary";
