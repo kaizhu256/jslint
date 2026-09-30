@@ -21,6 +21,7 @@
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
 - jslint-vscode - Add command 'JSLint - Autofix Whitespace', CTRL+SHIFT+J A.
+- jslint-ci - shGithubPrCreate takes the CHANGELOG items a pull-request adds.
 - jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.' and tagged-template backtick, and update function jslint_phase6_autofix() to autofix it.
 - jslint - Check escapes in untagged megastrings via \<char_after_escape>.
 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
@@ -28,7 +29,6 @@
 - jslint-ecma - Add Exponentiation-assignment-operator '**=' support.
 - jslint - Binding-power per spec, unary before '**', '??' mix, postfix, '?:'.
 - jslint - Move column-fudging into warn_at(); callers pass 0-based column.
-- jslint-ci - shGithubPrCreate takes the CHANGELOG items a pull-request adds.
 - jslint - Remove dead token-property 'free' from parser and whitage.
 - jslint - Improve parser to parse jquery.js without stopping - for-init comma, numeric object-key.
 - jslint-cli - Skip dotfiles when linting a directory.

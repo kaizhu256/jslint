@@ -203,61 +203,61 @@
     textLength="768"
     x="10"
     y="736"
->- jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-lin\</tspan>
+>- jslint-ci - shGithubPrCreate takes the CHANGELOG items a pull-request adds.                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="758"
->  e, except dot-operators '.', '?.' and tagged-template backtick, and update function jslint_pha\</tspan>
+>- jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-lin\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="780"
->  se6_autofix() to autofix it.                                                                   </tspan>
+>  e, except dot-operators '.', '?.' and tagged-template backtick, and update function jslint_pha\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="802"
->- jslint - Check escapes in untagged megastrings via \&lt;char_after_escape&gt;.                       </tspan>
+>  se6_autofix() to autofix it.                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="824"
->- jslint-autofix - Warning 'too_long' no longer blocks autofix.                                  </tspan>
+>- jslint - Check escapes in untagged megastrings via \&lt;char_after_escape&gt;.                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="846"
->- jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.                      </tspan>
+>- jslint-autofix - Warning 'too_long' no longer blocks autofix.                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="868"
->- jslint-ecma - Add Exponentiation-assignment-operator '**=' support.                            </tspan>
+>- jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="890"
->- jslint - Binding-power per spec, unary before '**', '??' mix, postfix, '?:'.                   </tspan>
+>- jslint-ecma - Add Exponentiation-assignment-operator '**=' support.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="912"
->- jslint - Move column-fudging into warn_at(); callers pass 0-based column.                      </tspan>
+>- jslint - Binding-power per spec, unary before '**', '??' mix, postfix, '?:'.                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="934"
->- jslint-ci - shGithubPrCreate takes the CHANGELOG items a pull-request adds.                    </tspan>
+>- jslint - Move column-fudging into warn_at(); callers pass 0-based column.                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
