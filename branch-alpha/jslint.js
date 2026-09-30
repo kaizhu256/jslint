@@ -7373,6 +7373,10 @@ function jslint_phase3_parse(state) {
         the_break.disrupt = true;
         if (token_nxt.identifier && token_now.line === token_nxt.line) {
             block_stack.some(function (scope_block) {
+
+// PR-xxx - Bugfix - Stop at the function boundary, since 'break aa' cannot
+// reach a label in an enclosing function, which is a SyntaxError.
+
                 if (scope_block === scope_function) {
                     return true;
                 }
