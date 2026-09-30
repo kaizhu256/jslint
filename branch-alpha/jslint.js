@@ -6737,8 +6737,6 @@ function jslint_phase3_parse(state) {
                 "variable",             // role
 
 // 2.fun.4 - Mark 'readonly', the function-name, during function-declaration.
-// PR-xxx - Bugfix - Mark it readonly, so reassigning a function warns, as
-// ESLint no-func-assign does.
 
                 true,                   // readonly
                 [],                     // name_list
@@ -7450,7 +7448,6 @@ function jslint_phase3_parse(state) {
         const the_token = token_now;
         const the_value = parse_expression(0);
 
-// PR-xxx - Bugfix - Allow 'delete aa?.bb', a valid optional-chain operand.
 // PR-xxx - Bugfix - In 'delete aa[bb] || cc', the parse at rbp 0 swallows the
 // '||'. Warn on the operator, not on a missing '.'. Rbp 150 would stop the
 // lint on the leftover '|| cc'.
@@ -7468,6 +7465,9 @@ function jslint_phase3_parse(state) {
         } else if (
             (
                 the_value.id !== "." &&
+
+// PR-xxx - Bugfix - Allow 'delete aa?.bb', a valid optional-chain operand.
+
                 the_value.id !== "?." &&
                 the_value.id !== "["
             ) ||
@@ -8845,9 +8845,6 @@ function jslint_phase3_parse(state) {
     assignment("%=");
     assignment("&&=");
     assignment("&=");
-
-// PR-xxx - Add Exponentiation-assignment-operator '**=' support.
-
     assignment("**=");
     assignment("*=");
     assignment("+=");
@@ -9771,10 +9768,6 @@ function jslint_phase4_walk(state) {
     }
 
     function post_p_update(thing) {
-
-// PR-xxx - Bugfix - A '++' or '--' assigns too, so a const, an import or an
-// undeclared operand warns like 'aa += 1' does.
-
         if (thing.expression.arity === "variable") {
             check_assignable(thing.expression, thing.expression.variable);
         }
@@ -10496,10 +10489,6 @@ function jslint_phase5_whitage(state) {
         "!=", "!==",
         "%", "%=",
         "&", "&&", "&&=", "&=",
-
-// PR-xxx - Add Exponentiation-assignment-operator '**=' support, and space
-// '**' like '*'.
-
         "*", "**", "**=", "*=",
         "+=",
         "-=",
