@@ -1267,10 +1267,10 @@ import moduleFs from "fs";
 // <branchMerge>, in CHANGELOG.md order.
 // Else it returns the first item of the top section, as before.
 
-        const itemList = (
+        const changelogNew = (
             /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n([\S\s]+?)\n\n/
         ).exec(data)[1].split(/\n(?=- )/);
-        const shippedList = await new Promise(function (resolve) {
+        const changelogOld = await new Promise(function (resolve) {
             moduleChildProcess.execFile(
                 "git",
                 ["show", `${branchMerge}:CHANGELOG.md`],
@@ -1281,11 +1281,11 @@ import moduleFs from "fs";
             );
         });
         return (
-            shippedList &&
-            itemList.filter(function (item) {
-                return !shippedList.includes(item.split("\n")[0]);
+            changelogOld &&
+            changelogNew.filter(function (item) {
+                return !changelogOld.includes(item.split("\n")[0]);
             }).join("\n")
-        ) || itemList[0];
+        ) || changelogNew[0];
     }
     version = version.replace((/-0?/g), ".").replace((/^v/), "");
     // security - sanitize branchXxx
