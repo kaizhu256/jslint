@@ -11163,16 +11163,16 @@ function jslint_phase6_autofix(state) {
         switch (code) {
         case "expected_a_at_b_c":
 
-// expected_a_at_b_c is indentation. Of the four callers of <expected_at>,
-// <at_margin> and <one_space> warn a token that belongs at a margin. The two
-// label callers pass 0 and warn a mid-line label too, such as 'cc:' after
-// 'bb();' on one line. That reaches here, so keep the mid-line branch below.
+// expected_a_at_b_c is indentation. <at_margin>, <one_space> and the two label
+// callers of <expected_at> warn a token that belongs at a margin, and a label
+// can be mid-line, such as 'cc:' after 'bb();'. Unless a warning such as
+// weird_loop blocks autofix, that reaches here, so keep the mid-line branch.
 
             indentage_at = line_source.length - line_source.trimStart().length;
 
-// A MID-LINE token cannot be re-indented, but it does not need to be skipped:
-// at_margin fires for tokens that belong AT a margin and therefore on their
-// OWN line. So split first and indent the remainder, which also lands a
+// A MID-LINE token cannot be re-indented, but it does not need to be skipped,
+// since all four callers warn a token that belongs AT a margin and therefore
+// on its OWN line. So split first and indent the remainder, which also lands a
 // trailing closer correctly, and is what line-breaks a single-line ternary.
 
             if (ii !== indentage_at) {
