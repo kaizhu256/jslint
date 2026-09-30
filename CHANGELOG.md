@@ -2,7 +2,6 @@
 
 # Todo
 - jslint - Allow a quoted accessor-name 'get "aa"() {}', valid ES2015 but a stop now.
-- jslint - Report - Stop naming an anonymous function after a keyword, e.g. '«return»' for 'return function () {}'.
 - jslint - Destructuring - Allow catch-variable 'catch ({aa})', valid ES2015 but a stop now, and maybe warn a const reassigned by '({aa} = {})'.
 - jslint - Destructuring - Allow a default in object destructuring-assignment '({aa = bb} = cc)', and a member-target '[aa.cc = bb] = cc', valid but stops now.
 - jslint - Add warning for 'aa.hasOwnProperty(bb)' and 'Object.prototype.hasOwnProperty.call(aa, bb)', suggesting 'Object.hasOwn(aa, bb)'.

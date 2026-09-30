@@ -1127,7 +1127,7 @@ aa();
 <dl><dt>exception</dt><dd>err</dd></dl>
 <dl><dt>closure</dt><dd>ff</dd></dl>
 <dl><dt>global</dt><dd>aa, ee</dd></dl></div>
-<div class="level level2"><address>14: 12</address><dfn>«return»()</dfn>
+<div class="level level2"><address>14: 12</address><dfn>«anonymous»()</dfn>
 <dl><dt>outer</dt><dd>ff</dd></dl></div>
         `).trim() + "\n", result);
 
@@ -1187,6 +1187,24 @@ String({
         `).trim() + "\n").functions.map(function ({name}) {
             return name;
         }), ["aa", "get bb", "dd"]);
+
+// PR-xxx - Bugfix - A function after a keyword is anonymous, except after
+// 'default', the name the spec gives it.
+
+        assertJsonEqual(jslint.jslint(String(`
+String(function () {
+    return function () {
+        return;
+    };
+}, typeof function () {
+    return;
+});
+export default function () {
+    return;
+}
+        `).trim() + "\n").functions.map(function ({name}) {
+            return name;
+        }), ["String", "anonymous", "anonymous", "default"]);
     });
     jstestIt((
         "test autofix-report handling-behavior"

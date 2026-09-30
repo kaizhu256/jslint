@@ -4794,7 +4794,19 @@ function jslint_phase3_parse(state) {
             token_now.id !== "function" &&
             token_now.id !== "async"
         ) {
-            anon = token_now.id;
+
+// PR-xxx - Bugfix - A keyword such as 'return' names no function, so reset
+// <anon>, else it would keep an earlier identifier. Keep 'default', the name
+// the spec gives 'export default function () {}'.
+
+            anon = (
+                (
+                    syntax_dict[token_now.id] === undefined ||
+                    token_now.id === "default"
+                )
+                ? token_now.id
+                : "anonymous"
+            );
         } else if (
             token_now.id === "(string)" &&
             jslint_rgx_identifier.test(token_now.value)
