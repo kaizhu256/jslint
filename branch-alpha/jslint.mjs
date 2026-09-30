@@ -291,10 +291,10 @@
     on,
     open,
     opening,
-    optional,
     operator,
     option,
     option_dict,
+    optional,
     order,
     package_name,
     padEnd,
@@ -9288,6 +9288,7 @@ function jslint_phase4_walk(state) {
 // ["if(0){function aa(){}}aa", "name_lookup", "undeclared_a", "aa", 23]
 // ["if(0){let aa}aa", "name_lookup", "undeclared_a", "aa", 14]
 // ["try{}catch(aa){}aa", "name_lookup", "undeclared_a", "aa", 17]
+// ["try{}finally{aa}", "name_lookup", "undeclared_a", "aa", 14]
 
             warn("undeclared_a", thing);
             return;

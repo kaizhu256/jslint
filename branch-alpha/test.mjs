@@ -1053,6 +1053,19 @@ ff();
             }), expect, operator);
         }
 
+// PR-xxx - A 'for in' suggests 'for...of Object.keys', not 'Object.keys'.
+
+        assertJsonEqual(jslint.jslint(String(`
+function ff(aa) {
+    for (const bb in aa) {
+        aa(bb);
+    }
+}
+ff();
+        `).trim() + "\n").warnings.map(function ({message}) {
+            return message;
+        }), ["Expected 'for...of Object.keys' and instead saw 'for in'."]);
+
 // PR-xxx - Bugfix - '**=' is one assignment token, '**' takes a space on each
 // side like '*', and a line break before a postfix '++' ends the expression.
 
