@@ -1085,7 +1085,7 @@ if (false) {
 1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
     - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
 1. update `CHANGELOG.md`
-    - copy notable `<commit entries>` to `<CHANGELOG.md entries>` ordered by impact
+    - copy recent `<commit entries>` to `<CHANGELOG.md entries>` ordered by impact
     - run
         ```shell
         # re-run until version propagates
