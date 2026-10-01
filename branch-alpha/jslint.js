@@ -5713,11 +5713,12 @@ function jslint_phase3_parse(state) {
 // - 2.fun.4 - Kept. Reassigning a function warns, as ESLint no-func-assign.
 // - 3.cat.4 - Kept. Reassigning a catch-variable warns, as ESLint no-ex-assign.
 // - 3.glo.4 - Kept. Reassigning a global warns, as ESLint no-global-assign.
-// - 3.var.1 - Kept. A switch has no block scope, so a 'let' in a case is seen
-//   after the switch. It is moot, since var_switch warns that 'let'.
+// - 3.var.1 - Kept. Unlike the spec, jslint gives a switch no block scope, so a
+//   'let' in a case is seen after the switch. It is moot, since var_switch
+//   warns that 'let'.
 // - 3.var.2 - Kept. A 'var' read above its declaration warns
 //   temporal_dead_zone_a, though its hoisted value 'undefined' is valid.
-// - 3.var.2 - Kept. A function reading a 'let' declared below it warns, see
+// - 3.var.2 - Kept. A function reading a 'let' declared below it warns. See
 //   the note in <name_lookup>.
 // - 3.var.3 - Kept. '&&=' and '+=' do not assign an unassigned variable, which
 //   stays undefined or becomes NaN, so it warns unassigned_var_a. ESLint
@@ -7255,6 +7256,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["new aa?.aa()", "prefix_new", "unexpected_a", "?.", 7]
+// ["new aa``?.aa()", "prefix_new", "unexpected_a", "?.", 9]
 
             warn("unexpected_a", optional_chain(right), "?.");
         }
@@ -7455,6 +7457,8 @@ function jslint_phase3_parse(state) {
         ) {
 
 // test_cause:
+// ["delete aa[aa]&&aa", "stmt_delete", "unexpected_a", "&&", 14]
+// ["delete aa[aa]??aa", "stmt_delete", "unexpected_a", "??", 14]
 // ["delete aa[aa]||aa", "stmt_delete", "unexpected_a", "||", 14]
 
             warn("unexpected_a", the_value);
@@ -7824,14 +7828,14 @@ function jslint_phase3_parse(state) {
                     warn("expected_a_b", the_operator, "of", "in");
                 }
 
+// PR-xxx - Suggest 'for...of Object.keys', since a plain object is not
+// iterable, so a bare 'for...of' would throw a TypeError.
+
 // test_cause:
 // ["for(aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
 // ["for(const aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
 // ["for(let aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
 // ["for(var aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
-
-// PR-xxx - Suggest 'for...of Object.keys', since a plain object is not
-// iterable, so a bare 'for...of' would throw a TypeError.
 
                 warn("expected_a_b", the_for, "for...of Object.keys", "for in");
                 break;
@@ -9186,6 +9190,7 @@ function jslint_phase4_walk(state) {
         if (the_variable.readonly) {
 
 // test_cause:
+// ["const aa=0;++aa", "check_assignable", "bad_assignment_a", "aa", 14]
 // ["const aa=0;aa++", "check_assignable", "bad_assignment_a", "aa", 12]
 // ["const aa=0;aa+=0", "check_assignable", "bad_assignment_a", "aa", 12]
 // ["const aa=0;aa=0", "check_assignable", "bad_assignment_a", "aa", 12]
@@ -9538,7 +9543,15 @@ function jslint_phase4_walk(state) {
 // '-aa ** 2' needs parens, while '[aa] ** 2' and '++aa ** 2' do not.
 
 // test_cause:
+// ["aa=!!0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
+// ["aa=!0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
+// ["aa=+0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
 // ["aa=-0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
+// ["aa=void 0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
+// ["aa=~0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
+// ["
+// async function aa(){return await aa**0;}
+// ", "post_b_binary", "wrap_subexpression_a_b", "**", 28]
 
                 warn(
                     "wrap_subexpression_a_b",
@@ -10506,6 +10519,7 @@ function jslint_phase5_whitage(state) {
                 if (!name.used) {
 
 // test_cause:
+// ["function aa(){bb:while(aa){aa();}}", "delve", "unused_a", "bb", 15]
 // ["function aa(bb){return;}", "delve", "unused_a", "bb", 13]
 // ["let aa;", "delve", "unused_a", "aa", 5]
 // ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]

@@ -1392,15 +1392,12 @@ if (
                 if (!name.used) {
 
 // test_cause:
+// ["function aa(){bb:while(aa){aa();}}", "delve", "unused_a", "bb", 15]
 // ["function aa(bb){return;}", "delve", "unused_a", "bb", 13]
 // ["let aa;", "delve", "unused_a", "aa", 5]
 // ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]
 
-                    warn("unused_a", name);
-                } else if (!name.assigned) {
-
-// test_cause:
-/...
+                    warn("unused_...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
