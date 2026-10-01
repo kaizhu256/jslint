@@ -24,6 +24,8 @@
 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
 - jslint-ecma - Add Exponentiation-assignment-operator '**=' support.
+- jslint - bugfix - Re-verify the block-scope and variable-lifecycle engine from v2026.7.30 against the spec, fixing labels, '??=' and '||=', redeclared 'var', and destructuring and for-of names.
+- jslint - Update operator binding-powers to match the spec, and merge warnings 'and', 'wrap_condition', 'wrap_unary' into 'wrap_subexpression_a_b'.
 - jslint - Move column-fudging into warn_at(); callers pass 0-based column.
 - jslint - Remove dead token-property 'free' from parser and whitage.
 - jslint - Improve parser to parse jquery.js without stopping - for-init comma, numeric object-key.
