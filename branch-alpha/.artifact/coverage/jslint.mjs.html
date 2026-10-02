@@ -915,7 +915,7 @@ body {
 <pre><span class="lineno"><a href="#line_750" id="line_750">  750.</a></span><span class="count                ">      1</span><span>    "|=(?:==?|&gt;)?" +</span></pre>
 <pre><span class="lineno"><a href="#line_751" id="line_751">  751.</a></span><span class="count                ">      1</span><span>    "|\\.+" +</span></pre>
 <pre><span class="lineno"><a href="#line_752" id="line_752">  752.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_753" id="line_753">  753.</a></span><span class="count                ">      1</span><span>// PR-xxx - Add Exponentiation-assignment-operator '**=' support.</span></pre>
+<pre><span class="lineno"><a href="#line_753" id="line_753">  753.</a></span><span class="count                ">      1</span><span>// PR-514 - Add Exponentiation-assignment-operator '**=' support.</span></pre>
 <pre><span class="lineno"><a href="#line_754" id="line_754">  754.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_755" id="line_755">  755.</a></span><span class="count                ">      1</span><span>    "|\\*(?:\\*=?|[\\/=])?" +</span></pre>
 <pre><span class="lineno"><a href="#line_756" id="line_756">  756.</a></span><span class="count                ">      1</span><span>    "|\\/[*\\/]?" +</span></pre>
@@ -4730,7 +4730,7 @@ body {
 <pre><span class="lineno"><a href="#line_4565" id="line_4565"> 4565.</a></span><span class="count                "> 279731</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_4566" id="line_4566"> 4566.</a></span><span class="count                "> 279731</span><span>        switch (id) {</span></pre>
 <pre><span class="lineno"><a href="#line_4567" id="line_4567"> 4567.</a></span><span class="count                "> 279731</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_4568" id="line_4568"> 4568.</a></span><span class="count                "> 279731</span><span>// PR-xxx - Bugfix - Push '{' and '${', so a ';' in a function-body inside</span></pre>
+<pre><span class="lineno"><a href="#line_4568" id="line_4568"> 4568.</a></span><span class="count                "> 279731</span><span>// PR-514 - Bugfix - Push '{' and '${', so a ';' in a function-body inside</span></pre>
 <pre><span class="lineno"><a href="#line_4569" id="line_4569"> 4569.</a></span><span class="count                "> 279731</span><span>// a for-loop-head 'for (const aa of function () {...}())' is not mistaken for</span></pre>
 <pre><span class="lineno"><a href="#line_4570" id="line_4570"> 4570.</a></span><span class="count                "> 279731</span><span>// a for-loop-semicolon.</span></pre>
 <pre><span class="lineno"><a href="#line_4571" id="line_4571"> 4571.</a></span><span class="count                "> 279731</span><span></span></pre>
@@ -5156,7 +5156,7 @@ body {
 <pre><span class="lineno"><a href="#line_4991" id="line_4991"> 4991.</a></span><span class="count                ">   5255</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_4992" id="line_4992"> 4992.</a></span><span class="count                ">   5255</span><span>        if (the_optional) {</span></pre>
 <pre><span class="lineno"><a href="#line_4993" id="line_4993"> 4993.</a></span><span class="count                ">      2</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_4994" id="line_4994"> 4994.</a></span><span class="count                ">      2</span><span>// PR-xxx - Bugfix - An optional-chain is never an assignment target, so</span></pre>
+<pre><span class="lineno"><a href="#line_4994" id="line_4994"> 4994.</a></span><span class="count                ">      2</span><span>// PR-514 - Bugfix - An optional-chain is never an assignment target, so</span></pre>
 <pre><span class="lineno"><a href="#line_4995" id="line_4995"> 4995.</a></span><span class="count                ">      2</span><span>// 'aa?.bb.cc = 0' and 'aa?.[bb] = 0' are SyntaxErrors too.</span></pre>
 <pre><span class="lineno"><a href="#line_4996" id="line_4996"> 4996.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_4997" id="line_4997"> 4997.</a></span><span class="count                ">      2</span><span>// test_cause:</span></pre>
@@ -5643,7 +5643,7 @@ body {
 <pre><span class="lineno"><a href="#line_5478" id="line_5478"> 5478.</a></span><span class="count                ">     15</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5479" id="line_5479"> 5479.</a></span><span class="count                ">     15</span><span>            test_cause("dyn_prop_or_call");</span></pre>
 <pre><span class="lineno"><a href="#line_5480" id="line_5480"> 5480.</a></span><span class="count                ">     15</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5481" id="line_5481"> 5481.</a></span><span class="count                ">     15</span><span>// PR-xxx - Bugfix - The '?.' token leaves the tree here, so mark the '[' or '('</span></pre>
+<pre><span class="lineno"><a href="#line_5481" id="line_5481"> 5481.</a></span><span class="count                ">     15</span><span>// PR-514 - Bugfix - The '?.' token leaves the tree here, so mark the '[' or '('</span></pre>
 <pre><span class="lineno"><a href="#line_5482" id="line_5482"> 5482.</a></span><span class="count                ">     15</span><span>// that follows it, for &lt;optional_chain&gt;.</span></pre>
 <pre><span class="lineno"><a href="#line_5483" id="line_5483"> 5483.</a></span><span class="count                ">     15</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5484" id="line_5484"> 5484.</a></span><span class="count                ">     15</span><span>            name.optional = true;</span></pre>
@@ -5868,7 +5868,7 @@ body {
 <pre><span class="lineno"><a href="#line_5703" id="line_5703"> 5703.</a></span><span class="count                ">  10163</span><span>// The 2.fun tags also cover a named function-expression, whose name is</span></pre>
 <pre><span class="lineno"><a href="#line_5704" id="line_5704"> 5704.</a></span><span class="count                ">  10163</span><span>// declared in &lt;scope_name&gt;, a scope outside its function.</span></pre>
 <pre><span class="lineno"><a href="#line_5705" id="line_5705"> 5705.</a></span><span class="count                ">  10163</span><span>//</span></pre>
-<pre><span class="lineno"><a href="#line_5706" id="line_5706"> 5706.</a></span><span class="count                ">  10163</span><span>// PR-xxx - Deviations from the spec, reviewed 2026-09-29, each kept. A fixed</span></pre>
+<pre><span class="lineno"><a href="#line_5706" id="line_5706"> 5706.</a></span><span class="count                ">  10163</span><span>// PR-514 - Deviations from the spec, reviewed 2026-09-29, each kept. A fixed</span></pre>
 <pre><span class="lineno"><a href="#line_5707" id="line_5707"> 5707.</a></span><span class="count                ">  10163</span><span>// one is commented at its site, and a Todo is in CHANGELOG.md.</span></pre>
 <pre><span class="lineno"><a href="#line_5708" id="line_5708"> 5708.</a></span><span class="count                ">  10163</span><span>//</span></pre>
 <pre><span class="lineno"><a href="#line_5709" id="line_5709"> 5709.</a></span><span class="count                ">  10163</span><span>// - 1.imp.2 - Kept. An import used above its import-statement warns</span></pre>
@@ -5927,7 +5927,7 @@ body {
 <pre><span class="lineno"><a href="#line_5762" id="line_5762"> 5762.</a></span><span class="count                ">   7099</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5763" id="line_5763"> 5763.</a></span><span class="count                ">   7099</span><span>// Has the name been declared in this context?</span></pre>
 <pre><span class="lineno"><a href="#line_5764" id="line_5764"> 5764.</a></span><span class="count                ">   7099</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5765" id="line_5765"> 5765.</a></span><span class="count                ">   7099</span><span>// PR-xxx - Bugfix - Check &lt;scope_declared&gt;, which differs from &lt;scope_block&gt;</span></pre>
+<pre><span class="lineno"><a href="#line_5765" id="line_5765"> 5765.</a></span><span class="count                ">   7099</span><span>// PR-514 - Bugfix - Check &lt;scope_declared&gt;, which differs from &lt;scope_block&gt;</span></pre>
 <pre><span class="lineno"><a href="#line_5766" id="line_5766"> 5766.</a></span><span class="count                ">   7099</span><span>// for a var in a nested block. Else 'var bb' in an if-block replaced an</span></pre>
 <pre><span class="lineno"><a href="#line_5767" id="line_5767"> 5767.</a></span><span class="count                ">   7099</span><span>// earlier 'var bb', and a use between them warned temporal_dead_zone_a.</span></pre>
 <pre><span class="lineno"><a href="#line_5768" id="line_5768"> 5768.</a></span><span class="count                ">   7099</span><span></span></pre>
@@ -6037,7 +6037,7 @@ body {
 <pre><span class="lineno"><a href="#line_5872" id="line_5872"> 5872.</a></span><span class="count                ">    942</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5873" id="line_5873"> 5873.</a></span><span class="count                ">   5444</span><span>    function optional_chain(thing) {</span></pre>
 <pre><span class="lineno"><a href="#line_5874" id="line_5874"> 5874.</a></span><span class="count                ">   5444</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5875" id="line_5875"> 5875.</a></span><span class="count                ">   5444</span><span>// PR-xxx - This function will return the '?.' token, or the '[' or '(' token</span></pre>
+<pre><span class="lineno"><a href="#line_5875" id="line_5875"> 5875.</a></span><span class="count                ">   5444</span><span>// PR-514 - This function will return the '?.' token, or the '[' or '(' token</span></pre>
 <pre><span class="lineno"><a href="#line_5876" id="line_5876"> 5876.</a></span><span class="count                ">   5444</span><span>// marked &lt;optional&gt; after a '?.', of an unwrapped optional-chain ending at</span></pre>
 <pre><span class="lineno"><a href="#line_5877" id="line_5877"> 5877.</a></span><span class="count                ">   5444</span><span>// &lt;thing&gt;. The spec forbids such a chain as an assignment target, the callee</span></pre>
 <pre><span class="lineno"><a href="#line_5878" id="line_5878"> 5878.</a></span><span class="count                ">   5444</span><span>// of 'new' and the tag of a template.</span></pre>
@@ -6183,7 +6183,7 @@ body {
 <pre><span class="lineno"><a href="#line_6018" id="line_6018"> 6018.</a></span><span class="count                "> 102169</span><span>                break;</span></pre>
 <pre><span class="lineno"><a href="#line_6019" id="line_6019"> 6019.</a></span><span class="count                "> 102169</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_6020" id="line_6020"> 6020.</a></span><span class="count                "> 102169</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6021" id="line_6021"> 6021.</a></span><span class="count                "> 102169</span><span>// PR-xxx - Bugfix - A line break before a postfix '++' or '--' ends the</span></pre>
+<pre><span class="lineno"><a href="#line_6021" id="line_6021"> 6021.</a></span><span class="count                "> 102169</span><span>// PR-514 - Bugfix - A line break before a postfix '++' or '--' ends the</span></pre>
 <pre><span class="lineno"><a href="#line_6022" id="line_6022"> 6022.</a></span><span class="count                "> 102169</span><span>// expression, since the spec forbids one there and inserts a ';'. So 'aa' then</span></pre>
 <pre><span class="lineno"><a href="#line_6023" id="line_6023"> 6023.</a></span><span class="count                "> 102169</span><span>// '++bb' on the next line is 'aa; ++bb', not 'aa++; bb'.</span></pre>
 <pre><span class="lineno"><a href="#line_6024" id="line_6024"> 6024.</a></span><span class="count                "> 102169</span><span></span></pre>
@@ -6744,7 +6744,7 @@ body {
 <pre><span class="lineno"><a href="#line_6579" id="line_6579"> 6579.</a></span><span class="count                ">    110</span><span>                name.expression = parse_expression(0);</span></pre>
 <pre><span class="lineno"><a href="#line_6580" id="line_6580"> 6580.</a></span><span class="count                ">    110</span><span>                if (is_assignment) {</span></pre>
 <pre><span class="lineno"><a href="#line_6581" id="line_6581"> 6581.</a></span><span class="count                ">    110</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6582" id="line_6582"> 6582.</a></span><span class="count                ">    110</span><span>// PR-xxx - Bugfix - No &lt;post_s_var&gt; walks a default in '[aa = bb] = ...', so</span></pre>
+<pre><span class="lineno"><a href="#line_6582" id="line_6582"> 6582.</a></span><span class="count                ">    110</span><span>// PR-514 - Bugfix - No &lt;post_s_var&gt; walks a default in '[aa = bb] = ...', so</span></pre>
 <pre><span class="lineno"><a href="#line_6583" id="line_6583"> 6583.</a></span><span class="count                ">    110</span><span>// 'bb' was never used. It is pushed wrapped in an array, which has no &lt;arity&gt;,</span></pre>
 <pre><span class="lineno"><a href="#line_6584" id="line_6584"> 6584.</a></span><span class="count                ">    110</span><span>// so &lt;prefix_lbracket&gt; walks it and never looks it up as a target.</span></pre>
 <pre><span class="lineno"><a href="#line_6585" id="line_6585"> 6585.</a></span><span class="count                ">    110</span><span></span></pre>
@@ -6869,7 +6869,7 @@ body {
 <pre><span class="lineno"><a href="#line_6704" id="line_6704"> 6704.</a></span><span class="count                ">   1196</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6705" id="line_6705"> 6705.</a></span><span class="count                ">   1196</span><span>            if (scope_function.switch &gt; 0 &amp;&amp; scope_block.function_body) {</span></pre>
 <pre><span class="lineno"><a href="#line_6706" id="line_6706"> 6706.</a></span><span class="count                ">   1196</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6707" id="line_6707"> 6707.</a></span><span class="count                ">   1196</span><span>// PR-xxx - Warn a function-declaration directly in a case, as ESLint</span></pre>
+<pre><span class="lineno"><a href="#line_6707" id="line_6707"> 6707.</a></span><span class="count                ">   1196</span><span>// PR-514 - Warn a function-declaration directly in a case, as ESLint</span></pre>
 <pre><span class="lineno"><a href="#line_6708" id="line_6708"> 6708.</a></span><span class="count                ">   1196</span><span>// no-case-declarations does. One nested in a block of the case already warns</span></pre>
 <pre><span class="lineno"><a href="#line_6709" id="line_6709"> 6709.</a></span><span class="count                ">   1196</span><span>// unexpected_a in &lt;pre_s_function&gt;.</span></pre>
 <pre><span class="lineno"><a href="#line_6710" id="line_6710"> 6710.</a></span><span class="count                ">   1196</span><span></span></pre>
@@ -6884,7 +6884,7 @@ body {
 <pre><span class="lineno"><a href="#line_6719" id="line_6719"> 6719.</a></span><span class="count                ">   1030</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6720" id="line_6720"> 6720.</a></span><span class="count                ">   1030</span><span>// A function expression may have an optional name.</span></pre>
 <pre><span class="lineno"><a href="#line_6721" id="line_6721"> 6721.</a></span><span class="count                ">   1030</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6722" id="line_6722"> 6722.</a></span><span class="count                ">   1030</span><span>// PR-xxx - Bugfix - Declare the name in &lt;scope_name&gt;, outside the function as</span></pre>
+<pre><span class="lineno"><a href="#line_6722" id="line_6722"> 6722.</a></span><span class="count                ">   1030</span><span>// PR-514 - Bugfix - Declare the name in &lt;scope_name&gt;, outside the function as</span></pre>
 <pre><span class="lineno"><a href="#line_6723" id="line_6723"> 6723.</a></span><span class="count                ">   1030</span><span>// in the spec, so a 'var' of that name in the body is a new binding.</span></pre>
 <pre><span class="lineno"><a href="#line_6724" id="line_6724"> 6724.</a></span><span class="count                ">   1030</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6725" id="line_6725"> 6725.</a></span><span class="count                ">   1030</span><span>            scope_declared = the_function.scope_name;</span></pre>
@@ -7083,7 +7083,7 @@ body {
 <pre><span class="lineno"><a href="#line_6918" id="line_6918"> 6918.</a></span><span class="count                ">   2213</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6919" id="line_6919"> 6919.</a></span><span class="count                ">   2213</span><span>// Check functions are ordered.</span></pre>
 <pre><span class="lineno"><a href="#line_6920" id="line_6920"> 6920.</a></span><span class="count                ">   2213</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6921" id="line_6921"> 6921.</a></span><span class="count                ">   2213</span><span>// PR-xxx - Bugfix - Check only function-declarations, since a named</span></pre>
+<pre><span class="lineno"><a href="#line_6921" id="line_6921"> 6921.</a></span><span class="count                ">   2213</span><span>// PR-514 - Bugfix - Check only function-declarations, since a named</span></pre>
 <pre><span class="lineno"><a href="#line_6922" id="line_6922"> 6922.</a></span><span class="count                ">   2213</span><span>// function-expression is not hoisted. Check an arrow-function's block-body too.</span></pre>
 <pre><span class="lineno"><a href="#line_6923" id="line_6923"> 6923.</a></span><span class="count                ">   2213</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6924" id="line_6924"> 6924.</a></span><span class="count                ">   2213</span><span>// test_cause:</span></pre>
@@ -7120,7 +7120,7 @@ body {
 <pre><span class="lineno"><a href="#line_6955" id="line_6955"> 6955.</a></span><span class="count                ">    942</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6956" id="line_6956"> 6956.</a></span><span class="count                ">    633</span><span>    function prefix_lbrace() {</span></pre>
 <pre><span class="lineno"><a href="#line_6957" id="line_6957"> 6957.</a></span><span class="count                ">    633</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6958" id="line_6958"> 6958.</a></span><span class="count                ">    633</span><span>// PR-xxx - Bugfix - &lt;seen&gt; maps a property-name to true, or to false if only</span></pre>
+<pre><span class="lineno"><a href="#line_6958" id="line_6958"> 6958.</a></span><span class="count                ">    633</span><span>// PR-514 - Bugfix - &lt;seen&gt; maps a property-name to true, or to false if only</span></pre>
 <pre><span class="lineno"><a href="#line_6959" id="line_6959"> 6959.</a></span><span class="count                ">    633</span><span>// an accessor has it. Accessor-keys like 'get aa' live apart in</span></pre>
 <pre><span class="lineno"><a href="#line_6960" id="line_6960"> 6960.</a></span><span class="count                ">    633</span><span>// &lt;seen_getset&gt;, so a string-key named get aa cannot collide with them.</span></pre>
 <pre><span class="lineno"><a href="#line_6961" id="line_6961"> 6961.</a></span><span class="count                ">    633</span><span></span></pre>
@@ -7320,7 +7320,7 @@ body {
 <pre><span class="lineno"><a href="#line_7155" id="line_7155"> 7155.</a></span><span class="count                ">     24</span><span>                false                   // the_function_toplevel</span></pre>
 <pre><span class="lineno"><a href="#line_7156" id="line_7156"> 7156.</a></span><span class="count                ">     24</span><span>            );</span></pre>
 <pre><span class="lineno"><a href="#line_7157" id="line_7157"> 7157.</a></span><span class="count                ">     24</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7158" id="line_7158"> 7158.</a></span><span class="count                ">     24</span><span>// PR-xxx - Walk defaults as expressions, and leave only variables in</span></pre>
+<pre><span class="lineno"><a href="#line_7158" id="line_7158"> 7158.</a></span><span class="count                ">     24</span><span>// PR-514 - Walk defaults as expressions, and leave only variables in</span></pre>
 <pre><span class="lineno"><a href="#line_7159" id="line_7159"> 7159.</a></span><span class="count                ">     24</span><span>// &lt;name_list&gt; for &lt;post_a_assignment&gt; to look up.</span></pre>
 <pre><span class="lineno"><a href="#line_7160" id="line_7160"> 7160.</a></span><span class="count                ">     24</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7161" id="line_7161"> 7161.</a></span><span class="count                ">     66</span><span>            element.expression = the_token.name_list.filter(function (name) {</span></pre>
@@ -7402,7 +7402,7 @@ body {
 <pre><span class="lineno"><a href="#line_7237" id="line_7237"> 7237.</a></span><span class="count                ">    164</span><span>        let right;</span></pre>
 <pre><span class="lineno"><a href="#line_7238" id="line_7238"> 7238.</a></span><span class="count                ">    164</span><span>        right = parse_expression(160);</span></pre>
 <pre><span class="lineno"><a href="#line_7239" id="line_7239"> 7239.</a></span><span class="count                ">    164</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7240" id="line_7240"> 7240.</a></span><span class="count                ">    164</span><span>// PR-xxx - Bugfix - In 'new aa`bb`()' the tagged-megastring belongs to the</span></pre>
+<pre><span class="lineno"><a href="#line_7240" id="line_7240"> 7240.</a></span><span class="count                ">    164</span><span>// PR-514 - Bugfix - In 'new aa`bb`()' the tagged-megastring belongs to the</span></pre>
 <pre><span class="lineno"><a href="#line_7241" id="line_7241"> 7241.</a></span><span class="count                ">    164</span><span>// callee, 'new (aa`bb`)()', but '`' shares lbp 160 with the call's '(', so rbp</span></pre>
 <pre><span class="lineno"><a href="#line_7242" id="line_7242"> 7242.</a></span><span class="count                ">    164</span><span>// 160 stops before it. Parse it, and any member after it, into the callee.</span></pre>
 <pre><span class="lineno"><a href="#line_7243" id="line_7243"> 7243.</a></span><span class="count                ">    164</span><span></span></pre>
@@ -7416,7 +7416,7 @@ body {
 <pre><span class="lineno"><a href="#line_7251" id="line_7251"> 7251.</a></span><span class="count                ">      3</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_7252" id="line_7252"> 7252.</a></span><span class="count                ">      2</span><span>        if (optional_chain(right)) {</span></pre>
 <pre><span class="lineno"><a href="#line_7253" id="line_7253"> 7253.</a></span><span class="count                ">      2</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7254" id="line_7254"> 7254.</a></span><span class="count                ">      2</span><span>// PR-xxx - Bugfix - Rbp 160 lets an optional-chain into the callee, since '?.'</span></pre>
+<pre><span class="lineno"><a href="#line_7254" id="line_7254"> 7254.</a></span><span class="count                ">      2</span><span>// PR-514 - Bugfix - Rbp 160 lets an optional-chain into the callee, since '?.'</span></pre>
 <pre><span class="lineno"><a href="#line_7255" id="line_7255"> 7255.</a></span><span class="count                ">      2</span><span>// binds at 170.</span></pre>
 <pre><span class="lineno"><a href="#line_7256" id="line_7256"> 7256.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7257" id="line_7257"> 7257.</a></span><span class="count                ">      2</span><span>// test_cause:</span></pre>
@@ -7477,7 +7477,7 @@ body {
 <pre><span class="lineno"><a href="#line_7312" id="line_7312"> 7312.</a></span><span class="count                ">      5</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7313" id="line_7313"> 7313.</a></span><span class="count                ">      5</span><span>        warn("unexpected_a", the_void);</span></pre>
 <pre><span class="lineno"><a href="#line_7314" id="line_7314"> 7314.</a></span><span class="count                ">      5</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7315" id="line_7315"> 7315.</a></span><span class="count                ">      5</span><span>// PR-xxx - Bugfix - Parse the operand at rbp 150, like every unary operator,</span></pre>
+<pre><span class="lineno"><a href="#line_7315" id="line_7315"> 7315.</a></span><span class="count                ">      5</span><span>// PR-514 - Bugfix - Parse the operand at rbp 150, like every unary operator,</span></pre>
 <pre><span class="lineno"><a href="#line_7316" id="line_7316"> 7316.</a></span><span class="count                ">      5</span><span>// since the spec reads 'void UnaryExpression'. At rbp 0, 'void aa ** 2', a</span></pre>
 <pre><span class="lineno"><a href="#line_7317" id="line_7317"> 7317.</a></span><span class="count                ">      5</span><span>// SyntaxError, parsed as 'void (aa ** 2)'.</span></pre>
 <pre><span class="lineno"><a href="#line_7318" id="line_7318"> 7318.</a></span><span class="count                ">      5</span><span></span></pre>
@@ -7541,7 +7541,7 @@ body {
 <pre><span class="lineno"><a href="#line_7376" id="line_7376"> 7376.</a></span><span class="count                ">     11</span><span>        if (token_nxt.identifier &amp;&amp; token_now.line === token_nxt.line) {</span></pre>
 <pre><span class="lineno"><a href="#line_7377" id="line_7377"> 7377.</a></span><span class="count                ">     28</span><span>            block_stack.some(function (scope_block) {</span></pre>
 <pre><span class="lineno"><a href="#line_7378" id="line_7378"> 7378.</a></span><span class="count                ">     28</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7379" id="line_7379"> 7379.</a></span><span class="count                ">     28</span><span>// PR-xxx - Bugfix - Stop at the function boundary, since 'break aa' cannot</span></pre>
+<pre><span class="lineno"><a href="#line_7379" id="line_7379"> 7379.</a></span><span class="count                ">     28</span><span>// PR-514 - Bugfix - Stop at the function boundary, since 'break aa' cannot</span></pre>
 <pre><span class="lineno"><a href="#line_7380" id="line_7380"> 7380.</a></span><span class="count                ">     28</span><span>// reach a label in an enclosing function, which is a SyntaxError.</span></pre>
 <pre><span class="lineno"><a href="#line_7381" id="line_7381"> 7381.</a></span><span class="count                ">     28</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7382" id="line_7382"> 7382.</a></span><span class="count                ">     11</span><span>                if (scope_block === scope_function) {</span></pre>
@@ -7611,7 +7611,7 @@ body {
 <pre><span class="lineno"><a href="#line_7446" id="line_7446"> 7446.</a></span><span class="count                ">     64</span><span>        const the_token = token_now;</span></pre>
 <pre><span class="lineno"><a href="#line_7447" id="line_7447"> 7447.</a></span><span class="count                ">     64</span><span>        const the_value = parse_expression(0);</span></pre>
 <pre><span class="lineno"><a href="#line_7448" id="line_7448"> 7448.</a></span><span class="count                ">     64</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7449" id="line_7449"> 7449.</a></span><span class="count                ">     64</span><span>// PR-xxx - Bugfix - In 'delete aa[bb] || cc', the parse at rbp 0 swallows the</span></pre>
+<pre><span class="lineno"><a href="#line_7449" id="line_7449"> 7449.</a></span><span class="count                ">     64</span><span>// PR-514 - Bugfix - In 'delete aa[bb] || cc', the parse at rbp 0 swallows the</span></pre>
 <pre><span class="lineno"><a href="#line_7450" id="line_7450"> 7450.</a></span><span class="count                ">     64</span><span>// '||'. Warn on the operator, not on a missing '.'. Rbp 150 would stop the</span></pre>
 <pre><span class="lineno"><a href="#line_7451" id="line_7451"> 7451.</a></span><span class="count                ">     64</span><span>// lint on the leftover '|| cc'.</span></pre>
 <pre><span class="lineno"><a href="#line_7452" id="line_7452"> 7452.</a></span><span class="count                ">     64</span><span></span></pre>
@@ -7957,7 +7957,7 @@ body {
 <pre><span class="lineno"><a href="#line_7792" id="line_7792"> 7792.</a></span><span class="count                ">     59</span><span>                break;</span></pre>
 <pre><span class="lineno"><a href="#line_7793" id="line_7793"> 7793.</a></span><span class="count                ">     59</span><span>            default:</span></pre>
 <pre><span class="lineno"><a href="#line_7794" id="line_7794"> 7794.</a></span><span class="count                ">     59</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7795" id="line_7795"> 7795.</a></span><span class="count                ">     59</span><span>// PR-xxx - Bugfix - Parse the target at rbp 110, which stops before 'in' and</span></pre>
+<pre><span class="lineno"><a href="#line_7795" id="line_7795"> 7795.</a></span><span class="count                ">     59</span><span>// PR-514 - Bugfix - Parse the target at rbp 110, which stops before 'in' and</span></pre>
 <pre><span class="lineno"><a href="#line_7796" id="line_7796"> 7796.</a></span><span class="count                ">     59</span><span>// 'of', then their right side at rbp 0, as the spec does. Parsing the whole</span></pre>
 <pre><span class="lineno"><a href="#line_7797" id="line_7797"> 7797.</a></span><span class="count                ">     59</span><span>// head at rbp 0 let a looser operator like '||' in 'for (aa in bb || cc)'</span></pre>
 <pre><span class="lineno"><a href="#line_7798" id="line_7798"> 7798.</a></span><span class="count                ">     59</span><span>// wrap the 'in' node, and the lint stopped.</span></pre>
@@ -7993,7 +7993,7 @@ body {
 <pre><span class="lineno"><a href="#line_7828" id="line_7828"> 7828.</a></span><span class="count                ">     59</span><span>                    warn("expected_a_b", the_operator, "of", "in");</span></pre>
 <pre><span class="lineno"><a href="#line_7829" id="line_7829"> 7829.</a></span><span class="count                ">     59</span><span>                }</span></pre>
 <pre><span class="lineno"><a href="#line_7830" id="line_7830"> 7830.</a></span><span class="count                ">     59</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7831" id="line_7831"> 7831.</a></span><span class="count                ">     59</span><span>// PR-xxx - Suggest 'for...of Object.keys', since a plain object is not</span></pre>
+<pre><span class="lineno"><a href="#line_7831" id="line_7831"> 7831.</a></span><span class="count                ">     59</span><span>// PR-514 - Suggest 'for...of Object.keys', since a plain object is not</span></pre>
 <pre><span class="lineno"><a href="#line_7832" id="line_7832"> 7832.</a></span><span class="count                ">     59</span><span>// iterable, so a bare 'for...of' would throw a TypeError.</span></pre>
 <pre><span class="lineno"><a href="#line_7833" id="line_7833"> 7833.</a></span><span class="count                ">     59</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7834" id="line_7834"> 7834.</a></span><span class="count                ">     59</span><span>// test_cause:</span></pre>
@@ -8747,7 +8747,7 @@ body {
 <pre><span class="lineno"><a href="#line_8582" id="line_8582"> 8582.</a></span><span class="count                ">   2517</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8583" id="line_8583"> 8583.</a></span><span class="count                ">   2517</span><span>// We don't expect to see variables created in switch statements.</span></pre>
 <pre><span class="lineno"><a href="#line_8584" id="line_8584"> 8584.</a></span><span class="count                ">   2517</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8585" id="line_8585"> 8585.</a></span><span class="count                ">   2517</span><span>// PR-xxx - Kept 2026-09-29, broader than ESLint no-case-declarations. This</span></pre>
+<pre><span class="lineno"><a href="#line_8585" id="line_8585"> 8585.</a></span><span class="count                ">   2517</span><span>// PR-514 - Kept 2026-09-29, broader than ESLint no-case-declarations. This</span></pre>
 <pre><span class="lineno"><a href="#line_8586" id="line_8586"> 8586.</a></span><span class="count                ">   2517</span><span>// also warns a 'var', a braced 'case 0: {let aa}' and a 'let' nested in a</span></pre>
 <pre><span class="lineno"><a href="#line_8587" id="line_8587"> 8587.</a></span><span class="count                ">   2517</span><span>// block of the case, all of which ESLint allows.</span></pre>
 <pre><span class="lineno"><a href="#line_8588" id="line_8588"> 8588.</a></span><span class="count                ">   2517</span><span></span></pre>
@@ -8976,7 +8976,7 @@ body {
 <pre><span class="lineno"><a href="#line_8811" id="line_8811"> 8811.</a></span><span class="count                ">    311</span><span>            const the_token = token_now;</span></pre>
 <pre><span class="lineno"><a href="#line_8812" id="line_8812"> 8812.</a></span><span class="count                ">    311</span><span>            let second;</span></pre>
 <pre><span class="lineno"><a href="#line_8813" id="line_8813"> 8813.</a></span><span class="count                ">    311</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_8814" id="line_8814"> 8814.</a></span><span class="count                ">    311</span><span>// PR-xxx - Bugfix - Both branches are an AssignmentExpression in the spec, so</span></pre>
+<pre><span class="lineno"><a href="#line_8814" id="line_8814"> 8814.</a></span><span class="count                ">    311</span><span>// PR-514 - Bugfix - Both branches are an AssignmentExpression in the spec, so</span></pre>
 <pre><span class="lineno"><a href="#line_8815" id="line_8815"> 8815.</a></span><span class="count                ">    311</span><span>// parse the second like the third. 'aa ? bb = 0 : cc' used to stop at '='.</span></pre>
 <pre><span class="lineno"><a href="#line_8816" id="line_8816"> 8816.</a></span><span class="count                ">    311</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_8817" id="line_8817"> 8817.</a></span><span class="count                ">    311</span><span>            second = parse_expression(10);</span></pre>
@@ -9175,7 +9175,7 @@ body {
 <pre><span class="lineno"><a href="#line_9010" id="line_9010"> 9010.</a></span><span class="count                ">    916</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9011" id="line_9011"> 9011.</a></span><span class="count                ">    916</span><span>// Check top-level functions are ordered.</span></pre>
 <pre><span class="lineno"><a href="#line_9012" id="line_9012"> 9012.</a></span><span class="count                ">    916</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9013" id="line_9013"> 9013.</a></span><span class="count                ">    916</span><span>// PR-xxx - Bugfix - Also check an exported function-declaration, which is</span></pre>
+<pre><span class="lineno"><a href="#line_9013" id="line_9013"> 9013.</a></span><span class="count                ">    916</span><span>// PR-514 - Bugfix - Also check an exported function-declaration, which is</span></pre>
 <pre><span class="lineno"><a href="#line_9014" id="line_9014"> 9014.</a></span><span class="count                ">    916</span><span>// hoisted too, though &lt;stmt_export&gt; resets its arity to 'unary'.</span></pre>
 <pre><span class="lineno"><a href="#line_9015" id="line_9015"> 9015.</a></span><span class="count                ">    916</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9016" id="line_9016"> 9016.</a></span><span class="count                ">    916</span><span>// test_cause:</span></pre>
@@ -9335,13 +9335,13 @@ body {
 <pre><span class="lineno"><a href="#line_9170" id="line_9170"> 9170.</a></span><span class="count                ">    810</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9171" id="line_9171"> 9171.</a></span><span class="count                ">   3726</span><span>    function check_assignable(name, the_variable) {</span></pre>
 <pre><span class="lineno"><a href="#line_9172" id="line_9172"> 9172.</a></span><span class="count                ">   3726</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9173" id="line_9173"> 9173.</a></span><span class="count                ">   3726</span><span>// PR-xxx - This function will warn bad_assignment_a when &lt;name&gt; has a readonly</span></pre>
+<pre><span class="lineno"><a href="#line_9173" id="line_9173"> 9173.</a></span><span class="count                ">   3726</span><span>// PR-514 - This function will warn bad_assignment_a when &lt;name&gt; has a readonly</span></pre>
 <pre><span class="lineno"><a href="#line_9174" id="line_9174"> 9174.</a></span><span class="count                ">   3726</span><span>// binding, such as a const, an import, a catch variable or a function name,</span></pre>
 <pre><span class="lineno"><a href="#line_9175" id="line_9175"> 9175.</a></span><span class="count                ">   3726</span><span>// and return false for that or for no binding.</span></pre>
 <pre><span class="lineno"><a href="#line_9176" id="line_9176"> 9176.</a></span><span class="count                ">   3726</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9177" id="line_9177"> 9177.</a></span><span class="count                ">     93</span><span>        if (!the_variable) {</span></pre>
 <pre><span class="lineno"><a href="#line_9178" id="line_9178"> 9178.</a></span><span class="count                ">     93</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9179" id="line_9179"> 9179.</a></span><span class="count                ">     93</span><span>// PR-xxx - An undeclared &lt;name&gt; returns false with no warning, since</span></pre>
+<pre><span class="lineno"><a href="#line_9179" id="line_9179"> 9179.</a></span><span class="count                ">     93</span><span>// PR-514 - An undeclared &lt;name&gt; returns false with no warning, since</span></pre>
 <pre><span class="lineno"><a href="#line_9180" id="line_9180"> 9180.</a></span><span class="count                ">     93</span><span>// &lt;name_lookup&gt; already warned undeclared_a on this token, and &lt;warn&gt; keeps</span></pre>
 <pre><span class="lineno"><a href="#line_9181" id="line_9181"> 9181.</a></span><span class="count                ">     93</span><span>// only the first warning of a token.</span></pre>
 <pre><span class="lineno"><a href="#line_9182" id="line_9182"> 9182.</a></span><span class="count                ">     93</span><span></span></pre>
@@ -9400,7 +9400,7 @@ body {
 <pre><span class="lineno"><a href="#line_9235" id="line_9235"> 9235.</a></span><span class="count                "> 121560</span><span>        block_stack.some(function (scope_block, ii) {</span></pre>
 <pre><span class="lineno"><a href="#line_9236" id="line_9236"> 9236.</a></span><span class="count                "> 121560</span><span>            the_variable = scope_block.context[id];</span></pre>
 <pre><span class="lineno"><a href="#line_9237" id="line_9237"> 9237.</a></span><span class="count                "> 121560</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9238" id="line_9238"> 9238.</a></span><span class="count                "> 121560</span><span>// PR-xxx - Bugfix - Skip a label, so a same-named variable, function or global</span></pre>
+<pre><span class="lineno"><a href="#line_9238" id="line_9238"> 9238.</a></span><span class="count                "> 121560</span><span>// PR-514 - Bugfix - Skip a label, so a same-named variable, function or global</span></pre>
 <pre><span class="lineno"><a href="#line_9239" id="line_9239"> 9239.</a></span><span class="count                "> 121560</span><span>// in an outer scope is still found.</span></pre>
 <pre><span class="lineno"><a href="#line_9240" id="line_9240"> 9240.</a></span><span class="count                "> 121560</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9241" id="line_9241"> 9241.</a></span><span class="count                ">  34545</span><span>            if (the_variable?.role === "label") {</span></pre>
@@ -9477,7 +9477,7 @@ body {
 <pre><span class="lineno"><a href="#line_9312" id="line_9312"> 9312.</a></span><span class="count                ">  34935</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_9313" id="line_9313"> 9313.</a></span><span class="count                ">  34935</span><span>        if (!the_variable.alive) {</span></pre>
 <pre><span class="lineno"><a href="#line_9314" id="line_9314"> 9314.</a></span><span class="count                ">     31</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9315" id="line_9315"> 9315.</a></span><span class="count                ">     31</span><span>// PR-xxx - Deviation kept 2026-09-29. A function reading a 'let' declared</span></pre>
+<pre><span class="lineno"><a href="#line_9315" id="line_9315"> 9315.</a></span><span class="count                ">     31</span><span>// PR-514 - Deviation kept 2026-09-29. A function reading a 'let' declared</span></pre>
 <pre><span class="lineno"><a href="#line_9316" id="line_9316"> 9316.</a></span><span class="count                ">     31</span><span>// below it warns, though valid when called later. This matches ESLint</span></pre>
 <pre><span class="lineno"><a href="#line_9317" id="line_9317"> 9317.</a></span><span class="count                ">     31</span><span>// no-use-before-define.</span></pre>
 <pre><span class="lineno"><a href="#line_9318" id="line_9318"> 9318.</a></span><span class="count                ">     31</span><span></span></pre>
@@ -9512,7 +9512,7 @@ body {
 <pre><span class="lineno"><a href="#line_9347" id="line_9347"> 9347.</a></span><span class="count                ">    763</span><span>                (thing.id === "??=" || thing.id === "||=")</span></pre>
 <pre><span class="lineno"><a href="#line_9348" id="line_9348"> 9348.</a></span><span class="count                ">    763</span><span>            ) {</span></pre>
 <pre><span class="lineno"><a href="#line_9349" id="line_9349"> 9349.</a></span><span class="count                ">    763</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9350" id="line_9350"> 9350.</a></span><span class="count                ">    763</span><span>// PR-xxx - Bugfix - '??=' and '||=' assign an unassigned variable, since its</span></pre>
+<pre><span class="lineno"><a href="#line_9350" id="line_9350"> 9350.</a></span><span class="count                ">    763</span><span>// PR-514 - Bugfix - '??=' and '||=' assign an unassigned variable, since its</span></pre>
 <pre><span class="lineno"><a href="#line_9351" id="line_9351"> 9351.</a></span><span class="count                ">    763</span><span>// 'undefined' is nullish and falsy, so it counts as assigned. '&amp;&amp;=' does not</span></pre>
 <pre><span class="lineno"><a href="#line_9352" id="line_9352"> 9352.</a></span><span class="count                ">    763</span><span>// assign it, and still warns unassigned_var_a.</span></pre>
 <pre><span class="lineno"><a href="#line_9353" id="line_9353"> 9353.</a></span><span class="count                ">    763</span><span></span></pre>
@@ -9703,7 +9703,7 @@ body {
 <pre><span class="lineno"><a href="#line_9538" id="line_9538"> 9538.</a></span><span class="count                ">   7244</span><span>                ].includes(thing.expression[0].id)</span></pre>
 <pre><span class="lineno"><a href="#line_9539" id="line_9539"> 9539.</a></span><span class="count                ">   7244</span><span>            ) {</span></pre>
 <pre><span class="lineno"><a href="#line_9540" id="line_9540"> 9540.</a></span><span class="count                ">   7244</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9541" id="line_9541"> 9541.</a></span><span class="count                ">   7244</span><span>// PR-xxx - Bugfix - A unary operator before '**' is a SyntaxError, since the</span></pre>
+<pre><span class="lineno"><a href="#line_9541" id="line_9541"> 9541.</a></span><span class="count                ">   7244</span><span>// PR-514 - Bugfix - A unary operator before '**' is a SyntaxError, since the</span></pre>
 <pre><span class="lineno"><a href="#line_9542" id="line_9542"> 9542.</a></span><span class="count                ">   7244</span><span>// spec's ExponentiationExpression takes an UpdateExpression on its left. So</span></pre>
 <pre><span class="lineno"><a href="#line_9543" id="line_9543"> 9543.</a></span><span class="count                ">   7244</span><span>// '-aa ** 2' needs parens, while '[aa] ** 2' and '++aa ** 2' do not.</span></pre>
 <pre><span class="lineno"><a href="#line_9544" id="line_9544"> 9544.</a></span><span class="count                ">   7244</span><span></span></pre>
@@ -9728,7 +9728,7 @@ body {
 <pre><span class="lineno"><a href="#line_9563" id="line_9563"> 9563.</a></span><span class="count                ">   7244</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9564" id="line_9564"> 9564.</a></span><span class="count                ">   7244</span><span>            if (thing.id === "??") {</span></pre>
 <pre><span class="lineno"><a href="#line_9565" id="line_9565"> 9565.</a></span><span class="count                ">   7244</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9566" id="line_9566"> 9566.</a></span><span class="count                ">   7244</span><span>// PR-xxx - Bugfix - An unwrapped '&amp;&amp;' or '||' operand of '??' is a SyntaxError,</span></pre>
+<pre><span class="lineno"><a href="#line_9566" id="line_9566"> 9566.</a></span><span class="count                ">   7244</span><span>// PR-514 - Bugfix - An unwrapped '&amp;&amp;' or '||' operand of '??' is a SyntaxError,</span></pre>
 <pre><span class="lineno"><a href="#line_9567" id="line_9567"> 9567.</a></span><span class="count                ">   7244</span><span>// since the spec's CoalesceExpression takes a BitwiseORExpression on each side.</span></pre>
 <pre><span class="lineno"><a href="#line_9568" id="line_9568"> 9568.</a></span><span class="count                ">   7244</span><span>// '??' binds loosest of the three, so only a '??' node can hold one.</span></pre>
 <pre><span class="lineno"><a href="#line_9569" id="line_9569"> 9569.</a></span><span class="count                ">   7244</span><span></span></pre>
@@ -10005,7 +10005,7 @@ body {
 <pre><span class="lineno"><a href="#line_9840" id="line_9840"> 9840.</a></span><span class="count                ">     54</span><span>            scope_block = scope_block_pop();</span></pre>
 <pre><span class="lineno"><a href="#line_9841" id="line_9841"> 9841.</a></span><span class="count                ">     54</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_9842" id="line_9842"> 9842.</a></span><span class="count                ">     57</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9843" id="line_9843"> 9843.</a></span><span class="count                ">     57</span><span>// PR-xxx - Bugfix - Walk the finally-block after the catch-block, as parsed.</span></pre>
+<pre><span class="lineno"><a href="#line_9843" id="line_9843"> 9843.</a></span><span class="count                ">     57</span><span>// PR-514 - Bugfix - Walk the finally-block after the catch-block, as parsed.</span></pre>
 <pre><span class="lineno"><a href="#line_9844" id="line_9844"> 9844.</a></span><span class="count                ">     57</span><span>// Else a 'var' from the catch-block warned temporal_dead_zone_a in it.</span></pre>
 <pre><span class="lineno"><a href="#line_9845" id="line_9845"> 9845.</a></span><span class="count                ">     57</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9846" id="line_9846"> 9846.</a></span><span class="count                ">     57</span><span>// Recurse walk_statement.</span></pre>
@@ -10196,7 +10196,7 @@ body {
 <pre><span class="lineno"><a href="#line_10031" id="line_10031">10031.</a></span><span class="count                ">  27293</span><span>            thing.id !== "||" &amp;&amp;</span></pre>
 <pre><span class="lineno"><a href="#line_10032" id="line_10032">10032.</a></span><span class="count                ">  26281</span><span>            thing.id !== "=" &amp;&amp;</span></pre>
 <pre><span class="lineno"><a href="#line_10033" id="line_10033">10033.</a></span><span class="count                ">  21789</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_10034" id="line_10034">10034.</a></span><span class="count                ">  21789</span><span>// PR-xxx - Bugfix - Skip the 'of' or 'in' node of a for-loop-head, so</span></pre>
+<pre><span class="lineno"><a href="#line_10034" id="line_10034">10034.</a></span><span class="count                ">  21789</span><span>// PR-514 - Bugfix - Skip the 'of' or 'in' node of a for-loop-head, so</span></pre>
 <pre><span class="lineno"><a href="#line_10035" id="line_10035">10035.</a></span><span class="count                ">  21789</span><span>// 'for (aa of bb &lt; cc)' does not warn on its own 'of', like the const form.</span></pre>
 <pre><span class="lineno"><a href="#line_10036" id="line_10036">10036.</a></span><span class="count                ">  21789</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_10037" id="line_10037">10037.</a></span><span class="count                ">  21789</span><span>            thing.for_init !== true &amp;&amp;</span></pre>
@@ -10340,7 +10340,7 @@ body {
 <pre><span class="lineno"><a href="#line_10175" id="line_10175">10175.</a></span><span class="count                ">     54</span><span>            case "let":</span></pre>
 <pre><span class="lineno"><a href="#line_10176" id="line_10176">10176.</a></span><span class="count                ">     54</span><span>            case "var":</span></pre>
 <pre><span class="lineno"><a href="#line_10177" id="line_10177">10177.</a></span><span class="count                ">     54</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_10178" id="line_10178">10178.</a></span><span class="count                ">     54</span><span>// PR-xxx - Bugfix - Walk the iterable of destructured 'for (const [aa] of bb)',</span></pre>
+<pre><span class="lineno"><a href="#line_10178" id="line_10178">10178.</a></span><span class="count                ">     54</span><span>// PR-514 - Bugfix - Walk the iterable of destructured 'for (const [aa] of bb)',</span></pre>
 <pre><span class="lineno"><a href="#line_10179" id="line_10179">10179.</a></span><span class="count                ">     54</span><span>// which &lt;stmt_var&gt; keeps in &lt;expression&gt;, and &lt;post_s_var&gt; does not walk. Walk</span></pre>
 <pre><span class="lineno"><a href="#line_10180" id="line_10180">10180.</a></span><span class="count                ">     54</span><span>// it before &lt;post_s_var&gt; marks the names alive, to catch temporal_dead_zone_a.</span></pre>
 <pre><span class="lineno"><a href="#line_10181" id="line_10181">10181.</a></span><span class="count                ">     54</span><span></span></pre>
@@ -10388,7 +10388,7 @@ body {
 <pre><span class="lineno"><a href="#line_10223" id="line_10223">10223.</a></span><span class="count                ">     11</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_10224" id="line_10224">10224.</a></span><span class="count                ">   2199</span><span>        } else if (thing.extra === "set") {</span></pre>
 <pre><span class="lineno"><a href="#line_10225" id="line_10225">10225.</a></span><span class="count                ">   2199</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_10226" id="line_10226">10226.</a></span><span class="count                ">   2199</span><span>// PR-xxx - Bugfix - A setter's one parameter cannot be a rest-parameter, a</span></pre>
+<pre><span class="lineno"><a href="#line_10226" id="line_10226">10226.</a></span><span class="count                ">   2199</span><span>// PR-514 - Bugfix - A setter's one parameter cannot be a rest-parameter, a</span></pre>
 <pre><span class="lineno"><a href="#line_10227" id="line_10227">10227.</a></span><span class="count                ">   2199</span><span>// SyntaxError. Read &lt;signature&gt;, since &lt;name_list&gt; flattens destructuring and</span></pre>
 <pre><span class="lineno"><a href="#line_10228" id="line_10228">10228.</a></span><span class="count                ">   2199</span><span>// cannot tell a rest-parameter from a valid rest-element inside a destructure.</span></pre>
 <pre><span class="lineno"><a href="#line_10229" id="line_10229">10229.</a></span><span class="count                ">   2199</span><span></span></pre>
@@ -10994,7 +10994,7 @@ body {
 <pre><span class="lineno"><a href="#line_10829" id="line_10829">10829.</a></span><span class="count                ">  56305</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_10830" id="line_10830">10830.</a></span><span class="count                ">  56305</span><span>        if (left.getset === true) {</span></pre>
 <pre><span class="lineno"><a href="#line_10831" id="line_10831">10831.</a></span><span class="count                ">      8</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_10832" id="line_10832">10832.</a></span><span class="count                ">      8</span><span>// PR-xxx - Bugfix - On one line, &lt;one_space&gt; still lets a comment sit between</span></pre>
+<pre><span class="lineno"><a href="#line_10832" id="line_10832">10832.</a></span><span class="count                ">      8</span><span>// PR-514 - Bugfix - On one line, &lt;one_space&gt; still lets a comment sit between</span></pre>
 <pre><span class="lineno"><a href="#line_10833" id="line_10833">10833.</a></span><span class="count                ">      8</span><span>// the 'get' or 'set' and its name.</span></pre>
 <pre><span class="lineno"><a href="#line_10834" id="line_10834">10834.</a></span><span class="count                ">      8</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_10835" id="line_10835">10835.</a></span><span class="count                ">      8</span><span>// test_cause:</span></pre>
