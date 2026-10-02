@@ -1224,7 +1224,7 @@ git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
             "$FILE" && \
             rm -f "$FILE".bak
     done
-    node --input-type=module --eval '
+    PR_XXX="$PR_XXX" node --input-type=module --eval '
 // init debugInline
 const debugInline = (function () {
     let consoleError = Object;
@@ -1300,8 +1300,8 @@ import moduleFs from "fs";
                 }
             );
         });
-        commitMessage = (
-            `- shGithubPrCreate - ${process.env.PR_XXX} ` +
+        commitMessage = String(
+            `- ${process.env.PR_XXX} ` +
             (
                 changelogNew
                     .filter(function (item) {
@@ -1310,7 +1310,7 @@ import moduleFs from "fs";
                     .join("\n") ||
                 changelogNew[0]
             )
-        );
+        ).replace("\n", "\n\n");
     }
     branchPull = `branch-${version}`;
     // security - sanitize commitMessage
