@@ -1215,7 +1215,7 @@ shGithubPrCreate() {(set -e
         then
             return
         fi
-        PR_XXX="PR-$((PR_XXX + 1))"
+        export PR_XXX="PR-$((PR_XXX + 1))"
         FILE_LIST="$(
 git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
         )"
@@ -1304,7 +1304,7 @@ import moduleFs from "fs";
             );
         });
         commitMessage = (
-            `- shGithubPrCreate #${process.env.PR_XXX}` +
+            `- shGithubPrCreate - ${process.env.PR_XXX} ` +
             (
                 changelogNew
                     .filter(function (item) {
