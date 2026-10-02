@@ -1304,7 +1304,7 @@ import moduleFs from "fs";
             );
         });
         commitMessage = (
-            `- shGithubPrCreate ` +
+            `- shGithubPrCreate #${process.env.PR_XXX}` +
             (
                 changelogNew
                     .filter(function (item) {
