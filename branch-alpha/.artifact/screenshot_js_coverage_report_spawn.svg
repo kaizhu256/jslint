@@ -311,7 +311,7 @@
     textLength="768"
     x="10"
     y="1132"
->(node:3699) [DEP0176] DeprecationWarning: fs.R_OK is deprecated, use fs.constants.R_OK instead   </tspan>
+>(node:4027) [DEP0176] DeprecationWarning: fs.R_OK is deprecated, use fs.constants.R_OK instead   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
