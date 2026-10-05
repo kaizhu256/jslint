@@ -1,5 +1,5 @@
-<svg height="1460" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1460" fill="#222" width="800"></rect>
+<svg height="1482" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1482" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -29,7 +29,7 @@
     textLength="768"
     x="10"
     y="98"
->&gt;     --branch=v5.0.11 \                                                                         </tspan>
+>&gt;     --branch=v6.0.1 \                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -221,13 +221,13 @@
     textLength="768"
     x="10"
     y="802"
->&gt; sqlite3@5.0.11 install                                                                         </tspan>
+>&gt; sqlite3@6.0.1 install                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="824"
->&gt; node-pre-gyp install --fallback-to-build                                                       </tspan>
+>&gt; prebuild-install -r napi || node-gyp rebuild                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -239,43 +239,43 @@
     textLength="768"
     x="10"
     y="868"
->node-pre-gyp info it worked if it ends with ok                                                   </tspan>
+>(node:3864) [DEP0176] DeprecationWarning: fs.R_OK is deprecated, use fs.constants.R_OK instead   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="890"
->node-pre-gyp info using node-pre-gyp@1.0.11                                                      </tspan>
+>(Use `node --trace-deprecation ...` to show where the warning was created)                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="912"
->node-pre-gyp info using node@24.21.0 | linux | x64                                               </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="934"
->[sqlite3] Success: "/home/runner/work/jslint/jslint/node-sqlite3-sh/lib/binding/napi-v6-linux-gl\</tspan>
+>up to date, audited 487 packages in 3s                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="956"
->  ibc-x64/node_sqlite3.node" already installed                                                   </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="978"
->Pass --update-binary to reinstall or --build-from-source to recompile                            </tspan>
+>70 packages are looking for funding                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1000"
->node-pre-gyp info ok                                                                             </tspan>
+>  run `npm fund` for details                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -287,7 +287,7 @@
     textLength="768"
     x="10"
     y="1044"
->up to date, audited 398 packages in 2s                                                           </tspan>
+>29 vulnerabilities (1 low, 4 moderate, 21 high, 3 critical)                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -299,13 +299,13 @@
     textLength="768"
     x="10"
     y="1088"
->95 packages are looking for funding                                                              </tspan>
+>To address issues that do not require attention, run:                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1110"
->  run `npm fund` for details                                                                     </tspan>
+>  npm audit fix                                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -317,84 +317,90 @@
     textLength="768"
     x="10"
     y="1154"
->29 vulnerabilities (6 low, 7 moderate, 15 high, 1 critical)                                      </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1176"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1198"
->To address issues that do not require attention, run:                                            </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1220"
->  npm audit fix                                                                                  </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1242"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1264"
 >To address all issues (including breaking changes), run:                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1286"
+    y="1176"
 >  npm audit fix --force                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1308"
+    y="1198"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1330"
+    y="1220"
 >Run `npm audit` for details.                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="1242"
+>npm warn install-scripts 1 package has install scripts not yet covered by allowScripts:          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1264"
+>npm warn install-scripts   es5-ext@0.10.64 (postinstall:  node -e "try{require('./_postinstall')\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1286"
+>  }catch(e){}" || exit 0)                                                                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1308"
+>npm warn install-scripts                                                                         </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1330"
+>npm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="1352"
->wrote file /home/runner/work/jslint/jslint/.artifact/coverage_sqlite3_sh//touch.txt              </tspan>
+>   &lt;pkg&gt;` to allow.                                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1374"
->                                                                                                 </tspan>
+>wrote file /home/runner/work/jslint/jslint/.artifact/coverage_sqlite3_sh//touch.txt              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1396"
->&gt; sqlite3@5.0.11 pretest                                                                         </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1418"
->&gt; node test/support/createdb.js                                                                  </tspan>
+>&gt; sqlite3@6.0.1 test                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1440"
+>&gt; node test/support/createdb.js &amp;&amp; mocha -R spec --timeout 480000                                </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1462"
 >                                                                                                 </tspan>
 
 </text>
