@@ -1123,9 +1123,11 @@ function aa(gg) {
         aa(bb, cc, ee, gg);
     }
     try {
-        aa();
+        aa(String);
     } catch (err) {
-        aa(err);
+        aa(function () {
+            return err;
+        });
     }
     return function () {
         return ff;
@@ -1138,9 +1140,11 @@ aa();
 <dl><dt>parameter</dt><dd>gg</dd></dl>
 <dl><dt>variable</dt><dd>bb, cc, ff</dd></dl>
 <dl><dt>exception</dt><dd>err</dd></dl>
-<dl><dt>closure</dt><dd>ff</dd></dl>
-<dl><dt>global</dt><dd>aa, ee</dd></dl></div>
-<div class="level level2"><address>14: 12</address><dfn>«anonymous»()</dfn>
+<dl><dt>closure</dt><dd>err, ff</dd></dl>
+<dl><dt>global</dt><dd>String, aa, ee</dd></dl></div>
+<div class="level level2"><address>12: 12</address><dfn>«aa»()</dfn>
+<dl><dt>outer</dt><dd>err</dd></dl></div>
+<div class="level level2"><address>16: 12</address><dfn>«anonymous»()</dfn>
 <dl><dt>outer</dt><dd>ff</dd></dl></div>
         `).trim() + "\n", result);
 
@@ -1238,9 +1242,14 @@ aa.catch = function () {
 String(aa?.finally || function () {
     return;
 });
+String(aa
+? null
+: function () {
+    return;
+});
         `).trim() + "\n").functions.map(function ({name}) {
             return name;
-        }), ["delete", "catch", "finally"]);
+        }), ["delete", "catch", "finally", "anonymous"]);
     });
     jstestIt((
         "test autofix-report handling-behavior"
