@@ -1159,6 +1159,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         scope_block_push,
         scope_function_pop,
         scope_function_push,
+        scope_report_push,
         stop,
         syntax_dict,
         tenure,
@@ -1188,8 +1189,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 
         if (
             token_now.identifier &amp;&amp;
-            token_now.id !== "function" &amp;&amp;
-            token_now...
+            token_now.id !== "function" &amp;...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1235,6 +1235,7 @@ if (!state.mode_json) {
         scope_block_push,
         scope_function_pop,
         scope_function_push,
+        scope_report_push,
         syntax_dict,
         test_cause,
         token_global,
@@ -1293,9 +1294,7 @@ if (!state.mode_json) {
 // Produce a function that will act on the tasks registered by an action
 // function while walking the tree.
 
-        return function (the_token) {
-
-/...
+        retur...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
