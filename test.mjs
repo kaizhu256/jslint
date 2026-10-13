@@ -1218,6 +1218,24 @@ export default function () {
         `).trim() + "\n").functions.map(function ({name}) {
             return name;
         }), ["String", "anonymous", "anonymous", "default"]);
+
+// PR-xxx - Bugfix - A keyword used as a property name still names a function.
+
+        assertJsonEqual(jslint.jslint(String(`
+const aa = {
+    delete: function () {
+        return;
+    }
+};
+aa.catch = function () {
+    return;
+};
+String(aa?.finally || function () {
+    return;
+});
+        `).trim() + "\n").functions.map(function ({name}) {
+            return name;
+        }), ["delete", "catch", "finally"]);
     });
     jstestIt((
         "test autofix-report handling-behavior"

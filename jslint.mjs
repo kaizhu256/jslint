@@ -4797,12 +4797,16 @@ function jslint_phase3_parse(state) {
 
 // PR-xxx - Bugfix - A keyword such as 'return' names no function, so reset
 // <anon>, else it would keep an earlier identifier. Keep 'default', the name
-// the spec gives 'export default function () {}'.
+// the spec gives 'export default function () {}', and a keyword used as a
+// property name, as in 'aa.catch = function () {}'.
 
             anon = (
                 (
                     syntax_dict[token_now.id] === undefined ||
-                    token_now.id === "default"
+                    token_now.id === "default" ||
+                    token_prv.id === "." ||
+                    token_prv.id === "?." ||
+                    token_nxt.id === ":"
                 )
                 ? token_now.id
                 : "anonymous"
