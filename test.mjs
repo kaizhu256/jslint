@@ -1144,8 +1144,9 @@ aa();
 <dl><dt>outer</dt><dd>ff</dd></dl></div>
         `).trim() + "\n", result);
 
-// PR-xxx - Bugfix - A named function expression's name is in no row, and a
-// function lists an outer 'bb' even beside its own block-scoped 'bb'.
+// PR-xxx - Bugfix - A named function expression's name is outer only in a
+// nested function, and a function lists an outer 'bb' even beside its own
+// block-scoped 'bb'.
 
         result = reportFunction(String(`
 function aa() {
@@ -1160,7 +1161,9 @@ function aa() {
         }
     }
     return function dd() {
-        return dd(cc);
+        return dd(cc, function () {
+            return dd;
+        });
     };
 }
 aa();
@@ -1174,6 +1177,8 @@ aa();
 <dl><dt>outer</dt><dd>bb, cc</dd></dl></div>
 <div class="level level2"><address>12: 12</address><dfn>dd()</dfn>
 <dl><dt>outer</dt><dd>cc</dd></dl></div>
+<div class="level level3"><address>13: 23</address><dfn>«cc»()</dfn>
+<dl><dt>outer</dt><dd>dd</dd></dl></div>
         `).trim() + "\n", result);
     });
     jstestIt((

@@ -1404,19 +1404,19 @@ function jslint(
 // names it uses. A list per id keeps an own 'bb' and an outer 'bb' apart.
 
         const {id} = name;
-        if (name.scope_declared.name_only === true) {
+        if (
+            the_function.id === "(global)" ||
+            the_function.scope_name === name.scope_declared
+        ) {
 
-// PR-xxx - Omit a named function expression's name. It sits in <scope_name>,
-// a scope outside its function, so no function owns it.
+// PR-xxx - The report lists no global function. A function using its own
+// name from <scope_name> lists it nowhere, though a nested function using it
+// lists it as outer.
 
             return;
         }
-        if (!the_function.context_report) {
-            the_function.context_report = empty();
-        }
-        if (!the_function.context_report[id]) {
-            the_function.context_report[id] = [];
-        }
+        the_function.context_report ??= empty();
+        the_function.context_report[id] ??= [];
         if (!the_function.context_report[id].includes(name)) {
             the_function.context_report[id].push(name);
         }
@@ -5871,7 +5871,13 @@ function jslint_phase3_parse(state) {
 // <scope_declared> may be a block inside it.
 
         name.scope_function = scope_function;
-        scope_report_push(name.scope_function, name);
+        if (!scope_declared.name_only) {
+
+// PR-xxx - Omit a named function expression's name from its declaring
+// function. It sits in <scope_name>, a scope outside its own function.
+
+            scope_report_push(name.scope_function, name);
+        }
 
 // Warn about variable redefinition.
 
@@ -11887,11 +11893,11 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 
         const entry_list = Object.values(context_report).flat();
         function id_list(filter) {
-            return entry_list.filter(filter).map(function ({id}) {
-                return id;
-            }).filter(function (id, ii, list) {
-                return list.indexOf(id) === ii;
-            }).sort();
+            return Array.from(
+                new Set(entry_list.filter(filter).map(function ({id}) {
+                    return id;
+                }))
+            ).sort();
         }
         function is_own({scope_function}) {
             return scope_function === the_function;
