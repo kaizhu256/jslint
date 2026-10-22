@@ -303,6 +303,7 @@
     padEnd,
     padStart,
     parameter_count,
+    parameter_rest,
     parentIi,
     parse,
     parseInt,
@@ -4755,6 +4756,7 @@ function jslint_phase3_parse(state) {
         global_dict,
         import_list,
         is_equal,
+        line_list,
         option_dict,
         property_dict,
         scope_block_pop,
@@ -6488,23 +6490,11 @@ function jslint_phase3_parse(state) {
         const sub_list = [];
         const the_destructure = token_now;
         let optional;
-        function advance_and_signature_push(id) {
-            advance(id);
-            if (the_function?.signature) {
-                the_function.signature.push(id);
-                switch (id) {
-                case ",":
-                case ":":
-                    the_function.signature.push(" ");
-                    break;
-                }
-            }
-        }
         function name_parse() {
             let name = token_nxt;
             switch (name.id) {
             case "...":
-                advance_and_signature_push("...");
+                advance("...");
                 name = token_nxt;
                 name.ellipsis = true;
                 if (name.id === "...") {
@@ -6553,7 +6543,7 @@ function jslint_phase3_parse(state) {
 // ["let[{aa}]=0", "name_parse", "recurse_element", "", 0]
 
                 test_cause("recurse_element");
-                advance_and_signature_push(token_nxt.id);
+                advance(token_nxt.id);
                 prefix_destructure(
                     scope_declared,     // scope_declared
                     role,               // role
@@ -6581,9 +6571,9 @@ function jslint_phase3_parse(state) {
             if (is_lbrace) {
                 survey(name);
             }
-            advance_and_signature_push(token_nxt.id);
+            advance(token_nxt.id);
             if (is_lbrace && token_nxt.id === ":") {
-                advance_and_signature_push(":");
+                advance(":");
                 if (!the_function_toplevel) {
                     the_destructure.open = true;
                 }
@@ -6618,7 +6608,7 @@ function jslint_phase3_parse(state) {
 
                     true                // assigned
                 );
-                advance_and_signature_push(token_nxt.id);
+                advance(token_nxt.id);
                 return;
             }
             name_declare(
@@ -6635,7 +6625,7 @@ function jslint_phase3_parse(state) {
             );
             if (token_nxt.id === "=") {
                 optional = the_function_toplevel && token_now;
-                advance_and_signature_push("=");
+                advance("=");
                 if (!the_function_toplevel) {
                     the_destructure.open = true;
                 }
@@ -6684,7 +6674,7 @@ function jslint_phase3_parse(state) {
 // ["let[,aa]=0", "prefix_destructure", "ignore", "", 0]
 
                 test_cause("ignore");
-                advance_and_signature_push(",");
+                advance(",");
             }
             if (the_function_toplevel) {
                 the_function.parameter_count += 1;
@@ -6693,12 +6683,15 @@ function jslint_phase3_parse(state) {
 
 // Break early from ellipsis.
 
+                if (the_function_toplevel) {
+                    the_function.parameter_rest = true;
+                }
                 break;
             }
             if (token_nxt.id !== ",") {
                 break;
             }
-            advance_and_signature_push(",");
+            advance(",");
         }
         name_list.push(...sub_list);
         if (the_function_toplevel) {
@@ -6715,10 +6708,10 @@ function jslint_phase3_parse(state) {
 // PR-501 - Fix false-warning about ordering in nested-object-destructuring.
 
             check_ordered(role, sub_list);
-            advance_and_signature_push("}");
+            advance("}");
             return the_destructure;
         }
-        advance_and_signature_push("]");
+        advance("]");
         return the_destructure;
     }
 
@@ -6837,7 +6830,7 @@ function jslint_phase3_parse(state) {
         the_function.signature = (
             mode_fart_unwrapped
             ? token_prv.id
-            : ["("]
+            : "("
         );
         the_function.switch = 0;
         the_function.try = 0;
@@ -6890,6 +6883,7 @@ function jslint_phase3_parse(state) {
                 true                    // assigned
             );
         } else {
+            const lparen = token_now;
             if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
 
 // PR-500 - Unify ES2015-destructure-logic. - function ([aa]) {...}
@@ -6907,7 +6901,29 @@ function jslint_phase3_parse(state) {
                 );
             }
             advance(")");
-            the_function.signature = the_function.signature.join("") + ")";
+
+// PR-xxx - Bugfix - Copy <signature> from the source text of each token but
+// comments, so it keeps default values. A space joins tokens apart in the
+// source, except after an opener or before a closer.
+
+            the_function.signature = token_list.slice(
+                lparen.nr,
+                token_now.nr + 1
+            ).filter(function ({id}) {
+                return id !== "(comment)";
+            }).map(function ({from, id, line, thru}, ii, list) {
+                const prv = list[ii - 1];
+                return (
+                    (
+                        ii > 0 &&
+                        (prv.line !== line || prv.thru < from) &&
+                        !["(", "[", "{"].includes(prv.id) &&
+                        ![")", "]", "}"].includes(id)
+                    )
+                    ? " "
+                    : ""
+                ) + line_list[line].line_source.slice(from, thru);
+            }).join("");
         }
         if (mode_fart && !mode_fart_unwrapped) {
             advance("=>");
@@ -10301,13 +10317,10 @@ function jslint_phase4_walk(state) {
         } else if (thing.extra === "set") {
 
 // PR-514 - Bugfix - A setter's one parameter cannot be a rest-parameter, a
-// SyntaxError. Read <signature>, since <name_list> flattens destructuring and
-// cannot tell a rest-parameter from a valid rest-element inside a destructure.
+// SyntaxError. Read <parameter_rest>, since <name_list> flattens destructuring
+// and cannot tell a rest-parameter from a valid rest-element inside one.
 
-            if (
-                thing.parameter_count !== 1 ||
-                thing.signature.startsWith("(...")
-            ) {
+            if (thing.parameter_count !== 1 || thing.parameter_rest) {
 
 // test_cause:
 // ["

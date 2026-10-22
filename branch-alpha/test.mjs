@@ -1252,6 +1252,27 @@ String(aa
         }), ["delete", "catch", "finally", "anonymous"]);
     });
     jstestIt((
+        "test report-function-signature handling-behavior"
+    ), function () {
+
+// PR-xxx - Bugfix - A signature keeps default values and drops comments, and a
+// multi-line destructure joins with no space inside its brackets.
+
+        assertJsonEqual(jslint.jslint(String(`
+function aa(bb, cc = 1, ...dd) {
+    return [bb, cc, dd];
+}
+function ee({
+    ff,
+    gg = "" // Comment.
+}, hh) {
+    return [ff, gg, hh];
+}
+        `).trim() + "\n").functions.map(function ({signature}) {
+            return signature;
+        }), ["(bb, cc = 1, ...dd)", "({ff, gg = \"\"}, hh)"]);
+    });
+    jstestIt((
         "test autofix-report handling-behavior"
     ), function () {
         let result;
