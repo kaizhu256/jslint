@@ -1,6 +1,9 @@
 # Changelog
 
 # Todo
+- jslint-cli - Lint every file argument, as 'node jslint.mjs aa.mjs bb.mjs' now lints 'aa.mjs' and silently skips 'bb.mjs'.
+- jslint - Add warning for jstestIt() descriptions not in ASCII order within each jstestDescribe().
+- jslint - Destructuring - Allow a default on a destructured parameter 'function aa({bb} = {})', valid ES2015 but a stop now.
 - jslint - Allow a quoted accessor-name 'get "aa"() {}', valid ES2015 but a stop now.
 - jslint - Destructuring - Allow catch-variable 'catch ({aa})', valid ES2015 but a stop now.
 - jslint - Destructuring - Allow a default in object destructuring-assignment '({aa = bb} = cc)', and a member-target '[aa.cc = bb] = cc', valid but stops now, and then warn a const reassigned by '({aa} = {})'.

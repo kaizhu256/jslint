@@ -1254,6 +1254,7 @@ String(aa
     jstestIt((
         "test report-function-signature handling-behavior"
     ), function () {
+        const a38 = "a".repeat(38);
 
 // PR-xxx - Bugfix - A signature keeps default values and drops comments, and a
 // multi-line destructure joins with no space inside its brackets. A default
@@ -1271,16 +1272,28 @@ function ee({
 }
 function ii(jj = function () {
     return "a default value longer than forty characters";
-}, kk = [0, 1]) {
-    return [jj, kk];
+}, kk = [0, 1], ll = \`\${kk}\`) {
+    return [jj, kk, ll];
+}
+function mm(
+    nn /* Comment. */,
+    oo = [
+        1
+    ],
+    pp = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    qq = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    rr = [\`a\`, 1]
+) {
+    return [nn, oo, pp, qq, rr];
 }
         `).trim() + "\n").functions.map(function ({signature}) {
             return signature;
         }), [
             "(bb, cc = 1, ...dd)",
             "({ff, gg = \"\"}, hh)",
-            "(jj = \u2026, kk = [0, 1])",
-            "()"
+            "(jj = \u2026, kk = [0, 1], ll = \u2026)",
+            "()",
+            `(nn, oo = [1], pp = "${a38}", qq = \u2026, rr = \u2026)`
         ]);
     });
     jstestIt((

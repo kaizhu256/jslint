@@ -6909,8 +6909,9 @@ function jslint_phase3_parse(state) {
 
 // PR-xxx - Bugfix - Copy <signature> from the source text of each token but
 // comments, so it keeps default values. A space joins tokens apart in the
-// source, except after an opener or before a closer. A default value longer
-// than 40 characters, such as a function, shows as an ellipsis.
+// source, except after an opener or before a comma or closer. A default value
+// over 40 characters shows as an ellipsis, and so does one with a backtick,
+// since a megastring's tokens carry columns that do not match the source.
 
             for (const token of token_list.slice(lparen.nr, token_now.nr + 1)) {
                 if (token.id !== "(comment)") {
@@ -6922,7 +6923,7 @@ function jslint_phase3_parse(state) {
                                 token_before.thru < token.from
                             ) &&
                             !["(", "[", "{"].includes(token_before.id) &&
-                            ![")", "]", "}"].includes(token.id)
+                            ![")", ",", "]", "}"].includes(token.id)
                         )
                         ? " "
                         : ""
@@ -6944,7 +6945,10 @@ function jslint_phase3_parse(state) {
                         )
                     ) {
                         signature += (
-                            default_text.length > 40
+                            (
+                                default_text.trim().length > 40 ||
+                                default_text.includes("`")
+                            )
                             ? " \u2026"
                             : default_text
                         );
@@ -6959,7 +6963,7 @@ function jslint_phase3_parse(state) {
                     } else {
                         default_text += piece;
                     }
-                    if (["(", "[", "{"].includes(token.id)) {
+                    if (["${", "(", "[", "{"].includes(token.id)) {
                         depth += 1;
                     }
                     token_before = token;
@@ -11899,6 +11903,10 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 //         <dd>NAMES</dd>
 //     </dl>
 // </div>
+
+// A function's name is a best guess, since most functions have none in the
+// source. A wrong name in an odd case goes in the CHANGELOG Todo list, and is
+// fixed only when a user reports it [owner 2026-10-22].
 
     html += "<fieldset id=\"JSLINT_REPORT_FUNCTIONS\">\n";
     html += "<legend>Report: Functions (" + functions.length + ")</legend>\n";
