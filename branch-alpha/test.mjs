@@ -1258,7 +1258,8 @@ String(aa
 
 // PR-xxx - Bugfix - A signature keeps default values and drops comments, and a
 // multi-line destructure joins with no space inside its brackets. A default
-// value longer than 40 characters shows as an ellipsis.
+// value longer than 40 characters, or holding a megastring, shows as an
+// ellipsis, but a backtick inside a string or regexp does not count.
 
         assertJsonEqual(jslint.jslint(String(`
 function aa(bb, cc = 1, ...dd) {
@@ -1286,6 +1287,12 @@ function mm(
 ) {
     return [nn, oo, pp, qq, rr];
 }
+function ss(tt = "\`", uu = /\`/) {
+    return [tt, uu];
+}
+function vv(ww = (xx = 1) => "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") {
+    return ww;
+}
         `).trim() + "\n").functions.map(function ({signature}) {
             return signature;
         }), [
@@ -1293,7 +1300,10 @@ function mm(
             "({ff, gg = \"\"}, hh)",
             "(jj = \u2026, kk = [0, 1], ll = \u2026)",
             "()",
-            `(nn, oo = [1], pp = "${a38}", qq = \u2026, rr = \u2026)`
+            `(nn, oo = [1], pp = "${a38}", qq = \u2026, rr = \u2026)`,
+            "(tt = \"`\", uu = /`/)",
+            "(ww = \u2026)",
+            "(xx = 1)"
         ]);
 
 // A parse that stops inside a parameter list leaves the signature '('.

@@ -1403,21 +1403,15 @@ function jslint(
 // lists for <the_function>, which are the names it declares and the outer
 // names it uses. An own 'bb' and an outer 'bb' are two entries.
 
-        if (
-            the_function.id === "(global)" ||
-            the_function.scope_name === name.scope_declared
-        ) {
+        if (the_function.scope_name === name.scope_declared) {
 
-// PR-xxx - The report lists no global function. A function using its own
-// name from <scope_name> lists it nowhere, though a nested function using it
-// lists it as outer.
+// PR-xxx - A function using its own name from <scope_name> lists it nowhere,
+// though a nested function using it lists it as outer.
 
             return;
         }
         the_function.context_report ??= [];
-        if (!the_function.context_report.includes(name)) {
-            the_function.context_report.push(name);
-        }
+        the_function.context_report.push(name);
     }
 
     function stop(code, the_token, a, b, c, d) {
@@ -6882,7 +6876,8 @@ function jslint_phase3_parse(state) {
         } else {
             const lparen = token_now;
             let default_depth;
-            let default_text;
+            let default_from;
+            let default_megastring = false;
             let depth = 0;
             let signature = "";
             let token_before;
@@ -6907,8 +6902,8 @@ function jslint_phase3_parse(state) {
 // PR-xxx - Bugfix - Copy <signature> from the source text of each token but
 // comments, so it keeps default values. A space joins tokens apart in the
 // source, except after an opener or before a comma or closer. A default value
-// over 40 characters shows as an ellipsis, and so does one with a backtick,
-// since a megastring's tokens carry columns that do not match the source.
+// over 40 characters shows as an ellipsis, and so does one holding a
+// megastring, whose tokens carry columns that do not match the source.
 
             for (const token of token_list.slice(lparen.nr, token_now.nr + 1)) {
                 if (token.id !== "(comment)") {
@@ -6935,30 +6930,30 @@ function jslint_phase3_parse(state) {
 // A default value ends at a comma or a closer of its own depth.
 
                     if (
-                        default_text !== undefined &&
+                        default_from !== undefined &&
                         (
                             depth < default_depth ||
                             (depth === default_depth && token.id === ",")
                         )
                     ) {
-                        signature += (
-                            (
-                                default_text.trim().length > 40 ||
-                                default_text.includes("`")
-                            )
-                            ? " \u2026"
-                            : default_text
-                        );
-                        default_text = undefined;
-                    }
-                    if (default_text === undefined) {
-                        signature += piece;
-                        if (token.id === "=") {
-                            default_depth = depth;
-                            default_text = "";
+                        if (
+                            default_megastring ||
+                            signature.slice(default_from).trim().length > 40
+                        ) {
+                            signature = (
+                                signature.slice(0, default_from) + " \u2026"
+                            );
                         }
-                    } else {
-                        default_text += piece;
+                        default_from = undefined;
+                        default_megastring = false;
+                    }
+                    signature += piece;
+                    if (token.id === "=" && default_from === undefined) {
+                        default_depth = depth;
+                        default_from = signature.length;
+                    }
+                    if (token.id === "`" && default_from !== undefined) {
+                        default_megastring = true;
                     }
                     if (["${", "(", "[", "{"].includes(token.id)) {
                         depth += 1;
