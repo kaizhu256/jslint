@@ -176,7 +176,6 @@
     filter,
     finally,
     flag,
-    flat,
     floor,
     forEach,
     for_init,
@@ -1402,9 +1401,8 @@ function jslint(
 
 // PR-xxx - Bugfix - This function will push <name> to what <jslint_report>
 // lists for <the_function>, which are the names it declares and the outer
-// names it uses. A list per id keeps an own 'bb' and an outer 'bb' apart.
+// names it uses. An own 'bb' and an outer 'bb' are two entries.
 
-        const {id} = name;
         if (
             the_function.id === "(global)" ||
             the_function.scope_name === name.scope_declared
@@ -1416,10 +1414,9 @@ function jslint(
 
             return;
         }
-        the_function.context_report ??= empty();
-        the_function.context_report[id] ??= [];
-        if (!the_function.context_report[id].includes(name)) {
-            the_function.context_report[id].push(name);
+        the_function.context_report ??= [];
+        if (!the_function.context_report.includes(name)) {
+            the_function.context_report.push(name);
         }
     }
 
@@ -5881,7 +5878,7 @@ function jslint_phase3_parse(state) {
 // PR-xxx - Omit a named function expression's name from its declaring
 // function. It sits in <scope_name>, a scope outside its own function.
 
-            scope_report_push(name.scope_function, name);
+            scope_report_push(scope_function, name);
         }
 
 // Warn about variable redefinition.
@@ -11944,7 +11941,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     }
     functions.forEach(function (the_function) {
         const {
-            context_report = empty(),
+            context_report = [],
             from,
             id,
             level,
@@ -11954,13 +11951,12 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
             signature
         } = the_function;
 
-// PR-xxx - Bugfix - <context_report> holds a list of names per id, which mixes
-// own and outer names, so each row checks <scope_function>.
+// PR-xxx - Bugfix - <context_report> mixes own and outer names, so each row
+// checks <scope_function>.
 
-        const entry_list = Object.values(context_report).flat();
         function id_list(filter) {
             return Array.from(
-                new Set(entry_list.filter(filter).map(function ({id}) {
+                new Set(context_report.filter(filter).map(function ({id}) {
                     return id;
                 }))
             ).sort();

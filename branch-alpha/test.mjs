@@ -1295,6 +1295,14 @@ function mm(
             "()",
             `(nn, oo = [1], pp = "${a38}", qq = \u2026, rr = \u2026)`
         ]);
+
+// A parse that stops inside a parameter list leaves the signature '('.
+
+        assertJsonEqual(jslint.jslint(
+            "function aa(bb, 0) {}\n"
+        ).functions.map(function ({signature}) {
+            return signature;
+        }), ["("]);
     });
     jstestIt((
         "test autofix-report handling-behavior"
