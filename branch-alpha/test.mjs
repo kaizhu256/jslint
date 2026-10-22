@@ -1256,7 +1256,8 @@ String(aa
     ), function () {
 
 // PR-xxx - Bugfix - A signature keeps default values and drops comments, and a
-// multi-line destructure joins with no space inside its brackets.
+// multi-line destructure joins with no space inside its brackets. A default
+// value longer than 40 characters shows as an ellipsis.
 
         assertJsonEqual(jslint.jslint(String(`
 function aa(bb, cc = 1, ...dd) {
@@ -1268,9 +1269,19 @@ function ee({
 }, hh) {
     return [ff, gg, hh];
 }
+function ii(jj = function () {
+    return "a default value longer than forty characters";
+}, kk = [0, 1]) {
+    return [jj, kk];
+}
         `).trim() + "\n").functions.map(function ({signature}) {
             return signature;
-        }), ["(bb, cc = 1, ...dd)", "({ff, gg = \"\"}, hh)"]);
+        }), [
+            "(bb, cc = 1, ...dd)",
+            "({ff, gg = \"\"}, hh)",
+            "(jj = \u2026, kk = [0, 1])",
+            "()"
+        ]);
     });
     jstestIt((
         "test autofix-report handling-behavior"

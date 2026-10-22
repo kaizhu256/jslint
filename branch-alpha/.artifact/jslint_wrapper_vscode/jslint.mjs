@@ -6884,6 +6884,11 @@ function jslint_phase3_parse(state) {
             );
         } else {
             const lparen = token_now;
+            let default_depth;
+            let default_text;
+            let depth = 0;
+            let signature = "";
+            let token_before;
             if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
 
 // PR-500 - Unify ES2015-destructure-logic. - function ([aa]) {...}
@@ -6904,26 +6909,63 @@ function jslint_phase3_parse(state) {
 
 // PR-xxx - Bugfix - Copy <signature> from the source text of each token but
 // comments, so it keeps default values. A space joins tokens apart in the
-// source, except after an opener or before a closer.
+// source, except after an opener or before a closer. A default value longer
+// than 40 characters, such as a function, shows as an ellipsis.
 
-            the_function.signature = token_list.slice(
-                lparen.nr,
-                token_now.nr + 1
-            ).filter(function ({id}) {
-                return id !== "(comment)";
-            }).map(function ({from, id, line, thru}, ii, list) {
-                const prv = list[ii - 1];
-                return (
-                    (
-                        ii > 0 &&
-                        (prv.line !== line || prv.thru < from) &&
-                        !["(", "[", "{"].includes(prv.id) &&
-                        ![")", "]", "}"].includes(id)
-                    )
-                    ? " "
-                    : ""
-                ) + line_list[line].line_source.slice(from, thru);
-            }).join("");
+            for (const token of token_list.slice(lparen.nr, token_now.nr + 1)) {
+                if (token.id !== "(comment)") {
+                    const piece = (
+                        (
+                            token_before !== undefined &&
+                            (
+                                token_before.line !== token.line ||
+                                token_before.thru < token.from
+                            ) &&
+                            !["(", "[", "{"].includes(token_before.id) &&
+                            ![")", "]", "}"].includes(token.id)
+                        )
+                        ? " "
+                        : ""
+                    ) + line_list[token.line].line_source.slice(
+                        token.from,
+                        token.thru
+                    );
+                    if ([")", "]", "}"].includes(token.id)) {
+                        depth -= 1;
+                    }
+
+// A default value ends at a comma or a closer of its own depth.
+
+                    if (
+                        default_text !== undefined &&
+                        (
+                            depth < default_depth ||
+                            (depth === default_depth && token.id === ",")
+                        )
+                    ) {
+                        signature += (
+                            default_text.length > 40
+                            ? " \u2026"
+                            : default_text
+                        );
+                        default_text = undefined;
+                    }
+                    if (default_text === undefined) {
+                        signature += piece;
+                        if (token.id === "=") {
+                            default_depth = depth;
+                            default_text = "";
+                        }
+                    } else {
+                        default_text += piece;
+                    }
+                    if (["(", "[", "{"].includes(token.id)) {
+                        depth += 1;
+                    }
+                    token_before = token;
+                }
+            }
+            the_function.signature = signature;
         }
         if (mode_fart && !mode_fart_unwrapped) {
             advance("=>");
