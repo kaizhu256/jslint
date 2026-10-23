@@ -17,6 +17,9 @@
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Add html and css linting back into jslint.
 
+# v2026.10.30
+- jslint - Report: Functions - List block-scoped names, catch-variables and outer names, mark closure only across functions, and keep default values in signatures.
+
 # v2026.9.29
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
