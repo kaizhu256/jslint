@@ -1564,13 +1564,13 @@ body {
 <pre><span class="lineno"><a href="#line_1399" id="line_1399"> 1399.</a></span><span class="count                ">   1005</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1400" id="line_1400"> 1400.</a></span><span class="count                ">  23192</span><span>    function scope_report_push(the_function, name) {</span></pre>
 <pre><span class="lineno"><a href="#line_1401" id="line_1401"> 1401.</a></span><span class="count                ">  23192</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1402" id="line_1402"> 1402.</a></span><span class="count                ">  23192</span><span>// PR-xxx - Bugfix - This function will push &lt;name&gt; to what &lt;jslint_report&gt;</span></pre>
+<pre><span class="lineno"><a href="#line_1402" id="line_1402"> 1402.</a></span><span class="count                ">  23192</span><span>// PR-516 - Bugfix - This function will push &lt;name&gt; to what &lt;jslint_report&gt;</span></pre>
 <pre><span class="lineno"><a href="#line_1403" id="line_1403"> 1403.</a></span><span class="count                ">  23192</span><span>// lists for &lt;the_function&gt;, which are the names it declares and the outer</span></pre>
 <pre><span class="lineno"><a href="#line_1404" id="line_1404"> 1404.</a></span><span class="count                ">  23192</span><span>// names it uses. An own 'bb' and an outer 'bb' are two entries.</span></pre>
 <pre><span class="lineno"><a href="#line_1405" id="line_1405"> 1405.</a></span><span class="count                ">  23192</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1406" id="line_1406"> 1406.</a></span><span class="count                ">      4</span><span>        if (the_function.scope_name === name.scope_declared) {</span></pre>
 <pre><span class="lineno"><a href="#line_1407" id="line_1407"> 1407.</a></span><span class="count                ">      4</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1408" id="line_1408"> 1408.</a></span><span class="count                ">      4</span><span>// PR-xxx - A function using its own name from &lt;scope_name&gt; lists it nowhere,</span></pre>
+<pre><span class="lineno"><a href="#line_1408" id="line_1408"> 1408.</a></span><span class="count                ">      4</span><span>// PR-516 - A function using its own name from &lt;scope_name&gt; lists it nowhere,</span></pre>
 <pre><span class="lineno"><a href="#line_1409" id="line_1409"> 1409.</a></span><span class="count                ">      4</span><span>// though a nested function using it lists it as outer.</span></pre>
 <pre><span class="lineno"><a href="#line_1410" id="line_1410"> 1410.</a></span><span class="count                ">      4</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1411" id="line_1411"> 1411.</a></span><span class="count                ">      4</span><span>            return;</span></pre>
@@ -4953,7 +4953,7 @@ body {
 <pre><span class="lineno"><a href="#line_4788" id="line_4788"> 4788.</a></span><span class="count                ">  74068</span><span>            token_now.id !== "async"</span></pre>
 <pre><span class="lineno"><a href="#line_4789" id="line_4789"> 4789.</a></span><span class="count                ">  73872</span><span>        ) {</span></pre>
 <pre><span class="lineno"><a href="#line_4790" id="line_4790"> 4790.</a></span><span class="count                ">  73872</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_4791" id="line_4791"> 4791.</a></span><span class="count                ">  73872</span><span>// PR-xxx - Bugfix - A keyword such as 'return' names no function, so reset</span></pre>
+<pre><span class="lineno"><a href="#line_4791" id="line_4791"> 4791.</a></span><span class="count                ">  73872</span><span>// PR-516 - Bugfix - A keyword such as 'return' names no function, so reset</span></pre>
 <pre><span class="lineno"><a href="#line_4792" id="line_4792"> 4792.</a></span><span class="count                ">  73872</span><span>// &lt;anon&gt;, else it would keep an earlier identifier. Keep 'default', the name</span></pre>
 <pre><span class="lineno"><a href="#line_4793" id="line_4793"> 4793.</a></span><span class="count                ">  73872</span><span>// the spec gives 'export default function () {}', and a property name such as</span></pre>
 <pre><span class="lineno"><a href="#line_4794" id="line_4794"> 4794.</a></span><span class="count                ">  73872</span><span>// 'catch' in 'aa.catch' or '{catch: ...}', but not 'null' in 'aa ? null : ...'.</span></pre>
@@ -6028,13 +6028,13 @@ body {
 <pre><span class="lineno"><a href="#line_5863" id="line_5863"> 5863.</a></span><span class="count                ">   7229</span><span>        scope_declared.context[id] = name;</span></pre>
 <pre><span class="lineno"><a href="#line_5864" id="line_5864"> 5864.</a></span><span class="count                ">   7229</span><span>        name.scope_declared = scope_declared;</span></pre>
 <pre><span class="lineno"><a href="#line_5865" id="line_5865"> 5865.</a></span><span class="count                ">   7229</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5866" id="line_5866"> 5866.</a></span><span class="count                ">   7229</span><span>// PR-xxx - Bugfix - Record the function that owns &lt;name&gt;, since a let/const</span></pre>
+<pre><span class="lineno"><a href="#line_5866" id="line_5866"> 5866.</a></span><span class="count                ">   7229</span><span>// PR-516 - Bugfix - Record the function that owns &lt;name&gt;, since a let/const</span></pre>
 <pre><span class="lineno"><a href="#line_5867" id="line_5867"> 5867.</a></span><span class="count                ">   7229</span><span>// &lt;scope_declared&gt; may be a block inside it.</span></pre>
 <pre><span class="lineno"><a href="#line_5868" id="line_5868"> 5868.</a></span><span class="count                ">   7229</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5869" id="line_5869"> 5869.</a></span><span class="count                ">   7229</span><span>        name.scope_function = scope_function;</span></pre>
 <pre><span class="lineno"><a href="#line_5870" id="line_5870"> 5870.</a></span><span class="count                ">   7229</span><span>        if (!scope_declared.name_only) {</span></pre>
 <pre><span class="lineno"><a href="#line_5871" id="line_5871"> 5871.</a></span><span class="count                ">   7191</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_5872" id="line_5872"> 5872.</a></span><span class="count                ">   7191</span><span>// PR-xxx - Omit a named function expression's name from its declaring</span></pre>
+<pre><span class="lineno"><a href="#line_5872" id="line_5872"> 5872.</a></span><span class="count                ">   7191</span><span>// PR-516 - Omit a named function expression's name from its declaring</span></pre>
 <pre><span class="lineno"><a href="#line_5873" id="line_5873"> 5873.</a></span><span class="count                ">   7191</span><span>// function. It sits in &lt;scope_name&gt;, a scope outside its own function.</span></pre>
 <pre><span class="lineno"><a href="#line_5874" id="line_5874"> 5874.</a></span><span class="count                ">   7191</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5875" id="line_5875"> 5875.</a></span><span class="count                ">   7191</span><span>            scope_report_push(scope_function, name);</span></pre>
@@ -6970,7 +6970,7 @@ body {
 <pre><span class="lineno"><a href="#line_6805" id="line_6805"> 6805.</a></span><span class="count                ">   2277</span><span>        the_function.level = scope_function.level + 1;</span></pre>
 <pre><span class="lineno"><a href="#line_6806" id="line_6806"> 6806.</a></span><span class="count                ">   2277</span><span>        the_function.loop = 0;</span></pre>
 <pre><span class="lineno"><a href="#line_6807" id="line_6807"> 6807.</a></span><span class="count                ">   2277</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6808" id="line_6808"> 6808.</a></span><span class="count                ">   2277</span><span>// PR-xxx - Bugfix - Keep the name &lt;property_parse&gt; gives a method or accessor,</span></pre>
+<pre><span class="lineno"><a href="#line_6808" id="line_6808"> 6808.</a></span><span class="count                ">   2277</span><span>// PR-516 - Bugfix - Keep the name &lt;property_parse&gt; gives a method or accessor,</span></pre>
 <pre><span class="lineno"><a href="#line_6809" id="line_6809"> 6809.</a></span><span class="count                ">   2277</span><span>// 'aa' or 'get aa'. Else &lt;anon&gt; named it after the previous identifier.</span></pre>
 <pre><span class="lineno"><a href="#line_6810" id="line_6810"> 6810.</a></span><span class="count                ">   2277</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6811" id="line_6811"> 6811.</a></span><span class="count                ">   2277</span><span>        the_function.name = (</span></pre>
@@ -7064,7 +7064,7 @@ body {
 <pre><span class="lineno"><a href="#line_6899" id="line_6899"> 6899.</a></span><span class="count                ">   2273</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_6900" id="line_6900"> 6900.</a></span><span class="count                ">   2273</span><span>            advance(")");</span></pre>
 <pre><span class="lineno"><a href="#line_6901" id="line_6901"> 6901.</a></span><span class="count                ">   2273</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_6902" id="line_6902"> 6902.</a></span><span class="count                ">   2273</span><span>// PR-xxx - Bugfix - Copy &lt;signature&gt; from the source text of each token but</span></pre>
+<pre><span class="lineno"><a href="#line_6902" id="line_6902"> 6902.</a></span><span class="count                ">   2273</span><span>// PR-516 - Bugfix - Copy &lt;signature&gt; from the source text of each token but</span></pre>
 <pre><span class="lineno"><a href="#line_6903" id="line_6903"> 6903.</a></span><span class="count                ">   2273</span><span>// comments, so it keeps default values. A space joins tokens apart in the</span></pre>
 <pre><span class="lineno"><a href="#line_6904" id="line_6904"> 6904.</a></span><span class="count                ">   2273</span><span>// source, except after an opener or before a comma or closer. A default value</span></pre>
 <pre><span class="lineno"><a href="#line_6905" id="line_6905"> 6905.</a></span><span class="count                ">   2273</span><span>// over 40 characters shows as an ellipsis, and so does one holding a</span></pre>
@@ -7343,7 +7343,7 @@ body {
 <pre><span class="lineno"><a href="#line_7178" id="line_7178"> 7178.</a></span><span class="count                ">   1274</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7179" id="line_7179"> 7179.</a></span><span class="count                ">   1274</span><span>                test_cause("paren");</span></pre>
 <pre><span class="lineno"><a href="#line_7180" id="line_7180"> 7180.</a></span><span class="count                ">   1274</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7181" id="line_7181"> 7181.</a></span><span class="count                ">   1274</span><span>// PR-xxx - Bugfix - Name an accessor 'get aa' in the report, not 'get'.</span></pre>
+<pre><span class="lineno"><a href="#line_7181" id="line_7181"> 7181.</a></span><span class="count                ">   1274</span><span>// PR-516 - Bugfix - Name an accessor 'get aa' in the report, not 'get'.</span></pre>
 <pre><span class="lineno"><a href="#line_7182" id="line_7182"> 7182.</a></span><span class="count                ">   1274</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_7183" id="line_7183"> 7183.</a></span><span class="count                ">   1274</span><span>                value = prefix_function(</span></pre>
 <pre><span class="lineno"><a href="#line_7184" id="line_7184"> 7184.</a></span><span class="count                ">   1274</span><span>                    {</span></pre>
@@ -9545,7 +9545,7 @@ body {
 <pre><span class="lineno"><a href="#line_9380" id="line_9380"> 9380.</a></span><span class="count                ">      3</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_9381" id="line_9381"> 9381.</a></span><span class="count                ">  35004</span><span>            if (the_variable &amp;&amp; ii &gt; ii_function) {</span></pre>
 <pre><span class="lineno"><a href="#line_9382" id="line_9382"> 9382.</a></span><span class="count                ">  15598</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9383" id="line_9383"> 9383.</a></span><span class="count                ">  15598</span><span>// PR-xxx - Bugfix - Mark closure only if found outside the current function,</span></pre>
+<pre><span class="lineno"><a href="#line_9383" id="line_9383"> 9383.</a></span><span class="count                ">  15598</span><span>// PR-516 - Bugfix - Mark closure only if found outside the current function,</span></pre>
 <pre><span class="lineno"><a href="#line_9384" id="line_9384"> 9384.</a></span><span class="count                ">  15598</span><span>// not merely outside the current scope_block, and record it for the report.</span></pre>
 <pre><span class="lineno"><a href="#line_9385" id="line_9385"> 9385.</a></span><span class="count                ">  15598</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_9386" id="line_9386"> 9386.</a></span><span class="count                ">  15598</span><span>                the_variable.closure = true;</span></pre>
@@ -12111,7 +12111,7 @@ body {
 <pre><span class="lineno"><a href="#line_11946" id="line_11946">11946.</a></span><span class="count                ">    349</span><span>            signature</span></pre>
 <pre><span class="lineno"><a href="#line_11947" id="line_11947">11947.</a></span><span class="count                ">    349</span><span>        } = the_function;</span></pre>
 <pre><span class="lineno"><a href="#line_11948" id="line_11948">11948.</a></span><span class="count                ">    349</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_11949" id="line_11949">11949.</a></span><span class="count                ">    349</span><span>// PR-xxx - Bugfix - &lt;context_report&gt; mixes own and outer names, so each row</span></pre>
+<pre><span class="lineno"><a href="#line_11949" id="line_11949">11949.</a></span><span class="count                ">    349</span><span>// PR-516 - Bugfix - &lt;context_report&gt; mixes own and outer names, so each row</span></pre>
 <pre><span class="lineno"><a href="#line_11950" id="line_11950">11950.</a></span><span class="count                ">    349</span><span>// checks &lt;scope_function&gt;.</span></pre>
 <pre><span class="lineno"><a href="#line_11951" id="line_11951">11951.</a></span><span class="count                ">    349</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_11952" id="line_11952">11952.</a></span><span class="count                ">   2094</span><span>        function id_list(filter) {</span></pre>
