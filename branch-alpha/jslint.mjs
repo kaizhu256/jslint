@@ -238,6 +238,7 @@
     jstestDescribe,
     jstestIt,
     jstestOnExit,
+    jstestOrderCheck,
     keys,
     label_break,
     label_name,
@@ -787,6 +788,7 @@ let jslint_export;                      // The jslint object to be exported.
 let jslint_import_meta_url = "";        // import.meta.url used by cli.
 let jstestCountFailed = 0;
 let jstestCountTotal = 0;
+let jstestDescribePrv = "";
 let jstestItCount = 0;
 let jstestItList = [];
 let jstestTimeStart;
@@ -12011,9 +12013,15 @@ async function jstestDescribe(description, testFunction) {
 // This function will create-and-run test-group <testFunction>
 // with given <description>.
 
+    const describePrv = jstestDescribePrv;
     let message;
     let result;
     let timerTimeout;
+
+// Record <description> before the first await, since describes then
+// interleave and finish out of source order.
+
+    jstestDescribePrv = description;
 
 // Init jstestTimeStart.
 
@@ -12038,6 +12046,16 @@ async function jstestDescribe(description, testFunction) {
     timerTimeout = setTimeout(noop, 0x7fffffff);
     result = await Promise.all(jstestItList);
     clearTimeout(timerTimeout);
+
+// PR-xxx - Assert this describe's tests, then this describe, are in ASCII
+// order.
+
+    jstestOrderCheck(result.map(function ([
+        ignore, descriptionIt
+    ]) {
+        return descriptionIt;
+    }), result);
+    jstestOrderCheck([describePrv, description], result);
 
 // Print test results.
 
@@ -12109,6 +12127,30 @@ function jstestOnExit(exitCode, mode) {
     }
     process.exitCode = exitCode || jstestCountFailed;
     return message;
+}
+
+function jstestOrderCheck(descriptionList, resultList) {
+
+// This function will push onto <resultList> one failed result, for the first
+// description in <descriptionList> not strictly after the one before it.
+// Strict means a duplicate fails too, as two identical lines cannot be told
+// apart in the output.
+
+    for (const [ii, description] of descriptionList.entries()) {
+        if (ii > 0 && !(descriptionList[ii - 1] < description)) {
+            const now = JSON.stringify(description);
+            const prv = JSON.stringify(descriptionList[ii - 1]);
+            resultList.push([
+                new Error(
+                    (prv === now)
+                    ? `duplicate description ${now}`
+                    : `${now} must sort after ${prv}`
+                ),
+                "jstestDescribe and jstestIt descriptions in ASCII order"
+            ]);
+            return;
+        }
+    }
 }
 
 async function moduleFsInit() {
@@ -13664,6 +13706,7 @@ jslint_export = Object.freeze(
             jstestDescribe,
             jstestIt,
             jstestOnExit,
+            jstestOrderCheck,
             moduleFsInit,
             noop,
             objectDeepCopyWithKeysSorted,
