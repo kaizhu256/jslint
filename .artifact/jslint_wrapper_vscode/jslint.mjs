@@ -1399,13 +1399,13 @@ function jslint(
 
     function scope_report_push(the_function, name) {
 
-// PR-xxx - Bugfix - This function will push <name> to what <jslint_report>
+// PR-516 - Bugfix - This function will push <name> to what <jslint_report>
 // lists for <the_function>, which are the names it declares and the outer
 // names it uses. An own 'bb' and an outer 'bb' are two entries.
 
         if (the_function.scope_name === name.scope_declared) {
 
-// PR-xxx - A function using its own name from <scope_name> lists it nowhere,
+// PR-516 - A function using its own name from <scope_name> lists it nowhere,
 // though a nested function using it lists it as outer.
 
             return;
@@ -4788,7 +4788,7 @@ function jslint_phase3_parse(state) {
             token_now.id !== "async"
         ) {
 
-// PR-xxx - Bugfix - A keyword such as 'return' names no function, so reset
+// PR-516 - Bugfix - A keyword such as 'return' names no function, so reset
 // <anon>, else it would keep an earlier identifier. Keep 'default', the name
 // the spec gives 'export default function () {}', and a property name such as
 // 'catch' in 'aa.catch' or '{catch: ...}', but not 'null' in 'aa ? null : ...'.
@@ -5863,13 +5863,13 @@ function jslint_phase3_parse(state) {
         scope_declared.context[id] = name;
         name.scope_declared = scope_declared;
 
-// PR-xxx - Bugfix - Record the function that owns <name>, since a let/const
+// PR-516 - Bugfix - Record the function that owns <name>, since a let/const
 // <scope_declared> may be a block inside it.
 
         name.scope_function = scope_function;
         if (!scope_declared.name_only) {
 
-// PR-xxx - Omit a named function expression's name from its declaring
+// PR-516 - Omit a named function expression's name from its declaring
 // function. It sits in <scope_name>, a scope outside its own function.
 
             scope_report_push(scope_function, name);
@@ -6805,7 +6805,7 @@ function jslint_phase3_parse(state) {
         the_function.level = scope_function.level + 1;
         the_function.loop = 0;
 
-// PR-xxx - Bugfix - Keep the name <property_parse> gives a method or accessor,
+// PR-516 - Bugfix - Keep the name <property_parse> gives a method or accessor,
 // 'aa' or 'get aa'. Else <anon> named it after the previous identifier.
 
         the_function.name = (
@@ -6899,7 +6899,7 @@ function jslint_phase3_parse(state) {
             }
             advance(")");
 
-// PR-xxx - Bugfix - Copy <signature> from the source text of each token but
+// PR-516 - Bugfix - Copy <signature> from the source text of each token but
 // comments, so it keeps default values. A space joins tokens apart in the
 // source, except after an opener or before a comma or closer. A default value
 // over 40 characters shows as an ellipsis, and so does one holding a
@@ -7178,7 +7178,7 @@ function jslint_phase3_parse(state) {
 
                 test_cause("paren");
 
-// PR-xxx - Bugfix - Name an accessor 'get aa' in the report, not 'get'.
+// PR-516 - Bugfix - Name an accessor 'get aa' in the report, not 'get'.
 
                 value = prefix_function(
                     {
@@ -9380,7 +9380,7 @@ function jslint_phase4_walk(state) {
             }
             if (the_variable && ii > ii_function) {
 
-// PR-xxx - Bugfix - Mark closure only if found outside the current function,
+// PR-516 - Bugfix - Mark closure only if found outside the current function,
 // not merely outside the current scope_block, and record it for the report.
 
                 the_variable.closure = true;
@@ -11946,7 +11946,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
             signature
         } = the_function;
 
-// PR-xxx - Bugfix - <context_report> mixes own and outer names, so each row
+// PR-516 - Bugfix - <context_report> mixes own and outer names, so each row
 // checks <scope_function>.
 
         function id_list(filter) {

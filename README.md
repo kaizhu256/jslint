@@ -1119,7 +1119,7 @@ if (false) {
         - base respository: `jslint-org/jslint`
         - base: `beta`
     - click `Create pull request`
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 
 1. wait awhile before continuing ...
     - click `Squash and merge`
@@ -1168,7 +1168,7 @@ if (false) {
         - base respository: `jslint-org/jslint`
         - base: `beta`
     - click `Create pull request`
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 
 1. wait awhile before continuing ...
     - click `Squash and merge`

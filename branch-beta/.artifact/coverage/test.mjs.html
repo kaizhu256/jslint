@@ -1275,7 +1275,7 @@ body {
 <pre><span class="lineno"><a href="#line_1110" id="line_1110"> 1110.</a></span><span class="count                ">      2</span><span>            ).replace((/&lt;dl&gt;/g), "\n&lt;dl&gt;");</span></pre>
 <pre><span class="lineno"><a href="#line_1111" id="line_1111"> 1111.</a></span><span class="count                ">      2</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_1112" id="line_1112"> 1112.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1113" id="line_1113"> 1113.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - The report's function details list block-scoped names and</span></pre>
+<pre><span class="lineno"><a href="#line_1113" id="line_1113"> 1113.</a></span><span class="count                ">      1</span><span>// PR-516 - Bugfix - The report's function details list block-scoped names and</span></pre>
 <pre><span class="lineno"><a href="#line_1114" id="line_1114"> 1114.</a></span><span class="count                ">      1</span><span>// catch-variables, and mark closure only across a function boundary.</span></pre>
 <pre><span class="lineno"><a href="#line_1115" id="line_1115"> 1115.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1116" id="line_1116"> 1116.</a></span><span class="count                ">      1</span><span>        result = reportFunction(String(`</span></pre>
@@ -1313,7 +1313,7 @@ body {
 <pre><span class="lineno"><a href="#line_1148" id="line_1148"> 1148.</a></span><span class="count                ">      1</span><span>&lt;dl&gt;&lt;dt&gt;outer&lt;/dt&gt;&lt;dd&gt;ff&lt;/dd&gt;&lt;/dl&gt;&lt;/div&gt;</span></pre>
 <pre><span class="lineno"><a href="#line_1149" id="line_1149"> 1149.</a></span><span class="count                ">      1</span><span>        `).trim() + "\n", result);</span></pre>
 <pre><span class="lineno"><a href="#line_1150" id="line_1150"> 1150.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1151" id="line_1151"> 1151.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - A named function expression's name is outer only in a</span></pre>
+<pre><span class="lineno"><a href="#line_1151" id="line_1151"> 1151.</a></span><span class="count                ">      1</span><span>// PR-516 - Bugfix - A named function expression's name is outer only in a</span></pre>
 <pre><span class="lineno"><a href="#line_1152" id="line_1152"> 1152.</a></span><span class="count                ">      1</span><span>// nested function, and a function lists an outer 'bb' even beside its own</span></pre>
 <pre><span class="lineno"><a href="#line_1153" id="line_1153"> 1153.</a></span><span class="count                ">      1</span><span>// block-scoped 'bb'.</span></pre>
 <pre><span class="lineno"><a href="#line_1154" id="line_1154"> 1154.</a></span><span class="count                ">      1</span><span></span></pre>
@@ -1354,7 +1354,7 @@ body {
 <pre><span class="lineno"><a href="#line_1189" id="line_1189"> 1189.</a></span><span class="count                ">      1</span><span>        "test report-function-name handling-behavior"</span></pre>
 <pre><span class="lineno"><a href="#line_1190" id="line_1190"> 1190.</a></span><span class="count                ">      1</span><span>    ), function () {</span></pre>
 <pre><span class="lineno"><a href="#line_1191" id="line_1191"> 1191.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1192" id="line_1192"> 1192.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - A method or accessor is named after its property, not</span></pre>
+<pre><span class="lineno"><a href="#line_1192" id="line_1192"> 1192.</a></span><span class="count                ">      1</span><span>// PR-516 - Bugfix - A method or accessor is named after its property, not</span></pre>
 <pre><span class="lineno"><a href="#line_1193" id="line_1193"> 1193.</a></span><span class="count                ">      1</span><span>// after the identifier before it.</span></pre>
 <pre><span class="lineno"><a href="#line_1194" id="line_1194"> 1194.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1195" id="line_1195"> 1195.</a></span><span class="count                ">      1</span><span>        assertJsonEqual(jslint.jslint(String(`</span></pre>
@@ -1375,7 +1375,7 @@ body {
 <pre><span class="lineno"><a href="#line_1210" id="line_1210"> 1210.</a></span><span class="count                ">      3</span><span>            return name;</span></pre>
 <pre><span class="lineno"><a href="#line_1211" id="line_1211"> 1211.</a></span><span class="count                ">      3</span><span>        }), ["aa", "get bb", "dd"]);</span></pre>
 <pre><span class="lineno"><a href="#line_1212" id="line_1212"> 1212.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1213" id="line_1213"> 1213.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - A function after a keyword is anonymous, except after</span></pre>
+<pre><span class="lineno"><a href="#line_1213" id="line_1213"> 1213.</a></span><span class="count                ">      1</span><span>// PR-516 - Bugfix - A function after a keyword is anonymous, except after</span></pre>
 <pre><span class="lineno"><a href="#line_1214" id="line_1214"> 1214.</a></span><span class="count                ">      1</span><span>// 'default', the name the spec gives it.</span></pre>
 <pre><span class="lineno"><a href="#line_1215" id="line_1215"> 1215.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1216" id="line_1216"> 1216.</a></span><span class="count                ">      1</span><span>        assertJsonEqual(jslint.jslint(String(`</span></pre>
@@ -1393,7 +1393,7 @@ body {
 <pre><span class="lineno"><a href="#line_1228" id="line_1228"> 1228.</a></span><span class="count                ">      4</span><span>            return name;</span></pre>
 <pre><span class="lineno"><a href="#line_1229" id="line_1229"> 1229.</a></span><span class="count                ">      4</span><span>        }), ["String", "anonymous", "anonymous", "default"]);</span></pre>
 <pre><span class="lineno"><a href="#line_1230" id="line_1230"> 1230.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1231" id="line_1231"> 1231.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - A keyword used as a property name still names a function.</span></pre>
+<pre><span class="lineno"><a href="#line_1231" id="line_1231"> 1231.</a></span><span class="count                ">      1</span><span>// PR-516 - Bugfix - A keyword used as a property name still names a function.</span></pre>
 <pre><span class="lineno"><a href="#line_1232" id="line_1232"> 1232.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1233" id="line_1233"> 1233.</a></span><span class="count                ">      1</span><span>        assertJsonEqual(jslint.jslint(String(`</span></pre>
 <pre><span class="lineno"><a href="#line_1234" id="line_1234"> 1234.</a></span><span class="count                ">      1</span><span>const aa = {</span></pre>
@@ -1421,7 +1421,7 @@ body {
 <pre><span class="lineno"><a href="#line_1256" id="line_1256"> 1256.</a></span><span class="count                ">      1</span><span>    ), function () {</span></pre>
 <pre><span class="lineno"><a href="#line_1257" id="line_1257"> 1257.</a></span><span class="count                ">      1</span><span>        const a38 = "a".repeat(38);</span></pre>
 <pre><span class="lineno"><a href="#line_1258" id="line_1258"> 1258.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1259" id="line_1259"> 1259.</a></span><span class="count                ">      1</span><span>// PR-xxx - Bugfix - A signature keeps default values and drops comments, and a</span></pre>
+<pre><span class="lineno"><a href="#line_1259" id="line_1259"> 1259.</a></span><span class="count                ">      1</span><span>// PR-516 - Bugfix - A signature keeps default values and drops comments, and a</span></pre>
 <pre><span class="lineno"><a href="#line_1260" id="line_1260"> 1260.</a></span><span class="count                ">      1</span><span>// multi-line destructure joins with no space inside its brackets. A default</span></pre>
 <pre><span class="lineno"><a href="#line_1261" id="line_1261"> 1261.</a></span><span class="count                ">      1</span><span>// value longer than 40 characters, or holding a megastring, shows as an</span></pre>
 <pre><span class="lineno"><a href="#line_1262" id="line_1262"> 1262.</a></span><span class="count                ">      1</span><span>// ellipsis, but a backtick inside a string or regexp does not count.</span></pre>

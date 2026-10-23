@@ -1110,7 +1110,7 @@ ff();
             ).replace((/<dl>/g), "\n<dl>");
         }
 
-// PR-xxx - Bugfix - The report's function details list block-scoped names and
+// PR-516 - Bugfix - The report's function details list block-scoped names and
 // catch-variables, and mark closure only across a function boundary.
 
         result = reportFunction(String(`
@@ -1148,7 +1148,7 @@ aa();
 <dl><dt>outer</dt><dd>ff</dd></dl></div>
         `).trim() + "\n", result);
 
-// PR-xxx - Bugfix - A named function expression's name is outer only in a
+// PR-516 - Bugfix - A named function expression's name is outer only in a
 // nested function, and a function lists an outer 'bb' even beside its own
 // block-scoped 'bb'.
 
@@ -1189,7 +1189,7 @@ aa();
         "test report-function-name handling-behavior"
     ), function () {
 
-// PR-xxx - Bugfix - A method or accessor is named after its property, not
+// PR-516 - Bugfix - A method or accessor is named after its property, not
 // after the identifier before it.
 
         assertJsonEqual(jslint.jslint(String(`
@@ -1210,7 +1210,7 @@ String({
             return name;
         }), ["aa", "get bb", "dd"]);
 
-// PR-xxx - Bugfix - A function after a keyword is anonymous, except after
+// PR-516 - Bugfix - A function after a keyword is anonymous, except after
 // 'default', the name the spec gives it.
 
         assertJsonEqual(jslint.jslint(String(`
@@ -1228,7 +1228,7 @@ export default function () {
             return name;
         }), ["String", "anonymous", "anonymous", "default"]);
 
-// PR-xxx - Bugfix - A keyword used as a property name still names a function.
+// PR-516 - Bugfix - A keyword used as a property name still names a function.
 
         assertJsonEqual(jslint.jslint(String(`
 const aa = {
@@ -1256,7 +1256,7 @@ String(aa
     ), function () {
         const a38 = "a".repeat(38);
 
-// PR-xxx - Bugfix - A signature keeps default values and drops comments, and a
+// PR-516 - Bugfix - A signature keeps default values and drops comments, and a
 // multi-line destructure joins with no space inside its brackets. A default
 // value longer than 40 characters, or holding a megastring, shows as an
 // ellipsis, but a backtick inside a string or regexp does not count.
