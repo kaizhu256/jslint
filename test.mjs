@@ -2949,10 +2949,10 @@ ${sourceWrapper}
 jstestDescribe((
     "test jstestXxx handling-behavior"
 ), function testBehaviorJstestXxx() {
-    function childRun(timeout, source) {
+    function childRun(env, source) {
 
 // Run <source> in a child node with jslint imported, and resolve its exit-code
-// and stderr.
+// and stderr. Clear the parent's jstest knobs, then apply <env>.
 
         return new Promise(function (resolve) {
             const child = moduleChildProcess.spawn(process.execPath, [
@@ -2962,7 +2962,9 @@ jstestDescribe((
             ], {
                 env: {
                     ...process.env,
-                    npm_config_mode_test_timeout: timeout
+                    npm_config_mode_test_filter: "",
+                    npm_config_mode_test_timeout: "",
+                    ...env
                 },
                 stdio: ["ignore", "ignore", "pipe"]
             });
@@ -2982,7 +2984,9 @@ jstestDescribe((
 // Opt-in npm_config_mode_test_timeout fails a hung test, so its describe
 // prints.
 
-        const [exitCode, stderr] = await childRun("1", String(`
+        const [exitCode, stderr] = await childRun({
+            npm_config_mode_test_timeout: "1"
+        }, String(`
 jslint.jstestDescribe("aa", function () {
     jslint.jstestIt("bb", function () {
         return new Promise(jslint.noop);
@@ -2993,6 +2997,33 @@ jslint.jstestDescribe("aa", function () {
         assertOrThrow((
             /1\. test it - bb\nError: test still pending after npm_config_mode_test_timeout=1 ms\n[\s\S]*tests failed - 1\n/
         ).test(stderr), stderr);
+    });
+    jstestIt((
+        "test jstestIt-filter handling-behavior"
+    ), async function () {
+
+// Opt-in npm_config_mode_test_filter runs only "cc - dd", and a describe left
+// with no test prints nothing.
+
+        const [exitCode, stderr] = await childRun({
+            npm_config_mode_test_filter: "^cc - dd$"
+        }, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", jslint.noop);
+});
+jslint.jstestDescribe("cc", function () {
+    jslint.jstestIt("dd", jslint.noop);
+    jslint.jstestIt("ee", function () {
+        throw new Error();
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 0);
+        assertOrThrow((
+            /test describe - cc\n.*1\. test it - dd\b[\s\S]*tests total {2}- 1\n/
+        ).test(stderr), stderr);
+        assertOrThrow(!stderr.includes("test describe - aa"), stderr);
+        assertOrThrow(!stderr.includes("test it - ee"), stderr);
     });
     jstestIt((
         "test jstestIt-mode-pass handling-behavior"
@@ -3017,7 +3048,7 @@ jslint.jstestDescribe("aa", function () {
 // A test still pending when something ends the process counts as failed,
 // though its describe never prints.
 
-        const [exitCode, stderr] = await childRun("", String(`
+        const [exitCode, stderr] = await childRun({}, String(`
 jslint.jstestDescribe("aa", function () {
     jslint.jstestIt("bb", function () {
         setTimeout(process.exit);

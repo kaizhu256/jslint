@@ -289,6 +289,7 @@
     nomen,
     noop,
     now,
+    npm_config_mode_test_filter,
     npm_config_mode_test_timeout,
     nr,
     nud_prefix,
@@ -12082,6 +12083,12 @@ async function jstestDescribe(description, testFunction) {
         jstestOrderCheck([describePrv, description])
     ].filter(Boolean));
 
+// PR-xxx - Print nothing for a describe whose tests the filter all skipped.
+
+    if (result.length === 0) {
+        return;
+    }
+
 // Print test results.
 
     message = (
@@ -12116,13 +12123,25 @@ function jstestIt(description, testFunction, mode) {
 // This function will create-and-run test-case <testFunction>
 // inside current test-group with given <description>.
 
+    const name = jstestDescribeNow + " - " + description;
+
+// PR-xxx - Run only a test whose "<describe> - <it>" matches opt-in regexp
+// npm_config_mode_test_filter, e.g.
+// npm_config_mode_test_filter="jstestXxx.*pending" npm test
+// Prefer the env form, since npm 11 warns the flag form --mode-test-filter
+// stops working in npm 12.
+
+    if (!new RegExp(
+        process.env.npm_config_mode_test_filter || ""
+    ).test(name)) {
+        return;
+    }
     jstestItList.push(new Promise(async function (resolve) {
-        const name = jstestDescribeNow + " - " + description;
         let err;
 
 // PR-xxx - Track this test as pending until it settles or its describe's
-// deadline fails it. Read both before the first await, since the next describe
-// resets them.
+// deadline fails it. Read the deadline before the first await, since the next
+// describe resets it.
 
         jstestItPendingSet.add(name);
         try {
