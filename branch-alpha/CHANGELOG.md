@@ -18,6 +18,7 @@
 - jslint - Add html and css linting back into jslint.
 
 # v2026.10.30
+- jstest - Fail any describe or jstestIt name not in ASCII order.
 - jslint - Report: Functions - Copy each signature from its source text, keeping default values.
 - jslint - Report: Functions - List block-scoped names, catch-variables and outer names, and mark closure only across functions.
 
