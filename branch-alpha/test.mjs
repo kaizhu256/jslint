@@ -32,6 +32,40 @@ await (async function init() {
     moduleFsInit();
     moduleFsInit();
 
+// A runner that ended every async test before it ran would also pass the tests
+// that check it, so check one async failure here, outside any jstestIt.
+
+    await new Promise(function (resolve, reject) {
+        moduleChildProcess.execFile(process.execPath, [
+            "--input-type=module",
+            "--eval",
+            String(`
+import jslint from "./jslint.mjs";
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", async function () {
+        await null;
+        throw new Error("bb late");
+    });
+});
+            `)
+        ], {
+            env: {
+                ...process.env,
+                npm_config_mode_test_filter: "",
+                npm_config_mode_test_timeout: ""
+            },
+            timeout: 10000
+        }, function (err, ignore, stderr) {
+            if (err?.code === 1 && stderr.includes("Error: bb late")) {
+                resolve();
+                return;
+            }
+            reject(new Error(
+                "jstest passed an async test that failed\n" + stderr
+            ));
+        });
+    });
+
 // Cleanup directory .tmp
 
     await moduleFs.promises.rm(".tmp", {
@@ -2981,6 +3015,56 @@ jstestDescribe((
         });
     }
     jstestIt((
+        "test jstestBefore-after handling-behavior"
+    ), async function () {
+
+// Before-hooks finish before any test starts, after-hooks run after. A failing
+// before-hook skips its describe's tests; each failing hook fails as one test.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+let server;
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestBefore(async function () {
+        await new Promise(function (resolve) {
+            setTimeout(resolve, 20);
+        });
+        server = "up";
+    });
+    jslint.jstestAfter(function () {
+        server = undefined;
+    });
+    jslint.jstestIt("bb", function () {
+        jslint.assertOrThrow(server === "up", "server not up");
+    });
+});
+jslint.jstestDescribe("cc", function () {
+    jslint.jstestBefore(function () {
+        throw new Error("cc before broke");
+    });
+    jslint.jstestIt("dd", jslint.noop);
+});
+jslint.jstestDescribe("ee", function () {
+    jslint.jstestAfter(function () {
+        throw new Error("ee after broke");
+    });
+    jslint.jstestIt("ff", jslint.noop);
+});
+        `));
+        assertJsonEqual(exitCode, 2);
+        assertOrThrow((
+            /test describe - aa\n.*\d\. test it - bb\b/
+        ).test(stderr), stderr);
+        assertOrThrow((
+            /test it skipped - dd\b[\s\S]*test it - jstestBefore\nError: cc before broke\n/
+        ).test(stderr), stderr);
+        assertOrThrow((
+            /test it - ff\b[\s\S]*test it - jstestAfter\nError: ee after broke\n/
+        ).test(stderr), stderr);
+        assertOrThrow((
+            /tests total {2}- 5\n {2}tests failed - 2\n/
+        ).test(stderr), stderr);
+    });
+    jstestIt((
         "test jstestDescribe-body-throw handling-behavior"
     ), async function () {
 
@@ -3092,26 +3176,120 @@ jslint.jstestDescribe("cc", function () {
         "test jstestIt-late handling-behavior"
     ), async function () {
 
-// A jstestIt after an await in its describe body throws; the body's rejection
-// fails as one more test, shown at exit since the describe has printed.
+// An async describe body registers tests after an await, and they run. A
+// jstestIt after the body settled, or before any describe, throws.
 
-        const [exitCode, stderr] = await childRun({}, String(`
+        const resultList = await Promise.all([
+            String(`
 jslint.jstestDescribe("aa", async function () {
     jslint.jstestIt("bb", jslint.noop);
     await null;
     jslint.jstestIt("cc", jslint.noop);
 });
-        `));
-        assertJsonEqual(exitCode, 1);
+            `),
+            String(`
+jslint.jstestDescribe("aa", function () {
+    setTimeout(function () {
+        jslint.jstestIt("cc", jslint.noop);
+    }, 10);
+    jslint.jstestIt("bb", function () {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 50);
+        });
+    });
+});
+            `),
+            String(`
+jslint.jstestIt("cc", jslint.noop);
+            `)
+        ].map(function (source) {
+            return childRun({}, source);
+        }));
+        assertJsonEqual(resultList.map(function ([exitCode]) {
+            return exitCode;
+        }), [0, 1, 1]);
         assertOrThrow((
-            /1\. test it - bb\b[\s\S]*2\. test it failed - aa - jstestDescribe body\nError: jstestIt "cc" called outside[\s\S]*tests total {2}- 2\n {2}tests failed - 1\n/
-        ).test(stderr), stderr);
+            /1\. test it - bb\b[\s\S]*2\. test it - cc\b[\s\S]*tests total {2}- 2\n {2}tests failed - 0\n/
+        ).test(resultList[0][1]), resultList[0][1]);
+        resultList.slice(1).forEach(function ([ignore, stderr]) {
+            assertOrThrow(stderr.includes(
+                "jstestIt \"cc\" called outside a jstestDescribe body, or" +
+                " after it settled"
+            ), stderr);
+        });
     });
     jstestIt((
         "test jstestIt-mode-pass handling-behavior"
-    ), function () {
-        throw new Error();
+    ), async function () {
+
+// Mode "pass" reports a throwing test as passed and counts 0 failed.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        throw new Error("bb expected");
     }, "pass");
+});
+        `));
+        assertJsonEqual(exitCode, 0);
+        assertOrThrow((
+            /\u2714 1\. test it - bb\b[\s\S]*tests total {2}- 1\n {2}tests failed - 0\n/
+        ).test(stderr), stderr);
+    });
+    jstestIt((
+        "test jstestIt-option handling-behavior"
+    ), async function () {
+
+// Options: <after> fails at once if a named test failed, and waits across
+// describes; <skip> skips; <timeout> fails one slow test. A test with no
+// options still runs to its end: "aa" fails after an await.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("aa", async function () {
+        await null;
+        throw new Error("aa late");
+    });
+    jslint.jstestIt("bb", function () {
+        throw new Error("bb broke");
+    });
+    jslint.jstestIt("cc", jslint.noop, {after: ["aa - bb"]});
+    jslint.jstestIt("dd", jslint.noop, {skip: true});
+    jslint.jstestIt("ee", function () {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 500);
+        });
+    }, {timeout: 10});
+    jslint.jstestIt("ff", jslint.noop, {after: ["gg - hh"]});
+});
+jslint.jstestDescribe("gg", function () {
+    jslint.jstestIt("hh", function () {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 20);
+        });
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 4);
+        assertOrThrow((
+            /test it - aa\nError: aa late\n/
+        ).test(stderr), stderr);
+        assertOrThrow((
+            /test it - cc\nError: after "aa - bb", which failed\n/
+        ).test(stderr), stderr);
+        assertOrThrow((
+            /test it skipped - dd\b/
+        ).test(stderr), stderr);
+        assertOrThrow((
+            /test it - ee\nError: test still pending after timeout=10 ms\n/
+        ).test(stderr), stderr);
+        assertOrThrow((
+            /\d\. test it - ff\u001b/
+        ).test(stderr), stderr);
+        assertOrThrow((
+            /tests total {2}- 7\n {2}tests failed - 4\n/
+        ).test(stderr), stderr);
+    });
     jstestIt((
         "test jstestOnExit-crash handling-behavior"
     ), async function () {
