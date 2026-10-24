@@ -396,10 +396,10 @@ jstestIt((
         return v8CoverageReportCreate({});
     }, "invalid coverageDir");
 });
-[
-    [
-        "v8CoverageReportCreate_high.js", (
-            "switch(0){\n" +
+jstestIt((
+    "test report-fixture handling-behavior"
+), async function () {
+    const fixtureList = [
 ...</pre></li>
 
 <li>
@@ -553,20 +553,20 @@ const jslint_autofix_warning_list = [ //jslint-ignore-line
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
     ]
-].forEach(function ([
+];
+await Promise.all(fixtureList.map(async function ([
     file, data
 ], ii) {
-    jstestIt(file, async function () {
-        let dir = ".tmp/coverage_" + ii + "/";
-        file = dir + file;
-        await <span class="apidocCodeKeywordSpan">fsWriteFileWithParents</span>(file, data);
-        await jslint.jslint_cli({
-            console_error: noop, // comment to debug
-            mode_cli: true,
-            process_argv: [
-                "node", "jslint.mjs",
-                "v8_coverage_report=" + dir,
-                "node",
+    const dir = ".tmp/coverage_" + ii + "/";
+    file = dir + file;
+    await <span class="apidocCodeKeywordSpan">fsWriteFileWithParents</span>(file, data);
+    await jslint.jslint_cli({
+        console_error: noop, // comment to debug
+        mode_cli: true,
+        process_argv: [
+            "node", "jslint.mjs",
+            "v8_coverage_report=" + dir,
+            "node",
 ...</pre></li>
 
 <li>
@@ -1027,21 +1027,21 @@ ${String(message).slice(0, 2000)}`
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-].forEach(function ([
+];
+await Promise.all(fixtureList.map(async function ([
     file, data
 ], ii) {
-    jstestIt(file, async function () {
-        let dir = ".tmp/coverage_" + ii + "/";
-        file = dir + file;
-        await fsWriteFileWithParents(file, data);
-        await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
-            console_error: noop, // comment to debug
-            mode_cli: true,
-            process_argv: [
-                "node", "jslint.mjs",
-                "v8_coverage_report=" + dir,
-                "node",
-                file
+    const dir = ".tmp/coverage_" + ii + "/";
+    file = dir + file;
+    await fsWriteFileWithParents(file, data);
+    await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
+        console_error: noop, // comment to debug
+        mode_cli: true,
+        process_argv: [
+            "node", "jslint.mjs",
+            "v8_coverage_report=" + dir,
+            "node",
+            file
 ...</pre></li>
 
 <li>
@@ -1838,21 +1838,21 @@ jslint.jstestAfter(function () {
     }));
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-            "case 2:break;\n" +
-            "}\n"
-        )
-    ]
-].forEach(function ([
-    file, data
-], ii) {
-    <span class="apidocCodeKeywordSpan">jstestIt</span>(file, async function () {
-        let dir = ".tmp/coverage_" + ii + "/";
-        file = dir + file;
-        await fsWriteFileWithParents(file, data);
-        await jslint.jslint_cli({
-            console_error: noop, // comment to debug
-            mode_cli: true,
-            process_argv: [
+jstestIt((
+    "test null-case handling-behavior"
+), async function () {
+    await assertErrorThrownAsync(function () {
+        return v8CoverageReportCreate({});
+    }, "invalid coverageDir");
+});
+<span class="apidocCodeKeywordSpan">jstestIt</span>((
+    "test report-fixture handling-behavior"
+), async function () {
+    const fixtureList = [
+        [
+            "v8CoverageReportCreate_high.js", (
+                "switch(0){\n" +
+                "case 0:break;\n" +
 ...</pre></li>
 
 <li>

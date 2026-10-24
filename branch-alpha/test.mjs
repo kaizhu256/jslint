@@ -121,7 +121,7 @@ jstestDescribe((
     jstestIt((
         "test assertXxx-error handling-behavior"
     ), async function () {
-        // test debugInline handling-behavior
+        // Keep <debugInline> imported, for debugging tests.
         noop(debugInline);
         // test assertErrorThrownAsync error handling-behavior
         await assertErrorThrownAsync(function () {
@@ -3423,23 +3423,21 @@ jstestDescribe((
             result: []
         });
     });
-    [
-        "test_coverage_merge_is_block_coverage_test.json",
-        "test_coverage_merge_issue_2_mixed_is_block_coverage_test.json",
-        "test_coverage_merge_node_10_internal_errors_one_of_test.json",
-        "test_coverage_merge_reduced_test.json",
-        "test_coverage_merge_simple_test.json",
-        "test_coverage_merge_various_test.json"
-    ].forEach(function (file) {
-        jstestIt(`test merge-fixture-${file} handling-behavior`, function () {
-            file = testCoverageMergeData[file];
-            file.forEach(function ({
-                expected,
-                inputs
-            }) {
-                assertJsonEqual(v8CoverageListMerge(inputs), expected);
-            });
-        });
+    jstestIt((
+        "test merge-fixture handling-behavior"
+    ), function () {
+        for (const file of [
+            "test_coverage_merge_is_block_coverage_test.json",
+            "test_coverage_merge_issue_2_mixed_is_block_coverage_test.json",
+            "test_coverage_merge_node_10_internal_errors_one_of_test.json",
+            "test_coverage_merge_reduced_test.json",
+            "test_coverage_merge_simple_test.json",
+            "test_coverage_merge_various_test.json"
+        ]) {
+            for (const {expected, inputs} of testCoverageMergeData[file]) {
+                assertJsonEqual(v8CoverageListMerge(inputs), expected, file);
+            }
+        }
     });
     jstestIt((
         "test merge-node-sqlite-files handling-behavior"
@@ -3771,47 +3769,50 @@ jstestDescribe((
             return v8CoverageReportCreate({});
         }, "invalid coverageDir");
     });
-    [
-        [
-            "v8CoverageReportCreate_high.js", (
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "}\n"
-            )
-        ], [
-            "v8CoverageReportCreate_ignore.js", (
-                "/*coverage-ignore-file*/\n" +
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "case 1:break;//coverage-ignore-line\n" +
-                "/*coverage-disable*/\n" +
-                "case 2:break;\n" +
-                "/*coverage-enable*/\n" +
-                "}\n"
-            )
-        ], [
-            "v8CoverageReportCreate_low.js", (
-                "switch(0){\n" +
-                "case 1:break;\n" +
-                "case 2:break;\n" +
-                "case 3:break;\n" +
-                "case 4:break;\n" +
-                "}\n"
-            )
-        ], [
-            "v8CoverageReportCreate_medium.js", (
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "case 1:break;\n" +
-                "case 2:break;\n" +
-                "}\n"
-            )
-        ]
-    ].forEach(function ([
-        file, data
-    ], ii) {
-        jstestIt(file, async function () {
-            let dir = ".tmp/coverage_" + ii + "/";
+    jstestIt((
+        "test report-fixture handling-behavior"
+    ), async function () {
+        const fixtureList = [
+            [
+                "v8CoverageReportCreate_high.js", (
+                    "switch(0){\n" +
+                    "case 0:break;\n" +
+                    "}\n"
+                )
+            ], [
+                "v8CoverageReportCreate_ignore.js", (
+                    "/*coverage-ignore-file*/\n" +
+                    "switch(0){\n" +
+                    "case 0:break;\n" +
+                    "case 1:break;//coverage-ignore-line\n" +
+                    "/*coverage-disable*/\n" +
+                    "case 2:break;\n" +
+                    "/*coverage-enable*/\n" +
+                    "}\n"
+                )
+            ], [
+                "v8CoverageReportCreate_low.js", (
+                    "switch(0){\n" +
+                    "case 1:break;\n" +
+                    "case 2:break;\n" +
+                    "case 3:break;\n" +
+                    "case 4:break;\n" +
+                    "}\n"
+                )
+            ], [
+                "v8CoverageReportCreate_medium.js", (
+                    "switch(0){\n" +
+                    "case 0:break;\n" +
+                    "case 1:break;\n" +
+                    "case 2:break;\n" +
+                    "}\n"
+                )
+            ]
+        ];
+        await Promise.all(fixtureList.map(async function ([
+            file, data
+        ], ii) {
+            const dir = ".tmp/coverage_" + ii + "/";
             file = dir + file;
             await fsWriteFileWithParents(file, data);
             await jslint.jslint_cli({
@@ -3824,6 +3825,6 @@ jstestDescribe((
                     file
                 ]
             });
-        });
+        }));
     });
 });
