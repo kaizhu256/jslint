@@ -94,6 +94,7 @@
 /*property
     JSLINT_BETA,
     NODE_V8_COVERAGE,
+    add,
     alive,
     all,
     argv,
@@ -137,6 +138,7 @@
     cwd,
     debugInline,
     default,
+    delete,
     delta,
     devel,
     directive,
@@ -287,6 +289,7 @@
     nomen,
     noop,
     now,
+    npm_config_mode_test_timeout,
     nr,
     nud_prefix,
     objectDeepCopyWithKeysSorted,
@@ -320,6 +323,7 @@
     property_dict,
     push,
     quote,
+    race,
     ranges,
     readFile,
     readdir,
@@ -351,6 +355,7 @@
     shift,
     signature,
     single,
+    size,
     slice,
     some,
     sort,
@@ -784,11 +789,14 @@ const jslint_rgx_url_search_window_jslint = (
 const jslint_rgx_weird_property = (
     /^_|\$|Sync$|_$/m
 );
+const jstestItPendingSet = new Set();
 let jslint_export;                      // The jslint object to be exported.
 let jslint_import_meta_url = "";        // import.meta.url used by cli.
 let jstestCountFailed = 0;
+let jstestDescribeNow = "";
 let jstestDescribePrv = "";
 let jstestItCount = 0;
+let jstestItDeadline;
 let jstestItList = [];
 let jstestTimeStart;
 let moduleChildProcess;
@@ -12013,6 +12021,9 @@ async function jstestDescribe(description, testFunction) {
 // with given <description>.
 
     const describePrv = jstestDescribePrv;
+    const timeout = (
+        Number(process.env.npm_config_mode_test_timeout) || 0x7fffffff
+    );
     let message;
     let result;
     let timerTimeout;
@@ -12038,11 +12049,24 @@ async function jstestDescribe(description, testFunction) {
 // Init jstestItList.
 
     jstestItList = [];
+
+// PR-xxx - Let <jstestIt> name this describe, and fail each test still pending
+// after opt-in npm_config_mode_test_timeout ms. The default 0x7fffffff ms,
+// ~24.8 days, keeps a hung run alive until something ends the process.
+
+    jstestDescribeNow = description;
+    jstestItDeadline = new Promise(function (ignore, reject) {
+        timerTimeout = setTimeout(function () {
+            reject(new Error(
+                "test still pending after npm_config_mode_test_timeout=" +
+                timeout + " ms"
+            ));
+        }, timeout);
+    });
     testFunction();
 
 // Wait for jstestItList to resolve.
 
-    timerTimeout = setTimeout(noop, 0x7fffffff);
     result = await Promise.all(jstestItList);
     clearTimeout(timerTimeout);
 
@@ -12093,12 +12117,20 @@ function jstestIt(description, testFunction, mode) {
 // inside current test-group with given <description>.
 
     jstestItList.push(new Promise(async function (resolve) {
+        const name = jstestDescribeNow + " - " + description;
         let err;
+
+// PR-xxx - Track this test as pending until it settles or its describe's
+// deadline fails it. Read both before the first await, since the next describe
+// resets them.
+
+        jstestItPendingSet.add(name);
         try {
-            await testFunction();
+            await Promise.race([testFunction(), jstestItDeadline]);
         } catch (errCaught) {
             err = errCaught;
         }
+        jstestItPendingSet.delete(name);
         resolve([err, description, mode]);
     }));
 }
@@ -12108,24 +12140,38 @@ function jstestOnExit(exitCode, mode) {
 // This function will on process-exit, print test-report
 // and exit with non-zero exit-code if any test failed.
 
-    let message = (
+// PR-xxx - Count each jstestIt still pending as failed, since its describe
+// never prints, e.g. a test hung until a watchdog ended the process.
+
+    const countFailed = jstestCountFailed + jstestItPendingSet.size;
+    const message = (
         (
-            (jstestCountFailed || mode === "testsFailed")
+            (countFailed > 0)
             ? "\n\u001b[31m"
             : "\n\u001b[32m"
         ) +
-        "  tests total  - " + jstestItCount + "\n" +
-        "  tests failed - " + jstestCountFailed + "\n" +
+        Array.from(jstestItPendingSet, function (name, ii) {
+            return (
+                "  \u2718 " + (jstestItCount + ii + 1) +
+                ". test it pending - " + name + "\n"
+            );
+        }).join("") +
+        "  tests total  - " + (jstestItCount + jstestItPendingSet.size) + "\n" +
+        "  tests failed - " + countFailed + "\n" +
         "\n" +
         "  time finished - " +
         Number(Date.now() - jstestTimeStart).toLocaleString() +
         " ms\n" +
         "\u001b[39m"
     );
+
+// A dry run, mode testsFailed, leaves the exit-code alone, since mid-run it
+// counts every running test as pending.
+
     if (mode !== "testsFailed") {
         console.error(message);
+        process.exitCode = exitCode || countFailed;
     }
-    process.exitCode = exitCode || jstestCountFailed;
     return message;
 }
 

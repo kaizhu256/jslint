@@ -1,6 +1,7 @@
 /*jslint beta, node*/
 import jslint from "./jslint.mjs";
 import jslintCjs from "./jslint_wrapper_cjs.cjs";
+import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 import modulePath from "path";
 import moduleVm from "vm";
@@ -2948,6 +2949,51 @@ ${sourceWrapper}
 jstestDescribe((
     "test jstestXxx handling-behavior"
 ), function testBehaviorJstestXxx() {
+    function childRun(timeout, source) {
+
+// Run <source> in a child node with jslint imported, and resolve its exit-code
+// and stderr.
+
+        return new Promise(function (resolve) {
+            const child = moduleChildProcess.spawn(process.execPath, [
+                "--input-type=module",
+                "--eval",
+                "import jslint from \"./jslint.mjs\";\n" + source
+            ], {
+                env: {
+                    ...process.env,
+                    npm_config_mode_test_timeout: timeout
+                },
+                stdio: ["ignore", "ignore", "pipe"]
+            });
+            let stderr = "";
+            child.stderr.on("data", function (chunk) {
+                stderr += chunk;
+            });
+            child.on("close", function (exitCode) {
+                resolve([exitCode, stderr]);
+            });
+        });
+    }
+    jstestIt((
+        "test jstestDescribe-timeout handling-behavior"
+    ), async function () {
+
+// Opt-in npm_config_mode_test_timeout fails a hung test, so its describe
+// prints.
+
+        const [exitCode, stderr] = await childRun("1", String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        return new Promise(jslint.noop);
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertOrThrow((
+            /1\. test it - bb\nError: test still pending after npm_config_mode_test_timeout=1 ms\n[\s\S]*tests failed - 1\n/
+        ).test(stderr), stderr);
+    });
     jstestIt((
         "test jstestIt-mode-pass handling-behavior"
     ), function () {
@@ -2956,7 +3002,34 @@ jstestDescribe((
     jstestIt((
         "test jstestOnExit tests-failed handling-behavior"
     ), function () {
-        jstestOnExit(undefined, "testsFailed");
+
+// A dry run lists this test, still running, as pending.
+
+        assertOrThrow(jstestOnExit(undefined, "testsFailed").includes(
+            ". test it pending - test jstestXxx handling-behavior" +
+            " - test jstestOnExit tests-failed handling-behavior\n"
+        ));
+    });
+    jstestIt((
+        "test jstestOnExit-pending handling-behavior"
+    ), async function () {
+
+// A test still pending when something ends the process counts as failed,
+// though its describe never prints.
+
+        const [exitCode, stderr] = await childRun("", String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        setTimeout(process.exit);
+        return new Promise(jslint.noop);
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertOrThrow((
+            /1\. test it pending - aa - bb\n {2}tests total {2}- 1\n {2}tests failed - 1\n/
+        ).test(stderr), stderr);
+        assertOrThrow(!stderr.includes("test describe - aa"), stderr);
     });
     jstestIt((
         "test jstestOrderCheck handling-behavior"
