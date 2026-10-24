@@ -25,10 +25,17 @@ let {
 let sourceJslintMjs;
 let testCoverageMergeData;
 
+function assertMatch(text, rgx) {
+
+// Assert <text> matches regexp <rgx>, showing <text> on failure.
+
+    assertOrThrow(rgx.test(text), text);
+}
+
 function childRun(env, source) {
 
 // Run <source> in a child node with jslint imported, and resolve its exit-code
-// and stderr. Clear the parent's jstest knobs, then apply <env>.
+// and stderr. Clear the parent's test filter, then apply <env>.
 
     return new Promise(function (resolve) {
         moduleChildProcess.execFile(process.execPath, [
@@ -39,7 +46,6 @@ function childRun(env, source) {
             env: {
                 ...process.env,
                 npm_config_mode_test_filter: "",
-                npm_config_mode_test_timeout: "",
                 ...env
             },
 
@@ -3035,18 +3041,10 @@ jslint.jstestDescribe("ee", function () {
 });
         `));
         assertJsonEqual(exitCode, 2);
-        assertOrThrow((
-            /test describe - aa\n.*\d\. test it - bb\b/
-        ).test(stderr), stderr);
-        assertOrThrow((
-            /test it skipped - dd\b[\s\S]*test it - jstestBefore\nError: cc before broke\n/
-        ).test(stderr), stderr);
-        assertOrThrow((
-            /test it - ff\b[\s\S]*test it - jstestAfter\nError: ee after broke\n/
-        ).test(stderr), stderr);
-        assertOrThrow((
-            /tests total {2}- 5\n {2}tests failed - 2\n/
-        ).test(stderr), stderr);
+        assertMatch(stderr, /test describe - aa\n.*\d\. test it - bb\b/);
+        assertMatch(stderr, /test it skipped - dd\b[\s\S]*test it - jstestBefore\nError: cc before broke\n/);
+        assertMatch(stderr, /test it - ff\b[\s\S]*test it - jstestAfter\nError: ee after broke\n/);
+        assertMatch(stderr, /tests total {2}- 5\n {2}tests failed - 2\n/);
     });
     jstestIt((
         "test jstestDescribe-body-throw handling-behavior"
@@ -3071,9 +3069,7 @@ jslint.jstestDescribe("aa", function () {
             `))
         ]);
         assertJsonEqual([exitCode, exitCode2], [1, 1]);
-        assertOrThrow((
-            /1\. test it - bb\b[\s\S]*2\. test it - jstestDescribe body\nError: aa body broke\n[\s\S]*tests total {2}- 2\n {2}tests failed - 1\n/
-        ).test(stderr), stderr);
+        assertMatch(stderr, /1\. test it - bb\b[\s\S]*2\. test it - jstestDescribe body\nError: aa body broke\n[\s\S]*tests total {2}- 2\n {2}tests failed - 1\n/);
         assertOrThrow(stderr2.includes(
             "test it - jstestDescribe body\nSyntaxError: Invalid regular"
         ), stderr2);
@@ -3103,33 +3099,6 @@ jslint.jstestDescribe("aa", function () {
         ), stderr);
     });
     jstestIt((
-        "test jstestDescribe-timeout handling-behavior"
-    ), async function () {
-
-// Opt-in npm_config_mode_test_timeout fails a hung test, so its describe
-// prints. The hang holds a live timer, else the run would exit before the
-// timeout.
-
-        const [exitCode, stderr] = await childRun({
-            npm_config_mode_test_timeout: "1"
-        }, String(`
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", function () {
-        setTimeout(jslint.noop, 200);
-        return new Promise(jslint.noop);
-    });
-});
-        `));
-        assertJsonEqual(exitCode, 1);
-        assertOrThrow((
-            /1\. test it - bb\nError: test still pending after 1 ms\n[\s\S]*tests failed - 1\n/
-        ).test(stderr), stderr);
-
-// A failure its describe printed is not listed again at exit.
-
-        assertOrThrow(!stderr.includes("test it failed"), stderr);
-    });
-    jstestIt((
         "test jstestIt-filter handling-behavior"
     ), async function () {
 
@@ -3150,9 +3119,7 @@ jslint.jstestDescribe("cc", function () {
 });
         `));
         assertJsonEqual(exitCode, 0);
-        assertOrThrow((
-            /test describe - cc\n.*1\. test it - dd\b[\s\S]*tests total {2}- 1\n/
-        ).test(stderr), stderr);
+        assertMatch(stderr, /test describe - cc\n.*1\. test it - dd\b[\s\S]*tests total {2}- 1\n/);
         assertOrThrow(!stderr.includes("test describe - aa"), stderr);
         assertOrThrow(!stderr.includes("test it - ee"), stderr);
     });
@@ -3192,9 +3159,7 @@ jslint.jstestIt("cc", jslint.noop);
         assertJsonEqual(resultList.map(function ([exitCode]) {
             return exitCode;
         }), [0, 1, 1]);
-        assertOrThrow((
-            /1\. test it - bb\b[\s\S]*2\. test it - cc\b[\s\S]*tests total {2}- 2\n {2}tests failed - 0\n/
-        ).test(resultList[0][1]), resultList[0][1]);
+        assertMatch(resultList[0][1], /1\. test it - bb\b[\s\S]*2\. test it - cc\b[\s\S]*tests total {2}- 2\n {2}tests failed - 0\n/);
         resultList.slice(1).forEach(function ([ignore, stderr]) {
             assertOrThrow(stderr.includes(
                 "jstestIt \"cc\" called outside a jstestDescribe body, or" +
@@ -3216,9 +3181,7 @@ jslint.jstestDescribe("aa", function () {
 });
         `));
         assertJsonEqual(exitCode, 0);
-        assertOrThrow((
-            /\u2714 1\. test it - bb\b[\s\S]*tests total {2}- 1\n {2}tests failed - 0\n/
-        ).test(stderr), stderr);
+        assertMatch(stderr, /\u2714 1\. test it - bb\b[\s\S]*tests total {2}- 1\n {2}tests failed - 0\n/);
     });
     jstestIt((
         "test jstestIt-option handling-behavior"
@@ -3255,24 +3218,16 @@ jslint.jstestDescribe("gg", function () {
 });
         `));
         assertJsonEqual(exitCode, 4);
-        assertOrThrow((
-            /test it - aa\nError: aa late\n/
-        ).test(stderr), stderr);
-        assertOrThrow((
-            /test it - cc\nError: after "aa - bb", which failed\n/
-        ).test(stderr), stderr);
-        assertOrThrow((
-            /test it skipped - dd\b/
-        ).test(stderr), stderr);
-        assertOrThrow((
-            /test it - ee\nError: test still pending after 10 ms\n/
-        ).test(stderr), stderr);
-        assertOrThrow((
-            /\d\. test it - ff\u001b/
-        ).test(stderr), stderr);
-        assertOrThrow((
-            /tests total {2}- 7\n {2}tests failed - 4\n/
-        ).test(stderr), stderr);
+        assertMatch(stderr, /test it - aa\nError: aa late\n/);
+        assertMatch(stderr, /test it - cc\nError: after "aa - bb", which failed\n/);
+        assertMatch(stderr, /test it skipped - dd\b/);
+        assertMatch(stderr, /test it - ee\nError: test still pending after 10 ms\n/);
+        assertMatch(stderr, /\d\. test it - ff\u001b/);
+        assertMatch(stderr, /tests total {2}- 7\n {2}tests failed - 4\n/);
+
+// A failure its describe printed is not listed again at exit.
+
+        assertOrThrow(!stderr.includes("test it failed"), stderr);
     });
     jstestIt((
         "test jstestOnExit-crash handling-behavior"
@@ -3337,21 +3292,13 @@ jslint.jstestDescribe("aa", function () {
         assertJsonEqual(resultList.map(function ([exitCode]) {
             return exitCode;
         }), [1, 1, 1, 1]);
-        assertOrThrow((
-            /test it crashed - aa - bb\nError: bb timer boom\n[\s\S]*test it pending - aa - cc\n/
-        ).test(resultList[0][1]), resultList[0][1]);
-        assertOrThrow((
-            /test it crashed - aa - bb\nError: bb unawaited\n/
-        ).test(resultList[1][1]), resultList[1][1]);
+        assertMatch(resultList[0][1], /test it crashed - aa - bb\nError: bb timer boom\n[\s\S]*test it pending - aa - cc\n/);
+        assertMatch(resultList[1][1], /test it crashed - aa - bb\nError: bb unawaited\n/);
 
 // A test that passed and printed, then crashed late, is listed again.
 
-        assertOrThrow((
-            /1\. test it - bb\b[\s\S]*test it crashed - aa - bb\nError: bb late boom\n/
-        ).test(resultList[2][1]), resultList[2][1]);
-        assertOrThrow((
-            /test it pending - aa - bb\n/
-        ).test(resultList[3][1]), resultList[3][1]);
+        assertMatch(resultList[2][1], /1\. test it - bb\b[\s\S]*test it crashed - aa - bb\nError: bb late boom\n/);
+        assertMatch(resultList[3][1], /test it pending - aa - bb\n/);
         assertOrThrow(
             !resultList[3][1].includes("crashed"),
             resultList[3][1]
@@ -3373,9 +3320,7 @@ jslint.jstestDescribe("aa", function () {
 });
         `));
         assertJsonEqual(exitCode, 1);
-        assertOrThrow((
-            /\[31m {2}\S+ 1\. test it pending - aa - bb\n {2}tests total {2}- 1\n {2}tests failed - 1\n/
-        ).test(stderr), stderr);
+        assertMatch(stderr, /\[31m {2}\S+ 1\. test it pending - aa - bb\n {2}tests total {2}- 1\n {2}tests failed - 1\n/);
         assertOrThrow(!stderr.includes("test describe - aa"), stderr);
     });
     jstestIt((
@@ -3402,9 +3347,7 @@ jslint.jstestDescribe("aa", function () {
 });
         `));
         assertJsonEqual(exitCode, 2);
-        assertOrThrow((
-            /1\. test it failed - aa - bb\nError: bb real error\n[\s\S]*2\. test it pending - aa - cc\n {2}tests total {2}- 2\n {2}tests failed - 2\n/
-        ).test(stderr), stderr);
+        assertMatch(stderr, /1\. test it failed - aa - bb\nError: bb real error\n[\s\S]*2\. test it pending - aa - cc\n {2}tests total {2}- 2\n {2}tests failed - 2\n/);
     });
     jstestIt((
         "test jstestOrderCheck handling-behavior"

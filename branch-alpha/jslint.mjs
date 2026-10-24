@@ -304,7 +304,6 @@
     noop,
     now,
     npm_config_mode_test_filter,
-    npm_config_mode_test_timeout,
     nr,
     nud_prefix,
     objectDeepCopyWithKeysSorted,
@@ -12082,9 +12081,6 @@ async function jstestDescribe(description, testFunction) {
         itList: []
     };
     const describePrv = jstestDescribePrv;
-    const timeout = (
-        Number(process.env.npm_config_mode_test_timeout) || 0x7fffffff
-    );
     let errAfter;
     let errBefore;
     let errBody;
@@ -12110,7 +12106,7 @@ async function jstestDescribe(description, testFunction) {
 
         const {AsyncLocalStorage} = process.getBuiltinModule("async_hooks");
         jstestAls = new AsyncLocalStorage();
-        jstestTimeStart = jstestTimeStart || Date.now();
+        jstestTimeStart = Date.now();
         process.on("exit", jstestOnExit);
         process.on("uncaughtExceptionMonitor", jstestOnCrash);
     }
@@ -12131,13 +12127,11 @@ async function jstestDescribe(description, testFunction) {
     }
     describe.collected = true;
 
-// PR-xxx - Run before-hooks in order; if one fails, skip the tests. Each hook
-// and test fails after its own timeout, option <timeout>, else opt-in
-// npm_config_mode_test_timeout ms, else 0x7fffffff, ~24.8 days.
+// PR-xxx - Run before-hooks in order; if one fails, skip the tests.
 
     try {
         for (const fn of describe.beforeList) {
-            await jstestRace(fn(), timeout);
+            await fn();
         }
     } catch (err) {
         errBefore = err;
@@ -12151,7 +12145,7 @@ async function jstestDescribe(description, testFunction) {
 
 // PR-xxx - Option <after> waits for the named tests, "<describe> - <it>", in
 // any describe, and fails at once if one failed, instead of each test waiting
-// on another's emit.
+// on another's emit. Option <timeout> fails this test after <timeout> ms.
 
         try {
             await jstestRace((async function () {
@@ -12163,7 +12157,7 @@ async function jstestDescribe(description, testFunction) {
                     }
                 }
                 await jstestAls.run({describe, record}, record.testFunction);
-            }()), option.timeout || timeout);
+            }()), option.timeout);
             record.status = "passed";
         } catch (err) {
             record.err = err;
@@ -12177,7 +12171,7 @@ async function jstestDescribe(description, testFunction) {
     }));
     try {
         for (const fn of describe.afterList) {
-            await jstestRace(fn(), timeout);
+            await fn();
         }
     } catch (err) {
         errAfter = err;
@@ -12299,10 +12293,9 @@ function jstestItSettle(record) {
 // This function will resolve the <jstestItSettled> promise of settled
 // test-record <record>, and return <record>.
 
-    jstestItSettled(record.describe + " - " + record.description);
-    jstestItSettleDict[record.describe + " - " + record.description][1](
-        record
-    );
+    const name = record.describe + " - " + record.description;
+    jstestItSettled(name);
+    jstestItSettleDict[name][1](record);
     return record;
 }
 
@@ -12374,9 +12367,12 @@ function jstestRace(promise, timeout) {
 
 // This function will race <promise> against a timer of <timeout> ms, rejecting
 // if the timer wins. The timer is unref'd, so it never keeps a run alive nor
-// shows in a dump of active handles: a hang with nothing else alive exits at
-// once, listing its pending tests.
+// shows in a dump of active handles. No <timeout>, no timer: a timer of
+// undefined ms would fire at once and fail the test before it ran.
 
+    if (!timeout) {
+        return promise;
+    }
     return Promise.race([
         promise,
         new Promise(function (ignore, reject) {

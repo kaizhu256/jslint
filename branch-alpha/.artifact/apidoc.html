@@ -1720,9 +1720,6 @@ jslint.jstestAfter(function () {
         itList: []
     };
     const describePrv = jstestDescribePrv;
-    const timeout = (
-        Number(process.env.npm_config_mode_test_timeout) || 0x7fffffff
-    );
     let errAfter;
     let errBefore;
     let errBody;
@@ -1748,7 +1745,7 @@ jslint.jstestAfter(function () {
 
         const {AsyncLocalStorage} = process.getBuiltinModule("async_hooks");
         jstestAls = new AsyncLocalStorage();
-        jstestTimeStart = jstestTimeStart || Date.now();
+        jstestTimeStart = Date.now();
         process.on("exit", jstestOnExit);
         process.on("uncaughtExceptionMonitor", jstestOnCrash);
     }
@@ -1767,7 +1764,12 @@ jslint.jstestAfter(function () {
     } catch (err) {
         errBody = err;
     }
-    de...
+    describe.collected = true;
+
+// PR-xxx - Run before-hooks in order; if one fails, skip the tests.
+
+    try {
+        for (...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
