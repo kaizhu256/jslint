@@ -2,7 +2,6 @@
 
 # Todo
 - jslint-cli - Lint every file argument, as 'node jslint.mjs aa.mjs bb.mjs' now lints 'aa.mjs' and silently skips 'bb.mjs'.
-- jslint - Add warning for jstestIt() descriptions not in ASCII order within each jstestDescribe().
 - jslint - Destructuring - Allow a default on a destructured parameter 'function aa({bb} = {})', valid ES2015 but a stop now.
 - jslint - Allow a quoted accessor-name 'get "aa"() {}', valid ES2015 but a stop now.
 - jslint - Destructuring - Allow catch-variable 'catch ({aa})', valid ES2015 but a stop now.
@@ -19,6 +18,11 @@
 
 # v2026.10.30
 - jstest - Fail any describe or jstestIt name not in ASCII order.
+- jstest - Report each jstestIt still pending at exit as failed, and add opt-in timeout 'npm_config_mode_test_timeout=<ms>'.
+- jstest - Add opt-in test filter 'npm_config_mode_test_filter=<regexp>' on '<describe> - <it>'.
+- jstest - Report at exit each failed jstestIt whose describe never printed, e.g. one failing while a sibling hangs.
+- jstest - Fail a jstestDescribe body that throws, and a jstestIt called after its describe body's first await, instead of passing silently.
+- jstest - Name the jstestIt an uncaught error escaped from, e.g. a throw in a timer or an un-awaited rejection; the run still crashes.
 - jslint - Report: Functions - Copy each signature from its source text, keeping default values.
 - jslint - Report: Functions - List block-scoped names, catch-variables and outer names, and mark closure only across functions.
 

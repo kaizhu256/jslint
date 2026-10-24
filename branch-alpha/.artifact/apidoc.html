@@ -258,48 +258,55 @@ function jstestIt<span class="apidocSignatureSpan">(description, testFunction, m
 <li>
 
 <a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestOnExit">21.
-function jstestOnExit<span class="apidocSignatureSpan">(exitCode, mode)</span>
+function jstestOnExit<span class="apidocSignatureSpan">(exitCode)</span>
 </a>
 
 </li>
 <li>
 
 <a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestOrderCheck">22.
-function jstestOrderCheck<span class="apidocSignatureSpan">(descriptionList, resultList)</span>
+function jstestOrderCheck<span class="apidocSignatureSpan">(descriptionList)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit">23.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestReport">23.
+function jstestReport<span class="apidocSignatureSpan">()</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit">24.
 function moduleFsInit<span class="apidocSignatureSpan">()</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.noop">24.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.noop">25.
 function noop<span class="apidocSignatureSpan">(value)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.objectDeepCopyWithKeysSorted">25.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.objectDeepCopyWithKeysSorted">26.
 function objectDeepCopyWithKeysSorted<span class="apidocSignatureSpan">(obj)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageListMerge">26.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageListMerge">27.
 function v8CoverageListMerge<span class="apidocSignatureSpan">(processCovs)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageReportCreate">27.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageReportCreate">28.
 function v8CoverageReportCreate<span class="apidocSignatureSpan">({
     consoleError,
     coverageDir,
@@ -310,21 +317,21 @@ function v8CoverageReportCreate<span class="apidocSignatureSpan">({
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_autofix_warning_list">28.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_autofix_warning_list">29.
 object jslint_autofix_warning_list
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_charset_ascii">29.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_charset_ascii">30.
 string jslint_charset_ascii
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_edition">30.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_edition">31.
 string jslint_edition
 </a>
 
@@ -1628,8 +1635,14 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 // with given &lt;description&gt;.
 
 </span>    const describePrv = jstestDescribePrv;
+    const timeout = (
+        Number(process.env.npm_config_mode_test_timeout) || 0x7fffffff
+    );
+    let errBody;
+    let itList;
     let message;
     let result;
+    let resultBody;
     let timerTimeout;
 
 // Record &lt;description&gt; before the first await, since describes then
@@ -1640,8 +1653,18 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 // Init jstestTimeStart.
 
     if (jstestTimeStart === undefined) {
+
+// PR-xxx - Run each test in its own async context, so an error escaping it,
+// e.g. thrown from a timer or an un-awaited rejection, names its test at exit.
+// The monitor only observes: node still crashes as before.
+// &lt;process.getBuiltinModule&gt; loads synchronously, so describes cannot race to
+// create two contexts, and the browser never reaches it.
+
+        const {AsyncLocalStorage} = process.getBuiltinModule("async_hooks");
+        jstestAls = new AsyncLocalStorage();
         jstestTimeStart = jstestTimeStart || Date.now();
         process.on("exit", jstestOnExit);
+        process.on("uncaughtExceptionMonitor", jstestOnCrash);
     }
 
 // PR-457 - Wait awhile for imports to initialize.
@@ -1653,47 +1676,17 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 // Init jstestItList.
 
     jstestItList = [];
-    testFunction();
 
-// Wait for jstestItList to resolve.
+// PR-xxx - Let &lt;jstestIt&gt; name this describe, and fail each test still pending
+// after opt-in npm_config_mode_test_timeout ms, default 0x7fffffff, ~24.8 days.
+// The timer is unref'd, so it never keeps a run alive nor shows in a dump of
+// active handles: a hang with nothing else alive exits at once, listing its
+// pending tests.
 
-    timerTimeout = setTimeout(noop, 0x7fffffff);
-    result = await Promise.all(jstestItList);
-    clearTimeout(timerTimeout);
-
-// PR-xxx - Assert this describe's tests, then this describe, are in ASCII
-// order.
-
-    jstestOrderCheck(result.map(function ([
-        ignore, descriptionIt
-    ]) {
-        return descriptionIt;
-    }), result);
-    jstestOrderCheck([describePrv, description], result);
-
-// Print test results.
-
-    message = (
-        "\n  " + (Date.now() - jstestTimeStart) + "ms" +
-        " - test describe - " + description + "\n" +
-        result.map(function ([
-            err, description, mode
-        ]) {
-            jstestItCount += 1;
-            if (err) {
-                jstestCountFailed += 1;
-                err = (
-                    "    \u001b[31m\u2718 " + jstestItCount + ". test it - " +
-                    description + "\n" + err.stack + "\u001b[39m"
-                );
-                if (mode === "pass") {
-                    jstestCountFailed -= 1;
-                    err = "";
-                }
-            }
-            return err || (
-                "    \u001b[32m\u2714 " + jstestItCount + ". test it - " +
-       ...
+    jstestDescribeNow = description;
+    jstestItDeadline = new Promise(function (ignore, reject) {
+        timerTimeout = setTimeout(reject, timeout, new Error(
+            "test still p...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1726,15 +1719,56 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 // This function will create-and-run test-case &lt;testFunction&gt;
 // inside current test-group with given &lt;description&gt;.
 
-</span>    jstestCountTotal += 1;
+</span>    const name = jstestDescribeNow + " - " + description;
+
+// PR-xxx - Throw outside a describe body's synchronous part, e.g. after an
+// await, since no describe would wait for this test or report it.
+
+    if (!jstestItList) {
+        throw new Error(
+            "jstestIt " + JSON.stringify(description) +
+            " called outside the synchronous part of a jstestDescribe body"
+        );
+    }
+
+// PR-xxx - Run only a test whose "&lt;describe&gt; - &lt;it&gt;" matches opt-in regexp
+// npm_config_mode_test_filter, e.g.
+// npm_config_mode_test_filter="jstestXxx.*pending" npm test
+// Prefer the env form, since npm 11 warns the flag form --mode-test-filter
+// stops working in npm 12.
+
+    if (!new RegExp(
+        process.env.npm_config_mode_test_filter || ""
+    ).test(name)) {
+        return;
+    }
     jstestItList.push(new Promise(async function (resolve) {
-        let err;
+
+// PR-xxx - Record this test as pending until it settles or its describe's
+// deadline fails it, so &lt;jstestReport&gt; sees it even if its describe never
+// prints. Read the deadline before the first await, since the next describe
+// resets it.
+
+        const record = jstestItRecordPush({
+            describe: jstestDescribeNow,
+            description,
+            status: "pending"
+        });
         try {
-            await testFunction();
-        } catch (errCaught) {
-            err = errCaught;
+            await Promise.race([
+                jstestAls.run(record, testFunction),
+                jstestItDeadline
+            ]);
+            record.status = "passed";
+        } catch (err) {
+            record.err = err;
+            record.status = (
+                (mode === "pass")
+                ? "passed"
+                : "failed"
+            );
         }
-        resolve([err, description, mode]);
+        resolve(record);
     }));
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1758,99 +1792,140 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 <li>
     <h2>
     <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestOnExit" id="apidoc.elem.%22.%2Fjslint.mjs%22.jstestOnExit">
-    function jstestOnExit<span class="apidocSignatureSpan">(exitCode, mode)</span>
+    function jstestOnExit<span class="apidocSignatureSpan">(exitCode)</span>
     </a>
     </h2>
 </li>
-<li>Description and source-code:<pre class="apidocCodePre">function jstestOnExit(exitCode, mode) {
+<li>Description and source-code:<pre class="apidocCodePre">function jstestOnExit(exitCode) {
 <span class="apidocCodeCommentSpan">
 // This function will on process-exit, print test-report
 // and exit with non-zero exit-code if any test failed.
 
-</span>    let message = (
+</span>    console.error(jstestReport());
+    process.exitCode = exitCode || jstestItRecordList.filter(function ({
+        status
+    }) {
+        return status !== "passed";
+    }).length;
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">N/A</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestOrderCheck" id="apidoc.elem.%22.%2Fjslint.mjs%22.jstestOrderCheck">
+    function jstestOrderCheck<span class="apidocSignatureSpan">(descriptionList)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jstestOrderCheck(descriptionList) {
+<span class="apidocCodeCommentSpan">
+// This function will return a failed result for the first description in
+// &lt;descriptionList&gt; not strictly after the one before it, else undefined.
+// Strict means a duplicate fails too, as two identical lines cannot be told
+// apart in the output.
+
+</span>    for (const [ii, description] of descriptionList.entries()) {
+        if (ii &gt; 0 &amp;&amp; descriptionList[ii - 1] &gt;= description) {
+            const now = JSON.stringify(description);
+            const prv = JSON.stringify(descriptionList[ii - 1]);
+            return [
+                new Error(
+                    (prv === now)
+                    ? `duplicate description ${now}`
+                    : `${now} must sort before ${prv}`
+                ),
+                "jstestDescribe and jstestIt descriptions in ASCII order"
+            ];
+        }
+    }
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+// failed result, for the first bad pair only.
+
+assertJsonEqual([
+    ["", "aa", "bb"],
+    ["aa", "cc", "bb", "aa"],
+    ["aa", "aa"]
+].map(function (descriptionList) {
+    const failure = <span class="apidocCodeKeywordSpan">jstestOrderCheck</span>(descriptionList);
+    return failure &amp;&amp; [failure[0].message, failure[1]];
+}), [
+    undefined,
+    [
+        "\"bb\" must sort before \"cc\"",
+        "jstestDescribe and jstestIt descriptions in ASCII order"
+    ], [
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestReport" id="apidoc.elem.%22.%2Fjslint.mjs%22.jstestReport">
+    function jstestReport<span class="apidocSignatureSpan">()</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jstestReport() {
+<span class="apidocCodeCommentSpan">
+// This function will return the test-report, without side effects.
+
+</span>// PR-xxx - List and count as failed each test its describe never printed: one
+// still pending, e.g. hung until a watchdog ended the process, or one that
+// failed while a sibling hung, whose error was otherwise never shown.
+
+    const countFailed = jstestItRecordList.filter(function ({status}) {
+        return status !== "passed";
+    }).length;
+    const unprintedList = jstestItRecordList.filter(function ({
+        printed,
+        status
+    }) {
+        return !printed &amp;&amp; status !== "passed";
+    });
+    return (
         (
-            (jstestCountFailed || mode === "testsFailed")
+            countFailed
             ? "\n\u001b[31m"
             : "\n\u001b[32m"
         ) +
-        "  tests total  - " + jstestCountTotal + "\n" +
-        "  tests failed - " + jstestCountFailed + "\n" +
+        unprintedList.map(function ({
+            describe,
+            description,
+            err,
+            status
+        }, ii) {
+            return (
+                "  \u2718 " + (jstestItCount + ii + 1) + ". test it " + status +
+                " - " + describe + " - " + description + "\n" + (
+                    err
+                    ? err.stack + "\n"
+                    : ""
+                )
+            );
+        }).join("") +
+        "  tests total  - " + jstestItRecordList.length + "\n" +
+        "  tests failed - " + countFailed + "\n" +
         "\n" +
         "  time finished - " +
         Number(Date.now() - jstestTimeStart).toLocaleString() +
         " ms\n" +
         "\u001b[39m"
     );
-    if (mode !== "testsFailed") {
-        console.error(message);
-    }
-    process.exitCode = exitCode || jstestCountFailed;
-    return message;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-        "test jstestIt-mode-pass handling-behavior"
+        "test jstestReport handling-behavior"
     ), function () {
-        throw new Error();
-    }, "pass");
-    jstestIt((
-        "test jstestOnExit tests-failed handling-behavior"
-    ), function () {
-        <span class="apidocCodeKeywordSpan">jstestOnExit</span>(undefined, "testsFailed");
+        const exitCode = process.exitCode;
+
+// The report lists this test, still running, as pending, and changes nothing,
+// since mid-run every running test is pending.
+
+        assertOrThrow(<span class="apidocCodeKeywordSpan">jstestReport</span>().includes(
+            ". test it pending - test jstestXxx handling-behavior" +
+            " - test jstestReport handling-behavior\n"
+        ));
+        assertJsonEqual(process.exitCode, exitCode);
     });
-    jstestIt((
-        "test jstestOrderCheck handling-behavior"
-    ), function () {
-        const resultList = [];
-
-// Sorted lists push nothing; the first unsorted pair or duplicate pushes one
-...</pre></li>
-
-<li>
-    <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestOrderCheck" id="apidoc.elem.%22.%2Fjslint.mjs%22.jstestOrderCheck">
-    function jstestOrderCheck<span class="apidocSignatureSpan">(descriptionList, resultList)</span>
-    </a>
-    </h2>
-</li>
-<li>Description and source-code:<pre class="apidocCodePre">function jstestOrderCheck(descriptionList, resultList) {
-<span class="apidocCodeCommentSpan">
-// This function will push onto &lt;resultList&gt; one failed result, for the first
-// description in &lt;descriptionList&gt; not strictly after the one before it.
-// Strict means a duplicate fails too, as two identical lines cannot be told
-// apart in the output.
-
-</span>    for (const [ii, description] of descriptionList.entries()) {
-        if (ii &gt; 0 &amp;&amp; !(descriptionList[ii - 1] &lt; description)) {
-            const now = JSON.stringify(description);
-            const prv = JSON.stringify(descriptionList[ii - 1]);
-            resultList.push([
-                new Error(
-                    (prv === now)
-                    ? `duplicate description ${now}`
-                    : `${now} must sort after ${prv}`
-                ),
-                "jstestDescribe and jstestIt descriptions in ASCII order"
-            ]);
-            return;
-        }
-    }
-}</pre></li>
-<li>Example usage:<pre class="apidocCodePre">...
-"test jstestOrderCheck handling-behavior"
-    ), function () {
-const resultList = [];
-
-// Sorted lists push nothing; the first unsorted pair or duplicate pushes one
-// failed result, and a later bad pair in the same list is not reported.
-
-<span class="apidocCodeKeywordSpan">jstestOrderCheck</span>(["", "aa", "bb"], resultList);
-jstestOrderCheck(["aa", "cc", "bb", "aa"], resultList);
-jstestOrderCheck(["aa", "aa"], resultList);
-assertJsonEqual(resultList.map(function ([
-    err, description
-]) {
-    return [err.message, description];
-}), [
+});
 ...</pre></li>
 
 <li>

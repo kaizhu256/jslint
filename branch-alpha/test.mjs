@@ -1,6 +1,7 @@
 /*jslint beta, node*/
 import jslint from "./jslint.mjs";
 import jslintCjs from "./jslint_wrapper_cjs.cjs";
+import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 import modulePath from "path";
 import moduleVm from "vm";
@@ -14,8 +15,8 @@ let {
     globExclude,
     jstestDescribe,
     jstestIt,
-    jstestOnExit,
     jstestOrderCheck,
+    jstestReport,
     moduleFsInit,
     noop,
     v8CoverageListMerge,
@@ -2948,40 +2949,339 @@ ${sourceWrapper}
 jstestDescribe((
     "test jstestXxx handling-behavior"
 ), function testBehaviorJstestXxx() {
+    function childRun(env, source) {
+
+// Run <source> in a child node with jslint imported, and resolve its exit-code
+// and stderr. Clear the parent's jstest knobs, then apply <env>.
+
+        return new Promise(function (resolve) {
+            moduleChildProcess.execFile(process.execPath, [
+                "--input-type=module",
+                "--eval",
+                "import jslint from \"./jslint.mjs\";\n" + source
+            ], {
+                env: {
+                    ...process.env,
+                    npm_config_mode_test_filter: "",
+                    npm_config_mode_test_timeout: "",
+                    ...env
+                },
+
+// Kill a hung child, so a broken runner fails this suite instead of hanging it.
+// A killed child resolves exit-code null, never a passing 0.
+
+                timeout: 10000
+            }, function (err, ignore, stderr) {
+                resolve([(
+                    err
+                    ? err.code
+                    : 0
+                ), stderr]);
+            });
+        });
+    }
+    jstestIt((
+        "test jstestDescribe-body-throw handling-behavior"
+    ), async function () {
+
+// A describe body that throws fails as one more test, after the tests it did
+// register; an invalid filter regexp throws from that body too.
+
+        const [[exitCode, stderr], [exitCode2, stderr2]] = await Promise.all([
+            childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", jslint.noop);
+    throw new Error("aa body broke");
+});
+            `)),
+            childRun({
+                npm_config_mode_test_filter: "("
+            }, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", jslint.noop);
+});
+            `))
+        ]);
+        assertJsonEqual([exitCode, exitCode2], [1, 1]);
+        assertOrThrow((
+            /1\. test it - bb\b[\s\S]*2\. test it - jstestDescribe body\nError: aa body broke\n[\s\S]*tests total {2}- 2\n {2}tests failed - 1\n/
+        ).test(stderr), stderr);
+        assertOrThrow(stderr2.includes(
+            "test it - jstestDescribe body\nSyntaxError: Invalid regular"
+        ), stderr2);
+    });
+    jstestIt((
+        "test jstestDescribe-order handling-behavior"
+    ), async function () {
+
+// The runner fails a describe's tests out of order, and a describe out of order
+// with the one before it, each as one more failed test.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+jslint.jstestDescribe("cc", function () {
+    jslint.jstestIt("bb", jslint.noop);
+    jslint.jstestIt("aa", jslint.noop);
+});
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("dd", jslint.noop);
+});
+        `));
+        assertJsonEqual(exitCode, 2);
+        assertOrThrow(stderr.includes(
+            "\"aa\" must sort before \"bb\""
+        ), stderr);
+        assertOrThrow(stderr.includes(
+            "\"aa\" must sort before \"cc\""
+        ), stderr);
+    });
+    jstestIt((
+        "test jstestDescribe-timeout handling-behavior"
+    ), async function () {
+
+// Opt-in npm_config_mode_test_timeout fails a hung test, so its describe
+// prints. The hang holds a live timer, else the run would exit before the
+// timeout.
+
+        const [exitCode, stderr] = await childRun({
+            npm_config_mode_test_timeout: "1"
+        }, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        setTimeout(jslint.noop, 200);
+        return new Promise(jslint.noop);
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertOrThrow((
+            /1\. test it - bb\nError: test still pending after npm_config_mode_test_timeout=1 ms\n[\s\S]*tests failed - 1\n/
+        ).test(stderr), stderr);
+
+// A failure its describe printed is not listed again at exit.
+
+        assertOrThrow(!stderr.includes("test it failed"), stderr);
+    });
+    jstestIt((
+        "test jstestIt-filter handling-behavior"
+    ), async function () {
+
+// Opt-in npm_config_mode_test_filter runs only "cc - dd", and a describe left
+// with no test prints nothing.
+
+        const [exitCode, stderr] = await childRun({
+            npm_config_mode_test_filter: "^cc - dd$"
+        }, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", jslint.noop);
+});
+jslint.jstestDescribe("cc", function () {
+    jslint.jstestIt("dd", jslint.noop);
+    jslint.jstestIt("ee", function () {
+        throw new Error();
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 0);
+        assertOrThrow((
+            /test describe - cc\n.*1\. test it - dd\b[\s\S]*tests total {2}- 1\n/
+        ).test(stderr), stderr);
+        assertOrThrow(!stderr.includes("test describe - aa"), stderr);
+        assertOrThrow(!stderr.includes("test it - ee"), stderr);
+    });
+    jstestIt((
+        "test jstestIt-late handling-behavior"
+    ), async function () {
+
+// A jstestIt after an await in its describe body throws; the body's rejection
+// fails as one more test, shown at exit since the describe has printed.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+jslint.jstestDescribe("aa", async function () {
+    jslint.jstestIt("bb", jslint.noop);
+    await null;
+    jslint.jstestIt("cc", jslint.noop);
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertOrThrow((
+            /1\. test it - bb\b[\s\S]*2\. test it failed - aa - jstestDescribe body\nError: jstestIt "cc" called outside[\s\S]*tests total {2}- 2\n {2}tests failed - 1\n/
+        ).test(stderr), stderr);
+    });
     jstestIt((
         "test jstestIt-mode-pass handling-behavior"
     ), function () {
         throw new Error();
     }, "pass");
     jstestIt((
-        "test jstestOnExit tests-failed handling-behavior"
-    ), function () {
-        jstestOnExit(undefined, "testsFailed");
+        "test jstestOnExit-crash handling-behavior"
+    ), async function () {
+
+// An error escaping a test, from a timer or an un-awaited rejection, still
+// crashes, and the exit report names that test as crashed, its slow sibling as
+// pending. A crash from outside any test names none.
+
+        const resultList = await Promise.all([
+            String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        setTimeout(function () {
+            throw new Error("bb timer boom");
+        }, 10);
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 50);
+        });
+    });
+    jslint.jstestIt("cc", function () {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 200);
+        });
+    });
+});
+            `),
+            String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        Promise.reject(new Error("bb unawaited"));
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 50);
+        });
+    });
+});
+            `),
+            String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        setTimeout(function () {
+            throw new Error("bb late boom");
+        }, 100);
+    });
+});
+            `),
+            String(`
+setTimeout(function () {
+    throw new Error("outside boom");
+}, 20);
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 200);
+        });
+    });
+});
+            `)
+        ].map(function (source) {
+            return childRun({}, source);
+        }));
+        assertJsonEqual(resultList.map(function ([exitCode]) {
+            return exitCode;
+        }), [1, 1, 1, 1]);
+        assertOrThrow((
+            /test it crashed - aa - bb\nError: bb timer boom\n[\s\S]*test it pending - aa - cc\n/
+        ).test(resultList[0][1]), resultList[0][1]);
+        assertOrThrow((
+            /test it crashed - aa - bb\nError: bb unawaited\n/
+        ).test(resultList[1][1]), resultList[1][1]);
+
+// A test that passed and printed, then crashed late, is listed again.
+
+        assertOrThrow((
+            /1\. test it - bb\b[\s\S]*test it crashed - aa - bb\nError: bb late boom\n/
+        ).test(resultList[2][1]), resultList[2][1]);
+        assertOrThrow((
+            /test it pending - aa - bb\n/
+        ).test(resultList[3][1]), resultList[3][1]);
+        assertOrThrow(
+            !resultList[3][1].includes("crashed"),
+            resultList[3][1]
+        );
+    });
+    jstestIt((
+        "test jstestOnExit-pending handling-behavior"
+    ), async function () {
+
+// A test still pending at exit counts as failed, in red, though its describe
+// never prints. With nothing alive, the hang exits at once, since jstest's own
+// timer is unref'd; else <childRun>'s 10 s watchdog kills it.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        return new Promise(jslint.noop);
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertOrThrow((
+            /\[31m {2}\S+ 1\. test it pending - aa - bb\n {2}tests total {2}- 1\n {2}tests failed - 1\n/
+        ).test(stderr), stderr);
+        assertOrThrow(!stderr.includes("test describe - aa"), stderr);
+    });
+    jstestIt((
+        "test jstestOnExit-unprinted handling-behavior"
+    ), async function () {
+
+// betadog's flake: bb fails before its emit, cc waits on that emit forever,
+// then something ends the process. bb's error, stored in a describe that never
+// prints, still shows and counts.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+import {EventEmitter} from "node:events";
+const ee = new EventEmitter();
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", async function () {
+        throw new Error("bb real error");
+    });
+    jslint.jstestIt("cc", function () {
+        setTimeout(process.exit, 100);
+        return new Promise(function (resolve) {
+            ee.once("done", resolve);
+        });
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 2);
+        assertOrThrow((
+            /1\. test it failed - aa - bb\nError: bb real error\n[\s\S]*2\. test it pending - aa - cc\n {2}tests total {2}- 2\n {2}tests failed - 2\n/
+        ).test(stderr), stderr);
     });
     jstestIt((
         "test jstestOrderCheck handling-behavior"
     ), function () {
-        const resultList = [];
 
-// Sorted lists push nothing; the first unsorted pair or duplicate pushes one
-// failed result, and a later bad pair in the same list is not reported.
+// A sorted list returns nothing. An unsorted pair or a duplicate returns one
+// failed result, for the first bad pair only.
 
-        jstestOrderCheck(["", "aa", "bb"], resultList);
-        jstestOrderCheck(["aa", "cc", "bb", "aa"], resultList);
-        jstestOrderCheck(["aa", "aa"], resultList);
-        assertJsonEqual(resultList.map(function ([
-            err, description
-        ]) {
-            return [err.message, description];
+        assertJsonEqual([
+            ["", "aa", "bb"],
+            ["aa", "cc", "bb", "aa"],
+            ["aa", "aa"]
+        ].map(function (descriptionList) {
+            const failure = jstestOrderCheck(descriptionList);
+            return failure && [failure[0].message, failure[1]];
         }), [
+            undefined,
             [
-                "\"bb\" must sort after \"cc\"",
+                "\"bb\" must sort before \"cc\"",
                 "jstestDescribe and jstestIt descriptions in ASCII order"
             ], [
                 "duplicate description \"aa\"",
                 "jstestDescribe and jstestIt descriptions in ASCII order"
             ]
         ]);
+    });
+    jstestIt((
+        "test jstestReport handling-behavior"
+    ), function () {
+        const exitCode = process.exitCode;
+
+// The report lists this test, still running, as pending, and changes nothing,
+// since mid-run every running test is pending.
+
+        assertOrThrow(jstestReport().includes(
+            ". test it pending - test jstestXxx handling-behavior" +
+            " - test jstestReport handling-behavior\n"
+        ));
+        assertJsonEqual(process.exitCode, exitCode);
     });
 });
 
