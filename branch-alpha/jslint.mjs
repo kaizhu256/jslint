@@ -141,7 +141,6 @@
     coverageDir,
     create,
     cwd,
-    deadline,
     debugInline,
     default,
     delete,
@@ -282,7 +281,6 @@
     meta,
     min,
     mkdir,
-    mode,
     modeCoverageIgnoreFile,
     modeIndex,
     mode_cli,
@@ -327,6 +325,7 @@
     parentIi,
     parse,
     parseInt,
+    pass,
     pathname,
     pathnameList,
     platform,
@@ -346,6 +345,7 @@
     readFile,
     readdir,
     readonly,
+    record,
     recursive,
     reduce,
     repeat,
@@ -818,7 +818,6 @@ const jstestItSettleDict = Object.create(null);
 let jslint_export;                      // The jslint object to be exported.
 let jslint_import_meta_url = "";        // import.meta.url used by cli.
 let jstestAls;
-let jstestAlsDescribe;
 let jstestDescribePrv = "";
 let jstestItCount = 0;
 let jstestTimeStart;
@@ -12060,7 +12059,7 @@ function jstestCollecting(caller) {
 // current async context, else throw, e.g. for a <jstestIt> called after its
 // describe body settled, since no describe would run or report it.
 
-    const describe = jstestAlsDescribe?.getStore();
+    const describe = jstestAls?.getStore()?.describe;
     if (!describe || describe.collected) {
         throw new Error(
             caller +
@@ -12091,7 +12090,6 @@ async function jstestDescribe(description, testFunction) {
     let errBody;
     let message;
     let result;
-    let timerTimeout;
 
 // Record <description> before the first await, since describes then
 // interleave and finish out of source order.
@@ -12102,7 +12100,8 @@ async function jstestDescribe(description, testFunction) {
 
     if (jstestTimeStart === undefined) {
 
-// PR-xxx - Run each body and each test in its own async context: a body's
+// PR-xxx - Run each body and each test in an async context, storing {describe}
+// while a body collects and {describe, record} while a test runs: a body's
 // <jstestIt> finds its describe even after an await, and an error escaping a
 // test, e.g. thrown from a timer or an un-awaited rejection, names its test at
 // exit. The monitor only observes: node still crashes as before.
@@ -12111,7 +12110,6 @@ async function jstestDescribe(description, testFunction) {
 
         const {AsyncLocalStorage} = process.getBuiltinModule("async_hooks");
         jstestAls = new AsyncLocalStorage();
-        jstestAlsDescribe = new AsyncLocalStorage();
         jstestTimeStart = jstestTimeStart || Date.now();
         process.on("exit", jstestOnExit);
         process.on("uncaughtExceptionMonitor", jstestOnCrash);
@@ -12127,31 +12125,19 @@ async function jstestDescribe(description, testFunction) {
 // test starts. A body that throws fails as one more test.
 
     try {
-        await jstestAlsDescribe.run(describe, testFunction);
+        await jstestAls.run({describe}, testFunction);
     } catch (err) {
         errBody = err;
     }
     describe.collected = true;
 
-// PR-xxx - Fail each hook or test still pending after opt-in
-// npm_config_mode_test_timeout ms, default 0x7fffffff, ~24.8 days.
-// The timer is unref'd, so it never keeps a run alive nor shows in a dump of
-// active handles: a hang with nothing else alive exits at once, listing its
-// pending tests.
-
-    describe.deadline = new Promise(function (ignore, reject) {
-        timerTimeout = setTimeout(reject, timeout, new Error(
-            "test still pending after npm_config_mode_test_timeout=" +
-            timeout + " ms"
-        ));
-        timerTimeout.unref();
-    });
-
-// PR-xxx - Run before-hooks in order; if one fails, skip the tests.
+// PR-xxx - Run before-hooks in order; if one fails, skip the tests. Each hook
+// and test fails after its own timeout, option <timeout>, else opt-in
+// npm_config_mode_test_timeout ms, else 0x7fffffff, ~24.8 days.
 
     try {
         for (const fn of describe.beforeList) {
-            await Promise.race([fn(), describe.deadline]);
+            await jstestRace(fn(), timeout);
         }
     } catch (err) {
         errBefore = err;
@@ -12165,38 +12151,24 @@ async function jstestDescribe(description, testFunction) {
 
 // PR-xxx - Option <after> waits for the named tests, "<describe> - <it>", in
 // any describe, and fails at once if one failed, instead of each test waiting
-// on another's emit. Option <timeout> fails this test after <timeout> ms.
+// on another's emit.
 
         try {
-            await Promise.race([
-                (async function () {
-                    for (const name of option.after || []) {
-                        if (jstestIsFailed(await jstestItSettled(name))) {
-                            throw new Error(
-                                "after " + JSON.stringify(name) +
-                                ", which failed"
-                            );
-                        }
+            await jstestRace((async function () {
+                for (const name of option.after || []) {
+                    if (jstestIsFailed(await jstestItSettled(name))) {
+                        throw new Error(
+                            "after " + JSON.stringify(name) + ", which failed"
+                        );
                     }
-                    await jstestAls.run(record, record.testFunction);
-                }()),
-                describe.deadline,
-                option.timeout && new Promise(function (ignore, reject) {
-                    setTimeout(reject, option.timeout, new Error(
-                        "test still pending after timeout=" + option.timeout +
-                        " ms"
-                    )).unref();
-                })
-
-// Drop an absent timeout: a race holding <undefined> settles at once, and
-// would pass every test before it ran.
-
-            ].filter(Boolean));
+                }
+                await jstestAls.run({describe, record}, record.testFunction);
+            }()), option.timeout || timeout);
             record.status = "passed";
         } catch (err) {
             record.err = err;
             record.status = (
-                (record.mode === "pass")
+                option.pass
                 ? "passed"
                 : "failed"
             );
@@ -12205,12 +12177,11 @@ async function jstestDescribe(description, testFunction) {
     }));
     try {
         for (const fn of describe.afterList) {
-            await Promise.race([fn(), describe.deadline]);
+            await jstestRace(fn(), timeout);
         }
     } catch (err) {
         errAfter = err;
     }
-    clearTimeout(timerTimeout);
 
 // PR-xxx - Assert this describe's tests, then this describe, are in ASCII
 // order. Then add one failed result each for the body and the hooks.
@@ -12297,16 +12268,18 @@ function jstestIt(description, testFunction, mode) {
 
 // PR-xxx - Record this test as pending from registration, so <jstestReport>
 // sees it even if its describe never runs or prints. Third argument <mode> is
-// the string "pass", or an object of options <after>, <skip>, <timeout>.
+// an object of options <after>, <pass>, <skip>, <timeout>, or the string
+// "pass", kept for old callers, for {pass: true}.
 
     describe.itList.push(jstestItRecordPush({
         describe: describe.description,
         description,
-        mode,
         option: (
             (typeof mode === "object")
             ? mode
-            : {}
+            : {
+                pass: mode === "pass"
+            }
         ),
         status: "pending",
         testFunction
@@ -12355,7 +12328,7 @@ function jstestOnCrash(err) {
 // This function will mark the test whose async context let uncaught <err>
 // escape as crashed, and list it at exit even if its describe printed.
 
-    const record = jstestAls.getStore();
+    const record = jstestAls.getStore()?.record;
     if (record) {
         record.err = err;
         record.printed = false;
@@ -12395,6 +12368,23 @@ function jstestOrderCheck(descriptionList) {
             ];
         }
     }
+}
+
+function jstestRace(promise, timeout) {
+
+// This function will race <promise> against a timer of <timeout> ms, rejecting
+// if the timer wins. The timer is unref'd, so it never keeps a run alive nor
+// shows in a dump of active handles: a hang with nothing else alive exits at
+// once, listing its pending tests.
+
+    return Promise.race([
+        promise,
+        new Promise(function (ignore, reject) {
+            setTimeout(reject, timeout, new Error(
+                "test still pending after " + timeout + " ms"
+            )).unref();
+        })
+    ]);
 }
 
 function jstestReport() {

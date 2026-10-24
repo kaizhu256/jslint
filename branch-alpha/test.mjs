@@ -25,6 +25,38 @@ let {
 let sourceJslintMjs;
 let testCoverageMergeData;
 
+function childRun(env, source) {
+
+// Run <source> in a child node with jslint imported, and resolve its exit-code
+// and stderr. Clear the parent's jstest knobs, then apply <env>.
+
+    return new Promise(function (resolve) {
+        moduleChildProcess.execFile(process.execPath, [
+            "--input-type=module",
+            "--eval",
+            "import jslint from \"./jslint.mjs\";\n" + source
+        ], {
+            env: {
+                ...process.env,
+                npm_config_mode_test_filter: "",
+                npm_config_mode_test_timeout: "",
+                ...env
+            },
+
+// Kill a hung child, so a broken runner fails this suite instead of hanging it.
+// A killed child resolves exit-code null, never a passing 0.
+
+            timeout: 10000
+        }, function (err, ignore, stderr) {
+            resolve([(
+                err
+                ? err.code
+                : 0
+            ), stderr]);
+        });
+    });
+}
+
 await (async function init() {
 
 // Coverage-hack - Ugly-hack to get test-coverage for all initialization-states.
@@ -35,35 +67,18 @@ await (async function init() {
 // A runner that ended every async test before it ran would also pass the tests
 // that check it, so check one async failure here, outside any jstestIt.
 
-    await new Promise(function (resolve, reject) {
-        moduleChildProcess.execFile(process.execPath, [
-            "--input-type=module",
-            "--eval",
-            String(`
-import jslint from "./jslint.mjs";
+    await childRun({}, String(`
 jslint.jstestDescribe("aa", function () {
     jslint.jstestIt("bb", async function () {
         await null;
         throw new Error("bb late");
     });
 });
-            `)
-        ], {
-            env: {
-                ...process.env,
-                npm_config_mode_test_filter: "",
-                npm_config_mode_test_timeout: ""
-            },
-            timeout: 10000
-        }, function (err, ignore, stderr) {
-            if (err?.code === 1 && stderr.includes("Error: bb late")) {
-                resolve();
-                return;
-            }
-            reject(new Error(
-                "jstest passed an async test that failed\n" + stderr
-            ));
-        });
+    `)).then(function ([exitCode, stderr]) {
+        assertOrThrow(
+            exitCode === 1 && stderr.includes("Error: bb late"),
+            "jstest passed an async test that failed\n" + stderr
+        );
     });
 
 // Cleanup directory .tmp
@@ -2983,37 +2998,6 @@ ${sourceWrapper}
 jstestDescribe((
     "test jstestXxx handling-behavior"
 ), function testBehaviorJstestXxx() {
-    function childRun(env, source) {
-
-// Run <source> in a child node with jslint imported, and resolve its exit-code
-// and stderr. Clear the parent's jstest knobs, then apply <env>.
-
-        return new Promise(function (resolve) {
-            moduleChildProcess.execFile(process.execPath, [
-                "--input-type=module",
-                "--eval",
-                "import jslint from \"./jslint.mjs\";\n" + source
-            ], {
-                env: {
-                    ...process.env,
-                    npm_config_mode_test_filter: "",
-                    npm_config_mode_test_timeout: "",
-                    ...env
-                },
-
-// Kill a hung child, so a broken runner fails this suite instead of hanging it.
-// A killed child resolves exit-code null, never a passing 0.
-
-                timeout: 10000
-            }, function (err, ignore, stderr) {
-                resolve([(
-                    err
-                    ? err.code
-                    : 0
-                ), stderr]);
-            });
-        });
-    }
     jstestIt((
         "test jstestBefore-after handling-behavior"
     ), async function () {
@@ -3138,7 +3122,7 @@ jslint.jstestDescribe("aa", function () {
         `));
         assertJsonEqual(exitCode, 1);
         assertOrThrow((
-            /1\. test it - bb\nError: test still pending after npm_config_mode_test_timeout=1 ms\n[\s\S]*tests failed - 1\n/
+            /1\. test it - bb\nError: test still pending after 1 ms\n[\s\S]*tests failed - 1\n/
         ).test(stderr), stderr);
 
 // A failure its describe printed is not listed again at exit.
@@ -3281,7 +3265,7 @@ jslint.jstestDescribe("gg", function () {
             /test it skipped - dd\b/
         ).test(stderr), stderr);
         assertOrThrow((
-            /test it - ee\nError: test still pending after timeout=10 ms\n/
+            /test it - ee\nError: test still pending after 10 ms\n/
         ).test(stderr), stderr);
         assertOrThrow((
             /\d\. test it - ff\u001b/

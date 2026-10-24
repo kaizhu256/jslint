@@ -1728,7 +1728,6 @@ jslint.jstestAfter(function () {
     let errBody;
     let message;
     let result;
-    let timerTimeout;
 
 // Record &lt;description&gt; before the first await, since describes then
 // interleave and finish out of source order.
@@ -1739,7 +1738,8 @@ jslint.jstestAfter(function () {
 
     if (jstestTimeStart === undefined) {
 
-// PR-xxx - Run each body and each test in its own async context: a body's
+// PR-xxx - Run each body and each test in an async context, storing {describe}
+// while a body collects and {describe, record} while a test runs: a body's
 // &lt;jstestIt&gt; finds its describe even after an await, and an error escaping a
 // test, e.g. thrown from a timer or an un-awaited rejection, names its test at
 // exit. The monitor only observes: node still crashes as before.
@@ -1748,7 +1748,6 @@ jslint.jstestAfter(function () {
 
         const {AsyncLocalStorage} = process.getBuiltinModule("async_hooks");
         jstestAls = new AsyncLocalStorage();
-        jstestAlsDescribe = new AsyncLocalStorage();
         jstestTimeStart = jstestTimeStart || Date.now();
         process.on("exit", jstestOnExit);
         process.on("uncaughtExceptionMonitor", jstestOnCrash);
@@ -1764,7 +1763,7 @@ jslint.jstestAfter(function () {
 // test starts. A body that throws fails as one more test.
 
     try {
-        await jstestAlsDescribe.run(describe, testFunction);
+        await jstestAls.run({describe}, testFunction);
     } catch (err) {
         errBody = err;
     }
@@ -1819,16 +1818,18 @@ jslint.jstestAfter(function () {
 
 // PR-xxx - Record this test as pending from registration, so &lt;jstestReport&gt;
 // sees it even if its describe never runs or prints. Third argument &lt;mode&gt; is
-// the string "pass", or an object of options &lt;after&gt;, &lt;skip&gt;, &lt;timeout&gt;.
+// an object of options &lt;after&gt;, &lt;pass&gt;, &lt;skip&gt;, &lt;timeout&gt;, or the string
+// "pass", kept for old callers, for {pass: true}.
 
     describe.itList.push(jstestItRecordPush({
         describe: describe.description,
         description,
-        mode,
         option: (
             (typeof mode === "object")
             ? mode
-            : {}
+            : {
+                pass: mode === "pass"
+            }
         ),
         status: "pending",
         testFunction
@@ -2029,21 +2030,21 @@ assertJsonEqual([
     }
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-let sourceJslintMjs;
-let testCoverageMergeData;
+    });
+}
 
 await (async function init() {
 
 // Coverage-hack - Ugly-hack to get test-coverage for all initialization-states.
 
-<span class="apidocCodeKeywordSpan">moduleFsInit</span>();
-moduleFsInit();
+    <span class="apidocCodeKeywordSpan">moduleFsInit</span>();
+    moduleFsInit();
 
 // A runner that ended every async test before it ran would also pass the tests
 // that check it, so check one async failure here, outside any jstestIt.
 
-await new Promise(function (resolve, reject) {
-    moduleChildProcess.execFile(process.execPath, [
+    await childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
 ...</pre></li>
 
 <li>

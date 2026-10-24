@@ -20,11 +20,6 @@
 - jstest - Fail any describe or jstestIt name not in ASCII order.
 - jstest - Report each jstestIt still pending at exit as failed, and add opt-in timeout 'npm_config_mode_test_timeout=<ms>'.
 - jstest - Add opt-in test filter 'npm_config_mode_test_filter=<regexp>' on '<describe> - <it>'.
-- jstest - Report at exit each failed jstestIt whose describe never printed, e.g. one failing while a sibling hangs.
-- jstest - Fail a jstestDescribe body that throws, and a jstestIt called after its describe body settled, instead of passing silently.
-- jstest - Name the jstestIt an uncaught error escaped from, e.g. a throw in a timer or an un-awaited rejection; the run still crashes.
-- jstest - Collect each describe's tests before running them, allow async describe bodies, and add hooks jstestBefore and jstestAfter.
-- jstest - Add jstestIt options {after, skip, timeout}; 'after' waits for named tests in any describe and fails at once if one failed.
 - jslint - Report: Functions - Copy each signature from its source text, keeping default values.
 - jslint - Report: Functions - List block-scoped names, catch-variables and outer names, and mark closure only across functions.
 
