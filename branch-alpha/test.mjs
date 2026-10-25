@@ -81,8 +81,13 @@ jslint.jstestDescribe("aa", function () {
     });
 });
     `)).then(function ([exitCode, stderr]) {
+
+// Reported as a failed test, not merely a crash, which also exits 1.
+
         assertOrThrow(
-            exitCode === 1 && stderr.includes("Error: bb late"),
+            exitCode === 1 && (
+                / 1\. test it - bb\nError: bb late\n/
+            ).test(stderr),
             "jstest passed an async test that failed\n" + stderr
         );
     });
