@@ -3332,6 +3332,30 @@ jslint.jstestDescribe("aa", function () {
         assertMatch(stderr4, /test it pending - aa - bb\n[\s\S]*test it failed - aa - jstestDescribe body\nError: aa body broke\n/);
     });
     jstestIt((
+        "test jstestDescribe-concurrent handling-behavior"
+    ), async function () {
+
+// A describe's tests run concurrently: bb waits on an event cc emits, which
+// hangs if they run one after another.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+import {EventEmitter} from "node:events";
+const ee = new EventEmitter();
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        return new Promise(function (resolve) {
+            ee.once("go", resolve);
+        });
+    });
+    jslint.jstestIt("cc", function () {
+        ee.emit("go");
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 0);
+        assertMatch(stderr, /tests total {2}- 2\n {2}tests failed - 0\n/);
+    });
+    jstestIt((
         "test jstestDescribe-order handling-behavior"
     ), async function () {
 
@@ -3427,6 +3451,33 @@ jslint.jstestIt("cc", jslint.noop);
                 " after it settled"
             ), stderr);
         });
+    });
+    jstestIt((
+        "test jstestIt-late-filtered handling-behavior"
+    ), async function () {
+
+// A late jstestIt throws even when the filter would skip it, so a filter never
+// hides a test registered after its describe settled.
+
+        const [exitCode, stderr] = await childRun({
+            npm_config_mode_test_filter: "^aa - bb$"
+        }, String(`
+jslint.jstestDescribe("aa", function () {
+    setTimeout(function () {
+        jslint.jstestIt("cc", jslint.noop);
+    }, 10);
+    jslint.jstestIt("bb", function () {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 50);
+        });
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertOrThrow(stderr.includes(
+            "jstestIt \"cc\" called outside a jstestDescribe body, or after" +
+            " it settled"
+        ), stderr);
     });
     jstestIt((
         "test jstestIt-mode-pass handling-behavior"
@@ -3668,6 +3719,29 @@ jslint.jstestDescribe("aa", function () {
             " - test jstestReport handling-behavior\n"
         ));
         assertJsonEqual(process.exitCode, exitCode);
+    });
+    jstestIt((
+        "test jstestReport-numbering handling-behavior"
+    ), async function () {
+
+// The exit report numbers on from the tests already printed, and leaves out a
+// passed test whose describe never printed, here ee beside its hung sibling.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", jslint.noop);
+});
+jslint.jstestDescribe("cc", function () {
+    jslint.jstestIt("dd", function () {
+        setTimeout(process.exit, 100);
+        return new Promise(jslint.noop);
+    });
+    jslint.jstestIt("ee", jslint.noop);
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertMatch(stderr, /1\. test it - bb\b[\s\S]*✘ 2\. test it pending - cc - dd\n/);
+        assertOrThrow(!stderr.includes("cc - ee"), stderr);
     });
 });
 
