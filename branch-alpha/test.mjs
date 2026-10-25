@@ -3005,48 +3005,6 @@ jstestDescribe((
     "test jstestXxx handling-behavior"
 ), function testBehaviorJstestXxx() {
     jstestIt((
-        "test jstestBefore-after handling-behavior"
-    ), async function () {
-
-// Before-hooks finish before any test starts, after-hooks run after. A failing
-// before-hook skips its describe's tests; each failing hook fails as one test.
-
-        const [exitCode, stderr] = await childRun({}, String(`
-let server;
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestBefore(async function () {
-        await new Promise(function (resolve) {
-            setTimeout(resolve, 20);
-        });
-        server = "up";
-    });
-    jslint.jstestAfter(function () {
-        server = undefined;
-    });
-    jslint.jstestIt("bb", function () {
-        jslint.assertOrThrow(server === "up", "server not up");
-    });
-});
-jslint.jstestDescribe("cc", function () {
-    jslint.jstestBefore(function () {
-        throw new Error("cc before broke");
-    });
-    jslint.jstestIt("dd", jslint.noop);
-});
-jslint.jstestDescribe("ee", function () {
-    jslint.jstestAfter(function () {
-        throw new Error("ee after broke");
-    });
-    jslint.jstestIt("ff", jslint.noop);
-});
-        `));
-        assertJsonEqual(exitCode, 2);
-        assertMatch(stderr, /test describe - aa\n.*\d\. test it - bb\b/);
-        assertMatch(stderr, /test it skipped - dd\b[\s\S]*test it - jstestBefore\nError: cc before broke\n/);
-        assertMatch(stderr, /test it - ff\b[\s\S]*test it - jstestAfter\nError: ee after broke\n/);
-        assertMatch(stderr, /tests total {2}- 5\n {2}tests failed - 2\n/);
-    });
-    jstestIt((
         "test jstestDescribe-body-throw handling-behavior"
     ), async function () {
 
@@ -3097,6 +3055,10 @@ jslint.jstestDescribe("aa", function () {
         assertOrThrow(stderr.includes(
             "\"aa\" must sort before \"cc\""
         ), stderr);
+
+// A failure its describe printed is not listed again at exit.
+
+        assertOrThrow(!stderr.includes("test it failed"), stderr);
     });
     jstestIt((
         "test jstestIt-filter handling-behavior"
@@ -3182,52 +3144,6 @@ jslint.jstestDescribe("aa", function () {
         `));
         assertJsonEqual(exitCode, 0);
         assertMatch(stderr, /\u2714 1\. test it - bb\b[\s\S]*tests total {2}- 1\n {2}tests failed - 0\n/);
-    });
-    jstestIt((
-        "test jstestIt-option handling-behavior"
-    ), async function () {
-
-// Options: <after> fails at once if a named test failed, and waits across
-// describes; <skip> skips; <timeout> fails one slow test. A test with no
-// options still runs to its end: "aa" fails after an await.
-
-        const [exitCode, stderr] = await childRun({}, String(`
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("aa", async function () {
-        await null;
-        throw new Error("aa late");
-    });
-    jslint.jstestIt("bb", function () {
-        throw new Error("bb broke");
-    });
-    jslint.jstestIt("cc", jslint.noop, {after: ["aa - bb"]});
-    jslint.jstestIt("dd", jslint.noop, {skip: true});
-    jslint.jstestIt("ee", function () {
-        return new Promise(function (resolve) {
-            setTimeout(resolve, 500);
-        });
-    }, {timeout: 10});
-    jslint.jstestIt("ff", jslint.noop, {after: ["gg - hh"]});
-});
-jslint.jstestDescribe("gg", function () {
-    jslint.jstestIt("hh", function () {
-        return new Promise(function (resolve) {
-            setTimeout(resolve, 20);
-        });
-    });
-});
-        `));
-        assertJsonEqual(exitCode, 4);
-        assertMatch(stderr, /test it - aa\nError: aa late\n/);
-        assertMatch(stderr, /test it - cc\nError: after "aa - bb", which failed\n/);
-        assertMatch(stderr, /test it skipped - dd\b/);
-        assertMatch(stderr, /test it - ee\nError: test still pending after 10 ms\n/);
-        assertMatch(stderr, /\d\. test it - ff\u001b/);
-        assertMatch(stderr, /tests total {2}- 7\n {2}tests failed - 4\n/);
-
-// A failure its describe printed is not listed again at exit.
-
-        assertOrThrow(!stderr.includes("test it failed"), stderr);
     });
     jstestIt((
         "test jstestOnExit-crash handling-behavior"
