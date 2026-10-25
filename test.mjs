@@ -15,8 +15,8 @@ let {
     globExclude,
     jstestDescribe,
     jstestIt,
-    jstestOnExit,
     jstestOrderCheck,
+    jstestReport,
     moduleFsInit,
     noop,
     v8CoverageListMerge,
@@ -25,12 +25,73 @@ let {
 let sourceJslintMjs;
 let testCoverageMergeData;
 
+function assertMatch(text, rgx) {
+
+// Assert <text> matches regexp <rgx>, showing <text> on failure.
+
+    assertOrThrow(rgx.test(text), text);
+}
+
+function childRun(env, source, stdin) {
+
+// Run <source> in a child node with jslint imported, fed <stdin>, and resolve
+// its exit-code, stderr and stdout. Clear the parent's test filter, then apply
+// <env>.
+
+    return new Promise(function (resolve) {
+        moduleChildProcess.execFile(process.execPath, [
+            "--input-type=module",
+            "--eval",
+            "import jslint from \"./jslint.mjs\";\n" + source
+        ], {
+            env: {
+                ...process.env,
+                npm_config_mode_test_filter: "",
+                ...env
+            },
+
+// Kill a hung child, so a broken runner fails this suite instead of hanging it.
+// A killed child resolves exit-code null, never a passing 0.
+
+            timeout: 10000
+        }, function (err, stdout, stderr) {
+            resolve([(
+                err
+                ? err.code
+                : 0
+            ), stderr, stdout]);
+        }).stdin.end(stdin);
+    });
+}
+
 await (async function init() {
 
 // Coverage-hack - Ugly-hack to get test-coverage for all initialization-states.
 
     moduleFsInit();
     moduleFsInit();
+
+// A runner that ended every async test before it ran would also pass the tests
+// that check it, so check one async failure here, outside any jstestIt.
+
+    await childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", async function () {
+        await null;
+        throw new Error("bb late");
+    });
+});
+    `)).then(function ([exitCode, stderr]) {
+
+// Reported as a failed test, not merely a crash, which also exits 1.
+
+        assertOrThrow(
+            exitCode === 1 && (
+                / 1\. test it - bb\nError: bb late\n/
+            ).test(stderr),
+            "jstest passed an async test that failed\n" + stderr
+        );
+    });
 
 // Cleanup directory .tmp
 
@@ -66,7 +127,7 @@ jstestDescribe((
     jstestIt((
         "test assertXxx-error handling-behavior"
     ), async function () {
-        // test debugInline handling-behavior
+        // Keep <debugInline> imported, for debugging tests.
         noop(debugInline);
         // test assertErrorThrownAsync error handling-behavior
         await assertErrorThrownAsync(function () {
@@ -2548,14 +2609,76 @@ ff();
     });
     jstestIt((
         "test warning-test-cause handling-behavior"
-    ), function () {
+    ), async function () {
 
-// this function will validate each jslint <warning> is raised with given
-// malformed <code>
+// This function will validate each fixture in each '// test_cause:' block of
+// jslint.mjs. Its source must run the code below the block, by V8 block
+// coverage, and when it names a warning code, raise that warning visibly.
 
+        const controlList = [];
+        const fixtureList = [];
+        function fixturePush(list, cause, anchor) {
+
+// This function will push to <list> the fixture <cause>, whose block sits
+// directly above the code at offset <anchor> in jslint.mjs.
+
+            const [ignore, callCode] = sourceJslintMjs.slice(
+                anchor,
+                anchor + 256
+            ).match(/^(?:return )?(?:[\w.]+ = )?\w+\(\s*(?:"(\w+)")?/) || [];
+            const [source, fn, code, aa, column] = cause;
+            const {warnings} = jslint.jslint(source, {
+                beta: true
+            });
+            list.push({
+                anchor,
+
+// Name the line of the code under the block, so a failure points at it.
+
+                at: "jslint.mjs:" + (
+                    sourceJslintMjs.slice(0, anchor).match(/\n/g).length + 1
+                ),
+                cause: JSON.stringify(cause),
+
+// Validate no internal-error. A crash mid-walk still runs every branch before
+// it, so a coverage-check alone passes straight through one, and "0``" threw
+// in post_b_binary for years with its cause declared and green.
+
+                codeless: warnings.some(function (warning) {
+                    return warning.code === undefined;
+                }),
+                fn,
+
+// A fixture has exactly 5 fields. Field 3 "(live)" marks a branch reached with
+// no warning of its own, documenting how, so it is not taken for deadcode. Any
+// other field 3 must be a warning shown below, so a typo fails there.
+
+                known: cause.length === 5 && (
+                    code !== "(live)" || (aa === "" && column === 0)
+                ),
+
+// A second warning on one token is dropped, so check the warnings the user
+// sees, never the ones raised.
+
+                shown: code === "(live)" || warnings.some(function (warning) {
+                    return (
+                        warning.code === code &&
+                        String(warning.b || warning.a || "") === aa &&
+                        warning.column === column
+                    );
+                }),
+
+// The call directly under the block raises the warning: its first argument is
+// the code.
+
+                site: code === "(live)" || callCode === code,
+                source
+            });
+        }
         sourceJslintMjs.replace((
             /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?) *?\S/g
-        ), function (match0, header, causeList, footer) {
+        ), function (match0, header, causeList, footer, offset) {
+            const rgxAnchor = (/(?:\/\/.*\n\s*)*(?:[?:]\s*)?/y);
             let tmp;
             // console.error(match0);
             // Validate header.
@@ -2586,37 +2709,189 @@ ff();
                 causeList === tmp,
                 "\n" + causeList + "\n\n" + tmp
             );
-            causeList.split("\n").forEach(function (cause) {
-                cause = JSON.parse(cause);
-                tmp = jslint.jslint(cause[0], {
-                    beta: true,
-                    test_cause: true
-                });
 
-// Validate no internal-error. A crash mid-walk still records every cause
-// raised before it, so the cause-assertion below passes straight through one
-// - "0``" threw in post_b_binary for years with its cause declared and green.
+// Anchor the block to the first code below it, past any comment paragraph and
+// a leading '?' or ':' of a ternary branch.
 
-                assertOrThrow(
-                    tmp.warnings.every(function ({
-                        code
-                    }) {
-                        return code !== undefined;
-                    }),
-                    "\n" + JSON.stringify(cause[0]) + "\n\n" +
-                    JSON.stringify(tmp.warnings, undefined, 4)
+            rgxAnchor.lastIndex = offset + match0.length - 1;
+            rgxAnchor.exec(sourceJslintMjs);
+            for (const cause of causeList.split("\n")) {
+                fixturePush(
+                    fixtureList,
+                    JSON.parse(cause),
+                    rgxAnchor.lastIndex
                 );
-                tmp = tmp.causes;
-                // Validate cause.
-                assertOrThrow(
-                    tmp[JSON.stringify(cause.slice(1))],
-                    (
-                        "\n" + JSON.stringify(cause) + "\n\n" +
-                        Object.keys(tmp).sort().join("\n")
-                    )
-                );
-            });
+            }
             return "";
+        });
+
+// Negative controls: each bad fixture, filed in the block of a good one, must
+// fail exactly the named check, so a weakened checker turns this test red.
+
+        for (const [good, bad, expect] of [
+            [
+                [
+                    "/*jslint test_internal_error*/\nif(0%0){}",
+                    "condition",
+                    "(live)",
+                    "",
+                    0
+                ],
+                {codeless: true}
+            ], [
+                ["if(0%0){}", "condition", "unexpectd_a", "%", 5],
+                {shown: false, site: false}
+            ], [
+                ["if(0%0){}", "condition", "(live)", "aa", 0],
+                {known: false}
+            ], [
+                ["if(0%0){}", "condition", "(live)", "", 5],
+                {known: false}
+            ], [
+                ["if(0%0){}", "condition", "unexpected_a", "%", 5, "extra"],
+                {known: false}
+            ], [
+                ["if(0%0){}", "condition", "unexpected_a", "%", 6],
+                {shown: false}
+            ], [
+                ["if(0%0){}", "condition", "unexpected_a", "&", 5],
+                {shown: false}
+            ], [
+                ["if(0%0){}", "condition", "empty_block", "{", 8],
+                {site: false}
+            ], [
+                ["if(0%0){}", "warn", "unexpected_a", "%", 5],
+                {inFn: false}
+            ], [
+                ["if(0&0){}", "condition", "unexpected_a", "&", 5],
+                {live: false}
+            ]
+        ].map(function ([bad, expect]) {
+            return [
+                "[\"if(0%0){}\",\"condition\",\"unexpected_a\",\"%\",5]",
+                bad,
+                expect
+            ];
+        }).concat([
+            [
+                "[\"let aa=!!0;\",\"post_u_unary\",\"expected_a_b\",\"!!\",8]",
+                ["!!0", "post_u_unary", "expected_a_b", "!!", 1],
+                {shown: false}
+            ], [
+                "[\"aa=/./vu\",\"lex_regexp\",\"unexpected_a\",\"u\",8]",
+                ["aa=/./u;if(0){}", "lex_regexp", "unexpected_a", "0", 12],
+                {live: false}
+            ]
+        ])) {
+            const found = fixtureList.find(function ({cause}) {
+                return cause === good;
+            });
+            assertOrThrow(found, `control's good fixture is missing: ${good}`);
+            fixturePush(controlList, bad, found.anchor);
+            controlList.at(-1).expect = expect;
+        }
+
+// Measure each fixture's coverage in a child, since taking precise coverage
+// resets the counters that NODE_V8_COVERAGE dumps at exit.
+
+        await childRun({
+            NODE_V8_COVERAGE: ""
+        }, String(`
+import moduleFs from "fs";
+import moduleInspector from "inspector/promises";
+const fixtureList = JSON.parse(moduleFs.readFileSync(0, "utf8"));
+const resultList = [];
+const session = new moduleInspector.Session();
+session.connect();
+await session.post("Profiler.enable");
+await session.post("Profiler.startPreciseCoverage", {
+    callCount: true,
+    detailed: true
+});
+await session.post("Profiler.takePreciseCoverage");
+for (const [offset, source] of fixtureList) {
+    const result = [0, ""];
+    const span = [Infinity, Infinity];
+    jslint(source, {
+        beta: true
+    });
+    for (const {functionName, ranges} of (
+        await session.post("Profiler.takePreciseCoverage")
+    ).result.find(function ({url}) {
+        return url.endsWith("/jslint.mjs");
+    }).functions) {
+        for (const [ii, range] of ranges.entries()) {
+            const width = range.endOffset - range.startOffset;
+            if (range.startOffset <= offset && offset < range.endOffset) {
+                if (width <= span[0]) {
+                    result[0] = range.count;
+                    span[0] = width;
+                }
+                if (ii === 0 && functionName && width < span[1]) {
+                    result[1] = functionName;
+                    span[1] = width;
+                }
+            }
+        }
+    }
+    resultList.push(result);
+}
+process.stdout.write(JSON.stringify(resultList));
+        `).trim() + "\n", JSON.stringify(
+            fixtureList.concat(controlList).map(function ({anchor, source}) {
+                return [anchor, source];
+            })
+        )).then(function ([exitCode, stderr, stdout]) {
+            assertOrThrow(exitCode === 0, stderr);
+            return JSON.parse(stdout).map(function ([count, name], ii) {
+                const {
+                    at,
+                    cause,
+                    codeless,
+                    fn,
+                    known,
+                    shown,
+                    site
+                } = fixtureList.concat(controlList)[ii];
+                return {
+                    at,
+                    cause,
+                    codeless,
+
+// The function is the named one holding the block.
+
+                    inFn: fn === name,
+                    known,
+                    live: count > 0,
+                    shown,
+                    site
+                };
+            });
+        }).then(function (recordList) {
+
+// List every bad fixture, not only the first.
+
+            assertJsonEqual(recordList.slice(
+                0,
+                fixtureList.length
+            ).filter(function ({codeless, inFn, known, live, shown, site}) {
+                return codeless || !inFn || !known || !live || !shown || !site;
+            }), []);
+            assertJsonEqual(recordList.slice(
+                fixtureList.length
+            ), controlList.map(function ({at, cause, expect}) {
+                return {
+                    at,
+                    cause,
+                    codeless: false,
+                    inFn: true,
+                    known: true,
+                    live: true,
+                    shown: true,
+                    site: true,
+                    ...expect
+                };
+            }));
         });
     });
 });
@@ -2949,54 +3224,87 @@ ${sourceWrapper}
 jstestDescribe((
     "test jstestXxx handling-behavior"
 ), function testBehaviorJstestXxx() {
-    function childRun(env, source) {
-
-// Run <source> in a child node with jslint imported, and resolve its exit-code
-// and stderr. Clear the parent's jstest knobs, then apply <env>.
-
-        return new Promise(function (resolve) {
-            const child = moduleChildProcess.spawn(process.execPath, [
-                "--input-type=module",
-                "--eval",
-                "import jslint from \"./jslint.mjs\";\n" + source
-            ], {
-                env: {
-                    ...process.env,
-                    npm_config_mode_test_filter: "",
-                    npm_config_mode_test_timeout: "",
-                    ...env
-                },
-                stdio: ["ignore", "ignore", "pipe"]
-            });
-            let stderr = "";
-            child.stderr.on("data", function (chunk) {
-                stderr += chunk;
-            });
-            child.on("close", function (exitCode) {
-                resolve([exitCode, stderr]);
-            });
-        });
-    }
     jstestIt((
-        "test jstestDescribe-timeout handling-behavior"
+        "test jstestDescribe-body-throw handling-behavior"
     ), async function () {
 
-// Opt-in npm_config_mode_test_timeout fails a hung test, so its describe
-// prints.
+// A describe body that throws fails as one more test, after the tests it did
+// register; an invalid filter regexp throws from that body too. A falsy throw
+// fails the same, and a hung sibling cannot hide the body's error at exit.
 
-        const [exitCode, stderr] = await childRun({
-            npm_config_mode_test_timeout: "1"
-        }, String(`
+        const [
+            [exitCode, stderr],
+            [exitCode2, stderr2],
+            [exitCode3, stderr3],
+            [exitCode4, stderr4]
+        ] = await Promise.all([
+            childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", jslint.noop);
+    throw new Error("aa body broke");
+});
+            `)),
+            childRun({
+                npm_config_mode_test_filter: "("
+            }, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", jslint.noop);
+});
+            `)),
+            childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", jslint.noop);
+    throw undefined;
+});
+            `)),
+            childRun({}, String(`
 jslint.jstestDescribe("aa", function () {
     jslint.jstestIt("bb", function () {
+        setTimeout(process.exit, 100);
         return new Promise(jslint.noop);
     });
+    throw new Error("aa body broke");
+});
+            `))
+        ]);
+        assertJsonEqual(
+            [exitCode, exitCode2, exitCode3, exitCode4],
+            [1, 1, 1, 2]
+        );
+        assertMatch(stderr, /1\. test it - bb\b[\s\S]*2\. test it - jstestDescribe body\nError: aa body broke\n[\s\S]*tests total {2}- 2\n {2}tests failed - 1\n/);
+        assertOrThrow(stderr2.includes(
+            "test it - jstestDescribe body\nSyntaxError: Invalid regular"
+        ), stderr2);
+        assertMatch(stderr3, /2\. test it - jstestDescribe body\nundefined\b[\s\S]*tests failed - 1\n/);
+        assertMatch(stderr4, /test it pending - aa - bb\n[\s\S]*test it failed - aa - jstestDescribe body\nError: aa body broke\n/);
+    });
+    jstestIt((
+        "test jstestDescribe-order handling-behavior"
+    ), async function () {
+
+// The runner fails a describe's tests out of order, and a describe out of order
+// with the one before it, each as one more failed test.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+jslint.jstestDescribe("cc", function () {
+    jslint.jstestIt("bb", jslint.noop);
+    jslint.jstestIt("aa", jslint.noop);
+});
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("dd", jslint.noop);
 });
         `));
-        assertJsonEqual(exitCode, 1);
-        assertOrThrow((
-            /1\. test it - bb\nError: test still pending after npm_config_mode_test_timeout=1 ms\n[\s\S]*tests failed - 1\n/
-        ).test(stderr), stderr);
+        assertJsonEqual(exitCode, 2);
+        assertOrThrow(stderr.includes(
+            "\"aa\" must sort before \"bb\""
+        ), stderr);
+        assertOrThrow(stderr.includes(
+            "\"aa\" must sort before \"cc\""
+        ), stderr);
+
+// A failure its describe printed is not listed again at exit.
+
+        assertOrThrow(!stderr.includes("test it failed"), stderr);
     });
     jstestIt((
         "test jstestIt-filter handling-behavior"
@@ -3019,60 +3327,264 @@ jslint.jstestDescribe("cc", function () {
 });
         `));
         assertJsonEqual(exitCode, 0);
-        assertOrThrow((
-            /test describe - cc\n.*1\. test it - dd\b[\s\S]*tests total {2}- 1\n/
-        ).test(stderr), stderr);
+        assertMatch(stderr, /test describe - cc\n.*1\. test it - dd\b[\s\S]*tests total {2}- 1\n/);
         assertOrThrow(!stderr.includes("test describe - aa"), stderr);
         assertOrThrow(!stderr.includes("test it - ee"), stderr);
     });
     jstestIt((
-        "test jstestIt-mode-pass handling-behavior"
-    ), function () {
-        throw new Error();
-    }, "pass");
+        "test jstestIt-late handling-behavior"
+    ), async function () {
+
+// An async describe body registers tests after an await, and they run. A
+// jstestIt after the body settled, or before any describe, throws.
+
+        const resultList = await Promise.all([
+            String(`
+jslint.jstestDescribe("aa", async function () {
+    jslint.jstestIt("bb", jslint.noop);
+    await null;
+    jslint.jstestIt("cc", jslint.noop);
+});
+            `),
+            String(`
+jslint.jstestDescribe("aa", function () {
+    setTimeout(function () {
+        jslint.jstestIt("cc", jslint.noop);
+    }, 10);
+    jslint.jstestIt("bb", function () {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 50);
+        });
+    });
+});
+            `),
+            String(`
+jslint.jstestIt("cc", jslint.noop);
+            `)
+        ].map(function (source) {
+            return childRun({}, source);
+        }));
+        assertJsonEqual(resultList.map(function ([exitCode]) {
+            return exitCode;
+        }), [0, 1, 1]);
+        assertMatch(resultList[0][1], /1\. test it - bb\b[\s\S]*2\. test it - cc\b[\s\S]*tests total {2}- 2\n {2}tests failed - 0\n/);
+        resultList.slice(1).forEach(function ([ignore, stderr]) {
+            assertOrThrow(stderr.includes(
+                "jstestIt \"cc\" called outside a jstestDescribe body, or" +
+                " after it settled"
+            ), stderr);
+        });
+    });
     jstestIt((
-        "test jstestOnExit tests-failed handling-behavior"
-    ), function () {
+        "test jstestIt-mode-pass handling-behavior"
+    ), async function () {
 
-// A dry run lists this test, still running, as pending.
+// Mode "pass" reports a throwing test as passed and counts 0 failed.
 
-        assertOrThrow(jstestOnExit(undefined, "testsFailed").includes(
-            ". test it pending - test jstestXxx handling-behavior" +
-            " - test jstestOnExit tests-failed handling-behavior\n"
-        ));
+        const [exitCode, stderr] = await childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        throw new Error("bb expected");
+    }, "pass");
+});
+        `));
+        assertJsonEqual(exitCode, 0);
+        assertMatch(stderr, /\u2714 1\. test it - bb\b[\s\S]*tests total {2}- 1\n {2}tests failed - 0\n/);
+    });
+    jstestIt((
+        "test jstestIt-throw-non-error handling-behavior"
+    ), async function () {
+
+// A test that throws undefined or a string, or rejects with no reason, fails
+// and prints what it threw, without crashing the runner's report. The exit
+// report prints a string too, for a failure a hung sibling kept unprinted.
+
+        const [[exitCode, stderr], [exitCode2, stderr2]] = await Promise.all([
+            childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        throw undefined;
+    });
+    jslint.jstestIt("cc", function () {
+        return Promise.reject();
+    });
+    jslint.jstestIt("dd", function () {
+        throw "dd string";
+    });
+});
+            `)),
+            childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        throw "bb string";
+    });
+    jslint.jstestIt("cc", function () {
+        setTimeout(process.exit, 100);
+        return new Promise(jslint.noop);
+    });
+});
+            `))
+        ]);
+        assertJsonEqual([exitCode, exitCode2], [3, 2]);
+        assertMatch(stderr, /1\. test it - bb\nundefined\b[\s\S]*2\. test it - cc\nundefined\b[\s\S]*3\. test it - dd\ndd string\b[\s\S]*tests failed - 3\n/);
+        assertOrThrow(!stderr.includes("TypeError"), stderr);
+        assertMatch(stderr2, /test it failed - aa - bb\nbb string\n/);
+    });
+    jstestIt((
+        "test jstestOnExit-crash handling-behavior"
+    ), async function () {
+
+// An error escaping a test, from a timer or an un-awaited rejection, still
+// crashes, and the exit report names that test as crashed, its slow sibling as
+// pending. A crash from outside any test names none.
+
+        const resultList = await Promise.all([
+            String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        setTimeout(function () {
+            throw new Error("bb timer boom");
+        }, 10);
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 50);
+        });
+    });
+    jslint.jstestIt("cc", function () {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 200);
+        });
+    });
+});
+            `),
+            String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        Promise.reject(new Error("bb unawaited"));
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 50);
+        });
+    });
+});
+            `),
+            String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        setTimeout(function () {
+            throw new Error("bb late boom");
+        }, 100);
+    });
+});
+            `),
+            String(`
+setTimeout(function () {
+    throw new Error("outside boom");
+}, 20);
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 200);
+        });
+    });
+});
+            `)
+        ].map(function (source) {
+            return childRun({}, source);
+        }));
+        assertJsonEqual(resultList.map(function ([exitCode]) {
+            return exitCode;
+        }), [1, 1, 1, 1]);
+        assertMatch(resultList[0][1], /test it crashed - aa - bb\nError: bb timer boom\n[\s\S]*test it pending - aa - cc\n/);
+        assertMatch(resultList[1][1], /test it crashed - aa - bb\nError: bb unawaited\n/);
+
+// A test that passed and printed, then crashed late, is listed again.
+
+        assertMatch(resultList[2][1], /1\. test it - bb\b[\s\S]*test it crashed - aa - bb\nError: bb late boom\n/);
+        assertMatch(resultList[3][1], /test it pending - aa - bb\n/);
+        assertOrThrow(
+            !resultList[3][1].includes("crashed"),
+            resultList[3][1]
+        );
+    });
+    jstestIt((
+        "test jstestOnExit-crash-handled handling-behavior"
+    ), async function () {
+
+// A user's own uncaughtException handler lets a test that crashed mid-run
+// finish, and it still fails, since a test settles once.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+process.on("uncaughtException", jslint.noop);
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        setTimeout(function () {
+            throw new Error("bb handled boom");
+        }, 10);
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 50);
+        });
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertMatch(stderr, /1\. test it - bb\nError: bb handled boom\n[\s\S]*tests failed - 1\n/);
     });
     jstestIt((
         "test jstestOnExit-pending handling-behavior"
     ), async function () {
 
-// A test still pending when something ends the process counts as failed,
-// though its describe never prints.
+// A test still pending at exit counts as failed, in red, though its describe
+// never prints. With nothing alive, the hang exits at once, since jstest keeps
+// no timer; else <childRun>'s 10 s watchdog kills it.
 
         const [exitCode, stderr] = await childRun({}, String(`
 jslint.jstestDescribe("aa", function () {
     jslint.jstestIt("bb", function () {
-        setTimeout(process.exit);
         return new Promise(jslint.noop);
     });
 });
         `));
         assertJsonEqual(exitCode, 1);
-        assertOrThrow((
-            /1\. test it pending - aa - bb\n {2}tests total {2}- 1\n {2}tests failed - 1\n/
-        ).test(stderr), stderr);
+        assertMatch(stderr, /\[31m {2}\S+ 1\. test it pending - aa - bb\n {2}tests total {2}- 1\n {2}tests failed - 1\n/);
         assertOrThrow(!stderr.includes("test describe - aa"), stderr);
+    });
+    jstestIt((
+        "test jstestOnExit-unprinted handling-behavior"
+    ), async function () {
+
+// betadog's flake: bb fails before its emit, cc waits on that emit forever,
+// then something ends the process. bb's error, stored in a describe that never
+// prints, still shows and counts.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+import {EventEmitter} from "node:events";
+const ee = new EventEmitter();
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", async function () {
+        throw new Error("bb real error");
+    });
+    jslint.jstestIt("cc", function () {
+        setTimeout(process.exit, 100);
+        return new Promise(function (resolve) {
+            ee.once("done", resolve);
+        });
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 2);
+        assertMatch(stderr, /1\. test it failed - aa - bb\nError: bb real error\n[\s\S]*2\. test it pending - aa - cc\n {2}tests total {2}- 2\n {2}tests failed - 2\n/);
     });
     jstestIt((
         "test jstestOrderCheck handling-behavior"
     ), function () {
 
 // A sorted list returns nothing. An unsorted pair or a duplicate returns one
-// failed result, for the first bad pair only.
+// failed result, for the first bad pair only. A non-string name fails too.
 
         assertJsonEqual([
             ["", "aa", "bb"],
             ["aa", "cc", "bb", "aa"],
-            ["aa", "aa"]
+            ["aa", "aa"],
+            [undefined, "bb"]
         ].map(function (descriptionList) {
             const failure = jstestOrderCheck(descriptionList);
             return failure && [failure[0].message, failure[1]];
@@ -3084,8 +3596,25 @@ jslint.jstestDescribe("aa", function () {
             ], [
                 "duplicate description \"aa\"",
                 "jstestDescribe and jstestIt descriptions in ASCII order"
+            ], [
+                "\"bb\" must sort before undefined",
+                "jstestDescribe and jstestIt descriptions in ASCII order"
             ]
         ]);
+    });
+    jstestIt((
+        "test jstestReport handling-behavior"
+    ), function () {
+        const exitCode = process.exitCode;
+
+// The report lists this test, still running, as pending, and changes nothing,
+// since mid-run every running test is pending.
+
+        assertOrThrow(jstestReport().text.includes(
+            ". test it pending - test jstestXxx handling-behavior" +
+            " - test jstestReport handling-behavior\n"
+        ));
+        assertJsonEqual(process.exitCode, exitCode);
     });
 });
 
@@ -3122,23 +3651,21 @@ jstestDescribe((
             result: []
         });
     });
-    [
-        "test_coverage_merge_is_block_coverage_test.json",
-        "test_coverage_merge_issue_2_mixed_is_block_coverage_test.json",
-        "test_coverage_merge_node_10_internal_errors_one_of_test.json",
-        "test_coverage_merge_reduced_test.json",
-        "test_coverage_merge_simple_test.json",
-        "test_coverage_merge_various_test.json"
-    ].forEach(function (file) {
-        jstestIt(`test merge-fixture-${file} handling-behavior`, function () {
-            file = testCoverageMergeData[file];
-            file.forEach(function ({
-                expected,
-                inputs
-            }) {
-                assertJsonEqual(v8CoverageListMerge(inputs), expected);
-            });
-        });
+    jstestIt((
+        "test merge-fixture handling-behavior"
+    ), function () {
+        for (const file of [
+            "test_coverage_merge_is_block_coverage_test.json",
+            "test_coverage_merge_issue_2_mixed_is_block_coverage_test.json",
+            "test_coverage_merge_node_10_internal_errors_one_of_test.json",
+            "test_coverage_merge_reduced_test.json",
+            "test_coverage_merge_simple_test.json",
+            "test_coverage_merge_various_test.json"
+        ]) {
+            for (const {expected, inputs} of testCoverageMergeData[file]) {
+                assertJsonEqual(v8CoverageListMerge(inputs), expected, file);
+            }
+        }
     });
     jstestIt((
         "test merge-node-sqlite-files handling-behavior"
@@ -3470,47 +3997,50 @@ jstestDescribe((
             return v8CoverageReportCreate({});
         }, "invalid coverageDir");
     });
-    [
-        [
-            "v8CoverageReportCreate_high.js", (
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "}\n"
-            )
-        ], [
-            "v8CoverageReportCreate_ignore.js", (
-                "/*coverage-ignore-file*/\n" +
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "case 1:break;//coverage-ignore-line\n" +
-                "/*coverage-disable*/\n" +
-                "case 2:break;\n" +
-                "/*coverage-enable*/\n" +
-                "}\n"
-            )
-        ], [
-            "v8CoverageReportCreate_low.js", (
-                "switch(0){\n" +
-                "case 1:break;\n" +
-                "case 2:break;\n" +
-                "case 3:break;\n" +
-                "case 4:break;\n" +
-                "}\n"
-            )
-        ], [
-            "v8CoverageReportCreate_medium.js", (
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "case 1:break;\n" +
-                "case 2:break;\n" +
-                "}\n"
-            )
-        ]
-    ].forEach(function ([
-        file, data
-    ], ii) {
-        jstestIt(file, async function () {
-            let dir = ".tmp/coverage_" + ii + "/";
+    jstestIt((
+        "test report-fixture handling-behavior"
+    ), async function () {
+        const fixtureList = [
+            [
+                "v8CoverageReportCreate_high.js", (
+                    "switch(0){\n" +
+                    "case 0:break;\n" +
+                    "}\n"
+                )
+            ], [
+                "v8CoverageReportCreate_ignore.js", (
+                    "/*coverage-ignore-file*/\n" +
+                    "switch(0){\n" +
+                    "case 0:break;\n" +
+                    "case 1:break;//coverage-ignore-line\n" +
+                    "/*coverage-disable*/\n" +
+                    "case 2:break;\n" +
+                    "/*coverage-enable*/\n" +
+                    "}\n"
+                )
+            ], [
+                "v8CoverageReportCreate_low.js", (
+                    "switch(0){\n" +
+                    "case 1:break;\n" +
+                    "case 2:break;\n" +
+                    "case 3:break;\n" +
+                    "case 4:break;\n" +
+                    "}\n"
+                )
+            ], [
+                "v8CoverageReportCreate_medium.js", (
+                    "switch(0){\n" +
+                    "case 0:break;\n" +
+                    "case 1:break;\n" +
+                    "case 2:break;\n" +
+                    "}\n"
+                )
+            ]
+        ];
+        await Promise.all(fixtureList.map(async function ([
+            file, data
+        ], ii) {
+            const dir = ".tmp/coverage_" + ii + "/";
             file = dir + file;
             await fsWriteFileWithParents(file, data);
             await jslint.jslint_cli({
@@ -3523,6 +4053,6 @@ jstestDescribe((
                     file
                 ]
             });
-        });
+        }));
     });
 });
