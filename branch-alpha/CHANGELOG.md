@@ -19,7 +19,6 @@
 # v2026.10.30
 - jstest - Collect each describe's tests before running them, and report every failed, hung or crashed test at exit.
 - jstest - Fail any describe or jstestIt name not in ASCII order.
-- jstest - Report each jstestIt still pending at exit as failed.
 - jstest - Add opt-in test filter 'npm_config_mode_test_filter=<regexp>' on '<describe> - <it>'.
 - jslint - Report: Functions - Copy each signature from its source text, keeping default values.
 - jslint - Report: Functions - List block-scoped names, catch-variables and outer names, and mark closure only across functions.
