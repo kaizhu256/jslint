@@ -2614,10 +2614,15 @@ ff();
 // This function will validate each fixture in each '// test_cause:' block of
 // jslint.mjs. A "(live)" source must run the code below its block, by V8 block
 // coverage. A warning must be shown, with the code below its block on the
-// stack that option trace records.
+// stack that option trace records. Then validate the roster of fixtures filed
+// up the stack, and that each raise site in jslint.mjs has a fixture.
 
         const controlList = [];
         const fixtureList = [];
+        const raiserList = ["stop", "stop_at", "warn", "warn_at"];
+        const rgxFrame = (
+            /^ {4}at (?:(?:Object\.)?([\w.]+).*? \()?.*?jslint\.mjs:(\d+):/gm
+        );
         const stackTraceLimit = Error.stackTraceLimit;
         function fixturePush(list, cause, anchor) {
 
@@ -2633,10 +2638,31 @@ ff();
                 trace: true
             });
 
+// List each warning with its frames in jslint.mjs, by the stack that option
+// trace records, as [name, line] innermost first. An anonymous function's
+// frame has no name. Its raise is the first frame above the raisers, the line
+// that raised it.
+
+            const warningsRaised = warnings.map(function (warning) {
+                const frameList = Array.from(
+                    String(warning.stack_trace).matchAll(rgxFrame),
+                    function ([ignore, name, line]) {
+                        return [name, Number(line)];
+                    }
+                );
+                return {
+                    frameList,
+                    raise: frameList.find(function ([name]) {
+                        return !raiserList.includes(name);
+                    }),
+                    warning
+                };
+            });
+
 // A second warning on one token is dropped, so check the warnings the user
 // sees, never the ones raised.
 
-            const warningsShown = warnings.filter(function (warning) {
+            const warningsShown = warningsRaised.filter(function ({warning}) {
                 return (
                     warning.code === code &&
                     String(warning.b || warning.a || "") === aa &&
@@ -2644,11 +2670,12 @@ ff();
                 );
             });
 
-// The shown warning raised through the code under the block, by the stack
-// that option trace records.
+// The shown warning raised through the code under the block.
 
-            const warningsVia = warningsShown.filter(function ({stack_trace}) {
-                return stack_trace.includes("/jslint.mjs:" + line + ":");
+            const warningsVia = warningsShown.filter(function ({frameList}) {
+                return frameList.some(function ([ignore, at]) {
+                    return at === line;
+                });
             });
             list.push({
                 anchor,
@@ -2680,19 +2707,20 @@ ff();
 // above the raisers in the stack that option trace records, so a fixture may
 // be filed up the stack, above the call that leads down to the raise site.
 
-                raiser: warningsVia.length > 0 && Array.from(
-                    warningsVia[0].stack_trace.matchAll(
-                        /^ {4}at (?:Object\.)?([\w.]+).*? \(.*:\d+:\d+\)$/gm
-                    ),
-                    function ([ignore, name]) {
-                        return name;
-                    }
-                ).find(function (name) {
-                    return !["stop", "stop_at", "warn", "warn_at"].includes(
-                        name
-                    );
-                }),
+                raise: warningsVia[0]?.raise,
+                raiser: warningsVia[0]?.frameList.find(function ([name]) {
+                    return name && !raiserList.includes(name);
+                })?.[0],
                 shown: code === "(live)" || warningsShown.length > 0,
+
+// A "(live)" block must not sit on a raise whose warning shows, since a
+// warning fixture checks more.
+
+                silent: code !== "(live)" || warningsRaised.every(function ({
+                    raise
+                }) {
+                    return raise?.[1] !== line;
+                }),
                 source,
                 via: code === "(live)" || warningsVia.length > 0
             });
@@ -2702,6 +2730,18 @@ ff();
 // default of 10. The deepest one now, at <post_s_var>, is frame 9.
 
         Error.stackTraceLimit = Infinity;
+
+// Validate each mention of test_cause is a block's header, so a misspelled one
+// fails, instead of hiding its block. Commented-out code keeps its blocks as
+// '// // test_cause:', unchecked.
+
+        assertJsonEqual(Array.from(sourceJslintMjs.matchAll(
+            /^.*test.?cause.*$/gim
+        ), function ([line]) {
+            return line;
+        }).filter(function (line) {
+            return line !== "// test_cause:" && line !== "// // test_cause:";
+        }), []);
         sourceJslintMjs.replace((
             /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?) *?\S/g
         ), function (match0, header, causeList, footer, offset) {
@@ -2764,16 +2804,19 @@ ff();
                     "",
                     0
                 ],
-                {codeless: true}
+                {codeless: true, silent: false}
             ], [
                 ["if(0%0){}", "condition", "unexpectd_a", "%", 5],
                 {inFn: false, shown: false, via: false}
             ], [
+                ["if(0%0){}", "condition", "(live)", "", 0],
+                {silent: false}
+            ], [
                 ["if(0%0){}", "condition", "(live)", "aa", 0],
-                {known: false}
+                {known: false, silent: false}
             ], [
                 ["if(0%0){}", "condition", "(live)", "", 5],
-                {known: false}
+                {known: false, silent: false}
             ], [
                 ["if(0%0){}", "condition", "unexpected_a", "%", 5, "extra"],
                 {known: false}
@@ -2895,8 +2938,11 @@ process.stdout.write(JSON.stringify(resultList));
                 return [anchor, source];
             })
         )).then(function ([exitCode, stderr, stdout]) {
+            const hostDict = {};
+            const raiseDict = {};
+            let recordList;
             assertOrThrow(exitCode === 0, stderr);
-            return JSON.parse(stdout).map(function ([count, name], ii) {
+            recordList = JSON.parse(stdout).map(function ([count, name], ii) {
                 const {
                     at,
                     cause,
@@ -2904,10 +2950,25 @@ process.stdout.write(JSON.stringify(resultList));
                     codeless,
                     fn,
                     known,
+                    raise,
                     raiser,
                     shown,
+                    silent,
                     via
                 } = fixtureList.concat(controlList)[ii];
+                if (ii < fixtureList.length && code !== "(live)") {
+                    raiseDict[raise?.[1]] = true;
+
+// A fixture filed up the stack pairs the function holding its block with the
+// one that raised it.
+
+                    if (name !== fn) {
+                        hostDict[name + " <- " + fn] = Array.from(new Set([
+                            ...hostDict[name + " <- " + fn] || [],
+                            at
+                        ]));
+                    }
+                }
                 return {
                     at,
                     cause,
@@ -2923,18 +2984,29 @@ process.stdout.write(JSON.stringify(resultList));
                     known,
                     live: count > 0,
                     shown,
+                    silent,
                     via
                 };
             });
-        }).then(function (recordList) {
 
 // List every bad fixture, not only the first.
 
             assertJsonEqual(recordList.slice(
                 0,
                 fixtureList.length
-            ).filter(function ({codeless, inFn, known, live, shown, via}) {
-                return codeless || !inFn || !known || !live || !shown || !via;
+            ).filter(function ({
+                codeless,
+                inFn,
+                known,
+                live,
+                shown,
+                silent,
+                via
+            }) {
+                return (
+                    codeless || !inFn || !known || !live || !shown ||
+                    !silent || !via
+                );
             }), []);
             assertJsonEqual(recordList.slice(
                 fixtureList.length
@@ -2947,10 +3019,51 @@ process.stdout.write(JSON.stringify(resultList));
                     known: true,
                     live: true,
                     shown: true,
+                    silent: true,
                     via: true,
                     ...expect
                 };
             }));
+
+// Validate the roster of fixtures filed up the stack, as "host <- raiser", so
+// one moved down to its raise site, or filed far up the stack, fails. A rename
+// of either function shows as one pair missing and one extra, at the same
+// lines.
+
+            assertJsonEqual(Object.keys(hostDict).sort(), [
+                "infix_dot <- check_left",
+                "infix_grave <- check_left",
+                "infix_lbracket <- check_left",
+                "infix_lparen <- check_left",
+                "jslint_phase3_parse <- check_ordered",
+                "post_s_var <- name_lookup",
+                "prefix_destructure <- check_ordered",
+                "prefix_destructure <- name_parse",
+                "prefix_function <- check_ordered",
+                "prefix_lbrace <- check_ordered",
+                "stmt_export <- check_ordered",
+                "stmt_export <- semicolon",
+                "stmt_switch <- check_ordered_case",
+                "whitage_default <- one_space_only"
+            ], JSON.stringify(hostDict, undefined, 4));
+
+// Validate each raise site in jslint.mjs raises the warning of some fixture,
+// except the raisers' own calls, and a test hook raising an unknown code.
+
+            assertJsonEqual(sourceJslintMjs.replace((
+                /^ {4}function (?:stop|warn)(?:_at)?\([\S\s]*?\n {4}\}\n/gm
+            ), function (match0) {
+                return match0.replace(/[^\n]/g, "");
+            }).split("\n").map(function (text, ii) {
+                return [ii + 1, text.trim()];
+            }).filter(function ([line, text]) {
+                return (
+                    !text.startsWith("//") &&
+                    (/(?:^|[^\w.])(?:stop|warn)(?:_at)?\(/m).test(text) &&
+                    !text.includes("\"test_unknown_warning_code\"") &&
+                    !raiseDict[line]
+                );
+            }), []);
         });
     });
 });
