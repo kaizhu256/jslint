@@ -1203,9 +1203,9 @@ function jslint(
     function is_equal(aa, bb) {
 
 // test_cause:
-// ["0&&0", "is_equal", "", "", 0]
+// ["0&&0", "is_equal", "(live)", "", 0]
 
-        test_cause("");
+        test_cause("(live)");
 
 // PR-510 - deadcode-confirmed - <aa> and <bb> are never the same object. Each
 // call below pairs a slot of <aa> with the same slot of <bb>, and the only
@@ -1229,10 +1229,10 @@ function jslint(
                 aa.every(function (value, index) {
 
 // test_cause:
-// ["`${0}`&&`${0}`", "is_equal", "recurse_isArray", "", 0]
-// ["`${0}`&&`${1}`", "is_equal", "recurse_isArray", "", 0]
+// ["`${0}`&&`${0}`", "is_equal", "(live)", "", 0]
+// ["`${0}`&&`${1}`", "is_equal", "(live)", "", 0]
 
-                    test_cause("recurse_isArray");
+                    test_cause("(live)");
                     return is_equal(value, bb[index]);
                 })
             );
@@ -1258,9 +1258,9 @@ function jslint(
         case "`":
 
 // test_cause:
-// ["aa=bb`${cc}${dd}`&&bb`${cc}${ee}`", "is_equal", "recurse_mega", "", 0]
+// ["aa=bb`${cc}${dd}`&&bb`${cc}${ee}`", "is_equal", "(live)", "", 0]
 
-            test_cause("recurse_mega");
+            test_cause("(live)");
             return (
 
 // PR-394 - Bugfix - Fix jslint treating megastrings bb`0` and bb`1` as equal.
@@ -1277,19 +1277,19 @@ function jslint(
         if (is_weird(aa) || is_weird(bb)) {
 
 // test_cause:
-// ["aa(/./)||{}", "is_equal", "weird", "", 0]
+// ["aa(/./)||{}", "is_equal", "(live)", "", 0]
 
-            test_cause("weird");
+            test_cause("(live)");
             return false;
         }
         if (aa.arity === bb.arity && aa.id === bb.id) {
             if (aa.id === "." || aa.id === "?.") {
 
 // test_cause:
-// ["aa.bb&&aa.bb", "is_equal", "recurse_arity_id", "", 0]
-// ["aa?.bb&&aa?.bb", "is_equal", "recurse_arity_id", "", 0]
+// ["aa.bb&&aa.bb", "is_equal", "(live)", "", 0]
+// ["aa?.bb&&aa?.bb", "is_equal", "(live)", "", 0]
 
-                test_cause("recurse_arity_id");
+                test_cause("(live)");
                 return (
                     is_equal(aa.expression, bb.expression) &&
                     is_equal(aa.name, bb.name)
@@ -1298,17 +1298,17 @@ function jslint(
             if (aa.arity === "unary") {
 
 // test_cause:
-// ["+0&&+0", "is_equal", "recurse_unary", "", 0]
+// ["+0&&+0", "is_equal", "(live)", "", 0]
 
-                test_cause("recurse_unary");
+                test_cause("(live)");
                 return is_equal(aa.expression, bb.expression);
             }
             if (aa.arity === "binary") {
 
 // test_cause:
-// ["aa[0]&&aa[0]", "is_equal", "recurse_binary", "", 0]
+// ["aa[0]&&aa[0]", "is_equal", "(live)", "", 0]
 
-                test_cause("recurse_binary");
+                test_cause("(live)");
                 return (
                     aa.id !== "(" &&
                     is_equal(aa.expression[0], bb.expression[0]) &&
@@ -1318,9 +1318,9 @@ function jslint(
             if (aa.arity === "ternary") {
 
 // test_cause:
-// ["aa=(``?``:``)&&(``?``:``)", "is_equal", "recurse_ternary", "", 0]
+// ["aa=(``?``:``)&&(``?``:``)", "is_equal", "(live)", "", 0]
 
-                test_cause("recurse_ternary");
+                test_cause("(live)");
                 return (
                     is_equal(aa.expression[0], bb.expression[0]) &&
                     is_equal(aa.expression[1], bb.expression[1]) &&
@@ -1347,16 +1347,16 @@ function jslint(
             );
 
 // test_cause:
-// ["undefined&&undefined", "is_equal", "true", "", 0]
+// ["undefined&&undefined", "is_equal", "(live)", "", 0]
 
-            test_cause("true");
+            test_cause("(live)");
             return true;
         }
 
 // test_cause:
-// ["null&&undefined", "is_equal", "false", "", 0]
+// ["null&&undefined", "is_equal", "(live)", "", 0]
 
-        test_cause("false");
+        test_cause("(live)");
         return false;
     }
 
@@ -1873,9 +1873,9 @@ function jslint(
         if (warning.directive_ignore_line) {
 
 // test_cause:
-// ["0 //jslint-ignore-line", "semicolon", "directive_ignore_line", "", 0]
+// ["0 //jslint-ignore-line", "semicolon", "(live)", "", 0]
 
-            test_cause("directive_ignore_line");
+            test_cause("(live)");
             return warning;
         }
         warning_list.push(warning);
@@ -2978,16 +2978,14 @@ function jslint_phase2_lex(state) {
 // matched an expected value.
 
         if (match !== undefined && char !== match) {
+            return (
+                char === ""
 
 // test_cause:
 // ["aa=/", "char_after", "expected_a_after_b", "/", 4]
 // ["aa=/(?-", "char_after", "expected_a_after_b", "-", 7]
 // ["aa=/[", "char_after", "expected_a_after_b", "[", 5]
-// ["aa=/aa{/", "char_after", "expected_a_b", "/", 8]
-// ["aa=/aa{/;", "char_after", "expected_a_b", "/", 8]
 
-            return (
-                char === ""
                 ? stop_at(
                     "expected_a_after_b",
                     line,
@@ -2998,6 +2996,11 @@ function jslint_phase2_lex(state) {
 
                     line_list[line].line_source.slice(-1)
                 )
+
+// test_cause:
+// ["aa=/aa{/", "char_after", "expected_a_b", "/", 8]
+// ["aa=/aa{/;", "char_after", "expected_a_b", "/", 8]
+
                 : stop_at("expected_a_b", line, column - 1, match, char)
             );
         }
@@ -3022,9 +3025,12 @@ function jslint_phase2_lex(state) {
 // A megastring's '\' at end of line continues the line.
 
 // test_cause:
-// ["`\\\n`", "char_after_escape", "megastring_continue", "", 0]
+// ["
+// `\
+// `
+// ", "char_after_escape", "(live)", "", 0]
 
-                test_cause("megastring_continue");
+                test_cause("(live)");
                 return;
             }
 
@@ -3049,10 +3055,10 @@ function jslint_phase2_lex(state) {
         case "t":
 
 // test_cause:
-// ["\"\\/\\\\\\`\\b\\f\\n\\r\\t\"", "char_after_escape", "char_after", "", 0]
-// ["`\\/\\\\\\`\\b\\f\\n\\r\\t`", "char_after_escape", "char_after", "", 0]
+// ["\"\\/\\\\\\`\\b\\f\\n\\r\\t\"", "char_after_escape", "(live)", "", 0]
+// ["`\\/\\\\\\`\\b\\f\\n\\r\\t`", "char_after_escape", "(live)", "", 0]
 
-            test_cause("char_after");
+            test_cause("(live)");
             return char_after();
         case "u":
             if (char_after("u") === "{") {
@@ -3522,10 +3528,10 @@ function jslint_phase2_lex(state) {
                 case "]":
 
 // test_cause:
-// ["aa=/[", "lex_regexp_bracketed", "closer", "", 0]
-// ["aa=/[]/", "lex_regexp_bracketed", "closer", "", 0]
+// ["aa=/[", "lex_regexp_bracketed", "(live)", "", 0]
+// ["aa=/[]/", "lex_regexp_bracketed", "(live)", "", 0]
 
-                    test_cause("closer");
+                    test_cause("(live)");
                     if (mode_regexp_range) {
 
 // test_cause:
@@ -3600,17 +3606,23 @@ function jslint_phase2_lex(state) {
             let modifier_seen = "";
             switch (char) {
             case "":
+
+// test_cause:
+// ["/ /", "lex_regexp_group", "expected_regexp_factor_a", "", 3]
+
                 warn_at("expected_regexp_factor_a", line, column - 0, char);
                 break;
             case ")":
+
+// test_cause:
+// ["aa=/)", "lex_regexp_group", "expected_regexp_factor_a", ")", 5]
+// ["aa=/);", "lex_regexp_group", "expected_regexp_factor_a", ")", 5]
+
                 warn_at("expected_regexp_factor_a", line, column - 1, char);
                 break;
             case "]":
 
 // test_cause:
-// ["/ /", "lex_regexp_group", "expected_regexp_factor_a", "", 3]
-// ["aa=/)", "lex_regexp_group", "expected_regexp_factor_a", ")", 5]
-// ["aa=/);", "lex_regexp_group", "expected_regexp_factor_a", ")", 5]
 // ["aa=/]", "lex_regexp_group", "expected_regexp_factor_a", "]", 5]
 
                 warn_at("expected_regexp_factor_a", line, column - 1, char);
@@ -3652,7 +3664,6 @@ function jslint_phase2_lex(state) {
 
 // test_cause:
 // ["aa=/(:)/", "lex_regexp_group", "expected_a_before_b", ":", 6]
-// ["aa=/?/", "lex_regexp_group", "expected_a_before_b", "?", 5]
 
                         warn_at(
                             "expected_a_before_b",
@@ -3701,12 +3712,12 @@ function jslint_phase2_lex(state) {
                                 case "i":
                                 case "m":
                                 case "s":
+                                    if (modifier_seen.includes(char)) {
 
 // test_cause:
 // ["aa=/(?--:x)/", "lex_regexp_group", "unexpected_a_after_b", "(?-", 8]
 // ["aa=/(?ii:x)/", "lex_regexp_group", "unexpected_a_after_b", "(?i", 8]
 
-                                    if (modifier_seen.includes(char)) {
                                         warn_at(
                                             "unexpected_a_after_b",
                                             line,
@@ -3780,9 +3791,9 @@ function jslint_phase2_lex(state) {
                 case "\\":
 
 // test_cause:
-// ["aa=/\\/", "lex_regexp_group", "escape", "", 0]
+// ["aa=/\\/", "lex_regexp_group", "(live)", "", 0]
 
-                    test_cause("escape");
+                    test_cause("(live)");
 
 // PR-437 - Add grammar for regexp-named-backreference.
 
@@ -3817,10 +3828,10 @@ function jslint_phase2_lex(state) {
                     if (char_after(char) === "?") {
 
 // test_cause:
-// ["aa=/.*?/", "lex_regexp_group", "?", "", 0]
-// ["aa=/.+?/", "lex_regexp_group", "?", "", 0]
+// ["aa=/.*?/", "lex_regexp_group", "(live)", "", 0]
+// ["aa=/.+?/", "lex_regexp_group", "(live)", "", 0]
 
-                        test_cause("?");
+                        test_cause("(live)");
                         char_after("?");
                     }
                     break;
@@ -3909,14 +3920,14 @@ function jslint_phase2_lex(state) {
             case "s":
                 break;
             case "u":
+                if (
+                    flag.v //jslint-ignore-line
+                ) {
 
 // test_cause:
 // ["aa=/./vu", "lex_regexp", "unexpected_a", "u", 8]
 // ["aa=/./vu;", "lex_regexp", "unexpected_a", "u", 8]
 
-                if (
-                    flag.v //jslint-ignore-line
-                ) {
                     warn_at("unexpected_a", line, column - 1, char);
                 }
                 break;
@@ -3926,22 +3937,22 @@ function jslint_phase2_lex(state) {
             case "v":
 
 // "u" and "v" select different grammars, so v8 rejects the pair.
+                if (
+                    flag.u //jslint-ignore-line
+                ) {
 
 // test_cause:
 // ["aa=/./uv", "lex_regexp", "unexpected_a", "v", 8]
 
-                if (
-                    flag.u //jslint-ignore-line
-                ) {
                     warn_at("unexpected_a", line, column - 1, char);
                 }
                 break;
             case "y":
 
 // test_cause:
-// ["aa=/./gimuy", "lex_regexp", "flag", "", 0]
+// ["aa=/./gimuy", "lex_regexp", "(live)", "", 0]
 
-                test_cause("flag");
+                test_cause("(live)");
                 break;
             default:
 
@@ -4065,14 +4076,14 @@ function jslint_phase2_lex(state) {
         case "[":
 
 // test_cause:
-// ["(/./", "lex_slash_or_regexp", "recurse", "", 0]
-// [",/./", "lex_slash_or_regexp", "recurse", "", 0]
-// [":/./", "lex_slash_or_regexp", "recurse", "", 0]
-// ["=/./", "lex_slash_or_regexp", "recurse", "", 0]
-// ["?/./", "lex_slash_or_regexp", "recurse", "", 0]
-// ["aa[/./", "lex_slash_or_regexp", "recurse", "", 0]
+// ["(/./", "lex_slash_or_regexp", "(live)", "", 0]
+// [",/./", "lex_slash_or_regexp", "(live)", "", 0]
+// [":/./", "lex_slash_or_regexp", "(live)", "", 0]
+// ["=/./", "lex_slash_or_regexp", "(live)", "", 0]
+// ["?/./", "lex_slash_or_regexp", "(live)", "", 0]
+// ["aa[/./", "lex_slash_or_regexp", "(live)", "", 0]
 
-            test_cause("recurse");
+            test_cause("(live)");
             return lex_regexp();
         }
         if (line_source[0] === "=") {
@@ -4406,9 +4417,9 @@ function jslint_phase2_lex(state) {
             if (line_source[0] === ",") {
 
 // test_cause:
-// ["aa=/.{,/", "read_digits", "comma", "", 0]
+// ["aa=/.{,/", "read_digits", "(live)", "", 0]
 
-                test_cause("comma");
+                test_cause("(live)");
                 char_after();
 
 // Recurse read_digits.
@@ -4488,9 +4499,9 @@ function jslint_phase2_lex(state) {
         if (line_source === "/*jslint-disable*/") {
 
 // test_cause:
-// ["/*jslint-disable*/", "read_line", "jslint_disable", "", 0]
+// ["/*jslint-disable*/", "read_line", "(live)", "", 0]
 
-            test_cause("jslint_disable");
+            test_cause("(live)");
             line_disable = line;
         } else if (line_source === "/*jslint-enable*/") {
             if (line_disable === undefined) {
@@ -4507,17 +4518,20 @@ function jslint_phase2_lex(state) {
         ) {
 
 // test_cause:
-// ["0 //jslint-ignore-line", "read_line", "jslint_ignore_line", "", 0]
+// ["0 //jslint-ignore-line", "read_line", "(live)", "", 0]
 
-            test_cause("jslint_ignore_line");
+            test_cause("(live)");
             line_list[line].directive_ignore_line = true;
         }
         if (line_disable !== undefined) {
 
 // test_cause:
-// ["/*jslint-disable*/\n0", "read_line", "line_disable", "", 0]
+// ["
+// /*jslint-disable*/
+// 0
+// ", "read_line", "(live)", "", 0]
 
-            test_cause("line_disable");
+            test_cause("(live)");
             line_source = "";
         }
         // jslint_rgx_tab
@@ -5202,9 +5216,9 @@ function jslint_phase3_parse(state) {
             case false:
 
 // test_cause:
-// ["import \"aa\";let aa", "check", "import", "", 0]
+// ["import \"aa\";let aa", "check", "(live)", "", 0]
 
-                test_cause("import");
+                test_cause("(live)");
                 break;
             default:
                 if (
@@ -5248,11 +5262,11 @@ function jslint_phase3_parse(state) {
         let the_value;
 
 // test_cause:
-// ["do{}while()", "condition", "", "", 0]
-// ["if(){}", "condition", "", "", 0]
-// ["while(){}", "condition", "", "", 0]
+// ["do{}while()", "condition", "(live)", "", 0]
+// ["if(){}", "condition", "(live)", "", 0]
+// ["while(){}", "condition", "(live)", "", 0]
 
-        test_cause("");
+        test_cause("(live)");
         advance("(");
         the_value = parse_expression(0);
         advance(")");
@@ -5268,68 +5282,113 @@ function jslint_phase3_parse(state) {
 
         switch (the_value.id) {
         case "%":
+
+// test_cause:
+// ["if(0%0){}", "condition", "unexpected_a", "%", 5]
+
             warn("unexpected_a", the_value);
             break;
         case "&":
+
+// test_cause:
+// ["if(0&0){}", "condition", "unexpected_a", "&", 5]
+
             warn("unexpected_a", the_value);
             break;
         case "(number)":
+
+// test_cause:
+// ["if(0){}", "condition", "unexpected_a", "0", 4]
+
             warn("unexpected_a", the_value);
             break;
         case "(string)":
+
+// test_cause:
+// ["if(\"aa\"){}", "condition", "unexpected_a", "aa", 4]
+
             warn("unexpected_a", the_value);
             break;
         case "*":
+
+// test_cause:
+// ["if(0*0){}", "condition", "unexpected_a", "*", 5]
+
             warn("unexpected_a", the_value);
             break;
         case "+":
+
+// test_cause:
+// ["if(0+0){}", "condition", "unexpected_a", "+", 5]
+
             warn("unexpected_a", the_value);
             break;
         case "-":
+
+// test_cause:
+// ["if(0-0){}", "condition", "unexpected_a", "-", 5]
+
             warn("unexpected_a", the_value);
             break;
         case "/":
+
+// test_cause:
+// ["if(0/0){}", "condition", "unexpected_a", "/", 5]
+
             warn("unexpected_a", the_value);
             break;
         case "<<":
+
+// test_cause:
+// ["if(0<<0){}", "condition", "unexpected_a", "<<", 5]
+
             warn("unexpected_a", the_value);
             break;
         case ">>":
+
+// test_cause:
+// ["if(0>>0){}", "condition", "unexpected_a", ">>", 5]
+
             warn("unexpected_a", the_value);
             break;
         case ">>>":
+
+// test_cause:
+// ["if(0>>>0){}", "condition", "unexpected_a", ">>>", 5]
+
             warn("unexpected_a", the_value);
             break;
         case "?":
+
+// test_cause:
+// ["if(0?0:0){}", "condition", "unexpected_a", "?", 5]
+
             warn("unexpected_a", the_value);
             break;
         case "^":
+
+// test_cause:
+// ["if(0^0){}", "condition", "unexpected_a", "^", 5]
+
             warn("unexpected_a", the_value);
             break;
         case "typeof":
+
+// test_cause:
+// ["if(typeof 0){}", "condition", "unexpected_a", "typeof", 4]
+
             warn("unexpected_a", the_value);
             break;
         case "|":
+
+// test_cause:
+// ["if(0|0){}", "condition", "unexpected_a", "|", 5]
+
             warn("unexpected_a", the_value);
             break;
         case "~":
 
 // test_cause:
-// ["if(0%0){}", "condition", "unexpected_a", "%", 5]
-// ["if(0&0){}", "condition", "unexpected_a", "&", 5]
-// ["if(0){}", "condition", "unexpected_a", "0", 4]
-// ["if(0*0){}", "condition", "unexpected_a", "*", 5]
-// ["if(0+0){}", "condition", "unexpected_a", "+", 5]
-// ["if(0-0){}", "condition", "unexpected_a", "-", 5]
-// ["if(0/0){}", "condition", "unexpected_a", "/", 5]
-// ["if(0<<0){}", "condition", "unexpected_a", "<<", 5]
-// ["if(0>>0){}", "condition", "unexpected_a", ">>", 5]
-// ["if(0>>>0){}", "condition", "unexpected_a", ">>>", 5]
-// ["if(0?0:0){}", "condition", "unexpected_a", "?", 5]
-// ["if(0^0){}", "condition", "unexpected_a", "^", 5]
-// ["if(0|0){}", "condition", "unexpected_a", "|", 5]
-// ["if(\"aa\"){}", "condition", "unexpected_a", "aa", 4]
-// ["if(typeof 0){}", "condition", "unexpected_a", "typeof", 4]
 // ["if(~0){}", "condition", "unexpected_a", "~", 4]
 
             warn("unexpected_a", the_value);
@@ -5534,10 +5593,10 @@ function jslint_phase3_parse(state) {
         ) {
 
 // test_cause:
-// ["aa?.(bb)", "infix_dot", "dyn_prop_or_call", "", 0]
-// ["aa?.[bb]", "infix_dot", "dyn_prop_or_call", "", 0]
+// ["aa?.(bb)", "infix_dot", "(live)", "", 0]
+// ["aa?.[bb]", "infix_dot", "(live)", "", 0]
 
-            test_cause("dyn_prop_or_call");
+            test_cause("(live)");
 
 // PR-514 - Bugfix - The '?.' token leaves the tree here, so mark the '[' or '('
 // that follows it, for <optional_chain>.
@@ -5647,9 +5706,9 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id === "...") {
 
 // test_cause:
-// ["aa(...aa)", "infix_lparen", "aa(...aa)", "", 0]
+// ["aa(...aa)", "infix_lparen", "(live)", "", 0]
 
-                    test_cause("aa(...aa)");
+                    test_cause("(live)");
                     the_argument = prefix_ellipsis();
                 } else {
                     the_argument = parse_expression(10);
@@ -5692,9 +5751,9 @@ function jslint_phase3_parse(state) {
             const the_token = token_now;
 
 // test_cause:
-// ["0**0", "parse_infixr_led", "led_infix", "", 0]
+// ["0**0", "parse_infixr_led", "(live)", "", 0]
 
-            test_cause("led_infix");
+            test_cause("(live)");
             the_token.arity = "binary";
             the_token.expression = [left, parse_expression(bp - 1)];
             return the_token;
@@ -5831,14 +5890,14 @@ function jslint_phase3_parse(state) {
         if (earlier) {
 
 // test_cause:
-// ["let aa;(function aa(){})", "name_declare", "scope_current", "aa", 0]
-// ["let aa;function aa(){}", "name_declare", "scope_current", "aa", 0]
+// ["let aa;(function aa(){})", "name_declare", "(live)", "", 0]
+// ["let aa;function aa(){}", "name_declare", "(live)", "", 0]
+// ["let aa;let aa", "name_declare", "(live)", "", 0]
 // ["let aa;let aa", "name_declare", "redefinition_a_b", "1", 12]
-// ["let aa;let aa", "name_declare", "scope_current", "aa", 0]
+// ["var aa;if(0){var aa}", "name_declare", "(live)", "", 0]
 // ["var aa;if(0){var aa}", "name_declare", "redefinition_a_b", "1", 18]
-// ["var aa;if(0){var aa}", "name_declare", "scope_current", "aa", 0]
 
-            test_cause("scope_current", id);
+            test_cause("(live)");
             warn("redefinition_a_b", name, id, earlier.line);
             return;
         }
@@ -5852,9 +5911,9 @@ function jslint_phase3_parse(state) {
                 if (earlier.role !== "label") {
 
 // test_cause:
-// ["let aa;aa:while(0){}", "name_declare", "label_vs_not_label", "aa", 0]
+// ["let aa;aa:while(0){}", "name_declare", "(live)", "", 0]
 
-                    test_cause("label_vs_not_label", id);
+                    test_cause("(live)");
                     warn("redefinition_a_b", name, id, earlier.line);
                     earlier = undefined;
                 }
@@ -5865,9 +5924,9 @@ function jslint_phase3_parse(state) {
                 if (earlier.role === "label") {
 
 // test_cause:
-// ["aa:while(0){let aa}", "name_declare", "default_vs_label", "aa", 0]
+// ["aa:while(0){let aa}", "name_declare", "(live)", "", 0]
 
-                    test_cause("default_vs_label", id);
+                    test_cause("(live)");
                     warn("redefinition_a_b", name, id, earlier.line);
                     earlier = undefined;
                 }
@@ -5898,9 +5957,9 @@ function jslint_phase3_parse(state) {
             if (earlier.role === "variable") {
 
 // test_cause:
-// ["let ignore;(ignore)=>0", "name_declare", "ignore", "ignore", 0]
+// ["let ignore;(ignore)=>0", "name_declare", "(live)", "", 0]
 
-                test_cause("ignore", id);
+                test_cause("(live)");
                 warn("redefinition_a_b", name, id, earlier.line);
             }
             return;
@@ -5912,20 +5971,20 @@ function jslint_phase3_parse(state) {
         ) {
 
 // test_cause:
-// ["for(let aa;;)let aa", "name_declare", "scope_outer", "aa", 0]
+// ["for(let aa;;)let aa", "name_declare", "(live)", "", 0]
 // ["
 // function aa(){try{aa();}catch(aa){aa();}}
-// ", "name_declare", "scope_outer", "aa", 0]
-// ["function aa(){var aa}", "name_declare", "scope_outer", "aa", 0]
-// ["let aa;do let aa;while(0)", "name_declare", "scope_outer", "aa", 0]
-// ["let aa;do;while(0)let aa", "name_declare", "scope_outer", "aa", 0]
-// ["let aa;for(let aa;;){}", "name_declare", "scope_outer", "aa", 0]
-// ["let aa;if(0);else if(0)let aa", "name_declare", "scope_outer", "aa", 0]
-// ["let aa;if(0);else let aa", "name_declare", "scope_outer", "aa", 0]
-// ["let aa;if(0)let aa", "name_declare", "scope_outer", "aa", 0]
-// ["let aa;while(0)let aa", "name_declare", "scope_outer", "aa", 0]
+// ", "name_declare", "(live)", "", 0]
+// ["function aa(){var aa}", "name_declare", "(live)", "", 0]
+// ["let aa;do let aa;while(0)", "name_declare", "(live)", "", 0]
+// ["let aa;do;while(0)let aa", "name_declare", "(live)", "", 0]
+// ["let aa;for(let aa;;){}", "name_declare", "(live)", "", 0]
+// ["let aa;if(0);else if(0)let aa", "name_declare", "(live)", "", 0]
+// ["let aa;if(0);else let aa", "name_declare", "(live)", "", 0]
+// ["let aa;if(0)let aa", "name_declare", "(live)", "", 0]
+// ["let aa;while(0)let aa", "name_declare", "(live)", "", 0]
 
-            test_cause("scope_outer", id);
+            test_cause("(live)");
             warn("redefinition_a_b", name, id, earlier.line);
             return;
         }
@@ -5968,9 +6027,9 @@ function jslint_phase3_parse(state) {
             default:
 
 // test_cause:
-// ["aa+aa=0", "optional_chain", "default", "", 0]
+// ["aa+aa=0", "optional_chain", "(live)", "", 0]
 
-                test_cause("default");
+                test_cause("(live)");
                 return;
             }
         }
@@ -6057,16 +6116,16 @@ function jslint_phase3_parse(state) {
         if (the_symbol !== undefined && the_symbol.nud_prefix !== undefined) {
 
 // test_cause:
-// ["0", "parse_expression", "symbol", "", 0]
+// ["0", "parse_expression", "(live)", "", 0]
 
-            test_cause("symbol");
+            test_cause("(live)");
             left = the_symbol.nud_prefix();
         } else if (token_now.identifier) {
 
 // test_cause:
-// ["aa", "parse_expression", "identifier", "", 0]
+// ["aa", "parse_expression", "(live)", "", 0]
 
-            test_cause("identifier");
+            test_cause("(live)");
             left = token_now;
             left.arity = "variable";
         } else {
@@ -6101,9 +6160,12 @@ function jslint_phase3_parse(state) {
             ) {
 
 // test_cause:
-// ["aa\n++aa", "parse_expression", "postfix_line_break", "", 0]
+// ["
+// aa
+// ++aa
+// ", "parse_expression", "(live)", "", 0]
 
-                test_cause("postfix_line_break");
+                test_cause("(live)");
                 break;
             }
             advance();
@@ -6122,12 +6184,8 @@ function jslint_phase3_parse(state) {
             if (!jslint_rgx_json_number.test(token_nxt.value)) {
 
 // test_cause:
-// ["[-.0]", "parse_json", "unexpected_a", ".", 3]
 // ["[-0x0]", "parse_json", "unexpected_a", "0x0", 3]
-// ["[...]", "parse_json", "unexpected_a", "...", 2]
-// ["[.0]", "parse_json", "unexpected_a", ".", 2]
 // ["[0x0]", "parse_json", "unexpected_a", "0x0", 2]
-// ["{...}", "parse_json", "unexpected_a", "...", 2]
 
                 warn("unexpected_a");
             }
@@ -6155,9 +6213,9 @@ function jslint_phase3_parse(state) {
         case "[":
 
 // test_cause:
-// ["[]", "parse_json", "bracket", "", 0]
+// ["[]", "parse_json", "(live)", "", 0]
 
-            test_cause("bracket");
+            test_cause("(live)");
             container = token_nxt;
             container.expression = [];
             advance("[");
@@ -6180,19 +6238,19 @@ function jslint_phase3_parse(state) {
         case "true":
 
 // test_cause:
-// ["[false]", "parse_json", "constant", "", 0]
-// ["[null]", "parse_json", "constant", "", 0]
-// ["[true]", "parse_json", "constant", "", 0]
+// ["[false]", "parse_json", "(live)", "", 0]
+// ["[null]", "parse_json", "(live)", "", 0]
+// ["[true]", "parse_json", "(live)", "", 0]
 
-            test_cause("constant");
+            test_cause("(live)");
             advance();
             return token_now;
         case "{":
 
 // test_cause:
-// ["{}", "parse_json", "brace", "", 0]
+// ["{}", "parse_json", "(live)", "", 0]
 
-            test_cause("brace");
+            test_cause("(live)");
             container = token_nxt;
 
 // Explicit empty-object required to detect "__proto__".
@@ -6209,6 +6267,7 @@ function jslint_phase3_parse(state) {
                     if (token_nxt.quote !== "\"") {
 
 // test_cause:
+// ["{...}", "parse_json", "unexpected_a", "...", 2]
 // ["{0:0}", "parse_json", "unexpected_a", "0", 2]
 
                         warn(
@@ -6257,6 +6316,9 @@ function jslint_phase3_parse(state) {
         default:
 
 // test_cause:
+// ["[-.0]", "parse_json", "unexpected_a", ".", 3]
+// ["[...]", "parse_json", "unexpected_a", "...", 2]
+// ["[.0]", "parse_json", "unexpected_a", ".", 2]
 // ["[undefined]", "parse_json", "unexpected_a", "undefined", 2]
 
             return stop("unexpected_a");
@@ -6283,13 +6345,13 @@ function jslint_phase3_parse(state) {
             case "}":
 
 // test_cause:
-// [";", "parse_statement_block", "closer", "", 0]
-// ["case", "parse_statement_block", "closer", "", 0]
-// ["default", "parse_statement_block", "closer", "", 0]
-// ["else", "parse_statement_block", "closer", "", 0]
-// ["}", "parse_statement_block", "closer", "", 0]
+// [";", "parse_statement_block", "(live)", "", 0]
+// ["case", "parse_statement_block", "(live)", "", 0]
+// ["default", "parse_statement_block", "(live)", "", 0]
+// ["else", "parse_statement_block", "(live)", "", 0]
+// ["}", "parse_statement_block", "(live)", "", 0]
 
-                test_cause("closer");
+                test_cause("(live)");
                 return statement_list;
             }
             a_statement = parse_statement_single();
@@ -6430,9 +6492,9 @@ function jslint_phase3_parse(state) {
             advance("=>");
 
 // test_cause:
-// ["async aa=>0", "prefix_async", "fart_unwrapped", "aa", 0]
+// ["async aa=>0", "prefix_async", "(live)", "", 0]
 
-            test_cause("fart_unwrapped", token_prv.id);
+            test_cause("(live)");
             prefix_function(the_function, true, true);
         } else if (token_nxt.fart) {
 
@@ -6521,10 +6583,10 @@ function jslint_phase3_parse(state) {
                 }
 
 // test_cause:
-// ["let[...aa]=0", "name_parse", "recurse_ellipsis", "", 0]
-// ["let{...aa}=0", "name_parse", "recurse_ellipsis", "", 0]
+// ["let[...aa]=0", "name_parse", "(live)", "", 0]
+// ["let{...aa}=0", "name_parse", "(live)", "", 0]
 
-                test_cause("recurse_ellipsis");
+                test_cause("(live)");
                 name_parse();
                 return true;
             case "[":
@@ -6547,10 +6609,10 @@ function jslint_phase3_parse(state) {
                 }
 
 // test_cause:
-// ["let[[aa]]=0", "name_parse", "recurse_element", "", 0]
-// ["let[{aa}]=0", "name_parse", "recurse_element", "", 0]
+// ["let[[aa]]=0", "name_parse", "(live)", "", 0]
+// ["let[{aa}]=0", "name_parse", "(live)", "", 0]
 
-                test_cause("recurse_element");
+                test_cause("(live)");
                 advance(token_nxt.id);
                 prefix_destructure(
                     scope_declared,     // scope_declared
@@ -6565,6 +6627,7 @@ function jslint_phase3_parse(state) {
             if (!name.identifier) {
 
 // test_cause:
+// ["(,aa)=>0", "name_parse", "expected_identifier_a", ",", 2]
 // ["function aa(...0){}", "name_parse", "expected_identifier_a", "0", 16]
 // ["function aa(0){}", "name_parse", "expected_identifier_a", "0", 13]
 // ["function aa([0]){}", "name_parse", "expected_identifier_a", "0", 14]
@@ -6595,10 +6658,10 @@ function jslint_phase3_parse(state) {
                 if (!token_nxt.identifier) {
 
 // test_cause:
-// ["let{aa:[aa]}=0", "name_parse", "recurse_property", "", 0]
-// ["let{aa:{aa}}=0", "name_parse", "recurse_property", "", 0]
+// ["let{aa:[aa]}=0", "name_parse", "(live)", "", 0]
+// ["let{aa:{aa}}=0", "name_parse", "(live)", "", 0]
 
-                    test_cause("recurse_property");
+                    test_cause("(live)");
                     name_parse();
                     return;
                 }
@@ -6645,23 +6708,19 @@ function jslint_phase3_parse(state) {
 // so <prefix_lbracket> walks it and never looks it up as a target.
 
 // test_cause:
-// [";[aa=0]=0", "name_parse", "default", "", 0]
+// [";[aa=0]=0", "name_parse", "(live)", "", 0]
 
-                    test_cause("default");
+                    test_cause("(live)");
                     name_list.push([name.expression]);
                 }
 
 // test_cause:
-// ["function aa([aa=aa]){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
-// ["function aa([aa=aa]){}", "name_parse", "optional", "aa", 0]
-// ["function aa({aa=aa}){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
-// ["function aa({aa=aa}){}", "name_parse", "optional", "aa", 0]
-// ["let[aa=bb]=0;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
-// ["let[aa=bb]=0;let bb", "name_parse", "optional", "aa", 0]
-// ["let{aa=bb}=0;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
-// ["let{aa=bb}=0;let bb", "name_parse", "optional", "aa", 0]
+// ["function aa([aa=aa]){}", "name_parse", "(live)", "", 0]
+// ["function aa({aa=aa}){}", "name_parse", "(live)", "", 0]
+// ["let[aa=bb]=0;let bb", "name_parse", "(live)", "", 0]
+// ["let{aa=bb}=0;let bb", "name_parse", "(live)", "", 0]
 
-                test_cause("optional", name.id);
+                test_cause("(live)");
                 return;
             }
             if (optional) {
@@ -6676,12 +6735,11 @@ function jslint_phase3_parse(state) {
             if (!is_lbrace && !the_function_toplevel && token_nxt.id === ",") {
 
 // test_cause:
-// ["(,aa)=>0", "name_parse", "expected_identifier_a", ",", 2]
-// ["([,aa])=>0", "prefix_destructure", "ignore", "", 0]
-// [";[,aa]=0", "prefix_destructure", "ignore", "", 0]
-// ["let[,aa]=0", "prefix_destructure", "ignore", "", 0]
+// ["([,aa])=>0", "prefix_destructure", "(live)", "", 0]
+// [";[,aa]=0", "prefix_destructure", "(live)", "", 0]
+// ["let[,aa]=0", "prefix_destructure", "(live)", "", 0]
 
-                test_cause("ignore");
+                test_cause("(live)");
                 advance(",");
             }
             if (the_function_toplevel) {
@@ -7122,9 +7180,9 @@ function jslint_phase3_parse(state) {
             if (!name.identifier && token_nxt.id === "...") {
 
 // test_cause:
-// ["aa={...aa}", "property_parse", "ellipsis", "", 0]
+// ["aa={...aa}", "property_parse", "(live)", "", 0]
 
-                test_cause("ellipsis");
+                test_cause("(live)");
                 value = prefix_ellipsis();
                 return value;
             }
@@ -7169,9 +7227,9 @@ function jslint_phase3_parse(state) {
             if (!name.identifier) {
 
 // test_cause:
-// ["aa={\"aa\":0}", "property_parse", "colon", "", 0]
+// ["aa={\"aa\":0}", "property_parse", "(live)", "", 0]
 
-                test_cause("colon");
+                test_cause("(live)");
                 advance(":");
                 value = parse_expression(0);
                 value.name_alias = name;
@@ -7181,19 +7239,19 @@ function jslint_phase3_parse(state) {
                 if (typeof extra === "string") {
 
 // test_cause:
-// ["aa={get aa}", "property_parse", "closer", "", 0]
+// ["aa={get aa}", "property_parse", "(live)", "", 0]
 
-                    test_cause("closer");
+                    test_cause("(live)");
                     advance("(");
                 }
                 value = parse_expression(Infinity, true);
             } else if (token_nxt.id === "(") {
 
 // test_cause:
-// ["aa={aa()}", "property_parse", "paren", "", 0]
-// ["aa={get aa(){}}", "property_parse", "paren", "", 0]
+// ["aa={aa()}", "property_parse", "(live)", "", 0]
+// ["aa={get aa(){}}", "property_parse", "(live)", "", 0]
 
-                test_cause("paren");
+                test_cause("(live)");
 
 // PR-516 - Bugfix - Name an accessor 'get aa' in the report, not 'get'.
 
@@ -7217,9 +7275,9 @@ function jslint_phase3_parse(state) {
                 if (typeof extra === "string") {
 
 // test_cause:
-// ["aa={get aa.aa}", "property_parse", "getset_no_paren", "", 0]
+// ["aa={get aa.aa}", "property_parse", "(live)", "", 0]
 
-                    test_cause("getset_no_paren");
+                    test_cause("(live)");
                     advance("(");
                 }
                 the_colon = token_nxt;
@@ -7319,9 +7377,9 @@ function jslint_phase3_parse(state) {
                 if (!state.mode_json && token_nxt.id === "...") {
 
 // test_cause:
-// ["aa=[...aa]", "prefix_lbracket", "ellipsis", "...", 0]
+// ["aa=[...aa]", "prefix_lbracket", "(live)", "", 0]
 
-                    test_cause("ellipsis", token_nxt.id);
+                    test_cause("(live)");
                     the_token.expression.push(prefix_ellipsis());
 
 // Issue #401 - Regression - Allow multiple-ellipsis in array-literal.
@@ -7358,9 +7416,9 @@ function jslint_phase3_parse(state) {
         }
 
 // test_cause:
-// ["(0)", "prefix_lparen", "expr", "", 0]
+// ["(0)", "prefix_lparen", "(live)", "", 0]
 
-        test_cause("expr");
+        test_cause("(live)");
         the_value = parse_expression(0);
         if (the_value.wrapped === true) {
 
@@ -7434,9 +7492,9 @@ function jslint_phase3_parse(state) {
                 advance("${");
 
 // test_cause:
-// ["let aa=`${}`", "prefix_tick", "${", "", 0]
+// ["let aa=`${}`", "prefix_tick", "(live)", "", 0]
 
-                test_cause("${");
+                test_cause("(live)");
                 the_tick.expression.push(parse_expression(0));
                 advance("}");
             }
@@ -7632,8 +7690,8 @@ function jslint_phase3_parse(state) {
         if (the_do.block.disrupt === true) {
 
 // test_cause:
-// [" do{break}while(0)", "stmt_do", "weird_loop", "do", 2]
-// ["do{break}while(0)", "stmt_do", "weird_loop", "do", 1]
+// ["function aa(){ do{break}while(0)}", "stmt_do", "weird_loop", "do", 16]
+// ["function aa(){do{break}while(0)}", "stmt_do", "weird_loop", "do", 15]
 
             warn("weird_loop", the_do);
         }
@@ -7730,9 +7788,9 @@ function jslint_phase3_parse(state) {
             } else if (token_nxt.id === "{") {
 
 // test_cause:
-// ["export {}", "stmt_export", "advance{", "", 0]
+// ["export {}", "stmt_export", "(live)", "", 0]
 
-                test_cause("advance{");
+                test_cause("(live)");
                 advance("{");
                 while (true) {
                     if (!token_nxt.identifier) {
@@ -7774,7 +7832,9 @@ function jslint_phase3_parse(state) {
 // PR-439 - Check exported properties are ordered.
 
 // test_cause:
-// ["export {bb, aa}", "check_ordered", "expected_a_b_before_c_d", "aa", 13]
+// ["
+// let aa;let bb;export {bb, aa};
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 27]
 
                 check_ordered("export", export_list);
                 advance("}");
@@ -7810,7 +7870,9 @@ function jslint_phase3_parse(state) {
             if (the_for.for_semicolon) {
 
 // test_cause:
-// ["for await(;;){}", "stmt_for", "expected_a", "for await...of", 1]
+// ["
+// function aa(){for await(;;){}}
+// ", "stmt_for", "expected_a", "for await...of", 15]
 
                 warn("expected_a", the_for, "for await...of");
             }
@@ -7848,9 +7910,9 @@ function jslint_phase3_parse(state) {
             case "let":
 
 // test_cause:
-// ["for(let aa;;){}", "stmt_for", "let", "let", 0]
+// ["for(let aa;;){}", "stmt_for", "(live)", "", 0]
 
-                test_cause("let", token_nxt.id);
+                test_cause("(live)");
                 break;
             default:
 
@@ -7867,9 +7929,9 @@ function jslint_phase3_parse(state) {
             while (token_nxt.id === ",") {
 
 // test_cause:
-// ["for(aa=0,bb=0;;){}", "stmt_for", "for_init_comma", "", 0]
+// ["for(aa=0,bb=0;;){}", "stmt_for", "(live)", "", 0]
 
-                test_cause("for_init_comma");
+                test_cause("(live)");
                 advance(",");
                 parse_expression(0);
                 semicolon();
@@ -7901,12 +7963,12 @@ function jslint_phase3_parse(state) {
             case "let":
 
 // test_cause:
-// ["for(const aa in aa){}", "stmt_for", "for_of_const", "const", 0]
-// ["for(const aa of aa){}", "stmt_for", "for_of_const", "const", 0]
-// ["for(let aa in aa){}", "stmt_for", "for_of_const", "let", 0]
-// ["for(let aa of aa){}", "stmt_for", "for_of_const", "let", 0]
+// ["for(const aa in aa){}", "stmt_for", "(live)", "", 0]
+// ["for(const aa of aa){}", "stmt_for", "(live)", "", 0]
+// ["for(let aa in aa){}", "stmt_for", "(live)", "", 0]
+// ["for(let aa of aa){}", "stmt_for", "(live)", "", 0]
 
-                test_cause("for_of_const", token_nxt.id);
+                test_cause("(live)");
                 break;
             case "var":
 
@@ -7945,6 +8007,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["for(aa 0){}", "stmt_for", "expected_a_b", "0", 8]
+// ["for(aa=aa){}", "stmt_for", "expected_a_b", "=", 7]
 
                     return stop(
                         "expected_a_b",
@@ -7975,10 +8038,16 @@ function jslint_phase3_parse(state) {
 // iterable, so a bare 'for...of' would throw a TypeError.
 
 // test_cause:
-// ["for(aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
-// ["for(const aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
-// ["for(let aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
-// ["for(var aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
+// ["function aa(){for(aa in aa){}}", "stmt_for", "expected_a_b", "for in", 15]
+// ["
+// function aa(){for(const aa in aa){}}
+// ", "stmt_for", "expected_a_b", "for in", 15]
+// ["
+// function aa(){for(let aa in aa){}}
+// ", "stmt_for", "expected_a_b", "for in", 15]
+// ["
+// function aa(){for(var aa in aa){}}
+// ", "stmt_for", "expected_a_b", "for in", 15]
 
                 warn("expected_a_b", the_for, "for...of Object.keys", "for in");
                 break;
@@ -7988,19 +8057,18 @@ function jslint_phase3_parse(state) {
             case "of":
 
 // test_cause:
-// ["for(aa of aa){}", "stmt_for", "of", "of", 0]
-// ["for(aa of aa||aa){}", "stmt_for", "of", "of", 0]
-// ["for(const aa of aa){}", "stmt_for", "of", "of", 0]
-// ["for(let aa of aa){}", "stmt_for", "of", "of", 0]
-// ["for(var aa of aa){}", "stmt_for", "of", "of", 0]
+// ["for(aa of aa){}", "stmt_for", "(live)", "", 0]
+// ["for(aa of aa||aa){}", "stmt_for", "(live)", "", 0]
+// ["for(const aa of aa){}", "stmt_for", "(live)", "", 0]
+// ["for(let aa of aa){}", "stmt_for", "(live)", "", 0]
+// ["for(var aa of aa){}", "stmt_for", "(live)", "", 0]
 
-                test_cause("of", the_operator.id);
+                test_cause("(live)");
                 the_operator.for_init = true;
                 break;
             default:
 
 // test_cause:
-// ["for(aa=aa){}", "stmt_for", "expected_a_b", "=", 7]
 // ["for(const aa=aa){}", "stmt_for", "expected_a_b", "=", 13]
 // ["for(let aa=aa){}", "stmt_for", "expected_a_b", "=", 11]
 // ["for(var aa=aa){}", "stmt_for", "expected_a_b", "=", 11]
@@ -8045,17 +8113,17 @@ function jslint_phase3_parse(state) {
             );
 
 // test_cause:
-// ["if(0){0}else if(0){0}", "stmt_if", "else", "", 0]
-// ["if(0){0}else{0}", "stmt_if", "else", "", 0]
+// ["if(0){0}else if(0){0}", "stmt_if", "(live)", "", 0]
+// ["if(0){0}else{0}", "stmt_if", "(live)", "", 0]
 
-            test_cause("else");
+            test_cause("(live)");
             if (the_if.block.disrupt === true) {
                 if (the_if.else.disrupt === true) {
 
 // test_cause:
-// ["if(0){break}else{break}", "stmt_if", "disrupt", "", 0]
+// ["if(0){break}else{break}", "stmt_if", "(live)", "", 0]
 
-                    test_cause("disrupt");
+                    test_cause("(live)");
                     the_if.disrupt = true;
                 } else {
 
@@ -8081,9 +8149,9 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id === "(string)") {
 
 // test_cause:
-// ["import \"aa\"", "stmt_import", "import_side_effect", "", 0]
+// ["import \"aa\"", "stmt_import", "(live)", "", 0]
 
-                test_cause("import_side_effect");
+                test_cause("(live)");
                 warn("expected_a_b", token_nxt, "{", artifact());
                 advance();
                 semicolon();
@@ -8249,12 +8317,12 @@ function jslint_phase3_parse(state) {
         case "while":
 
 // test_cause:
-// ["aa:do", "stmt_label", "label", "do", 0]
-// ["aa:for", "stmt_label", "label", "for", 0]
-// ["aa:switch", "stmt_label", "label", "switch", 0]
-// ["aa:while", "stmt_label", "label", "while", 0]
+// ["aa:do", "stmt_label", "(live)", "", 0]
+// ["aa:for", "stmt_label", "(live)", "", 0]
+// ["aa:switch", "stmt_label", "(live)", "", 0]
+// ["aa:while", "stmt_label", "(live)", "", 0]
 
-            test_cause("label", token_nxt.id);
+            test_cause("(live)");
             break;
         default:
 
@@ -8606,12 +8674,12 @@ function jslint_phase3_parse(state) {
                 advance();
                 advance(")");
             }
+            if (token_nxt.id !== "{") {
 
 // test_cause:
 // ["try{}catch(aa);", "stmt_try", "expected_a_b", ";", 15]
 // ["try{}catch(aa);;", "stmt_try", "expected_a_b", ";", 15]
 
-            if (token_nxt.id !== "{") {
                 return stop("expected_a_b", token_nxt, "{", artifact());
             }
             the_catch.block = block(ignored);
@@ -8636,11 +8704,11 @@ function jslint_phase3_parse(state) {
         if (token_nxt.id === "finally") {
             scope_function.finally += 1;
             advance("finally");
+            if (token_nxt.id !== "{") {
 
 // test_cause:
 // ["try{}finally;", "stmt_try", "expected_a_b", ";", 13]
 
-            if (token_nxt.id !== "{") {
                 return stop("expected_a_b", token_nxt, "{", artifact());
             }
             the_try.finally = block();
@@ -8679,24 +8747,24 @@ function jslint_phase3_parse(state) {
                 if (for_init) {
 
 // test_cause:
-// ["for(let aa in 0){}", "advance_operator", "for_init", "in", 0]
-// ["for(let aa of 0){}", "advance_operator", "for_init", "of", 0]
-// ["for(let {aa} in 0){}", "advance_operator", "for_init", "in", 0]
-// ["for(let {aa} of 0){}", "advance_operator", "for_init", "of", 0]
+// ["for(let aa in 0){}", "advance_operator", "(live)", "", 0]
+// ["for(let aa of 0){}", "advance_operator", "(live)", "", 0]
+// ["for(let {aa} in 0){}", "advance_operator", "(live)", "", 0]
+// ["for(let {aa} of 0){}", "advance_operator", "(live)", "", 0]
 
-                    test_cause("for_init", the_operator.id);
+                    test_cause("(live)");
                     the_variable.operator = the_operator;
                     advance();
                     break;
                 }
 
 // test_cause:
-// ["let aa in 0", "advance_operator", "not_for_init", "in", 0]
-// ["let aa of 0", "advance_operator", "not_for_init", "of", 0]
-// ["let {aa} in 0", "advance_operator", "not_for_init", "in", 0]
-// ["let {aa} of 0", "advance_operator", "not_for_init", "of", 0]
+// ["let aa in 0", "advance_operator", "(live)", "", 0]
+// ["let aa of 0", "advance_operator", "(live)", "", 0]
+// ["let {aa} in 0", "advance_operator", "(live)", "", 0]
+// ["let {aa} of 0", "advance_operator", "(live)", "", 0]
 
-                test_cause("not_for_init", the_operator.id);
+                test_cause("(live)");
                 the_variable.operator = the_operator;
                 advance("=");
                 break;
@@ -8832,8 +8900,8 @@ function jslint_phase3_parse(state) {
         if (the_while.block.disrupt === true) {
 
 // test_cause:
-// [" while(0){break}", "stmt_while", "weird_loop", "while", 2]
-// ["while(0){break}", "stmt_while", "weird_loop", "while", 1]
+// ["function aa(){ while(0){break}}", "stmt_while", "weird_loop", "while", 16]
+// ["function aa(){while(0){break}}", "stmt_while", "weird_loop", "while", 15]
 
             warn("weird_loop", the_while);
         }
@@ -9325,10 +9393,10 @@ function jslint_phase4_walk(state) {
 // only the first warning of a token.
 
 // test_cause:
-// ["aa+=0", "check_assignable", "undeclared", "", 0]
-// ["aa=0", "check_assignable", "undeclared", "", 0]
+// ["aa+=0", "check_assignable", "(live)", "", 0]
+// ["aa=0", "check_assignable", "(live)", "", 0]
 
-            test_cause("undeclared");
+            test_cause("(live)");
             return false;
         }
         if (the_variable.readonly) {
@@ -9338,7 +9406,10 @@ function jslint_phase4_walk(state) {
 // ["const aa=0;aa++", "check_assignable", "bad_assignment_a", "aa", 12]
 // ["const aa=0;aa+=0", "check_assignable", "bad_assignment_a", "aa", 12]
 // ["const aa=0;aa=0", "check_assignable", "bad_assignment_a", "aa", 12]
-// ["function aa(){}aa=0", "check_assignable", "bad_assignment_a", "aa", 16]
+// ["
+// function aa(){}
+// aa=0
+// ", "check_assignable", "bad_assignment_a", "aa", 1]
 
             warn("bad_assignment_a", name);
             return false;
@@ -9386,12 +9457,10 @@ function jslint_phase4_walk(state) {
             if (the_variable?.role === "label") {
 
 // test_cause:
-// ["aa:while(0){aa}", "name_lookup", "skip_label", "aa", 0]
-// ["
-// function aa(){aa:while(aa){break aa;}}
-// ", "name_lookup", "skip_label", "aa", 0]
+// ["aa:while(0){aa}", "name_lookup", "(live)", "", 0]
+// ["function aa(){aa:while(aa){break aa;}}", "name_lookup", "(live)", "", 0]
 
-                test_cause("skip_label", id);
+                test_cause("(live)");
                 the_label = the_variable;
                 the_variable = undefined;
             }
@@ -9419,8 +9488,14 @@ function jslint_phase4_walk(state) {
 // ["(function aa(){})aa", "name_lookup", "undeclared_a", "aa", 18]
 // ["aa", "name_lookup", "undeclared_a", "aa", 1]
 // ["class aa{}", "name_lookup", "undeclared_a", "aa", 7]
-// ["function aa(){function bb(){}}bb", "name_lookup", "undeclared_a", "bb", 31]
-// ["function aa(){var bb}bb", "name_lookup", "undeclared_a", "bb", 22]
+// ["
+// function aa(){function bb(){}}
+// bb
+// ", "name_lookup", "undeclared_a", "bb", 1]
+// ["
+// function aa(){var bb}
+// bb
+// ", "name_lookup", "undeclared_a", "bb", 1]
 // ["if(0){const aa=0}aa", "name_lookup", "undeclared_a", "aa", 18]
 // ["if(0){function aa(){}}aa", "name_lookup", "undeclared_a", "aa", 23]
 // ["if(0){let aa}aa", "name_lookup", "undeclared_a", "aa", 14]
@@ -9470,10 +9545,14 @@ function jslint_phase4_walk(state) {
 // (function aa(){aa();var aa})
 // ", "name_lookup", "temporal_dead_zone_a", "aa", 16]
 // ["for(const [aa] of aa){}", "name_lookup", "temporal_dead_zone_a", "aa", 19]
+// ["function aa([aa=aa]){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
+// ["function aa({aa=aa}){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
 // ["let [aa]=aa", "name_lookup", "temporal_dead_zone_a", "aa", 10]
 // ["let aa=()=>aa", "name_lookup", "temporal_dead_zone_a", "aa", 12]
 // ["let aa=aa", "name_lookup", "temporal_dead_zone_a", "aa", 8]
 // ["let aa=bb;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
+// ["let[aa=bb]=0;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
+// ["let{aa=bb}=0;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
 
             warn("temporal_dead_zone_a", thing);
         }
@@ -9537,8 +9616,12 @@ function jslint_phase4_walk(state) {
         if (lvalue.id === "." && thing.expression[1].id === "undefined") {
 
 // test_cause:
-// [" aa.aa=undefined", "post_a_assignment", "expected_a_b", "undefined", 2]
-// ["aa.aa=undefined", "post_a_assignment", "expected_a_b", "undefined", 1]
+// ["
+// let aa; aa.aa=undefined;
+// ", "post_a_assignment", "expected_a_b", "undefined", 9]
+// ["
+// let aa;aa.aa=undefined;
+// ", "post_a_assignment", "expected_a_b", "undefined", 8]
 
             warn("expected_a_b", lvalue.expression, "delete", "undefined");
             return;
@@ -9619,13 +9702,13 @@ function jslint_phase4_walk(state) {
                 if (thing.expression[0].value === "") {
 
 // test_cause:
-// ["\"\"+0", "post_b_binary", "expected_a_b", "\"\" +", 3]
+// ["let aa=\"\"+0;", "post_b_binary", "expected_a_b", "\"\" +", 10]
 
                     warn("expected_a_b", thing, "String(...)", "\"\" +");
                 } else if (thing.expression[1].value === "") {
 
 // test_cause:
-// ["0+\"\"", "post_b_binary", "expected_a_b", "+ \"\"", 2]
+// ["let aa=0+\"\";", "post_b_binary", "expected_a_b", "+ \"\"", 9]
 
                     warn("expected_a_b", thing, "String(...)", "+ \"\"");
                 }
@@ -9691,15 +9774,24 @@ function jslint_phase4_walk(state) {
 // '-aa ** 2' needs parens, while '[aa] ** 2' and '++aa ** 2' do not.
 
 // test_cause:
-// ["aa=!!0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
-// ["aa=!0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
-// ["aa=+0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
+// ["
+// /*jslint bitwise*/
+// let aa;aa=~aa**aa;
+// ", "post_b_binary", "wrap_subexpression_a_b", "**", 11]
+// ["
+// /*jslint convert*/
+// let aa;aa=!!aa**aa;
+// ", "post_b_binary", "wrap_subexpression_a_b", "**", 11]
+// ["
+// /*jslint convert*/
+// let aa;aa=+aa**aa;
+// ", "post_b_binary", "wrap_subexpression_a_b", "**", 11]
 // ["aa=-0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
 // ["aa=void 0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
-// ["aa=~0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
 // ["
 // async function aa(){return await aa**0;}
 // ", "post_b_binary", "wrap_subexpression_a_b", "**", 28]
+// ["let aa;aa=!aa**aa;", "post_b_binary", "wrap_subexpression_a_b", "**", 11]
 
                 warn(
                     "wrap_subexpression_a_b",
@@ -9722,8 +9814,8 @@ function jslint_phase4_walk(state) {
                     ) {
 
 // test_cause:
-// ["0&&0??0", "post_b_binary", "wrap_subexpression_a_b", "??", 2]
-// ["0??0||0", "post_b_binary", "wrap_subexpression_a_b", "??", 5]
+// ["aa&&bb??cc", "post_b_binary", "wrap_subexpression_a_b", "??", 3]
+// ["aa??bb||cc", "post_b_binary", "wrap_subexpression_a_b", "??", 7]
 
                         warn("wrap_subexpression_a_b", thang, thang.id, "??");
                     }
@@ -9836,7 +9928,7 @@ function jslint_phase4_walk(state) {
                 ) {
 
 // test_cause:
-// ["let Aa=Aa()", "post_b_lparen", "expected_a_before_b", "Aa", 8]
+// ["let Aa;let bb=Aa();", "post_b_lparen", "expected_a_before_b", "Aa", 15]
 
                     warn("expected_a_before_b", left, "new", artifact(left));
                 }
@@ -9846,9 +9938,9 @@ function jslint_phase4_walk(state) {
             if (left.expression.id === "Date" && left.name.id === "UTC") {
 
 // test_cause:
-// ["new Date.UTC()", "post_b_lparen", "cack", "", 0]
+// ["new Date.UTC()", "post_b_lparen", "(live)", "", 0]
 
-                test_cause("cack");
+                test_cause("(live)");
                 cack = !cack;
             }
             if (jslint_rgx_cap.test(left.name.id) !== cack) {
@@ -9861,7 +9953,7 @@ function jslint_phase4_walk(state) {
                 } else {
 
 // test_cause:
-// ["let Aa=Aa.Aa()", "post_b_lparen", "expected_a_before_b", "Aa", 8]
+// ["let Aa;let bb=Aa.Aa();", "post_b_lparen", "expected_a_before_b", "Aa", 15]
 
                     warn(
                         "expected_a_before_b",
@@ -10001,16 +10093,12 @@ function jslint_phase4_walk(state) {
             if (name.expression) {
 
 // test_cause:
-// ["let aa=0", "post_s_var", "let aa=0", "", 0]
+// ["let aa=0", "post_s_var", "(live)", "", 0]
 
-                test_cause("let aa=0");
+                test_cause("(live)");
                 walk_expression(name.expression);
             } else {
-
-// test_cause:
-// ["let aa", "post_s_var", "let aa", "", 0]
-
-                test_cause("let aa");
+                test_cause("(live)");
             }
 
 // PR-502 - Fix long-running regression where 'let x = x;'
@@ -10037,13 +10125,13 @@ function jslint_phase4_walk(state) {
         } else if (is_equal(thing.expression[0], thing.expression[1])) {
 
 // test_cause:
-// ["aa?aa:0", "post_t_ternary", "expected_a_b", "?", 3]
+// ["let aa;let bb=(aa?aa:0);", "post_t_ternary", "expected_a_b", "?", 18]
 
             warn("expected_a_b", thing, "||", "?");
         } else if (is_equal(thing.expression[0], thing.expression[2])) {
 
 // test_cause:
-// ["aa?0:aa", "post_t_ternary", "expected_a_b", "?", 3]
+// ["let aa;let bb=(aa?0:aa);", "post_t_ternary", "expected_a_b", "?", 18]
 
             warn("expected_a_b", thing, "&&", "?");
         } else if (
@@ -10052,7 +10140,7 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["aa?true:false", "post_t_ternary", "expected_a_b", "?", 3]
+// ["let aa;let bb=(aa?true:false);", "post_t_ternary", "expected_a_b", "?", 18]
 
             warn("expected_a_b", thing, "Boolean(...)", "?");
         } else if (
@@ -10061,7 +10149,7 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["aa?false:true", "post_t_ternary", "expected_a_b", "?", 3]
+// ["let aa;let bb=(aa?false:true);", "post_t_ternary", "expected_a_b", "?", 18]
 
             warn("expected_a_b", thing, "!", "?");
         } else if (
@@ -10119,8 +10207,8 @@ function jslint_phase4_walk(state) {
             if (!option_dict.convert) {
 
 // test_cause:
-// [" !!0", "post_u_unary", "expected_a_b", "!!", 2]
-// ["!!0", "post_u_unary", "expected_a_b", "!!", 1]
+// ["let aa= !!0;", "post_u_unary", "expected_a_b", "!!", 9]
+// ["let aa=!!0;", "post_u_unary", "expected_a_b", "!!", 8]
 
                 warn("expected_a_b", thing, "Boolean(...)", "!!");
             }
@@ -10260,11 +10348,11 @@ function jslint_phase4_walk(state) {
     }
 
     function pre_b_in(thing) {
+        if (!thing.for_init) {
 
 // test_cause:
 // ["aa in aa", "pre_b_in", "infix_in", "in", 4]
 
-        if (!thing.for_init) {
             warn("infix_in", thing);
         }
     }
@@ -10339,11 +10427,11 @@ function jslint_phase4_walk(state) {
     function pre_s_function(thing) {
 
 // test_cause:
-// ["()=>0", "pre_s_function", "", "", 0]
-// ["(function (){}())", "pre_s_function", "", "", 0]
-// ["function aa(){}", "pre_s_function", "", "", 0]
+// ["()=>0", "pre_s_function", "(live)", "", 0]
+// ["(function (){}())", "pre_s_function", "(live)", "", 0]
+// ["function aa(){}", "pre_s_function", "(live)", "", 0]
 
-        test_cause("");
+        test_cause("(live)");
         if (thing.arity === "statement" && !scope_block.function_body) {
 
 // test_cause:
@@ -10409,10 +10497,10 @@ function jslint_phase4_walk(state) {
             if (Array.isArray(thing)) {
 
 // test_cause:
-// ["(function(){}())", "walk_expression", "isArray", "", 0]
-// ["0&&0", "walk_expression", "isArray", "", 0]
+// ["(function(){}())", "walk_expression", "(live)", "", 0]
+// ["0&&0", "walk_expression", "(live)", "", 0]
 
-                test_cause("isArray");
+                test_cause("(live)");
                 thing.forEach(walk_expression);
             } else {
                 preamble(thing);
@@ -10423,10 +10511,10 @@ function jslint_phase4_walk(state) {
                 if (thing.id === "function" || thing.id === "=>") {
 
 // test_cause:
-// ["aa=()=>0", "walk_expression", "function", "=>", 0]
-// ["aa=function(){}", "walk_expression", "function", "function", 0]
+// ["aa=()=>0", "walk_expression", "(live)", "", 0]
+// ["aa=function(){}", "walk_expression", "(live)", "", 0]
 
-                    test_cause("function", thing.id);
+                    test_cause("(live)");
 
 // Recurse walk_statement.
 
@@ -10455,9 +10543,9 @@ function jslint_phase4_walk(state) {
                 }
 
 // test_cause:
-// ["aa=0", "walk_expression", "default", "", 0]
+// ["aa=0", "walk_expression", "(live)", "", 0]
 
-                test_cause("default");
+                test_cause("(live)");
                 postamble(thing);
             }
         }
@@ -10470,9 +10558,9 @@ function jslint_phase4_walk(state) {
         if (Array.isArray(thing)) {
 
 // test_cause:
-// ["+[]", "walk_statement", "isArray", "", 0]
+// ["+[]", "walk_statement", "(live)", "", 0]
 
-            test_cause("isArray");
+            test_cause("(live)");
 
 // Recurse walk_statement.
 
@@ -10658,9 +10746,9 @@ function jslint_phase5_whitage(state) {
             if (id !== "ignore" && name.scope_declared === the_block) {
 
 // test_cause:
-// ["function aa(aa) {return aa;}", "delve", "id", "", 0]
+// ["function aa(aa) {return aa;}", "delve", "(live)", "", 0]
 
-                test_cause("id");
+                test_cause("(live)");
                 if (!name.used) {
 
 // test_cause:
@@ -10750,9 +10838,13 @@ function jslint_phase5_whitage(state) {
         if (right.from !== margin) {
 
 // test_cause:
-// ["let aa={\naa:\n0};", "one_space", "open", "0", 0]
+// ["
+// let aa={
+// aa:
+// 0};
+// ", "one_space", "(live)", "", 0]
 
-            test_cause("open", right.value);
+            test_cause("(live)");
             expected_at(margin);
         }
     }
@@ -10766,12 +10858,12 @@ function jslint_phase5_whitage(state) {
     function whitage_closer() {
 
 // test_cause:
-// ["String(0);", "whitage_closer", "closer", ")", 0]
-// ["let aa=[0];", "whitage_closer", "closer", "]", 0]
-// ["let aa=`${0}`;", "whitage_closer", "closer", "}", 0]
-// ["let aa={String};", "whitage_closer", "closer", "}", 0]
+// ["String(0);", "whitage_closer", "(live)", "", 0]
+// ["let aa=[0];", "whitage_closer", "(live)", "", 0]
+// ["let aa=`${0}`;", "whitage_closer", "(live)", "", 0]
+// ["let aa={String};", "whitage_closer", "(live)", "", 0]
 
-        test_cause("closer", right.id);
+        test_cause("(live)");
 
 // If right is a closer, then pop the previous state.
 
@@ -10789,9 +10881,12 @@ function jslint_phase5_whitage(state) {
         if (opening && right.id !== ";") {
 
 // test_cause:
-// ["String(\n0);", "whitage_closer", "aa(\n0)", "0", 0]
+// ["
+// String(
+// 0);
+// ", "whitage_closer", "(live)", "", 0]
 
-            test_cause("aa(\n0)", left.value);
+            test_cause("(live)");
             at_margin(
                 indentage.dot_depth === 1
 
@@ -10804,9 +10899,9 @@ function jslint_phase5_whitage(state) {
         }
 
 // test_cause:
-// ["String( );", "whitage_closer", "no_space_only", ")", 0]
+// ["String( );", "whitage_closer", "(live)", "", 0]
 
-        test_cause("no_space_only", right.id);
+        test_cause("(live)");
         no_space_only();
     }
 
@@ -10836,17 +10931,17 @@ function jslint_phase5_whitage(state) {
 // test_cause:
 // ["
 // let aa=0;if(aa){aa();}else if(aa){aa();}
-// ", "whitage_default", "stmt_else_if", "else", 0]
+// ", "whitage_default", "(live)", "", 0]
 
-                test_cause("stmt_else_if", left.id);
+                test_cause("(live)");
                 one_space_only();
                 return;
             }
 
 // test_cause:
-// ["let aa;", "whitage_default", "stmt", "let", 0]
+// ["let aa;", "whitage_default", "(live)", "", 0]
 
-            test_cause("stmt", right.id);
+            test_cause("(live)");
             at_margin(0);
             open = false;
             return;
@@ -10866,9 +10961,9 @@ function jslint_phase5_whitage(state) {
 // ["
 // function aa(){
 //     aa();bb:while(aa){aa();}}
-// ", "whitage_default", "{\n label", "bb", 0]
+// ", "whitage_default", "(live)", "", 0]
 
-                test_cause("{\n label", right.id);
+                test_cause("(live)");
                 expected_at(0);
             }
             return;
@@ -10880,17 +10975,20 @@ function jslint_phase5_whitage(state) {
             ) {
 
 // test_cause:
-// ["String(0,0);", "whitage_default", "(0,", ",", 0]
+// ["String(0,0);", "whitage_default", "(live)", "", 0]
 
-                test_cause("(0,", left.id);
+                test_cause("(live)");
                 one_space();
                 return;
             }
 
 // test_cause:
-// ["String(\n0,0);", "whitage_default", "(\n0,", ",", 0]
+// ["
+// String(
+// 0,0);
+// ", "whitage_default", "(live)", "", 0]
 
-            test_cause("(\n0,", left.id);
+            test_cause("(live)");
             return;
         }
 
@@ -10900,17 +10998,20 @@ function jslint_phase5_whitage(state) {
             if (open) {
 
 // test_cause:
-// ["String(\nString?0:1);", "whitage_default", "(\n0?0:0", "?", 0]
+// ["
+// String(
+// String?0:1);
+// ", "whitage_default", "(live)", "", 0]
 
-                test_cause("(\n0?0:0", right.id);
+                test_cause("(live)");
                 at_margin(0);
                 return;
             }
 
 // test_cause:
-// ["String(String?0:1);", "whitage_default", "(0?0:0", "?", 0]
+// ["String(String?0:1);", "whitage_default", "(live)", "", 0]
 
-            test_cause("(0?0:0", right.id);
+            test_cause("(live)");
             warn("use_open", right);
             return;
         }
@@ -10932,9 +11033,9 @@ function jslint_phase5_whitage(state) {
         ) {
 
 // test_cause:
-// ["String(...String);", "whitage_default", "...", "...", 0]
+// ["String(...String);", "whitage_default", "(live)", "", 0]
 
-            test_cause("...", left.id);
+            test_cause("(live)");
             no_space_only();
             return;
         }
@@ -10942,9 +11043,9 @@ function jslint_phase5_whitage(state) {
             if (left.line === right.line) {
 
 // test_cause:
-// ["String?.aa();", "whitage_default", "?.", "?.", 0]
+// ["String?.aa();", "whitage_default", "(live)", "", 0]
 
-                test_cause("?.", right.id);
+                test_cause("(live)");
                 no_space_only();
                 return;
             }
@@ -10965,9 +11066,9 @@ function jslint_phase5_whitage(state) {
 //         aa(bb);
 //     }
 // }
-// ", "whitage_default", "for(;;)", ";", 0]
+// ", "whitage_default", "(live)", "", 0]
 
-                test_cause("for(;;)", left.id);
+                test_cause("(live)");
                 at_margin(0);
             }
             return;
@@ -10976,6 +11077,19 @@ function jslint_phase5_whitage(state) {
 
 // PR-514 - Bugfix - On one line, <one_space> still lets a comment sit between
 // the 'get' or 'set' and its name.
+            test_cause("(live)");
+            if (left.line === right.line) {
+
+// test_cause:
+// ["
+// /*jslint getset*/
+// String({get aa() {
+//     return;
+// }});
+// ", "whitage_default", "(live)", "", 0]
+
+                one_space();
+            } else {
 
 // test_cause:
 // ["
@@ -10987,17 +11101,7 @@ function jslint_phase5_whitage(state) {
 //     }
 // });
 // ", "one_space_only", "expected_space_a_b", "aa", 5]
-// ["
-// /*jslint getset*/
-// String({get aa() {
-//     return;
-// }});
-// ", "whitage_default", "getset", "", 0]
 
-            test_cause("getset");
-            if (left.line === right.line) {
-                one_space();
-            } else {
                 one_space_only();
             }
             return;
@@ -11018,9 +11122,9 @@ function jslint_phase5_whitage(state) {
         ) {
 
 // test_cause:
-// ["if(String()){String();}", "whitage_default", "){", "){", 0]
+// ["if(String()){String();}", "whitage_default", "(live)", "", 0]
 
-            test_cause("){", left.id + right.id);
+            test_cause("(live)");
             one_space_only();
             return;
         }
@@ -11057,9 +11161,9 @@ function jslint_phase5_whitage(state) {
         ) {
 
 // test_cause:
-// ["let aa=0;", "whitage_default", "=", "=", 0]
+// ["let aa=0;", "whitage_default", "(live)", "", 0]
 
-            test_cause("=", left.id);
+            test_cause("(live)");
             one_space();
             return;
         }
@@ -11072,15 +11176,15 @@ function jslint_phase5_whitage(state) {
     function whitage_opener() {
 
 // test_cause:
-// ["String();", "whitage_opener", "opener", "(", 0]
-// ["String(0);", "whitage_opener", "opener", "(", 0]
-// ["let aa=[0];", "whitage_opener", "opener", "[", 0]
-// ["let aa=[];", "whitage_opener", "opener", "[", 0]
-// ["let aa=`${0}`;", "whitage_opener", "opener", "${", 0]
-// ["let aa={String};", "whitage_opener", "opener", "{", 0]
-// ["let aa={};", "whitage_opener", "opener", "{", 0]
+// ["String();", "whitage_opener", "(live)", "", 0]
+// ["String(0);", "whitage_opener", "(live)", "", 0]
+// ["let aa=[0];", "whitage_opener", "(live)", "", 0]
+// ["let aa=[];", "whitage_opener", "(live)", "", 0]
+// ["let aa=`${0}`;", "whitage_opener", "(live)", "", 0]
+// ["let aa={String};", "whitage_opener", "(live)", "", 0]
+// ["let aa={};", "whitage_opener", "(live)", "", 0]
 
-        test_cause("opener", left.id);
+        test_cause("(live)");
         opening = left.open || (left.line !== right.line);
         indentage = {
             closer,
@@ -11120,9 +11224,12 @@ function jslint_phase5_whitage(state) {
         if (opening) {
 
 // test_cause:
-// ["String(\n0);", "whitage_opener", "(\n0)", "0", 0]
+// ["
+// String(
+// 0);
+// ", "whitage_opener", "(live)", "", 0]
 
-            test_cause("(\n0)", right.value);
+            test_cause("(live)");
             open = true;
             margin += mode_indent;
             if (right.role === "label") {
@@ -11132,9 +11239,9 @@ function jslint_phase5_whitage(state) {
 // ["
 // function aa(){
 //  bb:while(aa){aa();}}
-// ", "whitage_opener", "{\n label", "bb", 0]
+// ", "whitage_opener", "(live)", "", 0]
 
-                    test_cause("{\n label", right.id);
+                    test_cause("(live)");
                     expected_at(0);
                 }
             } else if (right.switch) {
@@ -11150,9 +11257,9 @@ function jslint_phase5_whitage(state) {
         ) {
 
 // test_cause:
-// ["function aa(){bb:while(aa){aa();}}", "whitage_opener", "{label", "bb", 0]
+// ["function aa(){bb:while(aa){aa();}}", "whitage_opener", "(live)", "", 0]
 
-            test_cause("{label", right.id);
+            test_cause("(live)");
             warn(
                 "expected_line_break_a_b",
                 right,
@@ -11163,9 +11270,9 @@ function jslint_phase5_whitage(state) {
         open = false;
 
 // test_cause:
-// ["String(0);", "whitage_opener", "(0)", "0", 0]
+// ["String(0);", "whitage_opener", "(live)", "", 0]
 
-        test_cause("(0)", right.value);
+        test_cause("(live)");
         no_space_only();
     }
 
