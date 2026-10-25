@@ -716,7 +716,6 @@ await Promise.all(fixtureList.map(async function ([
 
 </span>    const block_list = [];      // The array containing all lexical-blocks.
     const block_stack = [];     // The stack of lexical-blocks.
-    const cause_dict = empty(); // The object of test-causes.
     const directive_list = [];  // The directive comments.
     const export_dict = empty();        // The exported names and values.
     const function_list = [];   // The array containing all functions.
@@ -745,7 +744,9 @@ await Promise.all(fixtureList.map(async function ([
     const token_global = {      // The global object; the outermost context.
         async: 0,
         context: empty(),
- ...
+        finally: 0,
+        from: 0,
+        function_body: tru...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1081,7 +1082,6 @@ await Promise.all(fixtureList.map(async function ([
         stop,
         stop_at,
         tenure,
-        test_cause,
         token_global,
         token_list,
         warn,
@@ -1112,7 +1112,7 @@ await Promise.all(fixtureList.map(async function ([
     let token_prv = token_global;       // The previous token including
                                         // ... comments.
     let token_prv_expr = token_global;  // The previous token excluding
-                                    ...
+                                        // ... comments....
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1178,7 +1178,6 @@ await Promise.all(fixtureList.map(async function ([
         stop,
         syntax_dict,
         tenure,
-        test_cause,
         token_global,
         token_list,
         warn,
@@ -1204,7 +1203,7 @@ await Promise.all(fixtureList.map(async function ([
 
         if (
             token_now.identifier &amp;&amp;
-            token_now.id !...
+            token_now.id !== "function" &amp;&...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1252,7 +1251,6 @@ if (!state.mode_json) {
         scope_function_push,
         scope_report_push,
         syntax_dict,
-        test_cause,
         token_global,
         warn
     } = state;
@@ -1309,7 +1307,7 @@ if (!state.mode_json) {
 // Produce a function that will act on the tasks registered by an action
 // function while walking the tree.
 
-        retur...
+        return function (the_toke...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1345,7 +1343,6 @@ if (
         artifact,
         block_list,
         option_dict,
-        test_cause,
         token_global,
         token_list,
         warn
@@ -1400,9 +1397,8 @@ if (
             if (id !== "ignore" &amp;&amp; name.scope_declared === the_block) {
 
 // test_cause:
-// ["function aa(aa) {return aa;}", "delve", "id", "", 0]
+// ["function aa(aa) {return aa;}", "delve", "(live)", "", 0]
 
-                test_cause("id");
                 if (!name.used) {
 
 // test_cause:
@@ -1411,7 +1407,8 @@ if (
 // ["let aa;", "delve", "unused_a", "aa", 5]
 // ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]
 
-                    warn("unused_...
+                    warn("unused_a", name);
+                } else if (!name.assign...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1675,18 +1672,18 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
     });
 
 // PR-xxx - Collect, then run: await the whole body, async or not, before any
-// test starts. A body that throws fails as one more test.
+// test starts. A body that throws fails as one more test, wrapped, so a falsy
+// throw still fails.
 
     try {
         await jstestAls.run({describe}, testFunction);
     } catch (err) {
-        errBody = err;
+        errBody = [err, "jstestDescribe body"];
     }
     describe.collected = true;
-    result = await Promise.all(describe.itList.map(async function (record) {
-        try {
-            await jstestAls.run({describe, record}, record.testFunction);
-            record.stat...
+
+// PR-xxx - Assert this describe's tests, then this describe, are in ASCII
+// order. Then add one failed result for a bo...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1747,13 +1744,14 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 // sees it even if its describe never runs or prints. Mode "pass" counts a
 // throwing test as passed.
 
-    describe.itList.push(jstestItRecordPush({
+    jstestItRecordList.push({
         describe: describe.description,
         description,
         pass: mode === "pass",
         status: "pending",
         testFunction
-    }));
+    });
+    describe.itList.push(jstestItRecordList.at(-1));
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
 jstestIt((
@@ -1806,10 +1804,11 @@ jstestIt((
 // This function will return a failed result for the first description in
 // &lt;descriptionList&gt; not strictly after the one before it, else undefined.
 // Strict means a duplicate fails too, as two identical lines cannot be told
-// apart in the output.
+// apart in the output. Not '&gt;=', which is false for a non-string name such as
+// undefined, so that name would pass.
 
 </span>    for (const [ii, description] of descriptionList.entries()) {
-        if (ii &gt; 0 &amp;&amp; descriptionList[ii - 1] &gt;= description) {
+        if (ii &gt; 0 &amp;&amp; !(descriptionList[ii - 1] &lt; description)) {
             const now = JSON.stringify(description);
             const prv = JSON.stringify(descriptionList[ii - 1]);
             return [
@@ -1824,12 +1823,12 @@ jstestIt((
     }
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-// failed result, for the first bad pair only.
 
 assertJsonEqual([
     ["", "aa", "bb"],
     ["aa", "cc", "bb", "aa"],
-    ["aa", "aa"]
+    ["aa", "aa"],
+    [undefined, "bb"]
 ].map(function (descriptionList) {
     const failure = <span class="apidocCodeKeywordSpan">jstestOrderCheck</span>(descriptionList);
     return failure &amp;&amp; [failure[0].message, failure[1]];
