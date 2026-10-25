@@ -2622,23 +2622,40 @@ ff();
 // This function will push to <list> the fixture <cause>, whose block sits
 // directly above the code at offset <anchor> in jslint.mjs.
 
-            const [ignore, callCode] = sourceJslintMjs.slice(
-                anchor,
-                anchor + 256
-            ).match(/^(?:return )?(?:[\w.]+ = )?\w+\(\s*(?:"(\w+)")?/) || [];
+            const line = (
+                sourceJslintMjs.slice(0, anchor).match(/\n/g).length + 1
+            );
             const [source, fn, code, aa, column] = cause;
             const {warnings} = jslint.jslint(source, {
-                beta: true
+                beta: true,
+                trace: true
+            });
+
+// A second warning on one token is dropped, so check the warnings the user
+// sees, never the ones raised.
+
+            const warningsShown = warnings.filter(function (warning) {
+                return (
+                    warning.code === code &&
+                    String(warning.b || warning.a || "") === aa &&
+                    warning.column === column
+                );
+            });
+
+// The shown warning raised through the code under the block, by the stack
+// that option trace records.
+
+            const warningsVia = warningsShown.filter(function ({stack_trace}) {
+                return stack_trace.includes("/jslint.mjs:" + line + ":");
             });
             list.push({
                 anchor,
 
 // Name the line of the code under the block, so a failure points at it.
 
-                at: "jslint.mjs:" + (
-                    sourceJslintMjs.slice(0, anchor).match(/\n/g).length + 1
-                ),
+                at: "jslint.mjs:" + line,
                 cause: JSON.stringify(cause),
+                code,
 
 // Validate no internal-error. A crash mid-walk still runs every branch before
 // it, so a coverage-check alone passes straight through one, and "0``" threw
@@ -2657,24 +2674,28 @@ ff();
                     code !== "(live)" || (aa === "" && column === 0)
                 ),
 
-// A second warning on one token is dropped, so check the warnings the user
-// sees, never the ones raised.
+// Field 2 of a warning names the function that raised it, the first named one
+// above the raisers in the stack that option trace records, so a fixture may
+// be filed up the stack, above the call that leads down to the raise site.
 
-                shown: code === "(live)" || warnings.some(function (warning) {
-                    return (
-                        warning.code === code &&
-                        String(warning.b || warning.a || "") === aa &&
-                        warning.column === column
+                raiser: warningsVia.length > 0 && Array.from(
+                    warningsVia[0].stack_trace.matchAll(
+                        /^ {4}at (?:Object\.)?([\w.]+).*? \(.*:\d+:\d+\)$/gm
+                    ),
+                    function ([ignore, name]) {
+                        return name;
+                    }
+                ).find(function (name) {
+                    return !["stop", "stop_at", "warn", "warn_at"].includes(
+                        name
                     );
                 }),
-
-// The call directly under the block raises the warning: its first argument is
-// the code.
-
-                site: code === "(live)" || callCode === code,
-                source
+                shown: code === "(live)" || warningsShown.length > 0,
+                source,
+                via: code === "(live)" || warningsVia.length > 0
             });
         }
+        Error.stackTraceLimit = Infinity;
         sourceJslintMjs.replace((
             /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?) *?\S/g
         ), function (match0, header, causeList, footer, offset) {
@@ -2740,7 +2761,7 @@ ff();
                 {codeless: true}
             ], [
                 ["if(0%0){}", "condition", "unexpectd_a", "%", 5],
-                {shown: false, site: false}
+                {inFn: false, shown: false, via: false}
             ], [
                 ["if(0%0){}", "condition", "(live)", "aa", 0],
                 {known: false}
@@ -2752,19 +2773,19 @@ ff();
                 {known: false}
             ], [
                 ["if(0%0){}", "condition", "unexpected_a", "%", 6],
-                {shown: false}
+                {inFn: false, shown: false, via: false}
             ], [
                 ["if(0%0){}", "condition", "unexpected_a", "&", 5],
-                {shown: false}
+                {inFn: false, shown: false, via: false}
             ], [
                 ["if(0%0){}", "condition", "empty_block", "{", 8],
-                {site: false}
+                {inFn: false, via: false}
             ], [
                 ["if(0%0){}", "warn", "unexpected_a", "%", 5],
                 {inFn: false}
             ], [
                 ["if(0&0){}", "condition", "unexpected_a", "&", 5],
-                {live: false}
+                {inFn: false, live: false, via: false}
             ]
         ].map(function ([bad, expect]) {
             return [
@@ -2776,11 +2797,36 @@ ff();
             [
                 "[\"let aa=!!0;\",\"post_u_unary\",\"expected_a_b\",\"!!\",8]",
                 ["!!0", "post_u_unary", "expected_a_b", "!!", 1],
-                {shown: false}
+                {inFn: false, shown: false, via: false}
             ], [
                 "[\"aa=/./vu\",\"lex_regexp\",\"unexpected_a\",\"u\",8]",
                 ["aa=/./u;if(0){}", "lex_regexp", "unexpected_a", "0", 12],
-                {live: false}
+                {inFn: false, live: false, via: false}
+            ], [
+
+// Filed up the stack above the wrong caller: <check_left> raises it through
+// <infix_lbracket>, not through the call under this block in <infix_dot>.
+
+                "[\"aa=[]?.aa\",\"check_left\",\"unexpected_a\",\"?.\",6]",
+                ["\"\".aa;0[0]", "check_left", "unexpected_a", "[", 8],
+                {inFn: false, via: false}
+            ], [
+
+// Raised here but dropped, since <post_a_pluseq> warned on the token first,
+// so the warning shown is another site's.
+
+                (
+                    "[\"aa-=undefined\",\"post_a_assignment\"," +
+                    "\"unexpected_a\",\"undefined\",5]"
+                ),
+                [
+                    "aa+=undefined",
+                    "post_a_assignment",
+                    "unexpected_a",
+                    "undefined",
+                    5
+                ],
+                {inFn: false, via: false}
             ]
         ])) {
             const found = fixtureList.find(function ({cause}) {
@@ -2790,6 +2836,7 @@ ff();
             fixturePush(controlList, bad, found.anchor);
             controlList.at(-1).expect = expect;
         }
+        Error.stackTraceLimit = 10;
 
 // Measure each fixture's coverage in a child, since taking precise coverage
 // resets the counters that NODE_V8_COVERAGE dumps at exit.
@@ -2847,24 +2894,30 @@ process.stdout.write(JSON.stringify(resultList));
                 const {
                     at,
                     cause,
+                    code,
                     codeless,
                     fn,
                     known,
+                    raiser,
                     shown,
-                    site
+                    via
                 } = fixtureList.concat(controlList)[ii];
                 return {
                     at,
                     cause,
                     codeless,
 
-// The function is the named one holding the block.
+// Field 2 of a (live) fixture names the function holding the block.
 
-                    inFn: fn === name,
+                    inFn: fn === (
+                        code === "(live)"
+                        ? name
+                        : raiser
+                    ),
                     known,
                     live: count > 0,
                     shown,
-                    site
+                    via
                 };
             });
         }).then(function (recordList) {
@@ -2874,8 +2927,8 @@ process.stdout.write(JSON.stringify(resultList));
             assertJsonEqual(recordList.slice(
                 0,
                 fixtureList.length
-            ).filter(function ({codeless, inFn, known, live, shown, site}) {
-                return codeless || !inFn || !known || !live || !shown || !site;
+            ).filter(function ({codeless, inFn, known, live, shown, via}) {
+                return codeless || !inFn || !known || !live || !shown || !via;
             }), []);
             assertJsonEqual(recordList.slice(
                 fixtureList.length
@@ -2888,7 +2941,7 @@ process.stdout.write(JSON.stringify(resultList));
                     known: true,
                     live: true,
                     shown: true,
-                    site: true,
+                    via: true,
                     ...expect
                 };
             }));
