@@ -2622,18 +2622,11 @@ ff();
 // This function will push to <list> the fixture <cause>, whose block sits
 // directly above the code at offset <anchor> in jslint.mjs.
 
-            const [ignore, callName, callCode] = sourceJslintMjs.slice(
+            const [ignore, callCode] = sourceJslintMjs.slice(
                 anchor,
                 anchor + 256
-            ).match(/^(?:return )?(?:[\w.]+ = )?(\w+)\(\s*(?:"(\w+)")?/) || [];
+            ).match(/^(?:return )?(?:[\w.]+ = )?\w+\(\s*(?:"(\w+)")?/) || [];
             const [source, fn, code, aa, column] = cause;
-
-// A fixture may name, instead of its enclosing function, the function called
-// directly under the block that raises the warning, but never a raiser itself.
-
-            const viaCallee = callName === fn && ![
-                "stop", "stop_at", "warn", "warn_at"
-            ].includes(callName);
             const {warnings} = jslint.jslint(source, {
                 beta: true
             });
@@ -2645,7 +2638,6 @@ ff();
                 at: "jslint.mjs:" + (
                     sourceJslintMjs.slice(0, anchor).match(/\n/g).length + 1
                 ),
-                callee: viaCallee,
                 cause: JSON.stringify(cause),
 
 // Validate no internal-error. A crash mid-walk still runs every branch before
@@ -2677,9 +2669,9 @@ ff();
                 }),
 
 // The call directly under the block raises the warning: its first argument is
-// the code, or it is the callee the fixture names.
+// the code.
 
-                site: code === "(live)" || callCode === code || viaCallee,
+                site: code === "(live)" || callCode === code,
                 source
             });
         }
@@ -2854,7 +2846,6 @@ process.stdout.write(JSON.stringify(resultList));
             return JSON.parse(stdout).map(function ([count, name], ii) {
                 const {
                     at,
-                    callee,
                     cause,
                     codeless,
                     fn,
@@ -2867,9 +2858,9 @@ process.stdout.write(JSON.stringify(resultList));
                     cause,
                     codeless,
 
-// The function is the one holding the block, or a callee below it.
+// The function is the named one holding the block.
 
-                    inFn: fn === name || callee,
+                    inFn: fn === name,
                     known,
                     live: count > 0,
                     shown,

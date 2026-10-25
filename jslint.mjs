@@ -4979,6 +4979,18 @@ function jslint_phase3_parse(state) {
                 (id !== "." && id !== "?." && id !== "(" && id !== "[")
             )
         ) {
+
+// test_cause:
+// ["(/./)?.0", "check_left", "unexpected_a", "?.", 6]
+// ["(0?0:0)()", "check_left", "unexpected_a", "(", 8]
+// ["0()", "check_left", "unexpected_a", "(", 2]
+// ["0[0]", "check_left", "unexpected_a", "[", 2]
+// ["0``", "check_left", "unexpected_a", "`", 2]
+// ["\"\".aa", "check_left", "unexpected_a", ".", 3]
+// ["\"aa\"?.0", "check_left", "unexpected_a", "?.", 5]
+// ["aa=[]?.aa", "check_left", "unexpected_a", "?.", 6]
+// ["new aa``.aa()", "check_left", "unexpected_a", ".", 9]
+
             warn("unexpected_a", right || token_nxt);
             return false;
         }
@@ -5054,6 +5066,29 @@ function jslint_phase3_parse(state) {
             .reduce(function (aa, token) {
                 const bb = artifact(token);
                 if (!option_dict.unordered && aa > bb) {
+
+// test_cause:
+// ["
+// ()=>{function bb(){}function aa(){}}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 30]
+// ["aa={bb,aa}", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
+// ["
+// export async function bb(){}export async function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 51]
+// ["
+// export function bb(){}export default function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 47]
+// ["
+// export function bb(){}export function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 39]
+// ["
+// function aa({bb,aa}){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
+// ["
+// let aa;let bb;export {bb, aa};
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 27]
+// ["let{bb,aa}=0", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
+
                     warn("expected_a_b_before_c_d", token, type, bb, type, aa);
                 }
                 return bb;
@@ -5101,6 +5136,39 @@ function jslint_phase3_parse(state) {
                     (aa.order === bb.order && aa.value > bb.value)
                 )
             ) {
+
+// test_cause:
+// ["
+// switch(0){case 1:break;case 0:break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 29]
+// ["
+// switch(0){case 1:case 0:break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 23]
+// ["
+// switch(0){case "aa":break;case 0:break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 32]
+// ["
+// switch(0){case "aa":case 0:break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 26]
+// ["
+// switch(0){case "bb":break;case "aa":break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 32]
+// ["
+// switch(0){case "bb":case "aa":break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 26]
+// ["
+// switch(0){case aa:break;case "aa":break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 30]
+// ["
+// switch(0){case aa:case "aa":break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 24]
+// ["
+// switch(0){case bb:break;case aa:break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 30]
+// ["
+// switch(0){case bb:case aa:break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 24]
+
                 warn(
                     "expected_a_b_before_c_d",
                     bb.token,
@@ -5517,14 +5585,6 @@ function jslint_phase3_parse(state) {
                 (name.id !== "exec" && name.id !== "test")
             )
         ) {
-
-// test_cause:
-// ["(/./)?.0", "check_left", "unexpected_a", "?.", 6]
-// ["\"\".aa", "check_left", "unexpected_a", ".", 3]
-// ["\"aa\"?.0", "check_left", "unexpected_a", "?.", 5]
-// ["aa=[]?.aa", "check_left", "unexpected_a", "?.", 6]
-// ["new aa``.aa()", "check_left", "unexpected_a", ".", 9]
-
             check_left(left, the_token);
         }
 
@@ -5591,10 +5651,6 @@ function jslint_phase3_parse(state) {
 
             warn("unexpected_a", the_optional, "?.");
         }
-
-// test_cause:
-// ["0``", "check_left", "unexpected_a", "`", 2]
-
         check_left(left, the_tick);
         the_tick.expression = [left].concat(the_tick.expression);
         return the_tick;
@@ -5617,10 +5673,6 @@ function jslint_phase3_parse(state) {
                 warn("subscript_a", the_subscript, name);
             }
         }
-
-// test_cause:
-// ["0[0]", "check_left", "unexpected_a", "[", 2]
-
         check_left(left, the_token);
         the_token.expression = [left, the_subscript];
         advance("]");
@@ -5631,11 +5683,6 @@ function jslint_phase3_parse(state) {
         const the_paren = token_now;
         let the_argument;
         if (left.id !== "function" && left.id !== "=>") {
-
-// test_cause:
-// ["(0?0:0)()", "check_left", "unexpected_a", "(", 8]
-// ["0()", "check_left", "unexpected_a", "(", 2]
-
             check_left(left, the_paren);
         }
         the_paren.expression = [left];
@@ -6684,12 +6731,6 @@ function jslint_phase3_parse(state) {
         }
         if (is_lbrace) {
 
-// test_cause:
-// ["
-// function aa({bb,aa}){}
-// ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
-// ["let{bb,aa}=0", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
-
 // PR-501 - Fix false-warning about ordering in nested-object-destructuring.
 
             check_ordered(role, sub_list);
@@ -7038,11 +7079,6 @@ function jslint_phase3_parse(state) {
 // PR-514 - Bugfix - Check only function-declarations, since a named
 // function-expression is not hoisted. Check an arrow-function's block-body too.
 
-// test_cause:
-// ["
-// ()=>{function bb(){}function aa(){}}
-// ", "check_ordered", "expected_a_b_before_c_d", "aa", 30]
-
         check_ordered(
             "function",
             function_list.slice(
@@ -7234,10 +7270,6 @@ function jslint_phase3_parse(state) {
                 }
             }
         }
-
-// test_cause:
-// ["aa={bb,aa}", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
-
         check_ordered(
             "property",
             the_brace.expression.map(function ({
@@ -7442,6 +7474,9 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // [" 0//c", "semicolon", "expected_a_after_b", "0", 2]
 // ["0", "semicolon", "expected_a_after_b", "0", 1]
+// ["
+// export default Object.freeze({})
+// ", "semicolon", "expected_a_after_b", ")", 32]
 
             warn_at(
                 "expected_a_after_b",
@@ -7644,12 +7679,6 @@ function jslint_phase3_parse(state) {
 // PR-301 - Bugfix - Fixes issues #282 - optional-semicolon.
 
             } else {
-
-// test_cause:
-// ["
-// export default Object.freeze({})
-// ", "semicolon", "expected_a_after_b", ")", 32]
-
                 semicolon();
             }
             export_dict.default = the_thing;
@@ -7743,11 +7772,6 @@ function jslint_phase3_parse(state) {
                 }
 
 // PR-439 - Check exported properties are ordered.
-
-// test_cause:
-// ["
-// let aa;let bb;export {bb, aa};
-// ", "check_ordered", "expected_a_b_before_c_d", "aa", 27]
 
                 check_ordered("export", export_list);
                 advance("}");
@@ -8376,24 +8400,6 @@ function jslint_phase3_parse(state) {
                     break;
                 }
             }
-
-// test_cause:
-// ["
-// switch(0){case 1:case 0:break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 23]
-// ["
-// switch(0){case "aa":case 0:break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 26]
-// ["
-// switch(0){case "bb":case "aa":break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 26]
-// ["
-// switch(0){case aa:case "aa":break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 24]
-// ["
-// switch(0){case bb:case aa:break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 24]
-
             check_ordered_case(the_case.expression);
             parsed_block = parse_statement_block();
             if (parsed_block.length < 1) {
@@ -8428,24 +8434,6 @@ function jslint_phase3_parse(state) {
                 break;
             }
         }
-
-// test_cause:
-// ["
-// switch(0){case 1:break;case 0:break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 29]
-// ["
-// switch(0){case "aa":break;case 0:break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 32]
-// ["
-// switch(0){case "bb":break;case "aa":break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 32]
-// ["
-// switch(0){case aa:break;case "aa":break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 30]
-// ["
-// switch(0){case bb:break;case aa:break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 30]
-
         check_ordered_case(the_cases.map(function ({
             expression
         }) {
@@ -9128,17 +9116,6 @@ function jslint_phase3_parse(state) {
 
 // PR-514 - Bugfix - Also check an exported function-declaration, which is
 // hoisted too, though <stmt_export> resets its arity to 'unary'.
-
-// test_cause:
-// ["
-// export async function bb(){}export async function aa(){}
-// ", "check_ordered", "expected_a_b_before_c_d", "aa", 51]
-// ["
-// export function bb(){}export default function aa(){}
-// ", "check_ordered", "expected_a_b_before_c_d", "aa", 47]
-// ["
-// export function bb(){}export function aa(){}
-// ", "check_ordered", "expected_a_b_before_c_d", "aa", 39]
 
     check_ordered(
         "function",
@@ -10749,6 +10726,18 @@ function jslint_phase5_whitage(state) {
 
     function one_space_only() {
         if (left.line !== right.line || left.thru + 1 !== right.from) {
+
+// test_cause:
+// ["
+// /*jslint getset*/
+// String({
+//     get
+//     aa() {
+//         return;
+//     }
+// });
+// ", "one_space_only", "expected_space_a_b", "aa", 5]
+
             warn("expected_space_a_b", right, artifact(left), artifact(right));
         }
     }
@@ -10974,18 +10963,6 @@ function jslint_phase5_whitage(state) {
 
                 one_space();
             } else {
-
-// test_cause:
-// ["
-// /*jslint getset*/
-// String({
-//     get
-//     aa() {
-//         return;
-//     }
-// });
-// ", "one_space_only", "expected_space_a_b", "aa", 5]
-
                 one_space_only();
             }
             return;
