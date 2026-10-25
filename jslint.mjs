@@ -4847,7 +4847,7 @@ function jslint_phase3_parse(state) {
 // other assignment operators can modify, but they cannot initialize.
 
         const the_symbol = symbol(id, 20);
-        the_symbol.led_infix = function (left) {
+        the_symbol.led_infix = function parse_assignment_led(left) {
             const the_token = token_now;
             let right;
             the_token.arity = "assignment";
@@ -4873,7 +4873,7 @@ function jslint_phase3_parse(state) {
             ) {
 
 // test_cause:
-// ["aa=aa++", "the_symbol.led_infix", "unexpected_a", "++", 6]
+// ["aa=aa++", "parse_assignment_led", "unexpected_a", "++", 6]
 
                 warn("unexpected_a", right);
             }
