@@ -17,6 +17,7 @@
 - jslint - Add html and css linting back into jslint.
 
 # v2026.10.30
+- jstest - Collect each describe's tests before running them, add hooks jstestBefore and jstestAfter and jstestIt options {after, skip, timeout}, and report every failed, hung or crashed test at exit.
 - jstest - Fail any describe or jstestIt name not in ASCII order.
 - jstest - Report each jstestIt still pending at exit as failed.
 - jstest - Add opt-in test filter 'npm_config_mode_test_filter=<regexp>' on '<describe> - <it>'.
