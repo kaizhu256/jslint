@@ -1783,12 +1783,9 @@ jstestIt((
 // This function will on process-exit, print test-report
 // and exit with non-zero exit-code if any test failed.
 
-</span>    console.error(jstestReport());
-    process.exitCode = (
-        exitCode || jstestItRecordList.filter(function ({status}) {
-            return status !== "passed";
-        }).length
-    );
+</span>    const {countFailed, text} = jstestReport();
+    console.error(text);
+    process.exitCode = exitCode || countFailed;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">N/A</pre></li>
 
@@ -1849,7 +1846,8 @@ assertJsonEqual([
 </li>
 <li>Description and source-code:<pre class="apidocCodePre">function jstestReport() {
 <span class="apidocCodeCommentSpan">
-// This function will return the test-report, without side effects.
+// This function will return the test-report &lt;text&gt; and its &lt;countFailed&gt;,
+// without side effects.
 
 </span>// PR-xxx - List and count as failed each test its describe never printed: one
 // still pending, e.g. hung until a watchdog ended the process, or one that
@@ -1861,8 +1859,9 @@ assertJsonEqual([
     const unprintedList = jstestItRecordList.filter(function (record) {
         return !record.printed &amp;&amp; record.status !== "passed";
     });
-    return (
-        (
+    return {
+        countFailed,
+        text: (
             countFailed
             ? "\n\u001b[31m"
             : "\n\u001b[32m"
@@ -1877,7 +1876,7 @@ assertJsonEqual([
                 "  \u2718 " + (jstestItCount + ii + 1) + ". test it " + status +
                 " - " + describe + " - " + description + "\n" + (
                     err
-                    ? err.stack + "\n"
+                    ? String(err.stack ?? err) + "\n"
                     : ""
                 )
             );
@@ -1889,23 +1888,24 @@ assertJsonEqual([
         Number(Date.now() - jstestTimeStart).toLocaleString() +
         " ms\n" +
         "\u001b[39m"
-    );
+    };
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-        "test jstestReport handling-behavior"
-    ), function () {
-        const exitCode = process.exitCode;
+    "test jstestReport handling-behavior"
+), function () {
+    const exitCode = process.exitCode;
 
 // The report lists this test, still running, as pending, and changes nothing,
 // since mid-run every running test is pending.
 
-        assertOrThrow(<span class="apidocCodeKeywordSpan">jstestReport</span>().includes(
-            ". test it pending - test jstestXxx handling-behavior" +
-            " - test jstestReport handling-behavior\n"
-        ));
-        assertJsonEqual(process.exitCode, exitCode);
-    });
+    assertOrThrow(<span class="apidocCodeKeywordSpan">jstestReport</span>().text.includes(
+        ". test it pending - test jstestXxx handling-behavior" +
+        " - test jstestReport handling-behavior\n"
+    ));
+    assertJsonEqual(process.exitCode, exitCode);
 });
+jstestIt((
+    "test jstestReport-numbering handling-behavior"
 ...</pre></li>
 
 <li>

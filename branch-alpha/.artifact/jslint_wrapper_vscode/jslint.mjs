@@ -134,6 +134,7 @@
     context_report,
     convert,
     count,
+    countFailed,
     coverageDir,
     create,
     cwd,
@@ -393,6 +394,7 @@
     testFunction,
     test_internal_error,
     test_unknown_warning_code,
+    text,
     this,
     thru,
     toFixed,
@@ -4845,7 +4847,7 @@ function jslint_phase3_parse(state) {
 // other assignment operators can modify, but they cannot initialize.
 
         const the_symbol = symbol(id, 20);
-        the_symbol.led_infix = function (left) {
+        the_symbol.led_infix = function parse_assignment_led(left) {
             const the_token = token_now;
             let right;
             the_token.arity = "assignment";
@@ -4869,6 +4871,10 @@ function jslint_phase3_parse(state) {
                 right.arity === "preassign" ||
                 right.arity === "postassign"
             ) {
+
+// test_cause:
+// ["aa=aa++", "parse_assignment_led", "unexpected_a", "++", 6]
+
                 warn("unexpected_a", right);
             }
             check_mutation(left);
@@ -5522,6 +5528,7 @@ function jslint_phase3_parse(state) {
 // ["\"aa\"?.0", "check_left", "unexpected_a", "?.", 5]
 // ["aa=[]?.aa", "check_left", "unexpected_a", "?.", 6]
 // ["new aa``.aa()", "check_left", "unexpected_a", ".", 9]
+// ["new aa``?.aa()", "check_left", "unexpected_a", "?.", 9]
 
             check_left(left, the_token);
         }
@@ -5827,11 +5834,10 @@ function jslint_phase3_parse(state) {
         if (earlier) {
 
 // test_cause:
-// ["let aa;(function aa(){})", "name_declare", "(live)", "", 0]
-// ["let aa;function aa(){}", "name_declare", "(live)", "", 0]
-// ["let aa;let aa", "name_declare", "(live)", "", 0]
+// ["let aa;(function aa(){})", "name_declare", "redefinition_a_b", "1", 18]
+// ["let aa;function aa(){}", "name_declare", "redefinition_a_b", "1", 17]
 // ["let aa;let aa", "name_declare", "redefinition_a_b", "1", 12]
-// ["var aa;if(0){var aa}", "name_declare", "(live)", "", 0]
+// ["var aa;if(0){var aa}", "name_declare", "redefinition_a_b", "1", 18]
 // ["var aa;if(0){var aa}", "name_declare", "redefinition_a_b", "1", 18]
 
             warn("redefinition_a_b", name, id, earlier.line);
@@ -5847,7 +5853,7 @@ function jslint_phase3_parse(state) {
                 if (earlier.role !== "label") {
 
 // test_cause:
-// ["let aa;aa:while(0){}", "name_declare", "(live)", "", 0]
+// ["let aa;aa:while(0){}", "name_declare", "redefinition_a_b", "1", 8]
 
                     warn("redefinition_a_b", name, id, earlier.line);
                     earlier = undefined;
@@ -5859,7 +5865,7 @@ function jslint_phase3_parse(state) {
                 if (earlier.role === "label") {
 
 // test_cause:
-// ["aa:while(0){let aa}", "name_declare", "(live)", "", 0]
+// ["aa:while(0){let aa}", "name_declare", "redefinition_a_b", "1", 17]
 
                     warn("redefinition_a_b", name, id, earlier.line);
                     earlier = undefined;
@@ -5891,7 +5897,7 @@ function jslint_phase3_parse(state) {
             if (earlier.role === "variable") {
 
 // test_cause:
-// ["let ignore;(ignore)=>0", "name_declare", "(live)", "", 0]
+// ["let ignore;(ignore)=>0", "name_declare", "redefinition_a_b", "1", 13]
 
                 warn("redefinition_a_b", name, id, earlier.line);
             }
@@ -5904,18 +5910,20 @@ function jslint_phase3_parse(state) {
         ) {
 
 // test_cause:
-// ["for(let aa;;)let aa", "name_declare", "(live)", "", 0]
+// ["for(let aa;;)let aa", "name_declare", "redefinition_a_b", "1", 18]
 // ["
 // function aa(){try{aa();}catch(aa){aa();}}
-// ", "name_declare", "(live)", "", 0]
-// ["function aa(){var aa}", "name_declare", "(live)", "", 0]
-// ["let aa;do let aa;while(0)", "name_declare", "(live)", "", 0]
-// ["let aa;do;while(0)let aa", "name_declare", "(live)", "", 0]
-// ["let aa;for(let aa;;){}", "name_declare", "(live)", "", 0]
-// ["let aa;if(0);else if(0)let aa", "name_declare", "(live)", "", 0]
-// ["let aa;if(0);else let aa", "name_declare", "(live)", "", 0]
-// ["let aa;if(0)let aa", "name_declare", "(live)", "", 0]
-// ["let aa;while(0)let aa", "name_declare", "(live)", "", 0]
+// ", "name_declare", "redefinition_a_b", "1", 31]
+// ["function aa(){var aa}", "name_declare", "redefinition_a_b", "1", 19]
+// ["let aa;do let aa;while(0)", "name_declare", "redefinition_a_b", "1", 15]
+// ["let aa;do;while(0)let aa", "name_declare", "redefinition_a_b", "1", 23]
+// ["let aa;for(let aa;;){}", "name_declare", "redefinition_a_b", "1", 16]
+// ["
+// let aa;if(0);else if(0)let aa
+// ", "name_declare", "redefinition_a_b", "1", 28]
+// ["let aa;if(0);else let aa", "name_declare", "redefinition_a_b", "1", 23]
+// ["let aa;if(0)let aa", "name_declare", "redefinition_a_b", "1", 17]
+// ["let aa;while(0)let aa", "name_declare", "redefinition_a_b", "1", 20]
 
             warn("redefinition_a_b", name, id, earlier.line);
             return;
@@ -6548,7 +6556,6 @@ function jslint_phase3_parse(state) {
             if (!name.identifier) {
 
 // test_cause:
-// ["(,aa)=>0", "name_parse", "expected_identifier_a", ",", 2]
 // ["function aa(...0){}", "name_parse", "expected_identifier_a", "0", 16]
 // ["function aa(0){}", "name_parse", "expected_identifier_a", "0", 13]
 // ["function aa([0]){}", "name_parse", "expected_identifier_a", "0", 14]
@@ -6662,6 +6669,10 @@ function jslint_phase3_parse(state) {
             if (the_function_toplevel) {
                 the_function.parameter_count += 1;
             }
+
+// test_cause:
+// ["(,aa)=>0", "name_parse", "expected_identifier_a", ",", 2]
+
             if (name_parse()) {
 
 // Break early from ellipsis.
@@ -7366,7 +7377,6 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["new aa?.aa()", "prefix_new", "unexpected_a", "?.", 7]
-// ["new aa``?.aa()", "prefix_new", "unexpected_a", "?.", 9]
 
             warn("unexpected_a", optional_chain(right), "?.");
         }
@@ -7532,6 +7542,12 @@ function jslint_phase3_parse(state) {
         }
         check_not_top_level(the_continue);
         the_continue.disrupt = true;
+
+// test_cause:
+// ["
+// function aa(){while(aa){continue;}}
+// ", "stmt_continue", "unexpected_a", "continue", 25]
+
         warn("unexpected_a", the_continue);
         semicolon();
         return the_continue;
@@ -8054,7 +8070,7 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id === "(string)") {
 
 // test_cause:
-// ["import \"aa\"", "stmt_import", "(live)", "", 0]
+// ["import \"aa\"", "stmt_import", "expected_a_b", "aa", 8]
 
                 warn("expected_a_b", token_nxt, "{", artifact());
                 advance();
@@ -9445,14 +9461,10 @@ function jslint_phase4_walk(state) {
 // (function aa(){aa();var aa})
 // ", "name_lookup", "temporal_dead_zone_a", "aa", 16]
 // ["for(const [aa] of aa){}", "name_lookup", "temporal_dead_zone_a", "aa", 19]
-// ["function aa([aa=aa]){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
-// ["function aa({aa=aa}){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
 // ["let [aa]=aa", "name_lookup", "temporal_dead_zone_a", "aa", 10]
 // ["let aa=()=>aa", "name_lookup", "temporal_dead_zone_a", "aa", 12]
 // ["let aa=aa", "name_lookup", "temporal_dead_zone_a", "aa", 8]
 // ["let aa=bb;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
-// ["let[aa=bb]=0;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
-// ["let{aa=bb}=0;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
 
             warn("temporal_dead_zone_a", thing);
         }
@@ -9495,7 +9507,7 @@ function jslint_phase4_walk(state) {
             ) {
 
 // test_cause:
-// ["aa+=undefined", "post_a_assignment", "unexpected_a", "undefined", 5]
+// ["aa-=undefined", "post_a_assignment", "unexpected_a", "undefined", 5]
 
                 warn("unexpected_a", thing.expression[1]);
             }
@@ -9539,6 +9551,10 @@ function jslint_phase4_walk(state) {
                 right.id === "undefined" ||
                 Number.isNaN(right.value)
             ) {
+
+// test_cause:
+// ["let aa=0;aa+=0;", "post_a_pluseq", "unexpected_a", "0", 14]
+
                 warn("unexpected_a", right);
             }
         }
@@ -10002,7 +10018,11 @@ function jslint_phase4_walk(state) {
             if (name.expression) {
 
 // test_cause:
+// ["function aa([aa=aa]){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
+// ["function aa({aa=aa}){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
 // ["let aa=0", "post_s_var", "(live)", "", 0]
+// ["let[aa=bb]=0;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
+// ["let{aa=bb}=0;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
 
                 walk_expression(name.expression);
             }
@@ -10088,12 +10108,22 @@ function jslint_phase4_walk(state) {
             warn("expected_a_b", thing, "Number(...)", "+");
         }
         if (right.id === "(" && right.expression[0].id === "new") {
+
+// test_cause:
+// ["
+// /*jslint convert*/let aa=+new Date();
+// ", "post_u_plus", "unexpected_a_before_b", "new", 26]
+
             warn("unexpected_a_before_b", thing, "+", "new");
         } else if (
             right.constant ||
             right.id === "{" ||
             (right.id === "[" && right.arity !== "binary")
         ) {
+
+// test_cause:
+// ["/*jslint convert*/aa=+{};", "post_u_plus", "unexpected_a", "+", 22]
+
             warn("unexpected_a", thing, "+");
         }
     }
@@ -10107,6 +10137,10 @@ function jslint_phase4_walk(state) {
             }
         } else if (thing.id === "!") {
             if (thing.expression.constant === true) {
+
+// test_cause:
+// ["let aa=!0;", "post_u_unary", "unexpected_a", "!", 8]
+
                 warn("unexpected_a", thing);
             }
         } else if (thing.id === "!!") {
@@ -10427,10 +10461,10 @@ function jslint_phase4_walk(state) {
                 ) {
 
 // test_cause:
-// ["aa=++aa", "walk_expression", "unexpected_a", "++", 4]
-// ["aa=--aa", "walk_expression", "unexpected_a", "--", 4]
-// ["aa=aa++", "walk_expression", "unexpected_a", "++", 6]
-// ["aa=aa--", "walk_expression", "unexpected_a", "--", 6]
+// ["if(++aa){}", "walk_expression", "unexpected_a", "++", 4]
+// ["if(--aa){}", "walk_expression", "unexpected_a", "--", 4]
+// ["if(aa++){}", "walk_expression", "unexpected_a", "++", 6]
+// ["if(aa--){}", "walk_expression", "unexpected_a", "--", 6]
 
                     warn("unexpected_a", thing);
                 } else if (
@@ -10685,6 +10719,13 @@ function jslint_phase5_whitage(state) {
             !(right === undefined),
             `Expected !(right === undefined).`
         );
+
+// test_cause:
+// ["
+// let aa;
+//   aa();
+// ", "expected_at", "expected_a_at_b_c", "aa", 3]
+
         warn(
             "expected_a_at_b_c",
             right,
@@ -10895,7 +10936,7 @@ function jslint_phase5_whitage(state) {
             }
 
 // test_cause:
-// ["String(String?0:1);", "whitage_default", "(live)", "", 0]
+// ["String(String?0:1);", "whitage_default", "use_open", "?", 14]
 
             warn("use_open", right);
             return;
@@ -11134,7 +11175,9 @@ function jslint_phase5_whitage(state) {
         ) {
 
 // test_cause:
-// ["function aa(){bb:while(aa){aa();}}", "whitage_opener", "(live)", "", 0]
+// ["
+// function aa(){bb:while(aa){aa();}}
+// ", "whitage_opener", "expected_line_break_a_b", "aa", 28]
 
             warn(
                 "expected_line_break_a_b",
@@ -12128,8 +12171,8 @@ async function jstestDescribe(description, testFunction) {
                 )
                 : (
                     "    \u001b[31m\u2718 " + jstestItCount + ". test it - " +
-                    record.description + "\n" + record.err?.stack +
-                    "\u001b[39m"
+                    record.description + "\n" +
+                    String(record.err?.stack ?? record.err) + "\u001b[39m"
                 )
             );
         }).join("\n")
@@ -12198,12 +12241,9 @@ function jstestOnExit(exitCode) {
 // This function will on process-exit, print test-report
 // and exit with non-zero exit-code if any test failed.
 
-    console.error(jstestReport());
-    process.exitCode = (
-        exitCode || jstestItRecordList.filter(function ({status}) {
-            return status !== "passed";
-        }).length
-    );
+    const {countFailed, text} = jstestReport();
+    console.error(text);
+    process.exitCode = exitCode || countFailed;
 }
 
 function jstestOrderCheck(descriptionList) {
@@ -12232,7 +12272,8 @@ function jstestOrderCheck(descriptionList) {
 
 function jstestReport() {
 
-// This function will return the test-report, without side effects.
+// This function will return the test-report <text> and its <countFailed>,
+// without side effects.
 
 // PR-xxx - List and count as failed each test its describe never printed: one
 // still pending, e.g. hung until a watchdog ended the process, or one that
@@ -12244,8 +12285,9 @@ function jstestReport() {
     const unprintedList = jstestItRecordList.filter(function (record) {
         return !record.printed && record.status !== "passed";
     });
-    return (
-        (
+    return {
+        countFailed,
+        text: (
             countFailed
             ? "\n\u001b[31m"
             : "\n\u001b[32m"
@@ -12260,7 +12302,7 @@ function jstestReport() {
                 "  \u2718 " + (jstestItCount + ii + 1) + ". test it " + status +
                 " - " + describe + " - " + description + "\n" + (
                     err
-                    ? err.stack + "\n"
+                    ? String(err.stack ?? err) + "\n"
                     : ""
                 )
             );
@@ -12272,7 +12314,7 @@ function jstestReport() {
         Number(Date.now() - jstestTimeStart).toLocaleString() +
         " ms\n" +
         "\u001b[39m"
-    );
+    };
 }
 
 async function moduleFsInit() {
