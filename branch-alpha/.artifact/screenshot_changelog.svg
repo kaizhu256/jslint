@@ -203,13 +203,13 @@
     textLength="768"
     x="10"
     y="736"
->- jslint - Revamp cause-based testing on V8 block coverage, replacing the runtime hook and optio\</tspan>
+>- jslint - Revamp cause-based testing on option trace and V8 block coverage, replacing the runti\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="758"
->  n test_cause.                                                                                  </tspan>
+>  me hook and option test_cause.                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

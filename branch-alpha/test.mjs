@@ -2639,9 +2639,9 @@ ff();
             });
 
 // List each warning with its frames in jslint.mjs, by the stack that option
-// trace records, as [name, line] innermost first. An anonymous function's
-// frame has no name. Its raise is the first frame above the raisers, the line
-// that raised it.
+// trace records, as [name, line] innermost first, and the frames above the
+// raisers, whose first is the line that raised it. An anonymous function's
+// frame has no name.
 
             const warningsRaised = warnings.map(function (warning) {
                 const frameList = Array.from(
@@ -2651,10 +2651,10 @@ ff();
                     }
                 );
                 return {
-                    frameList,
-                    raise: frameList.find(function ([name]) {
+                    aboveList: frameList.filter(function ([name]) {
                         return !raiserList.includes(name);
                     }),
+                    frameList,
                     warning
                 };
             });
@@ -2707,9 +2707,9 @@ ff();
 // above the raisers in the stack that option trace records, so a fixture may
 // be filed up the stack, above the call that leads down to the raise site.
 
-                raise: warningsVia[0]?.raise,
-                raiser: warningsVia[0]?.frameList.find(function ([name]) {
-                    return name && !raiserList.includes(name);
+                raise: warningsVia[0]?.aboveList[0],
+                raiser: warningsVia[0]?.aboveList.find(function ([name]) {
+                    return name;
                 })?.[0],
                 shown: code === "(live)" || warningsShown.length > 0,
 
@@ -2717,9 +2717,9 @@ ff();
 // warning fixture checks more.
 
                 silent: code !== "(live)" || warningsRaised.every(function ({
-                    raise
+                    aboveList
                 }) {
-                    return raise?.[1] !== line;
+                    return aboveList[0]?.[1] !== line;
                 }),
                 source,
                 via: code === "(live)" || warningsVia.length > 0
@@ -2727,7 +2727,7 @@ ff();
         }
 
 // Keep every frame, since a fixture filed up the stack can sit past V8's
-// default of 10. The deepest one now, at <post_s_var>, is frame 9.
+// default of 10.
 
         Error.stackTraceLimit = Infinity;
 

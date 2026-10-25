@@ -2804,9 +2804,9 @@ body {
 <pre><span class="lineno"><a href="#line_2639" id="line_2639"> 2639.</a></span><span class="count                ">    736</span><span>            });</span></pre>
 <pre><span class="lineno"><a href="#line_2640" id="line_2640"> 2640.</a></span><span class="count                ">    736</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2641" id="line_2641"> 2641.</a></span><span class="count                ">    736</span><span>// List each warning with its frames in jslint.mjs, by the stack that option</span></pre>
-<pre><span class="lineno"><a href="#line_2642" id="line_2642"> 2642.</a></span><span class="count                ">    736</span><span>// trace records, as [name, line] innermost first. An anonymous function's</span></pre>
-<pre><span class="lineno"><a href="#line_2643" id="line_2643"> 2643.</a></span><span class="count                ">    736</span><span>// frame has no name. Its raise is the first frame above the raisers, the line</span></pre>
-<pre><span class="lineno"><a href="#line_2644" id="line_2644"> 2644.</a></span><span class="count                ">    736</span><span>// that raised it.</span></pre>
+<pre><span class="lineno"><a href="#line_2642" id="line_2642"> 2642.</a></span><span class="count                ">    736</span><span>// trace records, as [name, line] innermost first, and the frames above the</span></pre>
+<pre><span class="lineno"><a href="#line_2643" id="line_2643"> 2643.</a></span><span class="count                ">    736</span><span>// raisers, whose first is the line that raised it. An anonymous function's</span></pre>
+<pre><span class="lineno"><a href="#line_2644" id="line_2644"> 2644.</a></span><span class="count                ">    736</span><span>// frame has no name.</span></pre>
 <pre><span class="lineno"><a href="#line_2645" id="line_2645"> 2645.</a></span><span class="count                ">    736</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2646" id="line_2646"> 2646.</a></span><span class="count                ">   1864</span><span>            const warningsRaised = warnings.map(function (warning) {</span></pre>
 <pre><span class="lineno"><a href="#line_2647" id="line_2647"> 2647.</a></span><span class="count                ">   1864</span><span>                const frameList = Array.from(</span></pre>
@@ -2816,10 +2816,10 @@ body {
 <pre><span class="lineno"><a href="#line_2651" id="line_2651"> 2651.</a></span><span class="count                ">  19718</span><span>                    }</span></pre>
 <pre><span class="lineno"><a href="#line_2652" id="line_2652"> 2652.</a></span><span class="count                ">   1864</span><span>                );</span></pre>
 <pre><span class="lineno"><a href="#line_2653" id="line_2653"> 2653.</a></span><span class="count                ">   1864</span><span>                return {</span></pre>
-<pre><span class="lineno"><a href="#line_2654" id="line_2654"> 2654.</a></span><span class="count                ">   1864</span><span>                    frameList,</span></pre>
-<pre><span class="lineno"><a href="#line_2655" id="line_2655"> 2655.</a></span><span class="count                ">   5272</span><span>                    raise: frameList.find(function ([name]) {</span></pre>
-<pre><span class="lineno"><a href="#line_2656" id="line_2656"> 2656.</a></span><span class="count                ">   5272</span><span>                        return !raiserList.includes(name);</span></pre>
-<pre><span class="lineno"><a href="#line_2657" id="line_2657"> 2657.</a></span><span class="count                ">   5272</span><span>                    }),</span></pre>
+<pre><span class="lineno"><a href="#line_2654" id="line_2654"> 2654.</a></span><span class="count                ">  19718</span><span>                    aboveList: frameList.filter(function ([name]) {</span></pre>
+<pre><span class="lineno"><a href="#line_2655" id="line_2655"> 2655.</a></span><span class="count                ">  19718</span><span>                        return !raiserList.includes(name);</span></pre>
+<pre><span class="lineno"><a href="#line_2656" id="line_2656"> 2656.</a></span><span class="count                ">  19718</span><span>                    }),</span></pre>
+<pre><span class="lineno"><a href="#line_2657" id="line_2657"> 2657.</a></span><span class="count                ">   1864</span><span>                    frameList,</span></pre>
 <pre><span class="lineno"><a href="#line_2658" id="line_2658"> 2658.</a></span><span class="count                ">   1864</span><span>                    warning</span></pre>
 <pre><span class="lineno"><a href="#line_2659" id="line_2659"> 2659.</a></span><span class="count                ">   1864</span><span>                };</span></pre>
 <pre><span class="lineno"><a href="#line_2660" id="line_2660"> 2660.</a></span><span class="count                ">   1864</span><span>            });</span></pre>
@@ -2872,19 +2872,19 @@ body {
 <pre><span class="lineno"><a href="#line_2707" id="line_2707"> 2707.</a></span><span class="count                ">    736</span><span>// above the raisers in the stack that option trace records, so a fixture may</span></pre>
 <pre><span class="lineno"><a href="#line_2708" id="line_2708"> 2708.</a></span><span class="count                ">    736</span><span>// be filed up the stack, above the call that leads down to the raise site.</span></pre>
 <pre><span class="lineno"><a href="#line_2709" id="line_2709"> 2709.</a></span><span class="count                ">    736</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2710" id="line_2710"> 2710.</a></span><span class="count                ">    573</span><span>                raise: warningsVia[0]?.raise,</span></pre>
-<pre><span class="lineno"><a href="#line_2711" id="line_2711"> 2711.</a></span><span class="count                ">   1754</span><span>                raiser: warningsVia[0]?.frameList.find(function ([name]) {</span></pre>
-<pre><span class="lineno"><a href="#line_2712" id="line_2712"> 2712.</a></span><span class="count                ">   1714</span><span>                    return name &amp;&amp; !raiserList.includes(name);</span></pre>
-<pre><span class="lineno"><a href="#line_2713" id="line_2713"> 2713.</a></span><span class="count                ">   1754</span><span>                })?.[0],</span></pre>
+<pre><span class="lineno"><a href="#line_2710" id="line_2710"> 2710.</a></span><span class="count                ">    573</span><span>                raise: warningsVia[0]?.aboveList[0],</span></pre>
+<pre><span class="lineno"><a href="#line_2711" id="line_2711"> 2711.</a></span><span class="count                ">    613</span><span>                raiser: warningsVia[0]?.aboveList.find(function ([name]) {</span></pre>
+<pre><span class="lineno"><a href="#line_2712" id="line_2712"> 2712.</a></span><span class="count                ">    613</span><span>                    return name;</span></pre>
+<pre><span class="lineno"><a href="#line_2713" id="line_2713"> 2713.</a></span><span class="count                ">    613</span><span>                })?.[0],</span></pre>
 <pre><span class="lineno"><a href="#line_2714" id="line_2714"> 2714.</a></span><span class="count                ">    582</span><span>                shown: code === "(live)" || warningsShown.length &gt; 0,</span></pre>
 <pre><span class="lineno"><a href="#line_2715" id="line_2715"> 2715.</a></span><span class="count                ">    736</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2716" id="line_2716"> 2716.</a></span><span class="count                ">    736</span><span>// A "(live)" block must not sit on a raise whose warning shows, since a</span></pre>
 <pre><span class="lineno"><a href="#line_2717" id="line_2717"> 2717.</a></span><span class="count                ">    736</span><span>// warning fixture checks more.</span></pre>
 <pre><span class="lineno"><a href="#line_2718" id="line_2718"> 2718.</a></span><span class="count                ">    736</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2719" id="line_2719"> 2719.</a></span><span class="count                ">    346</span><span>                silent: code !== "(live)" || warningsRaised.every(function ({</span></pre>
-<pre><span class="lineno"><a href="#line_2720" id="line_2720"> 2720.</a></span><span class="count                ">    346</span><span>                    raise</span></pre>
+<pre><span class="lineno"><a href="#line_2720" id="line_2720"> 2720.</a></span><span class="count                ">    346</span><span>                    aboveList</span></pre>
 <pre><span class="lineno"><a href="#line_2721" id="line_2721"> 2721.</a></span><span class="count                ">    346</span><span>                }) {</span></pre>
-<pre><span class="lineno"><a href="#line_2722" id="line_2722"> 2722.</a></span><span class="count                ">    345</span><span>                    return raise?.[1] !== line;</span></pre>
+<pre><span class="lineno"><a href="#line_2722" id="line_2722"> 2722.</a></span><span class="count                ">    345</span><span>                    return aboveList[0]?.[1] !== line;</span></pre>
 <pre><span class="lineno"><a href="#line_2723" id="line_2723"> 2723.</a></span><span class="count                ">    346</span><span>                }),</span></pre>
 <pre><span class="lineno"><a href="#line_2724" id="line_2724"> 2724.</a></span><span class="count                ">    736</span><span>                source,</span></pre>
 <pre><span class="lineno"><a href="#line_2725" id="line_2725"> 2725.</a></span><span class="count                ">    582</span><span>                via: code === "(live)" || warningsVia.length &gt; 0</span></pre>
@@ -2892,7 +2892,7 @@ body {
 <pre><span class="lineno"><a href="#line_2727" id="line_2727"> 2727.</a></span><span class="count                ">    736</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_2728" id="line_2728"> 2728.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2729" id="line_2729"> 2729.</a></span><span class="count                ">      1</span><span>// Keep every frame, since a fixture filed up the stack can sit past V8's</span></pre>
-<pre><span class="lineno"><a href="#line_2730" id="line_2730"> 2730.</a></span><span class="count                ">      1</span><span>// default of 10. The deepest one now, at &lt;post_s_var&gt;, is frame 9.</span></pre>
+<pre><span class="lineno"><a href="#line_2730" id="line_2730"> 2730.</a></span><span class="count                ">      1</span><span>// default of 10.</span></pre>
 <pre><span class="lineno"><a href="#line_2731" id="line_2731"> 2731.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2732" id="line_2732"> 2732.</a></span><span class="count                ">      1</span><span>        Error.stackTraceLimit = Infinity;</span></pre>
 <pre><span class="lineno"><a href="#line_2733" id="line_2733"> 2733.</a></span><span class="count                ">      1</span><span></span></pre>
