@@ -5834,11 +5834,10 @@ function jslint_phase3_parse(state) {
         if (earlier) {
 
 // test_cause:
-// ["let aa;(function aa(){})", "name_declare", "(live)", "", 0]
-// ["let aa;function aa(){}", "name_declare", "(live)", "", 0]
-// ["let aa;let aa", "name_declare", "(live)", "", 0]
+// ["let aa;(function aa(){})", "name_declare", "redefinition_a_b", "1", 18]
+// ["let aa;function aa(){}", "name_declare", "redefinition_a_b", "1", 17]
 // ["let aa;let aa", "name_declare", "redefinition_a_b", "1", 12]
-// ["var aa;if(0){var aa}", "name_declare", "(live)", "", 0]
+// ["var aa;if(0){var aa}", "name_declare", "redefinition_a_b", "1", 18]
 // ["var aa;if(0){var aa}", "name_declare", "redefinition_a_b", "1", 18]
 
             warn("redefinition_a_b", name, id, earlier.line);
@@ -5854,7 +5853,7 @@ function jslint_phase3_parse(state) {
                 if (earlier.role !== "label") {
 
 // test_cause:
-// ["let aa;aa:while(0){}", "name_declare", "(live)", "", 0]
+// ["let aa;aa:while(0){}", "name_declare", "redefinition_a_b", "1", 8]
 
                     warn("redefinition_a_b", name, id, earlier.line);
                     earlier = undefined;
@@ -5866,7 +5865,7 @@ function jslint_phase3_parse(state) {
                 if (earlier.role === "label") {
 
 // test_cause:
-// ["aa:while(0){let aa}", "name_declare", "(live)", "", 0]
+// ["aa:while(0){let aa}", "name_declare", "redefinition_a_b", "1", 17]
 
                     warn("redefinition_a_b", name, id, earlier.line);
                     earlier = undefined;
@@ -5898,7 +5897,7 @@ function jslint_phase3_parse(state) {
             if (earlier.role === "variable") {
 
 // test_cause:
-// ["let ignore;(ignore)=>0", "name_declare", "(live)", "", 0]
+// ["let ignore;(ignore)=>0", "name_declare", "redefinition_a_b", "1", 13]
 
                 warn("redefinition_a_b", name, id, earlier.line);
             }
@@ -5911,18 +5910,20 @@ function jslint_phase3_parse(state) {
         ) {
 
 // test_cause:
-// ["for(let aa;;)let aa", "name_declare", "(live)", "", 0]
+// ["for(let aa;;)let aa", "name_declare", "redefinition_a_b", "1", 18]
 // ["
 // function aa(){try{aa();}catch(aa){aa();}}
-// ", "name_declare", "(live)", "", 0]
-// ["function aa(){var aa}", "name_declare", "(live)", "", 0]
-// ["let aa;do let aa;while(0)", "name_declare", "(live)", "", 0]
-// ["let aa;do;while(0)let aa", "name_declare", "(live)", "", 0]
-// ["let aa;for(let aa;;){}", "name_declare", "(live)", "", 0]
-// ["let aa;if(0);else if(0)let aa", "name_declare", "(live)", "", 0]
-// ["let aa;if(0);else let aa", "name_declare", "(live)", "", 0]
-// ["let aa;if(0)let aa", "name_declare", "(live)", "", 0]
-// ["let aa;while(0)let aa", "name_declare", "(live)", "", 0]
+// ", "name_declare", "redefinition_a_b", "1", 31]
+// ["function aa(){var aa}", "name_declare", "redefinition_a_b", "1", 19]
+// ["let aa;do let aa;while(0)", "name_declare", "redefinition_a_b", "1", 15]
+// ["let aa;do;while(0)let aa", "name_declare", "redefinition_a_b", "1", 23]
+// ["let aa;for(let aa;;){}", "name_declare", "redefinition_a_b", "1", 16]
+// ["
+// let aa;if(0);else if(0)let aa
+// ", "name_declare", "redefinition_a_b", "1", 28]
+// ["let aa;if(0);else let aa", "name_declare", "redefinition_a_b", "1", 23]
+// ["let aa;if(0)let aa", "name_declare", "redefinition_a_b", "1", 17]
+// ["let aa;while(0)let aa", "name_declare", "redefinition_a_b", "1", 20]
 
             warn("redefinition_a_b", name, id, earlier.line);
             return;
@@ -7541,6 +7542,12 @@ function jslint_phase3_parse(state) {
         }
         check_not_top_level(the_continue);
         the_continue.disrupt = true;
+
+// test_cause:
+// ["
+// function aa(){while(aa){continue;}}
+// ", "stmt_continue", "unexpected_a", "continue", 25]
+
         warn("unexpected_a", the_continue);
         semicolon();
         return the_continue;
@@ -8063,7 +8070,7 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id === "(string)") {
 
 // test_cause:
-// ["import \"aa\"", "stmt_import", "(live)", "", 0]
+// ["import \"aa\"", "stmt_import", "expected_a_b", "aa", 8]
 
                 warn("expected_a_b", token_nxt, "{", artifact());
                 advance();
@@ -9544,6 +9551,10 @@ function jslint_phase4_walk(state) {
                 right.id === "undefined" ||
                 Number.isNaN(right.value)
             ) {
+
+// test_cause:
+// ["let aa=0;aa+=0;", "post_a_pluseq", "unexpected_a", "0", 14]
+
                 warn("unexpected_a", right);
             }
         }
@@ -10097,12 +10108,22 @@ function jslint_phase4_walk(state) {
             warn("expected_a_b", thing, "Number(...)", "+");
         }
         if (right.id === "(" && right.expression[0].id === "new") {
+
+// test_cause:
+// ["
+// /*jslint convert*/let aa=+new Date();
+// ", "post_u_plus", "unexpected_a_before_b", "new", 26]
+
             warn("unexpected_a_before_b", thing, "+", "new");
         } else if (
             right.constant ||
             right.id === "{" ||
             (right.id === "[" && right.arity !== "binary")
         ) {
+
+// test_cause:
+// ["/*jslint convert*/aa=+{};", "post_u_plus", "unexpected_a", "+", 22]
+
             warn("unexpected_a", thing, "+");
         }
     }
@@ -10116,6 +10137,10 @@ function jslint_phase4_walk(state) {
             }
         } else if (thing.id === "!") {
             if (thing.expression.constant === true) {
+
+// test_cause:
+// ["let aa=!0;", "post_u_unary", "unexpected_a", "!", 8]
+
                 warn("unexpected_a", thing);
             }
         } else if (thing.id === "!!") {
@@ -10694,6 +10719,13 @@ function jslint_phase5_whitage(state) {
             !(right === undefined),
             `Expected !(right === undefined).`
         );
+
+// test_cause:
+// ["
+// let aa;
+//   aa();
+// ", "expected_at", "expected_a_at_b_c", "aa", 3]
+
         warn(
             "expected_a_at_b_c",
             right,
@@ -10904,7 +10936,7 @@ function jslint_phase5_whitage(state) {
             }
 
 // test_cause:
-// ["String(String?0:1);", "whitage_default", "(live)", "", 0]
+// ["String(String?0:1);", "whitage_default", "use_open", "?", 14]
 
             warn("use_open", right);
             return;
@@ -11143,7 +11175,9 @@ function jslint_phase5_whitage(state) {
         ) {
 
 // test_cause:
-// ["function aa(){bb:while(aa){aa();}}", "whitage_opener", "(live)", "", 0]
+// ["
+// function aa(){bb:while(aa){aa();}}
+// ", "whitage_opener", "expected_line_break_a_b", "aa", 28]
 
             warn(
                 "expected_line_break_a_b",
