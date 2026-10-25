@@ -20,7 +20,6 @@
 - jstest - Collect each describe's tests before running them, and report every failed, hung or crashed test at exit.
 - jstest - Fail any describe or jstestIt name not in ASCII order.
 - jstest - Add opt-in test filter 'npm_config_mode_test_filter=<regexp>' on '<describe> - <it>'.
-- jslint - Revamp cause-based testing on V8 block coverage, replacing the runtime hook and option test_cause.
 - jslint - Report: Functions - Copy each signature from its source text, keeping default values.
 - jslint - Report: Functions - List block-scoped names, catch-variables and outer names, and mark closure only across functions.
 

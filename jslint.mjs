@@ -107,7 +107,6 @@
     assigned,
     assignment,
     async,
-    at,
     autofix,
     autofixed,
     beta,
@@ -117,6 +116,7 @@
     block_stack,
     browser,
     catch,
+    causes,
     char,
     children,
     clear,
@@ -134,7 +134,6 @@
     context_report,
     convert,
     count,
-    countFailed,
     coverageDir,
     create,
     cwd,
@@ -392,9 +391,9 @@
     tenure,
     test,
     testFunction,
+    test_cause,
     test_internal_error,
     test_unknown_warning_code,
-    text,
     this,
     thru,
     toFixed,
@@ -1141,6 +1140,7 @@ function jslint(
 
     const block_list = [];      // The array containing all lexical-blocks.
     const block_stack = [];     // The stack of lexical-blocks.
+    const cause_dict = empty(); // The object of test-causes.
     const directive_list = [];  // The directive comments.
     const export_dict = empty();        // The exported names and values.
     const function_list = [];   // The array containing all functions.
@@ -1205,6 +1205,8 @@ function jslint(
 // test_cause:
 // ["0&&0", "is_equal", "(live)", "", 0]
 
+        test_cause("(live)");
+
 // PR-510 - deadcode-confirmed - <aa> and <bb> are never the same object. Each
 // call below pairs a slot of <aa> with the same slot of <bb>, and the only
 // slot that can be undefined on both sides is <expression>[1] of a binary
@@ -1230,6 +1232,7 @@ function jslint(
 // ["`${0}`&&`${0}`", "is_equal", "(live)", "", 0]
 // ["`${0}`&&`${1}`", "is_equal", "(live)", "", 0]
 
+                    test_cause("(live)");
                     return is_equal(value, bb[index]);
                 })
             );
@@ -1257,6 +1260,7 @@ function jslint(
 // test_cause:
 // ["aa=bb`${cc}${dd}`&&bb`${cc}${ee}`", "is_equal", "(live)", "", 0]
 
+            test_cause("(live)");
             return (
 
 // PR-394 - Bugfix - Fix jslint treating megastrings bb`0` and bb`1` as equal.
@@ -1275,6 +1279,7 @@ function jslint(
 // test_cause:
 // ["aa(/./)||{}", "is_equal", "(live)", "", 0]
 
+            test_cause("(live)");
             return false;
         }
         if (aa.arity === bb.arity && aa.id === bb.id) {
@@ -1284,6 +1289,7 @@ function jslint(
 // ["aa.bb&&aa.bb", "is_equal", "(live)", "", 0]
 // ["aa?.bb&&aa?.bb", "is_equal", "(live)", "", 0]
 
+                test_cause("(live)");
                 return (
                     is_equal(aa.expression, bb.expression) &&
                     is_equal(aa.name, bb.name)
@@ -1294,6 +1300,7 @@ function jslint(
 // test_cause:
 // ["+0&&+0", "is_equal", "(live)", "", 0]
 
+                test_cause("(live)");
                 return is_equal(aa.expression, bb.expression);
             }
             if (aa.arity === "binary") {
@@ -1301,6 +1308,7 @@ function jslint(
 // test_cause:
 // ["aa[0]&&aa[0]", "is_equal", "(live)", "", 0]
 
+                test_cause("(live)");
                 return (
                     aa.id !== "(" &&
                     is_equal(aa.expression[0], bb.expression[0]) &&
@@ -1312,6 +1320,7 @@ function jslint(
 // test_cause:
 // ["aa=(``?``:``)&&(``?``:``)", "is_equal", "(live)", "", 0]
 
+                test_cause("(live)");
                 return (
                     is_equal(aa.expression[0], bb.expression[0]) &&
                     is_equal(aa.expression[1], bb.expression[1]) &&
@@ -1340,12 +1349,14 @@ function jslint(
 // test_cause:
 // ["undefined&&undefined", "is_equal", "(live)", "", 0]
 
+            test_cause("(live)");
             return true;
         }
 
 // test_cause:
 // ["null&&undefined", "is_equal", "(live)", "", 0]
 
+        test_cause("(live)");
         return false;
     }
 
@@ -1438,6 +1449,32 @@ function jslint(
         throw warn_at(code, line, column, a, b, c, d);
     }
 
+    function test_cause(code, aa, column) {
+
+// This function will instrument <cause> to <cause_dict> for test-purposes.
+
+        if (option_dict.test_cause) {
+            cause_dict[
+                JSON.stringify([
+                    String(new Error().stack)
+                        .replace(
+                            (/^    at (?:file|stop|stop_at|test_cause|warn|warn_at)\b.*?\n/gm),
+                            ""
+                        )
+                        .match(/\n    at ((?:Object\.\w+?_)?\w+?) /)[1]
+                        .replace((/^Object\./), ""),
+                    code,
+                    String(
+                        (aa === undefined || aa === token_global)
+                        ? ""
+                        : aa
+                    ),
+                    column || 0
+                ])
+            ] = true;
+        }
+    }
+
     function warn(code, the_token, a, b, c, d) {
 
 // Same as warn_at, except the warning will be associated with a specific token.
@@ -1506,6 +1543,7 @@ function jslint(
             jslint_fudge +
             Math.max(0, Math.min(column, warning.line_source.length - 1))
         );
+        test_cause(code, b || a, warning.column);
         switch (code) {
 
 // The bundle contains the raw text messages that are generated by jslint. It
@@ -1835,8 +1873,9 @@ function jslint(
         if (warning.directive_ignore_line) {
 
 // test_cause:
-// ["0 //jslint-ignore-line", "warn_at", "(live)", "", 0]
+// ["0 //jslint-ignore-line", "semicolon", "(live)", "", 0]
 
+            test_cause("(live)");
             return warning;
         }
         warning_list.push(warning);
@@ -1888,6 +1927,7 @@ function jslint(
                 stop_at,
                 syntax_dict,
                 tenure,
+                test_cause,
                 token_global,
                 token_list,
                 token_nxt: token_global,
@@ -2030,6 +2070,7 @@ function jslint(
     });
 
     return {
+        causes: cause_dict,
         directives: directive_list,
         edition: jslint_edition,
         exports: export_dict,
@@ -2890,6 +2931,7 @@ function jslint_phase2_lex(state) {
         stop,
         stop_at,
         tenure,
+        test_cause,
         token_global,
         token_list,
         warn,
@@ -2988,6 +3030,7 @@ function jslint_phase2_lex(state) {
 // `
 // ", "char_after_escape", "(live)", "", 0]
 
+                test_cause("(live)");
                 return;
             }
 
@@ -3015,6 +3058,7 @@ function jslint_phase2_lex(state) {
 // ["\"\\/\\\\\\`\\b\\f\\n\\r\\t\"", "char_after_escape", "(live)", "", 0]
 // ["`\\/\\\\\\`\\b\\f\\n\\r\\t`", "char_after_escape", "(live)", "", 0]
 
+            test_cause("(live)");
             return char_after();
         case "u":
             if (char_after("u") === "{") {
@@ -3487,6 +3531,7 @@ function jslint_phase2_lex(state) {
 // ["aa=/[", "lex_regexp_bracketed", "(live)", "", 0]
 // ["aa=/[]/", "lex_regexp_bracketed", "(live)", "", 0]
 
+                    test_cause("(live)");
                     if (mode_regexp_range) {
 
 // test_cause:
@@ -3748,6 +3793,8 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/\\/", "lex_regexp_group", "(live)", "", 0]
 
+                    test_cause("(live)");
+
 // PR-437 - Add grammar for regexp-named-backreference.
 
                     char_after_escape("BbDdSsWw^${}[]():=!.|*+?k");
@@ -3784,6 +3831,7 @@ function jslint_phase2_lex(state) {
 // ["aa=/.*?/", "lex_regexp_group", "(live)", "", 0]
 // ["aa=/.+?/", "lex_regexp_group", "(live)", "", 0]
 
+                        test_cause("(live)");
                         char_after("?");
                     }
                     break;
@@ -3889,7 +3937,6 @@ function jslint_phase2_lex(state) {
             case "v":
 
 // "u" and "v" select different grammars, so v8 rejects the pair.
-
                 if (
                     flag.u //jslint-ignore-line
                 ) {
@@ -3905,6 +3952,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/./gimuy", "lex_regexp", "(live)", "", 0]
 
+                test_cause("(live)");
                 break;
             default:
 
@@ -4035,6 +4083,7 @@ function jslint_phase2_lex(state) {
 // ["?/./", "lex_slash_or_regexp", "(live)", "", 0]
 // ["aa[/./", "lex_slash_or_regexp", "(live)", "", 0]
 
+            test_cause("(live)");
             return lex_regexp();
         }
         if (line_source[0] === "=") {
@@ -4227,6 +4276,7 @@ function jslint_phase2_lex(state) {
         case "nomen":           // Allow weird property name.
         case "single":          // Allow single-quote strings.
         case "subscript":       // Allow identifier in subscript-notation.
+        case "test_cause":      // Test jslint's causes.
         case "test_internal_error":     // Test jslint's internal-error
                                         // ... handling-ability.
         case "test_unknown_warning_code": // Test jslint's unknown-warning-code
@@ -4369,6 +4419,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/.{,/", "read_digits", "(live)", "", 0]
 
+                test_cause("(live)");
                 char_after();
 
 // Recurse read_digits.
@@ -4450,6 +4501,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*jslint-disable*/", "read_line", "(live)", "", 0]
 
+            test_cause("(live)");
             line_disable = line;
         } else if (line_source === "/*jslint-enable*/") {
             if (line_disable === undefined) {
@@ -4468,6 +4520,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["0 //jslint-ignore-line", "read_line", "(live)", "", 0]
 
+            test_cause("(live)");
             line_list[line].directive_ignore_line = true;
         }
         if (line_disable !== undefined) {
@@ -4478,6 +4531,7 @@ function jslint_phase2_lex(state) {
 // 0
 // ", "read_line", "(live)", "", 0]
 
+            test_cause("(live)");
             line_source = "";
         }
         // jslint_rgx_tab
@@ -4735,6 +4789,7 @@ function jslint_phase3_parse(state) {
         stop,
         syntax_dict,
         tenure,
+        test_cause,
         token_global,
         token_list,
         warn,
@@ -4979,18 +5034,6 @@ function jslint_phase3_parse(state) {
                 (id !== "." && id !== "?." && id !== "(" && id !== "[")
             )
         ) {
-
-// test_cause:
-// ["(/./)?.0", "check_left", "unexpected_a", "?.", 6]
-// ["(0?0:0)()", "check_left", "unexpected_a", "(", 8]
-// ["0()", "check_left", "unexpected_a", "(", 2]
-// ["0[0]", "check_left", "unexpected_a", "[", 2]
-// ["0``", "check_left", "unexpected_a", "`", 2]
-// ["\"\".aa", "check_left", "unexpected_a", ".", 3]
-// ["\"aa\"?.0", "check_left", "unexpected_a", "?.", 5]
-// ["aa=[]?.aa", "check_left", "unexpected_a", "?.", 6]
-// ["new aa``.aa()", "check_left", "unexpected_a", ".", 9]
-
             warn("unexpected_a", right || token_nxt);
             return false;
         }
@@ -5066,29 +5109,6 @@ function jslint_phase3_parse(state) {
             .reduce(function (aa, token) {
                 const bb = artifact(token);
                 if (!option_dict.unordered && aa > bb) {
-
-// test_cause:
-// ["
-// ()=>{function bb(){}function aa(){}}
-// ", "check_ordered", "expected_a_b_before_c_d", "aa", 30]
-// ["aa={bb,aa}", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
-// ["
-// export async function bb(){}export async function aa(){}
-// ", "check_ordered", "expected_a_b_before_c_d", "aa", 51]
-// ["
-// export function bb(){}export default function aa(){}
-// ", "check_ordered", "expected_a_b_before_c_d", "aa", 47]
-// ["
-// export function bb(){}export function aa(){}
-// ", "check_ordered", "expected_a_b_before_c_d", "aa", 39]
-// ["
-// function aa({bb,aa}){}
-// ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
-// ["
-// let aa;let bb;export {bb, aa};
-// ", "check_ordered", "expected_a_b_before_c_d", "aa", 27]
-// ["let{bb,aa}=0", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
-
                     warn("expected_a_b_before_c_d", token, type, bb, type, aa);
                 }
                 return bb;
@@ -5136,39 +5156,6 @@ function jslint_phase3_parse(state) {
                     (aa.order === bb.order && aa.value > bb.value)
                 )
             ) {
-
-// test_cause:
-// ["
-// switch(0){case 1:break;case 0:break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 29]
-// ["
-// switch(0){case 1:case 0:break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 23]
-// ["
-// switch(0){case "aa":break;case 0:break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 32]
-// ["
-// switch(0){case "aa":case 0:break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 26]
-// ["
-// switch(0){case "bb":break;case "aa":break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 32]
-// ["
-// switch(0){case "bb":case "aa":break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 26]
-// ["
-// switch(0){case aa:break;case "aa":break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 30]
-// ["
-// switch(0){case aa:case "aa":break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 24]
-// ["
-// switch(0){case bb:break;case aa:break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 30]
-// ["
-// switch(0){case bb:case aa:break;}
-// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 24]
-
                 warn(
                     "expected_a_b_before_c_d",
                     bb.token,
@@ -5231,6 +5218,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["import \"aa\";let aa", "check", "(live)", "", 0]
 
+                test_cause("(live)");
                 break;
             default:
                 if (
@@ -5278,6 +5266,7 @@ function jslint_phase3_parse(state) {
 // ["if(){}", "condition", "(live)", "", 0]
 // ["while(){}", "condition", "(live)", "", 0]
 
+        test_cause("(live)");
         advance("(");
         the_value = parse_expression(0);
         advance(")");
@@ -5585,6 +5574,14 @@ function jslint_phase3_parse(state) {
                 (name.id !== "exec" && name.id !== "test")
             )
         ) {
+
+// test_cause:
+// ["(/./)?.0", "check_left", "unexpected_a", "?.", 6]
+// ["\"\".aa", "check_left", "unexpected_a", ".", 3]
+// ["\"aa\"?.0", "check_left", "unexpected_a", "?.", 5]
+// ["aa=[]?.aa", "check_left", "unexpected_a", "?.", 6]
+// ["new aa``.aa()", "check_left", "unexpected_a", ".", 9]
+
             check_left(left, the_token);
         }
 
@@ -5598,6 +5595,8 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa?.(bb)", "infix_dot", "(live)", "", 0]
 // ["aa?.[bb]", "infix_dot", "(live)", "", 0]
+
+            test_cause("(live)");
 
 // PR-514 - Bugfix - The '?.' token leaves the tree here, so mark the '[' or '('
 // that follows it, for <optional_chain>.
@@ -5651,6 +5650,10 @@ function jslint_phase3_parse(state) {
 
             warn("unexpected_a", the_optional, "?.");
         }
+
+// test_cause:
+// ["0``", "check_left", "unexpected_a", "`", 2]
+
         check_left(left, the_tick);
         the_tick.expression = [left].concat(the_tick.expression);
         return the_tick;
@@ -5673,6 +5676,10 @@ function jslint_phase3_parse(state) {
                 warn("subscript_a", the_subscript, name);
             }
         }
+
+// test_cause:
+// ["0[0]", "check_left", "unexpected_a", "[", 2]
+
         check_left(left, the_token);
         the_token.expression = [left, the_subscript];
         advance("]");
@@ -5683,6 +5690,11 @@ function jslint_phase3_parse(state) {
         const the_paren = token_now;
         let the_argument;
         if (left.id !== "function" && left.id !== "=>") {
+
+// test_cause:
+// ["(0?0:0)()", "check_left", "unexpected_a", "(", 8]
+// ["0()", "check_left", "unexpected_a", "(", 2]
+
             check_left(left, the_paren);
         }
         the_paren.expression = [left];
@@ -5696,6 +5708,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa(...aa)", "infix_lparen", "(live)", "", 0]
 
+                    test_cause("(live)");
                     the_argument = prefix_ellipsis();
                 } else {
                     the_argument = parse_expression(10);
@@ -5740,6 +5753,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["0**0", "parse_infixr_led", "(live)", "", 0]
 
+            test_cause("(live)");
             the_token.arity = "binary";
             the_token.expression = [left, parse_expression(bp - 1)];
             return the_token;
@@ -5883,6 +5897,7 @@ function jslint_phase3_parse(state) {
 // ["var aa;if(0){var aa}", "name_declare", "(live)", "", 0]
 // ["var aa;if(0){var aa}", "name_declare", "redefinition_a_b", "1", 18]
 
+            test_cause("(live)");
             warn("redefinition_a_b", name, id, earlier.line);
             return;
         }
@@ -5898,6 +5913,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["let aa;aa:while(0){}", "name_declare", "(live)", "", 0]
 
+                    test_cause("(live)");
                     warn("redefinition_a_b", name, id, earlier.line);
                     earlier = undefined;
                 }
@@ -5910,6 +5926,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa:while(0){let aa}", "name_declare", "(live)", "", 0]
 
+                    test_cause("(live)");
                     warn("redefinition_a_b", name, id, earlier.line);
                     earlier = undefined;
                 }
@@ -5942,6 +5959,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["let ignore;(ignore)=>0", "name_declare", "(live)", "", 0]
 
+                test_cause("(live)");
                 warn("redefinition_a_b", name, id, earlier.line);
             }
             return;
@@ -5966,6 +5984,7 @@ function jslint_phase3_parse(state) {
 // ["let aa;if(0)let aa", "name_declare", "(live)", "", 0]
 // ["let aa;while(0)let aa", "name_declare", "(live)", "", 0]
 
+            test_cause("(live)");
             warn("redefinition_a_b", name, id, earlier.line);
             return;
         }
@@ -6010,6 +6029,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa+aa=0", "optional_chain", "(live)", "", 0]
 
+                test_cause("(live)");
                 return;
             }
         }
@@ -6098,12 +6118,14 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["0", "parse_expression", "(live)", "", 0]
 
+            test_cause("(live)");
             left = the_symbol.nud_prefix();
         } else if (token_now.identifier) {
 
 // test_cause:
 // ["aa", "parse_expression", "(live)", "", 0]
 
+            test_cause("(live)");
             left = token_now;
             left.arity = "variable";
         } else {
@@ -6143,6 +6165,7 @@ function jslint_phase3_parse(state) {
 // ++aa
 // ", "parse_expression", "(live)", "", 0]
 
+                test_cause("(live)");
                 break;
             }
             advance();
@@ -6192,6 +6215,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["[]", "parse_json", "(live)", "", 0]
 
+            test_cause("(live)");
             container = token_nxt;
             container.expression = [];
             advance("[");
@@ -6218,6 +6242,7 @@ function jslint_phase3_parse(state) {
 // ["[null]", "parse_json", "(live)", "", 0]
 // ["[true]", "parse_json", "(live)", "", 0]
 
+            test_cause("(live)");
             advance();
             return token_now;
         case "{":
@@ -6225,6 +6250,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["{}", "parse_json", "(live)", "", 0]
 
+            test_cause("(live)");
             container = token_nxt;
 
 // Explicit empty-object required to detect "__proto__".
@@ -6325,6 +6351,7 @@ function jslint_phase3_parse(state) {
 // ["else", "parse_statement_block", "(live)", "", 0]
 // ["}", "parse_statement_block", "(live)", "", 0]
 
+                test_cause("(live)");
                 return statement_list;
             }
             a_statement = parse_statement_single();
@@ -6467,6 +6494,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["async aa=>0", "prefix_async", "(live)", "", 0]
 
+            test_cause("(live)");
             prefix_function(the_function, true, true);
         } else if (token_nxt.fart) {
 
@@ -6558,6 +6586,7 @@ function jslint_phase3_parse(state) {
 // ["let[...aa]=0", "name_parse", "(live)", "", 0]
 // ["let{...aa}=0", "name_parse", "(live)", "", 0]
 
+                test_cause("(live)");
                 name_parse();
                 return true;
             case "[":
@@ -6583,6 +6612,7 @@ function jslint_phase3_parse(state) {
 // ["let[[aa]]=0", "name_parse", "(live)", "", 0]
 // ["let[{aa}]=0", "name_parse", "(live)", "", 0]
 
+                test_cause("(live)");
                 advance(token_nxt.id);
                 prefix_destructure(
                     scope_declared,     // scope_declared
@@ -6631,6 +6661,7 @@ function jslint_phase3_parse(state) {
 // ["let{aa:[aa]}=0", "name_parse", "(live)", "", 0]
 // ["let{aa:{aa}}=0", "name_parse", "(live)", "", 0]
 
+                    test_cause("(live)");
                     name_parse();
                     return;
                 }
@@ -6679,6 +6710,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // [";[aa=0]=0", "name_parse", "(live)", "", 0]
 
+                    test_cause("(live)");
                     name_list.push([name.expression]);
                 }
 
@@ -6688,6 +6720,7 @@ function jslint_phase3_parse(state) {
 // ["let[aa=bb]=0;let bb", "name_parse", "(live)", "", 0]
 // ["let{aa=bb}=0;let bb", "name_parse", "(live)", "", 0]
 
+                test_cause("(live)");
                 return;
             }
             if (optional) {
@@ -6706,6 +6739,7 @@ function jslint_phase3_parse(state) {
 // [";[,aa]=0", "prefix_destructure", "(live)", "", 0]
 // ["let[,aa]=0", "prefix_destructure", "(live)", "", 0]
 
+                test_cause("(live)");
                 advance(",");
             }
             if (the_function_toplevel) {
@@ -6730,6 +6764,12 @@ function jslint_phase3_parse(state) {
             return the_destructure;
         }
         if (is_lbrace) {
+
+// test_cause:
+// ["
+// function aa({bb,aa}){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
+// ["let{bb,aa}=0", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
 
 // PR-501 - Fix false-warning about ordering in nested-object-destructuring.
 
@@ -7079,6 +7119,11 @@ function jslint_phase3_parse(state) {
 // PR-514 - Bugfix - Check only function-declarations, since a named
 // function-expression is not hoisted. Check an arrow-function's block-body too.
 
+// test_cause:
+// ["
+// ()=>{function bb(){}function aa(){}}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 30]
+
         check_ordered(
             "function",
             function_list.slice(
@@ -7137,6 +7182,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa={...aa}", "property_parse", "(live)", "", 0]
 
+                test_cause("(live)");
                 value = prefix_ellipsis();
                 return value;
             }
@@ -7183,6 +7229,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa={\"aa\":0}", "property_parse", "(live)", "", 0]
 
+                test_cause("(live)");
                 advance(":");
                 value = parse_expression(0);
                 value.name_alias = name;
@@ -7194,6 +7241,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa={get aa}", "property_parse", "(live)", "", 0]
 
+                    test_cause("(live)");
                     advance("(");
                 }
                 value = parse_expression(Infinity, true);
@@ -7202,6 +7250,8 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa={aa()}", "property_parse", "(live)", "", 0]
 // ["aa={get aa(){}}", "property_parse", "(live)", "", 0]
+
+                test_cause("(live)");
 
 // PR-516 - Bugfix - Name an accessor 'get aa' in the report, not 'get'.
 
@@ -7227,6 +7277,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa={get aa.aa}", "property_parse", "(live)", "", 0]
 
+                    test_cause("(live)");
                     advance("(");
                 }
                 the_colon = token_nxt;
@@ -7270,6 +7321,10 @@ function jslint_phase3_parse(state) {
                 }
             }
         }
+
+// test_cause:
+// ["aa={bb,aa}", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
+
         check_ordered(
             "property",
             the_brace.expression.map(function ({
@@ -7324,6 +7379,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa=[...aa]", "prefix_lbracket", "(live)", "", 0]
 
+                    test_cause("(live)");
                     the_token.expression.push(prefix_ellipsis());
 
 // Issue #401 - Regression - Allow multiple-ellipsis in array-literal.
@@ -7362,6 +7418,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["(0)", "prefix_lparen", "(live)", "", 0]
 
+        test_cause("(live)");
         the_value = parse_expression(0);
         if (the_value.wrapped === true) {
 
@@ -7437,6 +7494,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["let aa=`${}`", "prefix_tick", "(live)", "", 0]
 
+                test_cause("(live)");
                 the_tick.expression.push(parse_expression(0));
                 advance("}");
             }
@@ -7474,9 +7532,6 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // [" 0//c", "semicolon", "expected_a_after_b", "0", 2]
 // ["0", "semicolon", "expected_a_after_b", "0", 1]
-// ["
-// export default Object.freeze({})
-// ", "semicolon", "expected_a_after_b", ")", 32]
 
             warn_at(
                 "expected_a_after_b",
@@ -7679,6 +7734,12 @@ function jslint_phase3_parse(state) {
 // PR-301 - Bugfix - Fixes issues #282 - optional-semicolon.
 
             } else {
+
+// test_cause:
+// ["
+// export default Object.freeze({})
+// ", "semicolon", "expected_a_after_b", ")", 32]
+
                 semicolon();
             }
             export_dict.default = the_thing;
@@ -7698,19 +7759,15 @@ function jslint_phase3_parse(state) {
                 the_name = the_thing.name;
                 the_id = the_name.id;
                 the_name.used = true;
+                if (export_dict[the_id] !== undefined) {
 
-// PR-xxx - deadcode-confirmed - This duplicate is never shown. An earlier
-// export of <the_id> needs it declared at top level, so declaring it again
-// above warns redefinition_a_b on the same token first, and <warn> drops a
-// second warning on one token.
-//
-// deadcode-revive - Check for the duplicate before <parse_statement_single>
-// declares the name, or let a token carry more than one warning.
-//
-// if (export_dict[the_id] !== undefined) {
-//     warn("duplicate_a", the_name);
-// }
+// test_cause:
+// ["
+// let aa;export{aa};export function aa(){}
+// ", "stmt_export", "duplicate_a", "aa", 35]
 
+                    warn("duplicate_a", the_name);
+                }
                 export_dict[the_id] = the_thing;
                 the_export.expression.push(the_thing);
                 the_thing.statement = false;
@@ -7733,6 +7790,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["export {}", "stmt_export", "(live)", "", 0]
 
+                test_cause("(live)");
                 advance("{");
                 while (true) {
                     if (!token_nxt.identifier) {
@@ -7772,6 +7830,11 @@ function jslint_phase3_parse(state) {
                 }
 
 // PR-439 - Check exported properties are ordered.
+
+// test_cause:
+// ["
+// let aa;let bb;export {bb, aa};
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 27]
 
                 check_ordered("export", export_list);
                 advance("}");
@@ -7849,6 +7912,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["for(let aa;;){}", "stmt_for", "(live)", "", 0]
 
+                test_cause("(live)");
                 break;
             default:
 
@@ -7867,6 +7931,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["for(aa=0,bb=0;;){}", "stmt_for", "(live)", "", 0]
 
+                test_cause("(live)");
                 advance(",");
                 parse_expression(0);
                 semicolon();
@@ -7903,6 +7968,7 @@ function jslint_phase3_parse(state) {
 // ["for(let aa in aa){}", "stmt_for", "(live)", "", 0]
 // ["for(let aa of aa){}", "stmt_for", "(live)", "", 0]
 
+                test_cause("(live)");
                 break;
             case "var":
 
@@ -7997,6 +8063,7 @@ function jslint_phase3_parse(state) {
 // ["for(let aa of aa){}", "stmt_for", "(live)", "", 0]
 // ["for(var aa of aa){}", "stmt_for", "(live)", "", 0]
 
+                test_cause("(live)");
                 the_operator.for_init = true;
                 break;
             default:
@@ -8049,12 +8116,14 @@ function jslint_phase3_parse(state) {
 // ["if(0){0}else if(0){0}", "stmt_if", "(live)", "", 0]
 // ["if(0){0}else{0}", "stmt_if", "(live)", "", 0]
 
+            test_cause("(live)");
             if (the_if.block.disrupt === true) {
                 if (the_if.else.disrupt === true) {
 
 // test_cause:
 // ["if(0){break}else{break}", "stmt_if", "(live)", "", 0]
 
+                    test_cause("(live)");
                     the_if.disrupt = true;
                 } else {
 
@@ -8082,6 +8151,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["import \"aa\"", "stmt_import", "(live)", "", 0]
 
+                test_cause("(live)");
                 warn("expected_a_b", token_nxt, "{", artifact());
                 advance();
                 semicolon();
@@ -8252,6 +8322,7 @@ function jslint_phase3_parse(state) {
 // ["aa:switch", "stmt_label", "(live)", "", 0]
 // ["aa:while", "stmt_label", "(live)", "", 0]
 
+            test_cause("(live)");
             break;
         default:
 
@@ -8400,6 +8471,24 @@ function jslint_phase3_parse(state) {
                     break;
                 }
             }
+
+// test_cause:
+// ["
+// switch(0){case 1:case 0:break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 23]
+// ["
+// switch(0){case "aa":case 0:break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 26]
+// ["
+// switch(0){case "bb":case "aa":break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 26]
+// ["
+// switch(0){case aa:case "aa":break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 24]
+// ["
+// switch(0){case bb:case aa:break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 24]
+
             check_ordered_case(the_case.expression);
             parsed_block = parse_statement_block();
             if (parsed_block.length < 1) {
@@ -8434,6 +8523,24 @@ function jslint_phase3_parse(state) {
                 break;
             }
         }
+
+// test_cause:
+// ["
+// switch(0){case 1:break;case 0:break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 29]
+// ["
+// switch(0){case "aa":break;case 0:break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "case-number", 32]
+// ["
+// switch(0){case "bb":break;case "aa":break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 32]
+// ["
+// switch(0){case aa:break;case "aa":break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 30]
+// ["
+// switch(0){case bb:break;case aa:break;}
+// ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 30]
+
         check_ordered_case(the_cases.map(function ({
             expression
         }) {
@@ -8567,7 +8674,6 @@ function jslint_phase3_parse(state) {
                 advance();
                 advance(")");
             }
-
             if (token_nxt.id !== "{") {
 
 // test_cause:
@@ -8598,7 +8704,6 @@ function jslint_phase3_parse(state) {
         if (token_nxt.id === "finally") {
             scope_function.finally += 1;
             advance("finally");
-
             if (token_nxt.id !== "{") {
 
 // test_cause:
@@ -8647,6 +8752,7 @@ function jslint_phase3_parse(state) {
 // ["for(let {aa} in 0){}", "advance_operator", "(live)", "", 0]
 // ["for(let {aa} of 0){}", "advance_operator", "(live)", "", 0]
 
+                    test_cause("(live)");
                     the_variable.operator = the_operator;
                     advance();
                     break;
@@ -8658,6 +8764,7 @@ function jslint_phase3_parse(state) {
 // ["let {aa} in 0", "advance_operator", "(live)", "", 0]
 // ["let {aa} of 0", "advance_operator", "(live)", "", 0]
 
+                test_cause("(live)");
                 the_variable.operator = the_operator;
                 advance("=");
                 break;
@@ -9117,6 +9224,17 @@ function jslint_phase3_parse(state) {
 // PR-514 - Bugfix - Also check an exported function-declaration, which is
 // hoisted too, though <stmt_export> resets its arity to 'unary'.
 
+// test_cause:
+// ["
+// export async function bb(){}export async function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 51]
+// ["
+// export function bb(){}export default function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 47]
+// ["
+// export function bb(){}export function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 39]
+
     check_ordered(
         "function",
         function_list.map(function (the_function) {
@@ -9172,6 +9290,7 @@ function jslint_phase4_walk(state) {
         scope_function_push,
         scope_report_push,
         syntax_dict,
+        test_cause,
         token_global,
         warn
     } = state;
@@ -9277,6 +9396,7 @@ function jslint_phase4_walk(state) {
 // ["aa+=0", "check_assignable", "(live)", "", 0]
 // ["aa=0", "check_assignable", "(live)", "", 0]
 
+            test_cause("(live)");
             return false;
         }
         if (the_variable.readonly) {
@@ -9340,6 +9460,7 @@ function jslint_phase4_walk(state) {
 // ["aa:while(0){aa}", "name_lookup", "(live)", "", 0]
 // ["function aa(){aa:while(aa){break aa;}}", "name_lookup", "(live)", "", 0]
 
+                test_cause("(live)");
                 the_label = the_variable;
                 the_variable = undefined;
             }
@@ -9643,15 +9764,8 @@ function jslint_phase4_walk(state) {
                 thing.id === "**" &&
                 thing.expression[0].arity === "unary" &&
                 !thing.expression[0].wrapped &&
-
-// PR-xxx - deadcode-confirmed - A 'void' here never showed its warning, since
-// <prefix_void> has already warned on the same token, and <warn> drops a
-// second warning on one token.
-//
-// deadcode-revive - Let a token carry more than one warning, and list "void".
-
                 [
-                    "!", "!!", "+", "-", "await", "typeof", "~"
+                    "!", "!!", "+", "-", "await", "typeof", "void", "~"
                 ].includes(thing.expression[0].id)
             ) {
 
@@ -9673,6 +9787,7 @@ function jslint_phase4_walk(state) {
 // let aa;aa=+aa**aa;
 // ", "post_b_binary", "wrap_subexpression_a_b", "**", 11]
 // ["aa=-0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
+// ["aa=void 0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
 // ["
 // async function aa(){return await aa**0;}
 // ", "post_b_binary", "wrap_subexpression_a_b", "**", 28]
@@ -9754,18 +9869,6 @@ function jslint_phase4_walk(state) {
             }
         } else if (left.identifier) {
             if (the_new !== undefined) {
-
-// PR-xxx - deadcode-confirmed - A branch for 'new Function' never showed its
-// warning. Without option eval, <constant_Function> has already warned on the
-// same 'Function' token, and <warn> drops a second warning on one token.
-//
-// deadcode-revive - Let a token carry more than one warning.
-//
-// } else if (left.id === "Function") {
-//     if (!option_dict.eval) {
-//         warn("unexpected_a", left, "new Function");
-//     }
-
                 if (
                     left.id[0] > "Z" ||
                     left.id === "BigInt" ||
@@ -9784,6 +9887,14 @@ function jslint_phase4_walk(state) {
 // ["new aa()", "post_b_lparen", "unexpected_a", "new", 1]
 
                     warn("unexpected_a", the_new);
+                } else if (left.id === "Function") {
+                    if (!option_dict.eval) {
+
+// test_cause:
+// ["new Function()", "post_b_lparen", "unexpected_a", "new Function", 5]
+
+                        warn("unexpected_a", left, "new Function");
+                    }
                 } else if (left.id === "Array") {
                     arg = thing.expression;
                     if (arg.length !== 2 || arg[1].id === "(string)") {
@@ -9829,6 +9940,7 @@ function jslint_phase4_walk(state) {
 // test_cause:
 // ["new Date.UTC()", "post_b_lparen", "(live)", "", 0]
 
+                test_cause("(live)");
                 cack = !cack;
             }
             if (jslint_rgx_cap.test(left.name.id) !== cack) {
@@ -9983,7 +10095,10 @@ function jslint_phase4_walk(state) {
 // test_cause:
 // ["let aa=0", "post_s_var", "(live)", "", 0]
 
+                test_cause("(live)");
                 walk_expression(name.expression);
+            } else {
+                test_cause("(live)");
             }
 
 // PR-502 - Fix long-running regression where 'let x = x;'
@@ -10316,6 +10431,7 @@ function jslint_phase4_walk(state) {
 // ["(function (){}())", "pre_s_function", "(live)", "", 0]
 // ["function aa(){}", "pre_s_function", "(live)", "", 0]
 
+        test_cause("(live)");
         if (thing.arity === "statement" && !scope_block.function_body) {
 
 // test_cause:
@@ -10384,6 +10500,7 @@ function jslint_phase4_walk(state) {
 // ["(function(){}())", "walk_expression", "(live)", "", 0]
 // ["0&&0", "walk_expression", "(live)", "", 0]
 
+                test_cause("(live)");
                 thing.forEach(walk_expression);
             } else {
                 preamble(thing);
@@ -10396,6 +10513,8 @@ function jslint_phase4_walk(state) {
 // test_cause:
 // ["aa=()=>0", "walk_expression", "(live)", "", 0]
 // ["aa=function(){}", "walk_expression", "(live)", "", 0]
+
+                    test_cause("(live)");
 
 // Recurse walk_statement.
 
@@ -10426,6 +10545,7 @@ function jslint_phase4_walk(state) {
 // test_cause:
 // ["aa=0", "walk_expression", "(live)", "", 0]
 
+                test_cause("(live)");
                 postamble(thing);
             }
         }
@@ -10439,6 +10559,8 @@ function jslint_phase4_walk(state) {
 
 // test_cause:
 // ["+[]", "walk_statement", "(live)", "", 0]
+
+            test_cause("(live)");
 
 // Recurse walk_statement.
 
@@ -10569,6 +10691,7 @@ function jslint_phase5_whitage(state) {
         artifact,
         block_list,
         option_dict,
+        test_cause,
         token_global,
         token_list,
         warn
@@ -10625,6 +10748,7 @@ function jslint_phase5_whitage(state) {
 // test_cause:
 // ["function aa(aa) {return aa;}", "delve", "(live)", "", 0]
 
+                test_cause("(live)");
                 if (!name.used) {
 
 // test_cause:
@@ -10720,24 +10844,13 @@ function jslint_phase5_whitage(state) {
 // 0};
 // ", "one_space", "(live)", "", 0]
 
+            test_cause("(live)");
             expected_at(margin);
         }
     }
 
     function one_space_only() {
         if (left.line !== right.line || left.thru + 1 !== right.from) {
-
-// test_cause:
-// ["
-// /*jslint getset*/
-// String({
-//     get
-//     aa() {
-//         return;
-//     }
-// });
-// ", "one_space_only", "expected_space_a_b", "aa", 5]
-
             warn("expected_space_a_b", right, artifact(left), artifact(right));
         }
     }
@@ -10749,6 +10862,8 @@ function jslint_phase5_whitage(state) {
 // ["let aa=[0];", "whitage_closer", "(live)", "", 0]
 // ["let aa=`${0}`;", "whitage_closer", "(live)", "", 0]
 // ["let aa={String};", "whitage_closer", "(live)", "", 0]
+
+        test_cause("(live)");
 
 // If right is a closer, then pop the previous state.
 
@@ -10771,6 +10886,7 @@ function jslint_phase5_whitage(state) {
 // 0);
 // ", "whitage_closer", "(live)", "", 0]
 
+            test_cause("(live)");
             at_margin(
                 indentage.dot_depth === 1
 
@@ -10785,6 +10901,7 @@ function jslint_phase5_whitage(state) {
 // test_cause:
 // ["String( );", "whitage_closer", "(live)", "", 0]
 
+        test_cause("(live)");
         no_space_only();
     }
 
@@ -10816,6 +10933,7 @@ function jslint_phase5_whitage(state) {
 // let aa=0;if(aa){aa();}else if(aa){aa();}
 // ", "whitage_default", "(live)", "", 0]
 
+                test_cause("(live)");
                 one_space_only();
                 return;
             }
@@ -10823,6 +10941,7 @@ function jslint_phase5_whitage(state) {
 // test_cause:
 // ["let aa;", "whitage_default", "(live)", "", 0]
 
+            test_cause("(live)");
             at_margin(0);
             open = false;
             return;
@@ -10844,6 +10963,7 @@ function jslint_phase5_whitage(state) {
 //     aa();bb:while(aa){aa();}}
 // ", "whitage_default", "(live)", "", 0]
 
+                test_cause("(live)");
                 expected_at(0);
             }
             return;
@@ -10857,6 +10977,7 @@ function jslint_phase5_whitage(state) {
 // test_cause:
 // ["String(0,0);", "whitage_default", "(live)", "", 0]
 
+                test_cause("(live)");
                 one_space();
                 return;
             }
@@ -10867,6 +10988,7 @@ function jslint_phase5_whitage(state) {
 // 0,0);
 // ", "whitage_default", "(live)", "", 0]
 
+            test_cause("(live)");
             return;
         }
 
@@ -10881,6 +11003,7 @@ function jslint_phase5_whitage(state) {
 // String?0:1);
 // ", "whitage_default", "(live)", "", 0]
 
+                test_cause("(live)");
                 at_margin(0);
                 return;
             }
@@ -10888,6 +11011,7 @@ function jslint_phase5_whitage(state) {
 // test_cause:
 // ["String(String?0:1);", "whitage_default", "(live)", "", 0]
 
+            test_cause("(live)");
             warn("use_open", right);
             return;
         }
@@ -10911,6 +11035,7 @@ function jslint_phase5_whitage(state) {
 // test_cause:
 // ["String(...String);", "whitage_default", "(live)", "", 0]
 
+            test_cause("(live)");
             no_space_only();
             return;
         }
@@ -10920,6 +11045,7 @@ function jslint_phase5_whitage(state) {
 // test_cause:
 // ["String?.aa();", "whitage_default", "(live)", "", 0]
 
+                test_cause("(live)");
                 no_space_only();
                 return;
             }
@@ -10942,6 +11068,7 @@ function jslint_phase5_whitage(state) {
 // }
 // ", "whitage_default", "(live)", "", 0]
 
+                test_cause("(live)");
                 at_margin(0);
             }
             return;
@@ -10950,7 +11077,7 @@ function jslint_phase5_whitage(state) {
 
 // PR-514 - Bugfix - On one line, <one_space> still lets a comment sit between
 // the 'get' or 'set' and its name.
-
+            test_cause("(live)");
             if (left.line === right.line) {
 
 // test_cause:
@@ -10963,6 +11090,18 @@ function jslint_phase5_whitage(state) {
 
                 one_space();
             } else {
+
+// test_cause:
+// ["
+// /*jslint getset*/
+// String({
+//     get
+//     aa() {
+//         return;
+//     }
+// });
+// ", "one_space_only", "expected_space_a_b", "aa", 5]
+
                 one_space_only();
             }
             return;
@@ -10985,6 +11124,7 @@ function jslint_phase5_whitage(state) {
 // test_cause:
 // ["if(String()){String();}", "whitage_default", "(live)", "", 0]
 
+            test_cause("(live)");
             one_space_only();
             return;
         }
@@ -11023,6 +11163,7 @@ function jslint_phase5_whitage(state) {
 // test_cause:
 // ["let aa=0;", "whitage_default", "(live)", "", 0]
 
+            test_cause("(live)");
             one_space();
             return;
         }
@@ -11043,6 +11184,7 @@ function jslint_phase5_whitage(state) {
 // ["let aa={String};", "whitage_opener", "(live)", "", 0]
 // ["let aa={};", "whitage_opener", "(live)", "", 0]
 
+        test_cause("(live)");
         opening = left.open || (left.line !== right.line);
         indentage = {
             closer,
@@ -11087,6 +11229,7 @@ function jslint_phase5_whitage(state) {
 // 0);
 // ", "whitage_opener", "(live)", "", 0]
 
+            test_cause("(live)");
             open = true;
             margin += mode_indent;
             if (right.role === "label") {
@@ -11098,6 +11241,7 @@ function jslint_phase5_whitage(state) {
 //  bb:while(aa){aa();}}
 // ", "whitage_opener", "(live)", "", 0]
 
+                    test_cause("(live)");
                     expected_at(0);
                 }
             } else if (right.switch) {
@@ -11115,6 +11259,7 @@ function jslint_phase5_whitage(state) {
 // test_cause:
 // ["function aa(){bb:while(aa){aa();}}", "whitage_opener", "(live)", "", 0]
 
+            test_cause("(live)");
             warn(
                 "expected_line_break_a_b",
                 right,
@@ -11127,6 +11272,7 @@ function jslint_phase5_whitage(state) {
 // test_cause:
 // ["String(0);", "whitage_opener", "(live)", "", 0]
 
+        test_cause("(live)");
         no_space_only();
     }
 
@@ -12030,60 +12176,46 @@ async function jstestDescribe(description, testFunction) {
     });
 
 // PR-xxx - Collect, then run: await the whole body, async or not, before any
-// test starts. A body that throws fails as one more test, wrapped, so a falsy
-// throw still fails.
+// test starts. A body that throws fails as one more test.
 
     try {
         await jstestAls.run({describe}, testFunction);
     } catch (err) {
-        errBody = [err, "jstestDescribe body"];
+        errBody = err;
     }
     describe.collected = true;
+    result = await Promise.all(describe.itList.map(async function (record) {
+        try {
+            await jstestAls.run({describe, record}, record.testFunction);
+            record.status = "passed";
+        } catch (err) {
+            record.err = err;
+            record.status = (
+                record.pass
+                ? "passed"
+                : "failed"
+            );
+        }
+        return record;
+    }));
 
 // PR-xxx - Assert this describe's tests, then this describe, are in ASCII
-// order. Then add one failed result for a body that threw. Record them before
-// any test runs, so a hung sibling cannot hide them at exit.
+// order. Then add one failed result for a body that threw.
 
-    result = [
-        jstestOrderCheck(describe.itList.map(function (record) {
+    for (const [err, descriptionIt] of [
+        jstestOrderCheck(result.map(function (record) {
             return record.description;
         })),
         jstestOrderCheck([describePrv, description]),
-        errBody
-    ].filter(Boolean).map(function ([err, descriptionIt]) {
-        return {
+        errBody && [errBody, "jstestDescribe body"]
+    ].filter(Boolean)) {
+        result.push(jstestItRecordPush({
             describe: description,
             description: descriptionIt,
             err,
             status: "failed"
-        };
-    });
-    jstestItRecordList.push(...result);
-    await Promise.all(describe.itList.map(async function (record) {
-        let settle = {
-            status: "passed"
-        };
-        try {
-            await jstestAls.run({describe, record}, record.testFunction);
-        } catch (err) {
-            settle = {
-                err,
-                status: (
-                    record.pass
-                    ? "passed"
-                    : "failed"
-                )
-            };
-        }
-
-// PR-xxx - A test settles once, so a crash <jstestOnCrash> recorded while it
-// ran stands, even when a user's own uncaughtException handler lets it finish.
-
-        if (record.status === "pending") {
-            Object.assign(record, settle);
-        }
-    }));
-    result.unshift(...describe.itList);
+        }));
+    }
 
 // PR-xxx - Print nothing for a describe whose tests the filter all skipped.
 
@@ -12107,8 +12239,8 @@ async function jstestDescribe(description, testFunction) {
                 )
                 : (
                     "    \u001b[31m\u2718 " + jstestItCount + ". test it - " +
-                    record.description + "\n" +
-                    String(record.err?.stack ?? record.err) + "\u001b[39m"
+                    record.description + "\n" + record.err.stack +
+                    "\u001b[39m"
                 )
             );
         }).join("\n")
@@ -12149,14 +12281,21 @@ function jstestIt(description, testFunction, mode) {
 // sees it even if its describe never runs or prints. Mode "pass" counts a
 // throwing test as passed.
 
-    jstestItRecordList.push({
+    describe.itList.push(jstestItRecordPush({
         describe: describe.description,
         description,
         pass: mode === "pass",
         status: "pending",
         testFunction
-    });
-    describe.itList.push(jstestItRecordList.at(-1));
+    }));
+}
+
+function jstestItRecordPush(record) {
+
+// This function will append test-record <record> to <jstestItRecordList>.
+
+    jstestItRecordList.push(record);
+    return record;
 }
 
 function jstestOnCrash(err) {
@@ -12177,9 +12316,12 @@ function jstestOnExit(exitCode) {
 // This function will on process-exit, print test-report
 // and exit with non-zero exit-code if any test failed.
 
-    const {countFailed, text} = jstestReport();
-    console.error(text);
-    process.exitCode = exitCode || countFailed;
+    console.error(jstestReport());
+    process.exitCode = (
+        exitCode || jstestItRecordList.filter(function ({status}) {
+            return status !== "passed";
+        }).length
+    );
 }
 
 function jstestOrderCheck(descriptionList) {
@@ -12187,11 +12329,10 @@ function jstestOrderCheck(descriptionList) {
 // This function will return a failed result for the first description in
 // <descriptionList> not strictly after the one before it, else undefined.
 // Strict means a duplicate fails too, as two identical lines cannot be told
-// apart in the output. Not '>=', which is false for a non-string name such as
-// undefined, so that name would pass.
+// apart in the output.
 
     for (const [ii, description] of descriptionList.entries()) {
-        if (ii > 0 && !(descriptionList[ii - 1] < description)) {
+        if (ii > 0 && descriptionList[ii - 1] >= description) {
             const now = JSON.stringify(description);
             const prv = JSON.stringify(descriptionList[ii - 1]);
             return [
@@ -12208,8 +12349,7 @@ function jstestOrderCheck(descriptionList) {
 
 function jstestReport() {
 
-// This function will return the test-report <text> and its <countFailed>,
-// without side effects.
+// This function will return the test-report, without side effects.
 
 // PR-xxx - List and count as failed each test its describe never printed: one
 // still pending, e.g. hung until a watchdog ended the process, or one that
@@ -12221,9 +12361,8 @@ function jstestReport() {
     const unprintedList = jstestItRecordList.filter(function (record) {
         return !record.printed && record.status !== "passed";
     });
-    return {
-        countFailed,
-        text: (
+    return (
+        (
             countFailed
             ? "\n\u001b[31m"
             : "\n\u001b[32m"
@@ -12238,7 +12377,7 @@ function jstestReport() {
                 "  \u2718 " + (jstestItCount + ii + 1) + ". test it " + status +
                 " - " + describe + " - " + description + "\n" + (
                     err
-                    ? String(err.stack ?? err) + "\n"
+                    ? err.stack + "\n"
                     : ""
                 )
             );
@@ -12250,7 +12389,7 @@ function jstestReport() {
         Number(Date.now() - jstestTimeStart).toLocaleString() +
         " ms\n" +
         "\u001b[39m"
-    };
+    );
 }
 
 async function moduleFsInit() {
