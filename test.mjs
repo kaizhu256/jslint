@@ -2612,11 +2612,13 @@ ff();
     ), async function () {
 
 // This function will validate each fixture in each '// test_cause:' block of
-// jslint.mjs. Its source must run the code below the block, by V8 block
-// coverage, and when it names a warning code, raise that warning visibly.
+// jslint.mjs. A "(live)" source must run the code below its block, by V8 block
+// coverage. A warning must be shown, with the code below its block on the
+// stack that option trace records.
 
         const controlList = [];
         const fixtureList = [];
+        const stackTraceLimit = Error.stackTraceLimit;
         function fixturePush(list, cause, anchor) {
 
 // This function will push to <list> the fixture <cause>, whose block sits
@@ -2695,6 +2697,10 @@ ff();
                 via: code === "(live)" || warningsVia.length > 0
             });
         }
+
+// Keep every frame, since a fixture filed up the stack can sit past V8's
+// default of 10. The deepest one now, at <post_s_var>, is frame 9.
+
         Error.stackTraceLimit = Infinity;
         sourceJslintMjs.replace((
             /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?) *?\S/g
@@ -2836,7 +2842,7 @@ ff();
             fixturePush(controlList, bad, found.anchor);
             controlList.at(-1).expect = expect;
         }
-        Error.stackTraceLimit = 10;
+        Error.stackTraceLimit = stackTraceLimit;
 
 // Measure each fixture's coverage in a child, since taking precise coverage
 // resets the counters that NODE_V8_COVERAGE dumps at exit.
