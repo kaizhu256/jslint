@@ -2960,13 +2960,12 @@ process.stdout.write(JSON.stringify(resultList));
                     raiseDict[raise?.[1]] = true;
 
 // A fixture filed up the stack pairs the function holding its block with the
-// one that raised it.
+// one that raised it; count the fixtures of each pair.
 
                     if (name !== fn) {
-                        hostDict[name + " <- " + fn] = Array.from(new Set([
-                            ...hostDict[name + " <- " + fn] || [],
-                            at
-                        ]));
+                        hostDict[name + " <- " + fn] = (
+                            hostDict[name + " <- " + fn] || 0
+                        ) + 1;
                     }
                 }
                 check = {
@@ -3002,27 +3001,27 @@ process.stdout.write(JSON.stringify(resultList));
                 return String(fail) !== String(expect);
             }), []);
 
-// Validate the roster of fixtures filed up the stack, as "host <- raiser", so
-// one moved down to its raise site, or filed far up the stack, fails. A rename
-// of either function shows as one pair missing and one extra, at the same
-// lines.
+// Validate the roster of fixtures filed up the stack, as "host <- raiser" with
+// its fixture count, so one moved down to its raise site, or filed far up the
+// stack, fails. A rename of either function shows as one pair missing and one
+// extra, with the same count.
 
-            assertJsonEqual(Object.keys(hostDict).sort(), [
-                "infix_dot <- check_left",
-                "infix_grave <- check_left",
-                "infix_lbracket <- check_left",
-                "infix_lparen <- check_left",
-                "jslint_phase3_parse <- check_ordered",
-                "post_s_var <- name_lookup",
-                "prefix_destructure <- check_ordered",
-                "prefix_destructure <- name_parse",
-                "prefix_function <- check_ordered",
-                "prefix_lbrace <- check_ordered",
-                "stmt_export <- check_ordered",
-                "stmt_export <- semicolon",
-                "stmt_switch <- check_ordered_case",
-                "whitage_default <- one_space_only"
-            ], JSON.stringify(hostDict, undefined, 4));
+            assertJsonEqual(Object.entries(hostDict).sort(), [
+                ["infix_dot <- check_left", 6],
+                ["infix_grave <- check_left", 1],
+                ["infix_lbracket <- check_left", 1],
+                ["infix_lparen <- check_left", 2],
+                ["jslint_phase3_parse <- check_ordered", 3],
+                ["post_s_var <- name_lookup", 4],
+                ["prefix_destructure <- check_ordered", 2],
+                ["prefix_destructure <- name_parse", 1],
+                ["prefix_function <- check_ordered", 1],
+                ["prefix_lbrace <- check_ordered", 1],
+                ["stmt_export <- check_ordered", 1],
+                ["stmt_export <- semicolon", 1],
+                ["stmt_switch <- check_ordered_case", 10],
+                ["whitage_default <- one_space_only", 1]
+            ]);
 
 // Validate each raise site in jslint.mjs raises the warning of some fixture,
 // except the raisers' own calls, and a test hook raising an unknown code.
