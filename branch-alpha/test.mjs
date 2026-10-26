@@ -2731,17 +2731,6 @@ ff();
 
         Error.stackTraceLimit = Infinity;
 
-// Validate each mention of test_cause is a block's header, so a misspelled one
-// fails, instead of hiding its block. Commented-out code keeps its blocks as
-// '// // test_cause:', unchecked.
-
-        assertJsonEqual(Array.from(sourceJslintMjs.matchAll(
-            /^.*test.?cause.*$/gim
-        ), function ([line]) {
-            return line;
-        }).filter(function (line) {
-            return line !== "// test_cause:" && line !== "// // test_cause:";
-        }), []);
         sourceJslintMjs.replace((
             /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?) *?\S/g
         ), function (match0, header, causeList, footer, offset) {
@@ -2771,7 +2760,9 @@ ff();
                     }).join(", ") +
                     "]"
                 );
-            }).sort().join("\n");
+            }).sort().filter(function (cause, ii, list) {
+                return cause !== list[ii - 1];
+            }).join("\n");
             assertOrThrow(
                 causeList === tmp,
                 "\n" + causeList + "\n\n" + tmp
@@ -2792,6 +2783,14 @@ ff();
             return "";
         });
 
+// Validate each fixture's last line was parsed in a block, so a misspelled
+// header fails, instead of hiding its block. Commented-out code keeps its
+// blocks as '// // test_cause:', unchecked.
+
+        assertJsonEqual(sourceJslintMjs.match(
+            /^\/\/ (?!\/\/).*, \d+\](?: \/\/jslint-ignore-line)?$/gm
+        ).length, fixtureList.length);
+
 // Negative controls: each bad fixture, filed in the block of a good one, must
 // fail exactly the named check, so a weakened checker turns this test red.
 
@@ -2804,37 +2803,37 @@ ff();
                     "",
                     0
                 ],
-                {codeless: true, silent: false}
+                ["codeless", "silent"]
             ], [
                 ["if(0%0){}", "condition", "unexpectd_a", "%", 5],
-                {inFn: false, shown: false, via: false}
+                ["inFn", "shown", "via"]
             ], [
                 ["if(0%0){}", "condition", "(live)", "", 0],
-                {silent: false}
+                ["silent"]
             ], [
                 ["if(0%0){}", "condition", "(live)", "aa", 0],
-                {known: false, silent: false}
+                ["known", "silent"]
             ], [
                 ["if(0%0){}", "condition", "(live)", "", 5],
-                {known: false, silent: false}
+                ["known", "silent"]
             ], [
                 ["if(0%0){}", "condition", "unexpected_a", "%", 5, "extra"],
-                {known: false}
+                ["known"]
             ], [
                 ["if(0%0){}", "condition", "unexpected_a", "%", 6],
-                {inFn: false, shown: false, via: false}
+                ["inFn", "shown", "via"]
             ], [
                 ["if(0%0){}", "condition", "unexpected_a", "&", 5],
-                {inFn: false, shown: false, via: false}
+                ["inFn", "shown", "via"]
             ], [
                 ["if(0%0){}", "condition", "empty_block", "{", 8],
-                {inFn: false, via: false}
+                ["inFn", "via"]
             ], [
                 ["if(0%0){}", "warn", "unexpected_a", "%", 5],
-                {inFn: false}
+                ["inFn"]
             ], [
                 ["if(0&0){}", "condition", "unexpected_a", "&", 5],
-                {inFn: false, live: false, via: false}
+                ["inFn", "live", "via"]
             ]
         ].map(function ([bad, expect]) {
             return [
@@ -2846,11 +2845,11 @@ ff();
             [
                 "[\"let aa=!!0;\",\"post_u_unary\",\"expected_a_b\",\"!!\",8]",
                 ["!!0", "post_u_unary", "expected_a_b", "!!", 1],
-                {inFn: false, shown: false, via: false}
+                ["inFn", "shown", "via"]
             ], [
                 "[\"aa=/./vu\",\"lex_regexp\",\"unexpected_a\",\"u\",8]",
                 ["aa=/./u;if(0){}", "lex_regexp", "unexpected_a", "0", 12],
-                {inFn: false, live: false, via: false}
+                ["inFn", "live", "via"]
             ], [
 
 // Filed up the stack above the wrong caller: <check_left> raises it through
@@ -2858,7 +2857,7 @@ ff();
 
                 "[\"aa=[]?.aa\",\"check_left\",\"unexpected_a\",\"?.\",6]",
                 ["\"\".aa;0[0]", "check_left", "unexpected_a", "[", 8],
-                {inFn: false, via: false}
+                ["inFn", "via"]
             ], [
 
 // Raised here but dropped, since <post_a_pluseq> warned on the token first,
@@ -2875,7 +2874,7 @@ ff();
                     "undefined",
                     5
                 ],
-                {inFn: false, via: false}
+                ["inFn", "via"]
             ]
         ])) {
             const found = fixtureList.find(function ({cause}) {
@@ -2904,7 +2903,6 @@ await session.post("Profiler.startPreciseCoverage", {
     callCount: true,
     detailed: true
 });
-await session.post("Profiler.takePreciseCoverage");
 for (const [offset, source] of fixtureList) {
     const result = [0, ""];
     const span = [Infinity, Infinity];
@@ -2916,14 +2914,14 @@ for (const [offset, source] of fixtureList) {
     ).result.find(function ({url}) {
         return url.endsWith("/jslint.mjs");
     }).functions) {
-        for (const [ii, range] of ranges.entries()) {
+        for (const range of ranges) {
             const width = range.endOffset - range.startOffset;
             if (range.startOffset <= offset && offset < range.endOffset) {
                 if (width <= span[0]) {
                     result[0] = range.count;
                     span[0] = width;
                 }
-                if (ii === 0 && functionName && width < span[1]) {
+                if (functionName && width < span[1]) {
                     result[1] = functionName;
                     span[1] = width;
                 }
@@ -2948,6 +2946,7 @@ process.stdout.write(JSON.stringify(resultList));
                     cause,
                     code,
                     codeless,
+                    expect = [],
                     fn,
                     known,
                     raise,
@@ -2956,23 +2955,21 @@ process.stdout.write(JSON.stringify(resultList));
                     silent,
                     via
                 } = fixtureList.concat(controlList)[ii];
-                if (ii < fixtureList.length && code !== "(live)") {
+                let check;
+                if (ii < fixtureList.length) {
                     raiseDict[raise?.[1]] = true;
 
 // A fixture filed up the stack pairs the function holding its block with the
-// one that raised it.
+// one that raised it; count the fixtures of each pair.
 
                     if (name !== fn) {
-                        hostDict[name + " <- " + fn] = Array.from(new Set([
-                            ...hostDict[name + " <- " + fn] || [],
-                            at
-                        ]));
+                        hostDict[name + " <- " + fn] = (
+                            hostDict[name + " <- " + fn] || 0
+                        ) + 1;
                     }
                 }
-                return {
-                    at,
-                    cause,
-                    codeless,
+                check = {
+                    codeless: !codeless,
 
 // Field 2 of a (live) fixture names the function holding the block.
 
@@ -2987,65 +2984,44 @@ process.stdout.write(JSON.stringify(resultList));
                     silent,
                     via
                 };
-            });
-
-// List every bad fixture, not only the first.
-
-            assertJsonEqual(recordList.slice(
-                0,
-                fixtureList.length
-            ).filter(function ({
-                codeless,
-                inFn,
-                known,
-                live,
-                shown,
-                silent,
-                via
-            }) {
-                return (
-                    codeless || !inFn || !known || !live || !shown ||
-                    !silent || !via
-                );
-            }), []);
-            assertJsonEqual(recordList.slice(
-                fixtureList.length
-            ), controlList.map(function ({at, cause, expect}) {
                 return {
                     at,
                     cause,
-                    codeless: false,
-                    inFn: true,
-                    known: true,
-                    live: true,
-                    shown: true,
-                    silent: true,
-                    via: true,
-                    ...expect
+                    expect,
+                    fail: Object.keys(check).filter(function (key) {
+                        return !check[key];
+                    })
                 };
-            }));
+            });
 
-// Validate the roster of fixtures filed up the stack, as "host <- raiser", so
-// one moved down to its raise site, or filed far up the stack, fails. A rename
-// of either function shows as one pair missing and one extra, at the same
-// lines.
+// List every fixture whose failed checks differ from those expected: none for
+// a fixture, exactly the named ones for a negative control.
 
-            assertJsonEqual(Object.keys(hostDict).sort(), [
-                "infix_dot <- check_left",
-                "infix_grave <- check_left",
-                "infix_lbracket <- check_left",
-                "infix_lparen <- check_left",
-                "jslint_phase3_parse <- check_ordered",
-                "post_s_var <- name_lookup",
-                "prefix_destructure <- check_ordered",
-                "prefix_destructure <- name_parse",
-                "prefix_function <- check_ordered",
-                "prefix_lbrace <- check_ordered",
-                "stmt_export <- check_ordered",
-                "stmt_export <- semicolon",
-                "stmt_switch <- check_ordered_case",
-                "whitage_default <- one_space_only"
-            ], JSON.stringify(hostDict, undefined, 4));
+            assertJsonEqual(recordList.filter(function ({expect, fail}) {
+                return String(fail) !== String(expect);
+            }), []);
+
+// Validate the roster of fixtures filed up the stack, as "host <- raiser" with
+// its fixture count, so one moved down to its raise site, or filed far up the
+// stack, fails. A rename of either function shows as one pair missing and one
+// extra, with the same count.
+
+            assertJsonEqual(Object.entries(hostDict).sort(), [
+                ["infix_dot <- check_left", 6],
+                ["infix_grave <- check_left", 1],
+                ["infix_lbracket <- check_left", 1],
+                ["infix_lparen <- check_left", 2],
+                ["jslint_phase3_parse <- check_ordered", 3],
+                ["post_s_var <- name_lookup", 4],
+                ["prefix_destructure <- check_ordered", 2],
+                ["prefix_destructure <- name_parse", 1],
+                ["prefix_function <- check_ordered", 1],
+                ["prefix_lbrace <- check_ordered", 1],
+                ["stmt_export <- check_ordered", 1],
+                ["stmt_export <- semicolon", 1],
+                ["stmt_switch <- check_ordered_case", 10],
+                ["whitage_default <- one_space_only", 1]
+            ]);
 
 // Validate each raise site in jslint.mjs raises the warning of some fixture,
 // except the raisers' own calls, and a test hook raising an unknown code.
@@ -3634,12 +3610,18 @@ jslint.jstestDescribe("aa", function () {
     jslint.jstestIt("dd", function () {
         throw "dd string";
     });
+    jslint.jstestIt("ee", function () {
+        throw Object.create(null);
+    });
 });
             `)),
             childRun({}, String(`
 jslint.jstestDescribe("aa", function () {
     jslint.jstestIt("bb", function () {
         throw "bb string";
+    });
+    jslint.jstestIt("bc", function () {
+        throw 0;
     });
     jslint.jstestIt("cc", function () {
         setTimeout(process.exit, 100);
@@ -3648,10 +3630,10 @@ jslint.jstestDescribe("aa", function () {
 });
             `))
         ]);
-        assertJsonEqual([exitCode, exitCode2], [3, 2]);
-        assertMatch(stderr, /1\. test it - bb\nundefined\b[\s\S]*2\. test it - cc\nundefined\b[\s\S]*3\. test it - dd\ndd string\b[\s\S]*tests failed - 3\n/);
+        assertJsonEqual([exitCode, exitCode2], [4, 3]);
+        assertMatch(stderr, /1\. test it - bb\nundefined\b[\s\S]*2\. test it - cc\nundefined\b[\s\S]*3\. test it - dd\ndd string\b[\s\S]*4\. test it - ee\n\[object\][\s\S]*tests failed - 4\n/);
         assertOrThrow(!stderr.includes("TypeError"), stderr);
-        assertMatch(stderr2, /test it failed - aa - bb\nbb string\n/);
+        assertMatch(stderr2, /test it failed - aa - bb\nbb string\n[\s\S]*test it failed - aa - bc\n0\n/);
     });
     jstestIt((
         "test jstestOnExit-crash handling-behavior"

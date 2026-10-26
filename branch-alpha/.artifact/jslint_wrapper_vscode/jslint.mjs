@@ -5838,7 +5838,6 @@ function jslint_phase3_parse(state) {
 // ["let aa;function aa(){}", "name_declare", "redefinition_a_b", "1", 17]
 // ["let aa;let aa", "name_declare", "redefinition_a_b", "1", 12]
 // ["var aa;if(0){var aa}", "name_declare", "redefinition_a_b", "1", 18]
-// ["var aa;if(0){var aa}", "name_declare", "redefinition_a_b", "1", 18]
 
             warn("redefinition_a_b", name, id, earlier.line);
             return;
@@ -12172,12 +12171,24 @@ async function jstestDescribe(description, testFunction) {
                 : (
                     "    \u001b[31m\u2718 " + jstestItCount + ". test it - " +
                     record.description + "\n" +
-                    String(record.err?.stack ?? record.err) + "\u001b[39m"
+                    jstestErrText(record.err) + "\u001b[39m"
                 )
             );
         }).join("\n")
     );
     console.error(message);
+}
+
+function jstestErrText(err) {
+
+// This function will return the stack of thrown <err>, else <err> as text,
+// for any thrown value, even a falsy one or a null-prototype object.
+
+    try {
+        return String(err?.stack ?? err);
+    } catch (ignore) {
+        return "[" + typeof err + "]";
+    }
 }
 
 function jstestIt(description, testFunction, mode) {
@@ -12301,9 +12312,9 @@ function jstestReport() {
             return (
                 "  \u2718 " + (jstestItCount + ii + 1) + ". test it " + status +
                 " - " + describe + " - " + description + "\n" + (
-                    err
-                    ? String(err.stack ?? err) + "\n"
-                    : ""
+                    (status === "pending")
+                    ? ""
+                    : jstestErrText(err) + "\n"
                 )
             );
         }).join("") +
