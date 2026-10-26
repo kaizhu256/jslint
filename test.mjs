@@ -32,10 +32,11 @@ function assertMatch(text, rgx) {
     assertOrThrow(rgx.test(text), text);
 }
 
-function childRun(env, source) {
+function childRun(env, source, stdin) {
 
-// Run <source> in a child node with jslint imported, and resolve its exit-code
-// and stderr. Clear the parent's test filter, then apply <env>.
+// Run <source> in a child node with jslint imported, fed <stdin>, and resolve
+// its exit-code, stderr and stdout. Clear the parent's test filter, then apply
+// <env>.
 
     return new Promise(function (resolve) {
         moduleChildProcess.execFile(process.execPath, [
@@ -53,13 +54,13 @@ function childRun(env, source) {
 // A killed child resolves exit-code null, never a passing 0.
 
             timeout: 10000
-        }, function (err, ignore, stderr) {
+        }, function (err, stdout, stderr) {
             resolve([(
                 err
                 ? err.code
                 : 0
-            ), stderr]);
-        });
+            ), stderr, stdout]);
+        }).stdin.end(stdin);
     });
 }
 
@@ -2608,14 +2609,143 @@ ff();
     });
     jstestIt((
         "test warning-test-cause handling-behavior"
-    ), function () {
+    ), async function () {
 
-// this function will validate each jslint <warning> is raised with given
-// malformed <code>
+// This function will validate each fixture in each '// test_cause:' block of
+// jslint.mjs. A "(live)" source must run the code below its block, by V8 block
+// coverage. A warning must be shown, with the code below its block on the
+// stack that option trace records. Then validate the roster of fixtures filed
+// up the stack, and that each raise site in jslint.mjs has a fixture.
 
+        const controlList = [];
+        const fixtureList = [];
+        const raiserList = ["stop", "stop_at", "warn", "warn_at"];
+        const rgxFrame = (
+            /^ {4}at (?:(?:Object\.)?([\w.]+).*? \()?.*?jslint\.mjs:(\d+):/gm
+        );
+        const stackTraceLimit = Error.stackTraceLimit;
+        function fixturePush(list, cause, anchor) {
+
+// This function will push to <list> the fixture <cause>, whose block sits
+// directly above the code at offset <anchor> in jslint.mjs.
+
+            const line = (
+                sourceJslintMjs.slice(0, anchor).match(/\n/g).length + 1
+            );
+            const [source, fn, code, aa, column] = cause;
+            const {warnings} = jslint.jslint(source, {
+                beta: true,
+                trace: true
+            });
+
+// List each warning with its frames in jslint.mjs, by the stack that option
+// trace records, as [name, line] innermost first, and the frames above the
+// raisers, whose first is the line that raised it. An anonymous function's
+// frame has no name.
+
+            const warningsRaised = warnings.map(function (warning) {
+                const frameList = Array.from(
+                    String(warning.stack_trace).matchAll(rgxFrame),
+                    function ([ignore, name, line]) {
+                        return [name, Number(line)];
+                    }
+                );
+                return {
+                    aboveList: frameList.filter(function ([name]) {
+                        return !raiserList.includes(name);
+                    }),
+                    frameList,
+                    warning
+                };
+            });
+
+// A second warning on one token is dropped, so check the warnings the user
+// sees, never the ones raised.
+
+            const warningsShown = warningsRaised.filter(function ({warning}) {
+                return (
+                    warning.code === code &&
+                    String(warning.b || warning.a || "") === aa &&
+                    warning.column === column
+                );
+            });
+
+// The shown warning raised through the code under the block.
+
+            const warningsVia = warningsShown.filter(function ({frameList}) {
+                return frameList.some(function ([ignore, at]) {
+                    return at === line;
+                });
+            });
+            list.push({
+                anchor,
+
+// Name the line of the code under the block, so a failure points at it.
+
+                at: "jslint.mjs:" + line,
+                cause: JSON.stringify(cause),
+                code,
+
+// Validate no internal-error. A crash mid-walk still runs every branch before
+// it, so a coverage-check alone passes straight through one, and "0``" threw
+// in post_b_binary for years with its cause declared and green.
+
+                codeless: warnings.some(function (warning) {
+                    return warning.code === undefined;
+                }),
+                fn,
+
+// A fixture has exactly 5 fields. Field 3 "(live)" marks a branch reached with
+// no warning of its own, documenting how, so it is not taken for deadcode. Any
+// other field 3 must be a warning shown below, so a typo fails there.
+
+                known: cause.length === 5 && (
+                    code !== "(live)" || (aa === "" && column === 0)
+                ),
+
+// Field 2 of a warning names the function that raised it, the first named one
+// above the raisers in the stack that option trace records, so a fixture may
+// be filed up the stack, above the call that leads down to the raise site.
+
+                raise: warningsVia[0]?.aboveList[0],
+                raiser: warningsVia[0]?.aboveList.find(function ([name]) {
+                    return name;
+                })?.[0],
+                shown: code === "(live)" || warningsShown.length > 0,
+
+// A "(live)" block must not sit on a raise whose warning shows, since a
+// warning fixture checks more.
+
+                silent: code !== "(live)" || warningsRaised.every(function ({
+                    aboveList
+                }) {
+                    return aboveList[0]?.[1] !== line;
+                }),
+                source,
+                via: code === "(live)" || warningsVia.length > 0
+            });
+        }
+
+// Keep every frame, since a fixture filed up the stack can sit past V8's
+// default of 10.
+
+        Error.stackTraceLimit = Infinity;
+
+// Validate each mention of test_cause is a block's header, so a misspelled one
+// fails, instead of hiding its block. Commented-out code keeps its blocks as
+// '// // test_cause:', unchecked.
+
+        assertJsonEqual(Array.from(sourceJslintMjs.matchAll(
+            /^.*test.?cause.*$/gim
+        ), function ([line]) {
+            return line;
+        }).filter(function (line) {
+            return line !== "// test_cause:" && line !== "// // test_cause:";
+        }), []);
         sourceJslintMjs.replace((
             /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?) *?\S/g
-        ), function (match0, header, causeList, footer) {
+        ), function (match0, header, causeList, footer, offset) {
+            const rgxAnchor = (/(?:\/\/.*\n\s*)*(?:[?:]\s*)?/y);
             let tmp;
             // console.error(match0);
             // Validate header.
@@ -2646,37 +2776,294 @@ ff();
                 causeList === tmp,
                 "\n" + causeList + "\n\n" + tmp
             );
-            causeList.split("\n").forEach(function (cause) {
-                cause = JSON.parse(cause);
-                tmp = jslint.jslint(cause[0], {
-                    beta: true,
-                    test_cause: true
-                });
 
-// Validate no internal-error. A crash mid-walk still records every cause
-// raised before it, so the cause-assertion below passes straight through one
-// - "0``" threw in post_b_binary for years with its cause declared and green.
+// Anchor the block to the first code below it, past any comment paragraph and
+// a leading '?' or ':' of a ternary branch.
 
-                assertOrThrow(
-                    tmp.warnings.every(function ({
-                        code
-                    }) {
-                        return code !== undefined;
-                    }),
-                    "\n" + JSON.stringify(cause[0]) + "\n\n" +
-                    JSON.stringify(tmp.warnings, undefined, 4)
+            rgxAnchor.lastIndex = offset + match0.length - 1;
+            rgxAnchor.exec(sourceJslintMjs);
+            for (const cause of causeList.split("\n")) {
+                fixturePush(
+                    fixtureList,
+                    JSON.parse(cause),
+                    rgxAnchor.lastIndex
                 );
-                tmp = tmp.causes;
-                // Validate cause.
-                assertOrThrow(
-                    tmp[JSON.stringify(cause.slice(1))],
-                    (
-                        "\n" + JSON.stringify(cause) + "\n\n" +
-                        Object.keys(tmp).sort().join("\n")
-                    )
-                );
-            });
+            }
             return "";
+        });
+
+// Negative controls: each bad fixture, filed in the block of a good one, must
+// fail exactly the named check, so a weakened checker turns this test red.
+
+        for (const [good, bad, expect] of [
+            [
+                [
+                    "/*jslint test_internal_error*/\nif(0%0){}",
+                    "condition",
+                    "(live)",
+                    "",
+                    0
+                ],
+                {codeless: true, silent: false}
+            ], [
+                ["if(0%0){}", "condition", "unexpectd_a", "%", 5],
+                {inFn: false, shown: false, via: false}
+            ], [
+                ["if(0%0){}", "condition", "(live)", "", 0],
+                {silent: false}
+            ], [
+                ["if(0%0){}", "condition", "(live)", "aa", 0],
+                {known: false, silent: false}
+            ], [
+                ["if(0%0){}", "condition", "(live)", "", 5],
+                {known: false, silent: false}
+            ], [
+                ["if(0%0){}", "condition", "unexpected_a", "%", 5, "extra"],
+                {known: false}
+            ], [
+                ["if(0%0){}", "condition", "unexpected_a", "%", 6],
+                {inFn: false, shown: false, via: false}
+            ], [
+                ["if(0%0){}", "condition", "unexpected_a", "&", 5],
+                {inFn: false, shown: false, via: false}
+            ], [
+                ["if(0%0){}", "condition", "empty_block", "{", 8],
+                {inFn: false, via: false}
+            ], [
+                ["if(0%0){}", "warn", "unexpected_a", "%", 5],
+                {inFn: false}
+            ], [
+                ["if(0&0){}", "condition", "unexpected_a", "&", 5],
+                {inFn: false, live: false, via: false}
+            ]
+        ].map(function ([bad, expect]) {
+            return [
+                "[\"if(0%0){}\",\"condition\",\"unexpected_a\",\"%\",5]",
+                bad,
+                expect
+            ];
+        }).concat([
+            [
+                "[\"let aa=!!0;\",\"post_u_unary\",\"expected_a_b\",\"!!\",8]",
+                ["!!0", "post_u_unary", "expected_a_b", "!!", 1],
+                {inFn: false, shown: false, via: false}
+            ], [
+                "[\"aa=/./vu\",\"lex_regexp\",\"unexpected_a\",\"u\",8]",
+                ["aa=/./u;if(0){}", "lex_regexp", "unexpected_a", "0", 12],
+                {inFn: false, live: false, via: false}
+            ], [
+
+// Filed up the stack above the wrong caller: <check_left> raises it through
+// <infix_lbracket>, not through the call under this block in <infix_dot>.
+
+                "[\"aa=[]?.aa\",\"check_left\",\"unexpected_a\",\"?.\",6]",
+                ["\"\".aa;0[0]", "check_left", "unexpected_a", "[", 8],
+                {inFn: false, via: false}
+            ], [
+
+// Raised here but dropped, since <post_a_pluseq> warned on the token first,
+// so the warning shown is another site's.
+
+                (
+                    "[\"aa-=undefined\",\"post_a_assignment\"," +
+                    "\"unexpected_a\",\"undefined\",5]"
+                ),
+                [
+                    "aa+=undefined",
+                    "post_a_assignment",
+                    "unexpected_a",
+                    "undefined",
+                    5
+                ],
+                {inFn: false, via: false}
+            ]
+        ])) {
+            const found = fixtureList.find(function ({cause}) {
+                return cause === good;
+            });
+            assertOrThrow(found, `control's good fixture is missing: ${good}`);
+            fixturePush(controlList, bad, found.anchor);
+            controlList.at(-1).expect = expect;
+        }
+        Error.stackTraceLimit = stackTraceLimit;
+
+// Measure each fixture's coverage in a child, since taking precise coverage
+// resets the counters that NODE_V8_COVERAGE dumps at exit.
+
+        await childRun({
+            NODE_V8_COVERAGE: ""
+        }, String(`
+import moduleFs from "fs";
+import moduleInspector from "inspector/promises";
+const fixtureList = JSON.parse(moduleFs.readFileSync(0, "utf8"));
+const resultList = [];
+const session = new moduleInspector.Session();
+session.connect();
+await session.post("Profiler.enable");
+await session.post("Profiler.startPreciseCoverage", {
+    callCount: true,
+    detailed: true
+});
+await session.post("Profiler.takePreciseCoverage");
+for (const [offset, source] of fixtureList) {
+    const result = [0, ""];
+    const span = [Infinity, Infinity];
+    jslint(source, {
+        beta: true
+    });
+    for (const {functionName, ranges} of (
+        await session.post("Profiler.takePreciseCoverage")
+    ).result.find(function ({url}) {
+        return url.endsWith("/jslint.mjs");
+    }).functions) {
+        for (const [ii, range] of ranges.entries()) {
+            const width = range.endOffset - range.startOffset;
+            if (range.startOffset <= offset && offset < range.endOffset) {
+                if (width <= span[0]) {
+                    result[0] = range.count;
+                    span[0] = width;
+                }
+                if (ii === 0 && functionName && width < span[1]) {
+                    result[1] = functionName;
+                    span[1] = width;
+                }
+            }
+        }
+    }
+    resultList.push(result);
+}
+process.stdout.write(JSON.stringify(resultList));
+        `).trim() + "\n", JSON.stringify(
+            fixtureList.concat(controlList).map(function ({anchor, source}) {
+                return [anchor, source];
+            })
+        )).then(function ([exitCode, stderr, stdout]) {
+            const hostDict = {};
+            const raiseDict = {};
+            let recordList;
+            assertOrThrow(exitCode === 0, stderr);
+            recordList = JSON.parse(stdout).map(function ([count, name], ii) {
+                const {
+                    at,
+                    cause,
+                    code,
+                    codeless,
+                    fn,
+                    known,
+                    raise,
+                    raiser,
+                    shown,
+                    silent,
+                    via
+                } = fixtureList.concat(controlList)[ii];
+                if (ii < fixtureList.length && code !== "(live)") {
+                    raiseDict[raise?.[1]] = true;
+
+// A fixture filed up the stack pairs the function holding its block with the
+// one that raised it.
+
+                    if (name !== fn) {
+                        hostDict[name + " <- " + fn] = Array.from(new Set([
+                            ...hostDict[name + " <- " + fn] || [],
+                            at
+                        ]));
+                    }
+                }
+                return {
+                    at,
+                    cause,
+                    codeless,
+
+// Field 2 of a (live) fixture names the function holding the block.
+
+                    inFn: fn === (
+                        code === "(live)"
+                        ? name
+                        : raiser
+                    ),
+                    known,
+                    live: count > 0,
+                    shown,
+                    silent,
+                    via
+                };
+            });
+
+// List every bad fixture, not only the first.
+
+            assertJsonEqual(recordList.slice(
+                0,
+                fixtureList.length
+            ).filter(function ({
+                codeless,
+                inFn,
+                known,
+                live,
+                shown,
+                silent,
+                via
+            }) {
+                return (
+                    codeless || !inFn || !known || !live || !shown ||
+                    !silent || !via
+                );
+            }), []);
+            assertJsonEqual(recordList.slice(
+                fixtureList.length
+            ), controlList.map(function ({at, cause, expect}) {
+                return {
+                    at,
+                    cause,
+                    codeless: false,
+                    inFn: true,
+                    known: true,
+                    live: true,
+                    shown: true,
+                    silent: true,
+                    via: true,
+                    ...expect
+                };
+            }));
+
+// Validate the roster of fixtures filed up the stack, as "host <- raiser", so
+// one moved down to its raise site, or filed far up the stack, fails. A rename
+// of either function shows as one pair missing and one extra, at the same
+// lines.
+
+            assertJsonEqual(Object.keys(hostDict).sort(), [
+                "infix_dot <- check_left",
+                "infix_grave <- check_left",
+                "infix_lbracket <- check_left",
+                "infix_lparen <- check_left",
+                "jslint_phase3_parse <- check_ordered",
+                "post_s_var <- name_lookup",
+                "prefix_destructure <- check_ordered",
+                "prefix_destructure <- name_parse",
+                "prefix_function <- check_ordered",
+                "prefix_lbrace <- check_ordered",
+                "stmt_export <- check_ordered",
+                "stmt_export <- semicolon",
+                "stmt_switch <- check_ordered_case",
+                "whitage_default <- one_space_only"
+            ], JSON.stringify(hostDict, undefined, 4));
+
+// Validate each raise site in jslint.mjs raises the warning of some fixture,
+// except the raisers' own calls, and a test hook raising an unknown code.
+
+            assertJsonEqual(sourceJslintMjs.replace((
+                /^ {4}function (?:stop|warn)(?:_at)?\([\S\s]*?\n {4}\}\n/gm
+            ), function (match0) {
+                return match0.replace(/[^\n]/g, "");
+            }).split("\n").map(function (text, ii) {
+                return [ii + 1, text.trim()];
+            }).filter(function ([line, text]) {
+                return (
+                    !text.startsWith("//") &&
+                    (/(?:^|[^\w.])(?:stop|warn)(?:_at)?\(/m).test(text) &&
+                    !text.includes("\"test_unknown_warning_code\"") &&
+                    !raiseDict[line]
+                );
+            }), []);
         });
     });
 });
@@ -3014,9 +3401,15 @@ jstestDescribe((
     ), async function () {
 
 // A describe body that throws fails as one more test, after the tests it did
-// register; an invalid filter regexp throws from that body too.
+// register; an invalid filter regexp throws from that body too. A falsy throw
+// fails the same, and a hung sibling cannot hide the body's error at exit.
 
-        const [[exitCode, stderr], [exitCode2, stderr2]] = await Promise.all([
+        const [
+            [exitCode, stderr],
+            [exitCode2, stderr2],
+            [exitCode3, stderr3],
+            [exitCode4, stderr4]
+        ] = await Promise.all([
             childRun({}, String(`
 jslint.jstestDescribe("aa", function () {
     jslint.jstestIt("bb", jslint.noop);
@@ -3029,13 +3422,57 @@ jslint.jstestDescribe("aa", function () {
 jslint.jstestDescribe("aa", function () {
     jslint.jstestIt("bb", jslint.noop);
 });
+            `)),
+            childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", jslint.noop);
+    throw undefined;
+});
+            `)),
+            childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        setTimeout(process.exit, 100);
+        return new Promise(jslint.noop);
+    });
+    throw new Error("aa body broke");
+});
             `))
         ]);
-        assertJsonEqual([exitCode, exitCode2], [1, 1]);
+        assertJsonEqual(
+            [exitCode, exitCode2, exitCode3, exitCode4],
+            [1, 1, 1, 2]
+        );
         assertMatch(stderr, /1\. test it - bb\b[\s\S]*2\. test it - jstestDescribe body\nError: aa body broke\n[\s\S]*tests total {2}- 2\n {2}tests failed - 1\n/);
         assertOrThrow(stderr2.includes(
             "test it - jstestDescribe body\nSyntaxError: Invalid regular"
         ), stderr2);
+        assertMatch(stderr3, /2\. test it - jstestDescribe body\nundefined\b[\s\S]*tests failed - 1\n/);
+        assertMatch(stderr4, /test it pending - aa - bb\n[\s\S]*test it failed - aa - jstestDescribe body\nError: aa body broke\n/);
+    });
+    jstestIt((
+        "test jstestDescribe-concurrent handling-behavior"
+    ), async function () {
+
+// A describe's tests run concurrently: bb waits on an event cc emits, which
+// hangs if they run one after another.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+import {EventEmitter} from "node:events";
+const ee = new EventEmitter();
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        return new Promise(function (resolve) {
+            ee.once("go", resolve);
+        });
+    });
+    jslint.jstestIt("cc", function () {
+        ee.emit("go");
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 0);
+        assertMatch(stderr, /tests total {2}- 2\n {2}tests failed - 0\n/);
     });
     jstestIt((
         "test jstestDescribe-order handling-behavior"
@@ -3135,6 +3572,33 @@ jslint.jstestIt("cc", jslint.noop);
         });
     });
     jstestIt((
+        "test jstestIt-late-filtered handling-behavior"
+    ), async function () {
+
+// A late jstestIt throws even when the filter would skip it, so a filter never
+// hides a test registered after its describe settled.
+
+        const [exitCode, stderr] = await childRun({
+            npm_config_mode_test_filter: "^aa - bb$"
+        }, String(`
+jslint.jstestDescribe("aa", function () {
+    setTimeout(function () {
+        jslint.jstestIt("cc", jslint.noop);
+    }, 10);
+    jslint.jstestIt("bb", function () {
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 50);
+        });
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertOrThrow(stderr.includes(
+            "jstestIt \"cc\" called outside a jstestDescribe body, or after" +
+            " it settled"
+        ), stderr);
+    });
+    jstestIt((
         "test jstestIt-mode-pass handling-behavior"
     ), async function () {
 
@@ -3149,6 +3613,45 @@ jslint.jstestDescribe("aa", function () {
         `));
         assertJsonEqual(exitCode, 0);
         assertMatch(stderr, /\u2714 1\. test it - bb\b[\s\S]*tests total {2}- 1\n {2}tests failed - 0\n/);
+    });
+    jstestIt((
+        "test jstestIt-throw-non-error handling-behavior"
+    ), async function () {
+
+// A test that throws undefined or a string, or rejects with no reason, fails
+// and prints what it threw, without crashing the runner's report. The exit
+// report prints a string too, for a failure a hung sibling kept unprinted.
+
+        const [[exitCode, stderr], [exitCode2, stderr2]] = await Promise.all([
+            childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        throw undefined;
+    });
+    jslint.jstestIt("cc", function () {
+        return Promise.reject();
+    });
+    jslint.jstestIt("dd", function () {
+        throw "dd string";
+    });
+});
+            `)),
+            childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        throw "bb string";
+    });
+    jslint.jstestIt("cc", function () {
+        setTimeout(process.exit, 100);
+        return new Promise(jslint.noop);
+    });
+});
+            `))
+        ]);
+        assertJsonEqual([exitCode, exitCode2], [3, 2]);
+        assertMatch(stderr, /1\. test it - bb\nundefined\b[\s\S]*2\. test it - cc\nundefined\b[\s\S]*3\. test it - dd\ndd string\b[\s\S]*tests failed - 3\n/);
+        assertOrThrow(!stderr.includes("TypeError"), stderr);
+        assertMatch(stderr2, /test it failed - aa - bb\nbb string\n/);
     });
     jstestIt((
         "test jstestOnExit-crash handling-behavior"
@@ -3226,12 +3729,35 @@ jslint.jstestDescribe("aa", function () {
         );
     });
     jstestIt((
+        "test jstestOnExit-crash-handled handling-behavior"
+    ), async function () {
+
+// A user's own uncaughtException handler lets a test that crashed mid-run
+// finish, and it still fails, since a test settles once.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+process.on("uncaughtException", jslint.noop);
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", function () {
+        setTimeout(function () {
+            throw new Error("bb handled boom");
+        }, 10);
+        return new Promise(function (resolve) {
+            setTimeout(resolve, 50);
+        });
+    });
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertMatch(stderr, /1\. test it - bb\nError: bb handled boom\n[\s\S]*tests failed - 1\n/);
+    });
+    jstestIt((
         "test jstestOnExit-pending handling-behavior"
     ), async function () {
 
 // A test still pending at exit counts as failed, in red, though its describe
-// never prints. With nothing alive, the hang exits at once, since jstest's own
-// timer is unref'd; else <childRun>'s 10 s watchdog kills it.
+// never prints. With nothing alive, the hang exits at once, since jstest keeps
+// no timer; else <childRun>'s 10 s watchdog kills it.
 
         const [exitCode, stderr] = await childRun({}, String(`
 jslint.jstestDescribe("aa", function () {
@@ -3275,12 +3801,13 @@ jslint.jstestDescribe("aa", function () {
     ), function () {
 
 // A sorted list returns nothing. An unsorted pair or a duplicate returns one
-// failed result, for the first bad pair only.
+// failed result, for the first bad pair only. A non-string name fails too.
 
         assertJsonEqual([
             ["", "aa", "bb"],
             ["aa", "cc", "bb", "aa"],
-            ["aa", "aa"]
+            ["aa", "aa"],
+            [undefined, "bb"]
         ].map(function (descriptionList) {
             const failure = jstestOrderCheck(descriptionList);
             return failure && [failure[0].message, failure[1]];
@@ -3291,6 +3818,9 @@ jslint.jstestDescribe("aa", function () {
                 "jstestDescribe and jstestIt descriptions in ASCII order"
             ], [
                 "duplicate description \"aa\"",
+                "jstestDescribe and jstestIt descriptions in ASCII order"
+            ], [
+                "\"bb\" must sort before undefined",
                 "jstestDescribe and jstestIt descriptions in ASCII order"
             ]
         ]);
@@ -3303,11 +3833,34 @@ jslint.jstestDescribe("aa", function () {
 // The report lists this test, still running, as pending, and changes nothing,
 // since mid-run every running test is pending.
 
-        assertOrThrow(jstestReport().includes(
+        assertOrThrow(jstestReport().text.includes(
             ". test it pending - test jstestXxx handling-behavior" +
             " - test jstestReport handling-behavior\n"
         ));
         assertJsonEqual(process.exitCode, exitCode);
+    });
+    jstestIt((
+        "test jstestReport-numbering handling-behavior"
+    ), async function () {
+
+// The exit report numbers on from the tests already printed, and leaves out a
+// passed test whose describe never printed, here ee beside its hung sibling.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", jslint.noop);
+});
+jslint.jstestDescribe("cc", function () {
+    jslint.jstestIt("dd", function () {
+        setTimeout(process.exit, 100);
+        return new Promise(jslint.noop);
+    });
+    jslint.jstestIt("ee", jslint.noop);
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertMatch(stderr, /1\. test it - bb\b[\s\S]*✘ 2\. test it pending - cc - dd\n/);
+        assertOrThrow(!stderr.includes("cc - ee"), stderr);
     });
 });
 
