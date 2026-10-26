@@ -2789,107 +2789,107 @@ body {
 <pre><span class="lineno"><a href="#line_2624" id="line_2624"> 2624.</a></span><span class="count                ">      1</span><span>            /^ {4}at (?:(?:Object\.)?([\w.]+).*? \()?.*?jslint\.mjs:(\d+):/gm</span></pre>
 <pre><span class="lineno"><a href="#line_2625" id="line_2625"> 2625.</a></span><span class="count                ">      1</span><span>        );</span></pre>
 <pre><span class="lineno"><a href="#line_2626" id="line_2626"> 2626.</a></span><span class="count                ">      1</span><span>        const stackTraceLimit = Error.stackTraceLimit;</span></pre>
-<pre><span class="lineno"><a href="#line_2627" id="line_2627"> 2627.</a></span><span class="count                ">    735</span><span>        function fixturePush(list, cause, anchor) {</span></pre>
-<pre><span class="lineno"><a href="#line_2628" id="line_2628"> 2628.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2629" id="line_2629"> 2629.</a></span><span class="count                ">    735</span><span>// This function will push to &lt;list&gt; the fixture &lt;cause&gt;, whose block sits</span></pre>
-<pre><span class="lineno"><a href="#line_2630" id="line_2630"> 2630.</a></span><span class="count                ">    735</span><span>// directly above the code at offset &lt;anchor&gt; in jslint.mjs.</span></pre>
-<pre><span class="lineno"><a href="#line_2631" id="line_2631"> 2631.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2632" id="line_2632"> 2632.</a></span><span class="count                ">    735</span><span>            const line = (</span></pre>
-<pre><span class="lineno"><a href="#line_2633" id="line_2633"> 2633.</a></span><span class="count                ">    735</span><span>                sourceJslintMjs.slice(0, anchor).match(/\n/g).length + 1</span></pre>
-<pre><span class="lineno"><a href="#line_2634" id="line_2634"> 2634.</a></span><span class="count                ">    735</span><span>            );</span></pre>
-<pre><span class="lineno"><a href="#line_2635" id="line_2635"> 2635.</a></span><span class="count                ">    735</span><span>            const [source, fn, code, aa, column] = cause;</span></pre>
-<pre><span class="lineno"><a href="#line_2636" id="line_2636"> 2636.</a></span><span class="count                ">    735</span><span>            const {warnings} = jslint.jslint(source, {</span></pre>
-<pre><span class="lineno"><a href="#line_2637" id="line_2637"> 2637.</a></span><span class="count                ">    735</span><span>                beta: true,</span></pre>
-<pre><span class="lineno"><a href="#line_2638" id="line_2638"> 2638.</a></span><span class="count                ">    735</span><span>                trace: true</span></pre>
-<pre><span class="lineno"><a href="#line_2639" id="line_2639"> 2639.</a></span><span class="count                ">    735</span><span>            });</span></pre>
-<pre><span class="lineno"><a href="#line_2640" id="line_2640"> 2640.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2641" id="line_2641"> 2641.</a></span><span class="count                ">    735</span><span>// List each warning with its frames in jslint.mjs, by the stack that option</span></pre>
-<pre><span class="lineno"><a href="#line_2642" id="line_2642"> 2642.</a></span><span class="count                ">    735</span><span>// trace records, as [name, line] innermost first, and the frames above the</span></pre>
-<pre><span class="lineno"><a href="#line_2643" id="line_2643"> 2643.</a></span><span class="count                ">    735</span><span>// raisers, whose first is the line that raised it. An anonymous function's</span></pre>
-<pre><span class="lineno"><a href="#line_2644" id="line_2644"> 2644.</a></span><span class="count                ">    735</span><span>// frame has no name.</span></pre>
-<pre><span class="lineno"><a href="#line_2645" id="line_2645"> 2645.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2646" id="line_2646"> 2646.</a></span><span class="count                ">   1860</span><span>            const warningsRaised = warnings.map(function (warning) {</span></pre>
-<pre><span class="lineno"><a href="#line_2647" id="line_2647"> 2647.</a></span><span class="count                ">   1860</span><span>                const frameList = Array.from(</span></pre>
-<pre><span class="lineno"><a href="#line_2648" id="line_2648"> 2648.</a></span><span class="count                ">   1860</span><span>                    String(warning.stack_trace).matchAll(rgxFrame),</span></pre>
-<pre><span class="lineno"><a href="#line_2649" id="line_2649"> 2649.</a></span><span class="count                ">  19667</span><span>                    function ([ignore, name, line]) {</span></pre>
-<pre><span class="lineno"><a href="#line_2650" id="line_2650"> 2650.</a></span><span class="count                ">  19667</span><span>                        return [name, Number(line)];</span></pre>
-<pre><span class="lineno"><a href="#line_2651" id="line_2651"> 2651.</a></span><span class="count                ">  19667</span><span>                    }</span></pre>
-<pre><span class="lineno"><a href="#line_2652" id="line_2652"> 2652.</a></span><span class="count                ">   1860</span><span>                );</span></pre>
-<pre><span class="lineno"><a href="#line_2653" id="line_2653"> 2653.</a></span><span class="count                ">   1860</span><span>                return {</span></pre>
-<pre><span class="lineno"><a href="#line_2654" id="line_2654"> 2654.</a></span><span class="count                ">  19667</span><span>                    aboveList: frameList.filter(function ([name]) {</span></pre>
-<pre><span class="lineno"><a href="#line_2655" id="line_2655"> 2655.</a></span><span class="count                ">  19667</span><span>                        return !raiserList.includes(name);</span></pre>
-<pre><span class="lineno"><a href="#line_2656" id="line_2656"> 2656.</a></span><span class="count                ">  19667</span><span>                    }),</span></pre>
-<pre><span class="lineno"><a href="#line_2657" id="line_2657"> 2657.</a></span><span class="count                ">   1860</span><span>                    frameList,</span></pre>
-<pre><span class="lineno"><a href="#line_2658" id="line_2658"> 2658.</a></span><span class="count                ">   1860</span><span>                    warning</span></pre>
-<pre><span class="lineno"><a href="#line_2659" id="line_2659"> 2659.</a></span><span class="count                ">   1860</span><span>                };</span></pre>
-<pre><span class="lineno"><a href="#line_2660" id="line_2660"> 2660.</a></span><span class="count                ">   1860</span><span>            });</span></pre>
-<pre><span class="lineno"><a href="#line_2661" id="line_2661"> 2661.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2662" id="line_2662"> 2662.</a></span><span class="count                ">    735</span><span>// A second warning on one token is dropped, so check the warnings the user</span></pre>
-<pre><span class="lineno"><a href="#line_2663" id="line_2663"> 2663.</a></span><span class="count                ">    735</span><span>// sees, never the ones raised.</span></pre>
-<pre><span class="lineno"><a href="#line_2664" id="line_2664"> 2664.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2665" id="line_2665"> 2665.</a></span><span class="count                ">   1860</span><span>            const warningsShown = warningsRaised.filter(function ({warning}) {</span></pre>
-<pre><span class="lineno"><a href="#line_2666" id="line_2666"> 2666.</a></span><span class="count                ">   1860</span><span>                return (</span></pre>
-<pre><span class="lineno"><a href="#line_2667" id="line_2667"> 2667.</a></span><span class="count                ">    610</span><span>                    warning.code === code &amp;&amp;</span></pre>
-<pre><span class="lineno"><a href="#line_2668" id="line_2668"> 2668.</a></span><span class="count                ">    610</span><span>                    String(warning.b || warning.a || "") === aa &amp;&amp;</span></pre>
-<pre><span class="lineno"><a href="#line_2669" id="line_2669"> 2669.</a></span><span class="count                ">    588</span><span>                    warning.column === column</span></pre>
-<pre><span class="lineno"><a href="#line_2670" id="line_2670"> 2670.</a></span><span class="count                ">   1860</span><span>                );</span></pre>
-<pre><span class="lineno"><a href="#line_2671" id="line_2671"> 2671.</a></span><span class="count                ">   1860</span><span>            });</span></pre>
-<pre><span class="lineno"><a href="#line_2672" id="line_2672"> 2672.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2673" id="line_2673"> 2673.</a></span><span class="count                ">    735</span><span>// The shown warning raised through the code under the block.</span></pre>
-<pre><span class="lineno"><a href="#line_2674" id="line_2674"> 2674.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2675" id="line_2675"> 2675.</a></span><span class="count                ">    580</span><span>            const warningsVia = warningsShown.filter(function ({frameList}) {</span></pre>
-<pre><span class="lineno"><a href="#line_2676" id="line_2676"> 2676.</a></span><span class="count                ">   1863</span><span>                return frameList.some(function ([ignore, at]) {</span></pre>
-<pre><span class="lineno"><a href="#line_2677" id="line_2677"> 2677.</a></span><span class="count                ">   1863</span><span>                    return at === line;</span></pre>
-<pre><span class="lineno"><a href="#line_2678" id="line_2678"> 2678.</a></span><span class="count                ">   1863</span><span>                });</span></pre>
-<pre><span class="lineno"><a href="#line_2679" id="line_2679"> 2679.</a></span><span class="count                ">    580</span><span>            });</span></pre>
-<pre><span class="lineno"><a href="#line_2680" id="line_2680"> 2680.</a></span><span class="count                ">    735</span><span>            list.push({</span></pre>
-<pre><span class="lineno"><a href="#line_2681" id="line_2681"> 2681.</a></span><span class="count                ">    735</span><span>                anchor,</span></pre>
-<pre><span class="lineno"><a href="#line_2682" id="line_2682"> 2682.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2683" id="line_2683"> 2683.</a></span><span class="count                ">    735</span><span>// Name the line of the code under the block, so a failure points at it.</span></pre>
-<pre><span class="lineno"><a href="#line_2684" id="line_2684"> 2684.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2685" id="line_2685"> 2685.</a></span><span class="count                ">    735</span><span>                at: "jslint.mjs:" + line,</span></pre>
-<pre><span class="lineno"><a href="#line_2686" id="line_2686"> 2686.</a></span><span class="count                ">    735</span><span>                cause: JSON.stringify(cause),</span></pre>
-<pre><span class="lineno"><a href="#line_2687" id="line_2687"> 2687.</a></span><span class="count                ">    735</span><span>                code,</span></pre>
-<pre><span class="lineno"><a href="#line_2688" id="line_2688"> 2688.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2689" id="line_2689"> 2689.</a></span><span class="count                ">    735</span><span>// Validate no internal-error. A crash mid-walk still runs every branch before</span></pre>
-<pre><span class="lineno"><a href="#line_2690" id="line_2690"> 2690.</a></span><span class="count                ">    735</span><span>// it, so a coverage-check alone passes straight through one, and "0``" threw</span></pre>
-<pre><span class="lineno"><a href="#line_2691" id="line_2691"> 2691.</a></span><span class="count                ">    735</span><span>// in post_b_binary for years with its cause declared and green.</span></pre>
-<pre><span class="lineno"><a href="#line_2692" id="line_2692"> 2692.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2693" id="line_2693"> 2693.</a></span><span class="count                ">   1858</span><span>                codeless: warnings.some(function (warning) {</span></pre>
-<pre><span class="lineno"><a href="#line_2694" id="line_2694"> 2694.</a></span><span class="count                ">   1858</span><span>                    return warning.code === undefined;</span></pre>
-<pre><span class="lineno"><a href="#line_2695" id="line_2695"> 2695.</a></span><span class="count                ">   1858</span><span>                }),</span></pre>
-<pre><span class="lineno"><a href="#line_2696" id="line_2696"> 2696.</a></span><span class="count                ">    735</span><span>                fn,</span></pre>
-<pre><span class="lineno"><a href="#line_2697" id="line_2697"> 2697.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2698" id="line_2698"> 2698.</a></span><span class="count                ">    735</span><span>// A fixture has exactly 5 fields. Field 3 "(live)" marks a branch reached with</span></pre>
-<pre><span class="lineno"><a href="#line_2699" id="line_2699"> 2699.</a></span><span class="count                ">    735</span><span>// no warning of its own, documenting how, so it is not taken for deadcode. Any</span></pre>
-<pre><span class="lineno"><a href="#line_2700" id="line_2700"> 2700.</a></span><span class="count                ">    735</span><span>// other field 3 must be a warning shown below, so a typo fails there.</span></pre>
-<pre><span class="lineno"><a href="#line_2701" id="line_2701"> 2701.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2702" id="line_2702"> 2702.</a></span><span class="count                ">    734</span><span>                known: cause.length === 5 &amp;&amp; (</span></pre>
-<pre><span class="lineno"><a href="#line_2703" id="line_2703"> 2703.</a></span><span class="count                ">    734</span><span>                    code !== "(live)" || (aa === "" &amp;&amp; column === 0)</span></pre>
-<pre><span class="lineno"><a href="#line_2704" id="line_2704"> 2704.</a></span><span class="count                ">    734</span><span>                ),</span></pre>
-<pre><span class="lineno"><a href="#line_2705" id="line_2705"> 2705.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2706" id="line_2706"> 2706.</a></span><span class="count                ">    735</span><span>// Field 2 of a warning names the function that raised it, the first named one</span></pre>
-<pre><span class="lineno"><a href="#line_2707" id="line_2707"> 2707.</a></span><span class="count                ">    735</span><span>// above the raisers in the stack that option trace records, so a fixture may</span></pre>
-<pre><span class="lineno"><a href="#line_2708" id="line_2708"> 2708.</a></span><span class="count                ">    735</span><span>// be filed up the stack, above the call that leads down to the raise site.</span></pre>
-<pre><span class="lineno"><a href="#line_2709" id="line_2709"> 2709.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2710" id="line_2710"> 2710.</a></span><span class="count                ">    572</span><span>                raise: warningsVia[0]?.aboveList[0],</span></pre>
-<pre><span class="lineno"><a href="#line_2711" id="line_2711"> 2711.</a></span><span class="count                ">    612</span><span>                raiser: warningsVia[0]?.aboveList.find(function ([name]) {</span></pre>
-<pre><span class="lineno"><a href="#line_2712" id="line_2712"> 2712.</a></span><span class="count                ">    612</span><span>                    return name;</span></pre>
-<pre><span class="lineno"><a href="#line_2713" id="line_2713"> 2713.</a></span><span class="count                ">    612</span><span>                })?.[0],</span></pre>
-<pre><span class="lineno"><a href="#line_2714" id="line_2714"> 2714.</a></span><span class="count                ">    581</span><span>                shown: code === "(live)" || warningsShown.length &gt; 0,</span></pre>
-<pre><span class="lineno"><a href="#line_2715" id="line_2715"> 2715.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2716" id="line_2716"> 2716.</a></span><span class="count                ">    735</span><span>// A "(live)" block must not sit on a raise whose warning shows, since a</span></pre>
-<pre><span class="lineno"><a href="#line_2717" id="line_2717"> 2717.</a></span><span class="count                ">    735</span><span>// warning fixture checks more.</span></pre>
-<pre><span class="lineno"><a href="#line_2718" id="line_2718"> 2718.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2719" id="line_2719"> 2719.</a></span><span class="count                ">    346</span><span>                silent: code !== "(live)" || warningsRaised.every(function ({</span></pre>
-<pre><span class="lineno"><a href="#line_2720" id="line_2720"> 2720.</a></span><span class="count                ">    346</span><span>                    aboveList</span></pre>
-<pre><span class="lineno"><a href="#line_2721" id="line_2721"> 2721.</a></span><span class="count                ">    346</span><span>                }) {</span></pre>
-<pre><span class="lineno"><a href="#line_2722" id="line_2722"> 2722.</a></span><span class="count                ">    345</span><span>                    return aboveList[0]?.[1] !== line;</span></pre>
-<pre><span class="lineno"><a href="#line_2723" id="line_2723"> 2723.</a></span><span class="count                ">    346</span><span>                }),</span></pre>
-<pre><span class="lineno"><a href="#line_2724" id="line_2724"> 2724.</a></span><span class="count                ">    735</span><span>                source,</span></pre>
-<pre><span class="lineno"><a href="#line_2725" id="line_2725"> 2725.</a></span><span class="count                ">    581</span><span>                via: code === "(live)" || warningsVia.length &gt; 0</span></pre>
-<pre><span class="lineno"><a href="#line_2726" id="line_2726"> 2726.</a></span><span class="count                ">    735</span><span>            });</span></pre>
-<pre><span class="lineno"><a href="#line_2727" id="line_2727"> 2727.</a></span><span class="count                ">    735</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_2627" id="line_2627"> 2627.</a></span><span class="count                ">    765</span><span>        function fixturePush(list, cause, anchor) {</span></pre>
+<pre><span class="lineno"><a href="#line_2628" id="line_2628"> 2628.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2629" id="line_2629"> 2629.</a></span><span class="count                ">    765</span><span>// This function will push to &lt;list&gt; the fixture &lt;cause&gt;, whose block sits</span></pre>
+<pre><span class="lineno"><a href="#line_2630" id="line_2630"> 2630.</a></span><span class="count                ">    765</span><span>// directly above the code at offset &lt;anchor&gt; in jslint.mjs.</span></pre>
+<pre><span class="lineno"><a href="#line_2631" id="line_2631"> 2631.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2632" id="line_2632"> 2632.</a></span><span class="count                ">    765</span><span>            const line = (</span></pre>
+<pre><span class="lineno"><a href="#line_2633" id="line_2633"> 2633.</a></span><span class="count                ">    765</span><span>                sourceJslintMjs.slice(0, anchor).match(/\n/g).length + 1</span></pre>
+<pre><span class="lineno"><a href="#line_2634" id="line_2634"> 2634.</a></span><span class="count                ">    765</span><span>            );</span></pre>
+<pre><span class="lineno"><a href="#line_2635" id="line_2635"> 2635.</a></span><span class="count                ">    765</span><span>            const [source, fn, code, aa, column] = cause;</span></pre>
+<pre><span class="lineno"><a href="#line_2636" id="line_2636"> 2636.</a></span><span class="count                ">    765</span><span>            const {warnings} = jslint.jslint(source, {</span></pre>
+<pre><span class="lineno"><a href="#line_2637" id="line_2637"> 2637.</a></span><span class="count                ">    765</span><span>                beta: true,</span></pre>
+<pre><span class="lineno"><a href="#line_2638" id="line_2638"> 2638.</a></span><span class="count                ">    765</span><span>                trace: true</span></pre>
+<pre><span class="lineno"><a href="#line_2639" id="line_2639"> 2639.</a></span><span class="count                ">    765</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_2640" id="line_2640"> 2640.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2641" id="line_2641"> 2641.</a></span><span class="count                ">    765</span><span>// List each warning with its frames in jslint.mjs, by the stack that option</span></pre>
+<pre><span class="lineno"><a href="#line_2642" id="line_2642"> 2642.</a></span><span class="count                ">    765</span><span>// trace records, as [name, line] innermost first, and the frames above the</span></pre>
+<pre><span class="lineno"><a href="#line_2643" id="line_2643"> 2643.</a></span><span class="count                ">    765</span><span>// raisers, whose first is the line that raised it. An anonymous function's</span></pre>
+<pre><span class="lineno"><a href="#line_2644" id="line_2644"> 2644.</a></span><span class="count                ">    765</span><span>// frame has no name.</span></pre>
+<pre><span class="lineno"><a href="#line_2645" id="line_2645"> 2645.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2646" id="line_2646"> 2646.</a></span><span class="count                ">   1918</span><span>            const warningsRaised = warnings.map(function (warning) {</span></pre>
+<pre><span class="lineno"><a href="#line_2647" id="line_2647"> 2647.</a></span><span class="count                ">   1918</span><span>                const frameList = Array.from(</span></pre>
+<pre><span class="lineno"><a href="#line_2648" id="line_2648"> 2648.</a></span><span class="count                ">   1918</span><span>                    String(warning.stack_trace).matchAll(rgxFrame),</span></pre>
+<pre><span class="lineno"><a href="#line_2649" id="line_2649"> 2649.</a></span><span class="count                ">  20226</span><span>                    function ([ignore, name, line]) {</span></pre>
+<pre><span class="lineno"><a href="#line_2650" id="line_2650"> 2650.</a></span><span class="count                ">  20226</span><span>                        return [name, Number(line)];</span></pre>
+<pre><span class="lineno"><a href="#line_2651" id="line_2651"> 2651.</a></span><span class="count                ">  20226</span><span>                    }</span></pre>
+<pre><span class="lineno"><a href="#line_2652" id="line_2652"> 2652.</a></span><span class="count                ">   1918</span><span>                );</span></pre>
+<pre><span class="lineno"><a href="#line_2653" id="line_2653"> 2653.</a></span><span class="count                ">   1918</span><span>                return {</span></pre>
+<pre><span class="lineno"><a href="#line_2654" id="line_2654"> 2654.</a></span><span class="count                ">  20226</span><span>                    aboveList: frameList.filter(function ([name]) {</span></pre>
+<pre><span class="lineno"><a href="#line_2655" id="line_2655"> 2655.</a></span><span class="count                ">  20226</span><span>                        return !raiserList.includes(name);</span></pre>
+<pre><span class="lineno"><a href="#line_2656" id="line_2656"> 2656.</a></span><span class="count                ">  20226</span><span>                    }),</span></pre>
+<pre><span class="lineno"><a href="#line_2657" id="line_2657"> 2657.</a></span><span class="count                ">   1918</span><span>                    frameList,</span></pre>
+<pre><span class="lineno"><a href="#line_2658" id="line_2658"> 2658.</a></span><span class="count                ">   1918</span><span>                    warning</span></pre>
+<pre><span class="lineno"><a href="#line_2659" id="line_2659"> 2659.</a></span><span class="count                ">   1918</span><span>                };</span></pre>
+<pre><span class="lineno"><a href="#line_2660" id="line_2660"> 2660.</a></span><span class="count                ">   1918</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_2661" id="line_2661"> 2661.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2662" id="line_2662"> 2662.</a></span><span class="count                ">    765</span><span>// A second warning on one token is dropped, so check the warnings the user</span></pre>
+<pre><span class="lineno"><a href="#line_2663" id="line_2663"> 2663.</a></span><span class="count                ">    765</span><span>// sees, never the ones raised.</span></pre>
+<pre><span class="lineno"><a href="#line_2664" id="line_2664"> 2664.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2665" id="line_2665"> 2665.</a></span><span class="count                ">   1918</span><span>            const warningsShown = warningsRaised.filter(function ({warning}) {</span></pre>
+<pre><span class="lineno"><a href="#line_2666" id="line_2666"> 2666.</a></span><span class="count                ">   1918</span><span>                return (</span></pre>
+<pre><span class="lineno"><a href="#line_2667" id="line_2667"> 2667.</a></span><span class="count                ">    614</span><span>                    warning.code === code &amp;&amp;</span></pre>
+<pre><span class="lineno"><a href="#line_2668" id="line_2668"> 2668.</a></span><span class="count                ">    614</span><span>                    String(warning.b || warning.a || "") === aa &amp;&amp;</span></pre>
+<pre><span class="lineno"><a href="#line_2669" id="line_2669"> 2669.</a></span><span class="count                ">    592</span><span>                    warning.column === column</span></pre>
+<pre><span class="lineno"><a href="#line_2670" id="line_2670"> 2670.</a></span><span class="count                ">   1918</span><span>                );</span></pre>
+<pre><span class="lineno"><a href="#line_2671" id="line_2671"> 2671.</a></span><span class="count                ">   1918</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_2672" id="line_2672"> 2672.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2673" id="line_2673"> 2673.</a></span><span class="count                ">    765</span><span>// The shown warning raised through the code under the block.</span></pre>
+<pre><span class="lineno"><a href="#line_2674" id="line_2674"> 2674.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2675" id="line_2675"> 2675.</a></span><span class="count                ">    584</span><span>            const warningsVia = warningsShown.filter(function ({frameList}) {</span></pre>
+<pre><span class="lineno"><a href="#line_2676" id="line_2676"> 2676.</a></span><span class="count                ">   1872</span><span>                return frameList.some(function ([ignore, at]) {</span></pre>
+<pre><span class="lineno"><a href="#line_2677" id="line_2677"> 2677.</a></span><span class="count                ">   1872</span><span>                    return at === line;</span></pre>
+<pre><span class="lineno"><a href="#line_2678" id="line_2678"> 2678.</a></span><span class="count                ">   1872</span><span>                });</span></pre>
+<pre><span class="lineno"><a href="#line_2679" id="line_2679"> 2679.</a></span><span class="count                ">    584</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_2680" id="line_2680"> 2680.</a></span><span class="count                ">    765</span><span>            list.push({</span></pre>
+<pre><span class="lineno"><a href="#line_2681" id="line_2681"> 2681.</a></span><span class="count                ">    765</span><span>                anchor,</span></pre>
+<pre><span class="lineno"><a href="#line_2682" id="line_2682"> 2682.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2683" id="line_2683"> 2683.</a></span><span class="count                ">    765</span><span>// Name the line of the code under the block, so a failure points at it.</span></pre>
+<pre><span class="lineno"><a href="#line_2684" id="line_2684"> 2684.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2685" id="line_2685"> 2685.</a></span><span class="count                ">    765</span><span>                at: "jslint.mjs:" + line,</span></pre>
+<pre><span class="lineno"><a href="#line_2686" id="line_2686"> 2686.</a></span><span class="count                ">    765</span><span>                cause: JSON.stringify(cause),</span></pre>
+<pre><span class="lineno"><a href="#line_2687" id="line_2687"> 2687.</a></span><span class="count                ">    765</span><span>                code,</span></pre>
+<pre><span class="lineno"><a href="#line_2688" id="line_2688"> 2688.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2689" id="line_2689"> 2689.</a></span><span class="count                ">    765</span><span>// Validate no internal-error. A crash mid-walk still runs every branch before</span></pre>
+<pre><span class="lineno"><a href="#line_2690" id="line_2690"> 2690.</a></span><span class="count                ">    765</span><span>// it, so a coverage-check alone passes straight through one, and "0``" threw</span></pre>
+<pre><span class="lineno"><a href="#line_2691" id="line_2691"> 2691.</a></span><span class="count                ">    765</span><span>// in post_b_binary for years with its cause declared and green.</span></pre>
+<pre><span class="lineno"><a href="#line_2692" id="line_2692"> 2692.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2693" id="line_2693"> 2693.</a></span><span class="count                ">   1916</span><span>                codeless: warnings.some(function (warning) {</span></pre>
+<pre><span class="lineno"><a href="#line_2694" id="line_2694"> 2694.</a></span><span class="count                ">   1916</span><span>                    return warning.code === undefined;</span></pre>
+<pre><span class="lineno"><a href="#line_2695" id="line_2695"> 2695.</a></span><span class="count                ">   1916</span><span>                }),</span></pre>
+<pre><span class="lineno"><a href="#line_2696" id="line_2696"> 2696.</a></span><span class="count                ">    765</span><span>                fn,</span></pre>
+<pre><span class="lineno"><a href="#line_2697" id="line_2697"> 2697.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2698" id="line_2698"> 2698.</a></span><span class="count                ">    765</span><span>// A fixture has exactly 5 fields. Field 3 "(live)" marks a branch reached with</span></pre>
+<pre><span class="lineno"><a href="#line_2699" id="line_2699"> 2699.</a></span><span class="count                ">    765</span><span>// no warning of its own, documenting how, so it is not taken for deadcode. Any</span></pre>
+<pre><span class="lineno"><a href="#line_2700" id="line_2700"> 2700.</a></span><span class="count                ">    765</span><span>// other field 3 must be a warning shown below, so a typo fails there.</span></pre>
+<pre><span class="lineno"><a href="#line_2701" id="line_2701"> 2701.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2702" id="line_2702"> 2702.</a></span><span class="count                ">    764</span><span>                known: cause.length === 5 &amp;&amp; (</span></pre>
+<pre><span class="lineno"><a href="#line_2703" id="line_2703"> 2703.</a></span><span class="count                ">    764</span><span>                    code !== "(live)" || (aa === "" &amp;&amp; column === 0)</span></pre>
+<pre><span class="lineno"><a href="#line_2704" id="line_2704"> 2704.</a></span><span class="count                ">    764</span><span>                ),</span></pre>
+<pre><span class="lineno"><a href="#line_2705" id="line_2705"> 2705.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2706" id="line_2706"> 2706.</a></span><span class="count                ">    765</span><span>// Field 2 of a warning names the function that raised it, the first named one</span></pre>
+<pre><span class="lineno"><a href="#line_2707" id="line_2707"> 2707.</a></span><span class="count                ">    765</span><span>// above the raisers in the stack that option trace records, so a fixture may</span></pre>
+<pre><span class="lineno"><a href="#line_2708" id="line_2708"> 2708.</a></span><span class="count                ">    765</span><span>// be filed up the stack, above the call that leads down to the raise site.</span></pre>
+<pre><span class="lineno"><a href="#line_2709" id="line_2709"> 2709.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2710" id="line_2710"> 2710.</a></span><span class="count                ">    576</span><span>                raise: warningsVia[0]?.aboveList[0],</span></pre>
+<pre><span class="lineno"><a href="#line_2711" id="line_2711"> 2711.</a></span><span class="count                ">    616</span><span>                raiser: warningsVia[0]?.aboveList.find(function ([name]) {</span></pre>
+<pre><span class="lineno"><a href="#line_2712" id="line_2712"> 2712.</a></span><span class="count                ">    616</span><span>                    return name;</span></pre>
+<pre><span class="lineno"><a href="#line_2713" id="line_2713"> 2713.</a></span><span class="count                ">    616</span><span>                })?.[0],</span></pre>
+<pre><span class="lineno"><a href="#line_2714" id="line_2714"> 2714.</a></span><span class="count                ">    585</span><span>                shown: code === "(live)" || warningsShown.length &gt; 0,</span></pre>
+<pre><span class="lineno"><a href="#line_2715" id="line_2715"> 2715.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2716" id="line_2716"> 2716.</a></span><span class="count                ">    765</span><span>// A "(live)" block must not sit on a raise whose warning shows, since a</span></pre>
+<pre><span class="lineno"><a href="#line_2717" id="line_2717"> 2717.</a></span><span class="count                ">    765</span><span>// warning fixture checks more.</span></pre>
+<pre><span class="lineno"><a href="#line_2718" id="line_2718"> 2718.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2719" id="line_2719"> 2719.</a></span><span class="count                ">    393</span><span>                silent: code !== "(live)" || warningsRaised.every(function ({</span></pre>
+<pre><span class="lineno"><a href="#line_2720" id="line_2720"> 2720.</a></span><span class="count                ">    393</span><span>                    aboveList</span></pre>
+<pre><span class="lineno"><a href="#line_2721" id="line_2721"> 2721.</a></span><span class="count                ">    393</span><span>                }) {</span></pre>
+<pre><span class="lineno"><a href="#line_2722" id="line_2722"> 2722.</a></span><span class="count                ">    392</span><span>                    return aboveList[0]?.[1] !== line;</span></pre>
+<pre><span class="lineno"><a href="#line_2723" id="line_2723"> 2723.</a></span><span class="count                ">    393</span><span>                }),</span></pre>
+<pre><span class="lineno"><a href="#line_2724" id="line_2724"> 2724.</a></span><span class="count                ">    765</span><span>                source,</span></pre>
+<pre><span class="lineno"><a href="#line_2725" id="line_2725"> 2725.</a></span><span class="count                ">    585</span><span>                via: code === "(live)" || warningsVia.length &gt; 0</span></pre>
+<pre><span class="lineno"><a href="#line_2726" id="line_2726"> 2726.</a></span><span class="count                ">    765</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_2727" id="line_2727"> 2727.</a></span><span class="count                ">    765</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_2728" id="line_2728"> 2728.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2729" id="line_2729"> 2729.</a></span><span class="count                ">      1</span><span>// Keep every frame, since a fixture filed up the stack can sit past V8's</span></pre>
 <pre><span class="lineno"><a href="#line_2730" id="line_2730"> 2730.</a></span><span class="count                ">      1</span><span>// default of 10.</span></pre>
@@ -2898,55 +2898,55 @@ body {
 <pre><span class="lineno"><a href="#line_2733" id="line_2733"> 2733.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2734" id="line_2734"> 2734.</a></span><span class="count                ">      1</span><span>        sourceJslintMjs.replace((</span></pre>
 <pre><span class="lineno"><a href="#line_2735" id="line_2735"> 2735.</a></span><span class="count                ">      1</span><span>            /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?) *?\S/g</span></pre>
-<pre><span class="lineno"><a href="#line_2736" id="line_2736"> 2736.</a></span><span class="count                ">    390</span><span>        ), function (match0, header, causeList, footer, offset) {</span></pre>
-<pre><span class="lineno"><a href="#line_2737" id="line_2737"> 2737.</a></span><span class="count                ">    390</span><span>            const rgxAnchor = (/(?:\/\/.*\n\s*)*(?:[?:]\s*)?/y);</span></pre>
-<pre><span class="lineno"><a href="#line_2738" id="line_2738"> 2738.</a></span><span class="count                ">    390</span><span>            let tmp;</span></pre>
-<pre><span class="lineno"><a href="#line_2739" id="line_2739"> 2739.</a></span><span class="count                ">    390</span><span>            // console.error(match0);</span></pre>
-<pre><span class="lineno"><a href="#line_2740" id="line_2740"> 2740.</a></span><span class="count                ">    390</span><span>            // Validate header.</span></pre>
-<pre><span class="lineno"><a href="#line_2741" id="line_2741"> 2741.</a></span><span class="count                ">    390</span><span>            assertOrThrow(header === "\n\n// test_cause:\n", match0);</span></pre>
-<pre><span class="lineno"><a href="#line_2742" id="line_2742"> 2742.</a></span><span class="count                ">    390</span><span>            // Validate footer.</span></pre>
-<pre><span class="lineno"><a href="#line_2743" id="line_2743"> 2743.</a></span><span class="count                ">    390</span><span>            assertOrThrow(footer === "\n\n", match0);</span></pre>
-<pre><span class="lineno"><a href="#line_2744" id="line_2744"> 2744.</a></span><span class="count                ">    390</span><span>            // Validate causeList.</span></pre>
-<pre><span class="lineno"><a href="#line_2745" id="line_2745"> 2745.</a></span><span class="count                ">    390</span><span>            causeList = causeList.replace((</span></pre>
-<pre><span class="lineno"><a href="#line_2746" id="line_2746"> 2746.</a></span><span class="count                ">    390</span><span>                /^\/\/ /gm</span></pre>
-<pre><span class="lineno"><a href="#line_2747" id="line_2747"> 2747.</a></span><span class="count                ">    390</span><span>            ), "").replace((</span></pre>
-<pre><span class="lineno"><a href="#line_2748" id="line_2748"> 2748.</a></span><span class="count                ">    390</span><span>                /^\["\n([\S\s]*?)\n"(,.*?)$/gm</span></pre>
+<pre><span class="lineno"><a href="#line_2736" id="line_2736"> 2736.</a></span><span class="count                ">    413</span><span>        ), function (match0, header, causeList, footer, offset) {</span></pre>
+<pre><span class="lineno"><a href="#line_2737" id="line_2737"> 2737.</a></span><span class="count                ">    413</span><span>            const rgxAnchor = (/(?:\/\/.*\n\s*)*(?:[?:]\s*)?/y);</span></pre>
+<pre><span class="lineno"><a href="#line_2738" id="line_2738"> 2738.</a></span><span class="count                ">    413</span><span>            let tmp;</span></pre>
+<pre><span class="lineno"><a href="#line_2739" id="line_2739"> 2739.</a></span><span class="count                ">    413</span><span>            // console.error(match0);</span></pre>
+<pre><span class="lineno"><a href="#line_2740" id="line_2740"> 2740.</a></span><span class="count                ">    413</span><span>            // Validate header.</span></pre>
+<pre><span class="lineno"><a href="#line_2741" id="line_2741"> 2741.</a></span><span class="count                ">    413</span><span>            assertOrThrow(header === "\n\n// test_cause:\n", match0);</span></pre>
+<pre><span class="lineno"><a href="#line_2742" id="line_2742"> 2742.</a></span><span class="count                ">    413</span><span>            // Validate footer.</span></pre>
+<pre><span class="lineno"><a href="#line_2743" id="line_2743"> 2743.</a></span><span class="count                ">    413</span><span>            assertOrThrow(footer === "\n\n", match0);</span></pre>
+<pre><span class="lineno"><a href="#line_2744" id="line_2744"> 2744.</a></span><span class="count                ">    413</span><span>            // Validate causeList.</span></pre>
+<pre><span class="lineno"><a href="#line_2745" id="line_2745"> 2745.</a></span><span class="count                ">    413</span><span>            causeList = causeList.replace((</span></pre>
+<pre><span class="lineno"><a href="#line_2746" id="line_2746"> 2746.</a></span><span class="count                ">    413</span><span>                /^\/\/ /gm</span></pre>
+<pre><span class="lineno"><a href="#line_2747" id="line_2747"> 2747.</a></span><span class="count                ">    413</span><span>            ), "").replace((</span></pre>
+<pre><span class="lineno"><a href="#line_2748" id="line_2748"> 2748.</a></span><span class="count                ">    413</span><span>                /^\["\n([\S\s]*?)\n"(,.*?)$/gm</span></pre>
 <pre><span class="lineno"><a href="#line_2749" id="line_2749"> 2749.</a></span><span class="count                ">     74</span><span>            ), function (ignore, source, param) {</span></pre>
 <pre><span class="lineno"><a href="#line_2750" id="line_2750"> 2750.</a></span><span class="count                ">     74</span><span>                source = "[" + JSON.stringify(source) + param;</span></pre>
 <pre><span class="lineno"><a href="#line_2751" id="line_2751"> 2751.</a></span><span class="count                ">     74</span><span>                return source;</span></pre>
 <pre><span class="lineno"><a href="#line_2752" id="line_2752"> 2752.</a></span><span class="count                ">     74</span><span>            }).replace((</span></pre>
-<pre><span class="lineno"><a href="#line_2753" id="line_2753"> 2753.</a></span><span class="count                ">    390</span><span>                / \/\/jslint-ignore-line$/gm</span></pre>
-<pre><span class="lineno"><a href="#line_2754" id="line_2754"> 2754.</a></span><span class="count                ">    390</span><span>            ), "");</span></pre>
-<pre><span class="lineno"><a href="#line_2755" id="line_2755"> 2755.</a></span><span class="count                ">    720</span><span>            tmp = causeList.split("\n").map(function (cause) {</span></pre>
-<pre><span class="lineno"><a href="#line_2756" id="line_2756"> 2756.</a></span><span class="count                ">    720</span><span>                return (</span></pre>
-<pre><span class="lineno"><a href="#line_2757" id="line_2757"> 2757.</a></span><span class="count                ">    720</span><span>                    "[" +</span></pre>
-<pre><span class="lineno"><a href="#line_2758" id="line_2758"> 2758.</a></span><span class="count                ">   3600</span><span>                    JSON.parse(cause).map(function (elem) {</span></pre>
-<pre><span class="lineno"><a href="#line_2759" id="line_2759"> 2759.</a></span><span class="count                ">   3600</span><span>                        return JSON.stringify(elem);</span></pre>
-<pre><span class="lineno"><a href="#line_2760" id="line_2760"> 2760.</a></span><span class="count                ">   3600</span><span>                    }).join(", ") +</span></pre>
-<pre><span class="lineno"><a href="#line_2761" id="line_2761"> 2761.</a></span><span class="count                ">    720</span><span>                    "]"</span></pre>
-<pre><span class="lineno"><a href="#line_2762" id="line_2762"> 2762.</a></span><span class="count                ">    720</span><span>                );</span></pre>
-<pre><span class="lineno"><a href="#line_2763" id="line_2763"> 2763.</a></span><span class="count                ">    720</span><span>            }).sort().filter(function (cause, ii, list) {</span></pre>
-<pre><span class="lineno"><a href="#line_2764" id="line_2764"> 2764.</a></span><span class="count                ">    720</span><span>                return cause !== list[ii - 1];</span></pre>
-<pre><span class="lineno"><a href="#line_2765" id="line_2765"> 2765.</a></span><span class="count                ">    720</span><span>            }).join("\n");</span></pre>
-<pre><span class="lineno"><a href="#line_2766" id="line_2766"> 2766.</a></span><span class="count                ">    390</span><span>            assertOrThrow(</span></pre>
-<pre><span class="lineno"><a href="#line_2767" id="line_2767"> 2767.</a></span><span class="count                ">    390</span><span>                causeList === tmp,</span></pre>
-<pre><span class="lineno"><a href="#line_2768" id="line_2768"> 2768.</a></span><span class="count                ">    390</span><span>                "\n" + causeList + "\n\n" + tmp</span></pre>
-<pre><span class="lineno"><a href="#line_2769" id="line_2769"> 2769.</a></span><span class="count                ">    390</span><span>            );</span></pre>
-<pre><span class="lineno"><a href="#line_2770" id="line_2770"> 2770.</a></span><span class="count                ">    390</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2771" id="line_2771"> 2771.</a></span><span class="count                ">    390</span><span>// Anchor the block to the first code below it, past any comment paragraph and</span></pre>
-<pre><span class="lineno"><a href="#line_2772" id="line_2772"> 2772.</a></span><span class="count                ">    390</span><span>// a leading '?' or ':' of a ternary branch.</span></pre>
-<pre><span class="lineno"><a href="#line_2773" id="line_2773"> 2773.</a></span><span class="count                ">    390</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2774" id="line_2774"> 2774.</a></span><span class="count                ">    390</span><span>            rgxAnchor.lastIndex = offset + match0.length - 1;</span></pre>
-<pre><span class="lineno"><a href="#line_2775" id="line_2775"> 2775.</a></span><span class="count                ">    390</span><span>            rgxAnchor.exec(sourceJslintMjs);</span></pre>
-<pre><span class="lineno"><a href="#line_2776" id="line_2776"> 2776.</a></span><span class="count                ">    720</span><span>            for (const cause of causeList.split("\n")) {</span></pre>
-<pre><span class="lineno"><a href="#line_2777" id="line_2777"> 2777.</a></span><span class="count                ">    720</span><span>                fixturePush(</span></pre>
-<pre><span class="lineno"><a href="#line_2778" id="line_2778"> 2778.</a></span><span class="count                ">    720</span><span>                    fixtureList,</span></pre>
-<pre><span class="lineno"><a href="#line_2779" id="line_2779"> 2779.</a></span><span class="count                ">    720</span><span>                    JSON.parse(cause),</span></pre>
-<pre><span class="lineno"><a href="#line_2780" id="line_2780"> 2780.</a></span><span class="count                ">    720</span><span>                    rgxAnchor.lastIndex</span></pre>
-<pre><span class="lineno"><a href="#line_2781" id="line_2781"> 2781.</a></span><span class="count                ">    720</span><span>                );</span></pre>
-<pre><span class="lineno"><a href="#line_2782" id="line_2782"> 2782.</a></span><span class="count                ">    720</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_2783" id="line_2783"> 2783.</a></span><span class="count                ">    390</span><span>            return "";</span></pre>
-<pre><span class="lineno"><a href="#line_2784" id="line_2784"> 2784.</a></span><span class="count                ">    390</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_2753" id="line_2753"> 2753.</a></span><span class="count                ">    413</span><span>                / \/\/jslint-ignore-line$/gm</span></pre>
+<pre><span class="lineno"><a href="#line_2754" id="line_2754"> 2754.</a></span><span class="count                ">    413</span><span>            ), "");</span></pre>
+<pre><span class="lineno"><a href="#line_2755" id="line_2755"> 2755.</a></span><span class="count                ">    750</span><span>            tmp = causeList.split("\n").map(function (cause) {</span></pre>
+<pre><span class="lineno"><a href="#line_2756" id="line_2756"> 2756.</a></span><span class="count                ">    750</span><span>                return (</span></pre>
+<pre><span class="lineno"><a href="#line_2757" id="line_2757"> 2757.</a></span><span class="count                ">    750</span><span>                    "[" +</span></pre>
+<pre><span class="lineno"><a href="#line_2758" id="line_2758"> 2758.</a></span><span class="count                ">   3750</span><span>                    JSON.parse(cause).map(function (elem) {</span></pre>
+<pre><span class="lineno"><a href="#line_2759" id="line_2759"> 2759.</a></span><span class="count                ">   3750</span><span>                        return JSON.stringify(elem);</span></pre>
+<pre><span class="lineno"><a href="#line_2760" id="line_2760"> 2760.</a></span><span class="count                ">   3750</span><span>                    }).join(", ") +</span></pre>
+<pre><span class="lineno"><a href="#line_2761" id="line_2761"> 2761.</a></span><span class="count                ">    750</span><span>                    "]"</span></pre>
+<pre><span class="lineno"><a href="#line_2762" id="line_2762"> 2762.</a></span><span class="count                ">    750</span><span>                );</span></pre>
+<pre><span class="lineno"><a href="#line_2763" id="line_2763"> 2763.</a></span><span class="count                ">    750</span><span>            }).sort().filter(function (cause, ii, list) {</span></pre>
+<pre><span class="lineno"><a href="#line_2764" id="line_2764"> 2764.</a></span><span class="count                ">    750</span><span>                return cause !== list[ii - 1];</span></pre>
+<pre><span class="lineno"><a href="#line_2765" id="line_2765"> 2765.</a></span><span class="count                ">    750</span><span>            }).join("\n");</span></pre>
+<pre><span class="lineno"><a href="#line_2766" id="line_2766"> 2766.</a></span><span class="count                ">    413</span><span>            assertOrThrow(</span></pre>
+<pre><span class="lineno"><a href="#line_2767" id="line_2767"> 2767.</a></span><span class="count                ">    413</span><span>                causeList === tmp,</span></pre>
+<pre><span class="lineno"><a href="#line_2768" id="line_2768"> 2768.</a></span><span class="count                ">    413</span><span>                "\n" + causeList + "\n\n" + tmp</span></pre>
+<pre><span class="lineno"><a href="#line_2769" id="line_2769"> 2769.</a></span><span class="count                ">    413</span><span>            );</span></pre>
+<pre><span class="lineno"><a href="#line_2770" id="line_2770"> 2770.</a></span><span class="count                ">    413</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2771" id="line_2771"> 2771.</a></span><span class="count                ">    413</span><span>// Anchor the block to the first code below it, past any comment paragraph and</span></pre>
+<pre><span class="lineno"><a href="#line_2772" id="line_2772"> 2772.</a></span><span class="count                ">    413</span><span>// a leading '?' or ':' of a ternary branch.</span></pre>
+<pre><span class="lineno"><a href="#line_2773" id="line_2773"> 2773.</a></span><span class="count                ">    413</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2774" id="line_2774"> 2774.</a></span><span class="count                ">    413</span><span>            rgxAnchor.lastIndex = offset + match0.length - 1;</span></pre>
+<pre><span class="lineno"><a href="#line_2775" id="line_2775"> 2775.</a></span><span class="count                ">    413</span><span>            rgxAnchor.exec(sourceJslintMjs);</span></pre>
+<pre><span class="lineno"><a href="#line_2776" id="line_2776"> 2776.</a></span><span class="count                ">    750</span><span>            for (const cause of causeList.split("\n")) {</span></pre>
+<pre><span class="lineno"><a href="#line_2777" id="line_2777"> 2777.</a></span><span class="count                ">    750</span><span>                fixturePush(</span></pre>
+<pre><span class="lineno"><a href="#line_2778" id="line_2778"> 2778.</a></span><span class="count                ">    750</span><span>                    fixtureList,</span></pre>
+<pre><span class="lineno"><a href="#line_2779" id="line_2779"> 2779.</a></span><span class="count                ">    750</span><span>                    JSON.parse(cause),</span></pre>
+<pre><span class="lineno"><a href="#line_2780" id="line_2780"> 2780.</a></span><span class="count                ">    750</span><span>                    rgxAnchor.lastIndex</span></pre>
+<pre><span class="lineno"><a href="#line_2781" id="line_2781"> 2781.</a></span><span class="count                ">    750</span><span>                );</span></pre>
+<pre><span class="lineno"><a href="#line_2782" id="line_2782"> 2782.</a></span><span class="count                ">    750</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_2783" id="line_2783"> 2783.</a></span><span class="count                ">    413</span><span>            return "";</span></pre>
+<pre><span class="lineno"><a href="#line_2784" id="line_2784"> 2784.</a></span><span class="count                ">    413</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_2785" id="line_2785"> 2785.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2786" id="line_2786"> 2786.</a></span><span class="count                ">      1</span><span>// Validate each fixture's last line was parsed in a block, so a misspelled</span></pre>
 <pre><span class="lineno"><a href="#line_2787" id="line_2787"> 2787.</a></span><span class="count                ">      1</span><span>// header fails, instead of hiding its block. Commented-out code keeps its</span></pre>
@@ -3042,9 +3042,9 @@ body {
 <pre><span class="lineno"><a href="#line_2877" id="line_2877"> 2877.</a></span><span class="count                ">      1</span><span>                ["inFn", "via"]</span></pre>
 <pre><span class="lineno"><a href="#line_2878" id="line_2878"> 2878.</a></span><span class="count                ">      1</span><span>            ]</span></pre>
 <pre><span class="lineno"><a href="#line_2879" id="line_2879"> 2879.</a></span><span class="count                ">     15</span><span>        ])) {</span></pre>
-<pre><span class="lineno"><a href="#line_2880" id="line_2880"> 2880.</a></span><span class="count                ">   3741</span><span>            const found = fixtureList.find(function ({cause}) {</span></pre>
-<pre><span class="lineno"><a href="#line_2881" id="line_2881"> 2881.</a></span><span class="count                ">   3741</span><span>                return cause === good;</span></pre>
-<pre><span class="lineno"><a href="#line_2882" id="line_2882"> 2882.</a></span><span class="count                ">   3741</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_2880" id="line_2880"> 2880.</a></span><span class="count                ">   4053</span><span>            const found = fixtureList.find(function ({cause}) {</span></pre>
+<pre><span class="lineno"><a href="#line_2881" id="line_2881"> 2881.</a></span><span class="count                ">   4053</span><span>                return cause === good;</span></pre>
+<pre><span class="lineno"><a href="#line_2882" id="line_2882"> 2882.</a></span><span class="count                ">   4053</span><span>            });</span></pre>
 <pre><span class="lineno"><a href="#line_2883" id="line_2883"> 2883.</a></span><span class="count                ">     15</span><span>            assertOrThrow(found, `control's good fixture is missing: ${good}`);</span></pre>
 <pre><span class="lineno"><a href="#line_2884" id="line_2884"> 2884.</a></span><span class="count                ">     15</span><span>            fixturePush(controlList, bad, found.anchor);</span></pre>
 <pre><span class="lineno"><a href="#line_2885" id="line_2885"> 2885.</a></span><span class="count                ">     15</span><span>            controlList.at(-1).expect = expect;</span></pre>
@@ -3097,74 +3097,74 @@ body {
 <pre><span class="lineno"><a href="#line_2932" id="line_2932"> 2932.</a></span><span class="count                ">      1</span><span>}</span></pre>
 <pre><span class="lineno"><a href="#line_2933" id="line_2933"> 2933.</a></span><span class="count                ">      1</span><span>process.stdout.write(JSON.stringify(resultList));</span></pre>
 <pre><span class="lineno"><a href="#line_2934" id="line_2934"> 2934.</a></span><span class="count                ">      1</span><span>        `).trim() + "\n", JSON.stringify(</span></pre>
-<pre><span class="lineno"><a href="#line_2935" id="line_2935"> 2935.</a></span><span class="count                ">    735</span><span>            fixtureList.concat(controlList).map(function ({anchor, source}) {</span></pre>
-<pre><span class="lineno"><a href="#line_2936" id="line_2936"> 2936.</a></span><span class="count                ">    735</span><span>                return [anchor, source];</span></pre>
-<pre><span class="lineno"><a href="#line_2937" id="line_2937"> 2937.</a></span><span class="count                ">    735</span><span>            })</span></pre>
+<pre><span class="lineno"><a href="#line_2935" id="line_2935"> 2935.</a></span><span class="count                ">    765</span><span>            fixtureList.concat(controlList).map(function ({anchor, source}) {</span></pre>
+<pre><span class="lineno"><a href="#line_2936" id="line_2936"> 2936.</a></span><span class="count                ">    765</span><span>                return [anchor, source];</span></pre>
+<pre><span class="lineno"><a href="#line_2937" id="line_2937"> 2937.</a></span><span class="count                ">    765</span><span>            })</span></pre>
 <pre><span class="lineno"><a href="#line_2938" id="line_2938"> 2938.</a></span><span class="count                ">      1</span><span>        )).then(function ([exitCode, stderr, stdout]) {</span></pre>
 <pre><span class="lineno"><a href="#line_2939" id="line_2939"> 2939.</a></span><span class="count                ">      1</span><span>            const hostDict = {};</span></pre>
 <pre><span class="lineno"><a href="#line_2940" id="line_2940"> 2940.</a></span><span class="count                ">      1</span><span>            const raiseDict = {};</span></pre>
 <pre><span class="lineno"><a href="#line_2941" id="line_2941"> 2941.</a></span><span class="count                ">      1</span><span>            let recordList;</span></pre>
 <pre><span class="lineno"><a href="#line_2942" id="line_2942"> 2942.</a></span><span class="count                ">      1</span><span>            assertOrThrow(exitCode === 0, stderr);</span></pre>
-<pre><span class="lineno"><a href="#line_2943" id="line_2943"> 2943.</a></span><span class="count                ">    735</span><span>            recordList = JSON.parse(stdout).map(function ([count, name], ii) {</span></pre>
-<pre><span class="lineno"><a href="#line_2944" id="line_2944"> 2944.</a></span><span class="count                ">    735</span><span>                const {</span></pre>
-<pre><span class="lineno"><a href="#line_2945" id="line_2945"> 2945.</a></span><span class="count                ">    735</span><span>                    at,</span></pre>
-<pre><span class="lineno"><a href="#line_2946" id="line_2946"> 2946.</a></span><span class="count                ">    735</span><span>                    cause,</span></pre>
-<pre><span class="lineno"><a href="#line_2947" id="line_2947"> 2947.</a></span><span class="count                ">    735</span><span>                    code,</span></pre>
-<pre><span class="lineno"><a href="#line_2948" id="line_2948"> 2948.</a></span><span class="count                ">    735</span><span>                    codeless,</span></pre>
-<pre><span class="lineno"><a href="#line_2949" id="line_2949"> 2949.</a></span><span class="count                ">    735</span><span>                    expect = [],</span></pre>
-<pre><span class="lineno"><a href="#line_2950" id="line_2950"> 2950.</a></span><span class="count                ">    735</span><span>                    fn,</span></pre>
-<pre><span class="lineno"><a href="#line_2951" id="line_2951"> 2951.</a></span><span class="count                ">    735</span><span>                    known,</span></pre>
-<pre><span class="lineno"><a href="#line_2952" id="line_2952"> 2952.</a></span><span class="count                ">    735</span><span>                    raise,</span></pre>
-<pre><span class="lineno"><a href="#line_2953" id="line_2953"> 2953.</a></span><span class="count                ">    735</span><span>                    raiser,</span></pre>
-<pre><span class="lineno"><a href="#line_2954" id="line_2954"> 2954.</a></span><span class="count                ">    735</span><span>                    shown,</span></pre>
-<pre><span class="lineno"><a href="#line_2955" id="line_2955"> 2955.</a></span><span class="count                ">    735</span><span>                    silent,</span></pre>
-<pre><span class="lineno"><a href="#line_2956" id="line_2956"> 2956.</a></span><span class="count                ">    735</span><span>                    via</span></pre>
-<pre><span class="lineno"><a href="#line_2957" id="line_2957"> 2957.</a></span><span class="count                ">    735</span><span>                } = fixtureList.concat(controlList)[ii];</span></pre>
-<pre><span class="lineno"><a href="#line_2958" id="line_2958"> 2958.</a></span><span class="count                ">    735</span><span>                let check;</span></pre>
-<pre><span class="lineno"><a href="#line_2959" id="line_2959"> 2959.</a></span><span class="count                ">    720</span><span>                if (ii &lt; fixtureList.length) {</span></pre>
-<pre><span class="lineno"><a href="#line_2960" id="line_2960"> 2960.</a></span><span class="count                ">    720</span><span>                    raiseDict[raise?.[1]] = true;</span></pre>
-<pre><span class="lineno"><a href="#line_2961" id="line_2961"> 2961.</a></span><span class="count                ">    720</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2962" id="line_2962"> 2962.</a></span><span class="count                ">    720</span><span>// A fixture filed up the stack pairs the function holding its block with the</span></pre>
-<pre><span class="lineno"><a href="#line_2963" id="line_2963"> 2963.</a></span><span class="count                ">    720</span><span>// one that raised it; count the fixtures of each pair.</span></pre>
-<pre><span class="lineno"><a href="#line_2964" id="line_2964"> 2964.</a></span><span class="count                ">    720</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2965" id="line_2965"> 2965.</a></span><span class="count                ">    720</span><span>                    if (name !== fn) {</span></pre>
-<pre><span class="lineno"><a href="#line_2966" id="line_2966"> 2966.</a></span><span class="count                ">    720</span><span>                        hostDict[name + " &lt;- " + fn] = (</span></pre>
-<pre><span class="lineno"><a href="#line_2967" id="line_2967"> 2967.</a></span><span class="count                ">    720</span><span>                            hostDict[name + " &lt;- " + fn] || 0</span></pre>
-<pre><span class="lineno"><a href="#line_2968" id="line_2968"> 2968.</a></span><span class="count                ">    720</span><span>                        ) + 1;</span></pre>
-<pre><span class="lineno"><a href="#line_2969" id="line_2969"> 2969.</a></span><span class="count                ">    720</span><span>                    }</span></pre>
-<pre><span class="lineno"><a href="#line_2970" id="line_2970"> 2970.</a></span><span class="count                ">    720</span><span>                }</span></pre>
-<pre><span class="lineno"><a href="#line_2971" id="line_2971"> 2971.</a></span><span class="count                ">    735</span><span>                check = {</span></pre>
-<pre><span class="lineno"><a href="#line_2972" id="line_2972"> 2972.</a></span><span class="count                ">    735</span><span>                    codeless: !codeless,</span></pre>
-<pre><span class="lineno"><a href="#line_2973" id="line_2973"> 2973.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2974" id="line_2974"> 2974.</a></span><span class="count                ">    735</span><span>// Field 2 of a (live) fixture names the function holding the block.</span></pre>
-<pre><span class="lineno"><a href="#line_2975" id="line_2975"> 2975.</a></span><span class="count                ">    735</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2976" id="line_2976"> 2976.</a></span><span class="count                ">    735</span><span>                    inFn: fn === (</span></pre>
-<pre><span class="lineno"><a href="#line_2977" id="line_2977"> 2977.</a></span><span class="count                ">    735</span><span>                        code === "(live)"</span></pre>
-<pre><span class="lineno"><a href="#line_2978" id="line_2978"> 2978.</a></span><span class="count                ">    154</span><span>                        ? name</span></pre>
-<pre><span class="lineno"><a href="#line_2979" id="line_2979"> 2979.</a></span><span class="count                ">    581</span><span>                        : raiser</span></pre>
-<pre><span class="lineno"><a href="#line_2980" id="line_2980"> 2980.</a></span><span class="count                ">    735</span><span>                    ),</span></pre>
-<pre><span class="lineno"><a href="#line_2981" id="line_2981"> 2981.</a></span><span class="count                ">    735</span><span>                    known,</span></pre>
-<pre><span class="lineno"><a href="#line_2982" id="line_2982"> 2982.</a></span><span class="count                ">    735</span><span>                    live: count &gt; 0,</span></pre>
-<pre><span class="lineno"><a href="#line_2983" id="line_2983"> 2983.</a></span><span class="count                ">    735</span><span>                    shown,</span></pre>
-<pre><span class="lineno"><a href="#line_2984" id="line_2984"> 2984.</a></span><span class="count                ">    735</span><span>                    silent,</span></pre>
-<pre><span class="lineno"><a href="#line_2985" id="line_2985"> 2985.</a></span><span class="count                ">    735</span><span>                    via</span></pre>
-<pre><span class="lineno"><a href="#line_2986" id="line_2986"> 2986.</a></span><span class="count                ">    735</span><span>                };</span></pre>
-<pre><span class="lineno"><a href="#line_2987" id="line_2987"> 2987.</a></span><span class="count                ">    735</span><span>                return {</span></pre>
-<pre><span class="lineno"><a href="#line_2988" id="line_2988"> 2988.</a></span><span class="count                ">    735</span><span>                    at,</span></pre>
-<pre><span class="lineno"><a href="#line_2989" id="line_2989"> 2989.</a></span><span class="count                ">    735</span><span>                    cause,</span></pre>
-<pre><span class="lineno"><a href="#line_2990" id="line_2990"> 2990.</a></span><span class="count                ">    735</span><span>                    expect,</span></pre>
-<pre><span class="lineno"><a href="#line_2991" id="line_2991"> 2991.</a></span><span class="count                ">   5145</span><span>                    fail: Object.keys(check).filter(function (key) {</span></pre>
-<pre><span class="lineno"><a href="#line_2992" id="line_2992"> 2992.</a></span><span class="count                ">   5145</span><span>                        return !check[key];</span></pre>
-<pre><span class="lineno"><a href="#line_2993" id="line_2993"> 2993.</a></span><span class="count                ">   5145</span><span>                    })</span></pre>
-<pre><span class="lineno"><a href="#line_2994" id="line_2994"> 2994.</a></span><span class="count                ">    735</span><span>                };</span></pre>
-<pre><span class="lineno"><a href="#line_2995" id="line_2995"> 2995.</a></span><span class="count                ">    735</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_2943" id="line_2943"> 2943.</a></span><span class="count                ">    765</span><span>            recordList = JSON.parse(stdout).map(function ([count, name], ii) {</span></pre>
+<pre><span class="lineno"><a href="#line_2944" id="line_2944"> 2944.</a></span><span class="count                ">    765</span><span>                const {</span></pre>
+<pre><span class="lineno"><a href="#line_2945" id="line_2945"> 2945.</a></span><span class="count                ">    765</span><span>                    at,</span></pre>
+<pre><span class="lineno"><a href="#line_2946" id="line_2946"> 2946.</a></span><span class="count                ">    765</span><span>                    cause,</span></pre>
+<pre><span class="lineno"><a href="#line_2947" id="line_2947"> 2947.</a></span><span class="count                ">    765</span><span>                    code,</span></pre>
+<pre><span class="lineno"><a href="#line_2948" id="line_2948"> 2948.</a></span><span class="count                ">    765</span><span>                    codeless,</span></pre>
+<pre><span class="lineno"><a href="#line_2949" id="line_2949"> 2949.</a></span><span class="count                ">    765</span><span>                    expect = [],</span></pre>
+<pre><span class="lineno"><a href="#line_2950" id="line_2950"> 2950.</a></span><span class="count                ">    765</span><span>                    fn,</span></pre>
+<pre><span class="lineno"><a href="#line_2951" id="line_2951"> 2951.</a></span><span class="count                ">    765</span><span>                    known,</span></pre>
+<pre><span class="lineno"><a href="#line_2952" id="line_2952"> 2952.</a></span><span class="count                ">    765</span><span>                    raise,</span></pre>
+<pre><span class="lineno"><a href="#line_2953" id="line_2953"> 2953.</a></span><span class="count                ">    765</span><span>                    raiser,</span></pre>
+<pre><span class="lineno"><a href="#line_2954" id="line_2954"> 2954.</a></span><span class="count                ">    765</span><span>                    shown,</span></pre>
+<pre><span class="lineno"><a href="#line_2955" id="line_2955"> 2955.</a></span><span class="count                ">    765</span><span>                    silent,</span></pre>
+<pre><span class="lineno"><a href="#line_2956" id="line_2956"> 2956.</a></span><span class="count                ">    765</span><span>                    via</span></pre>
+<pre><span class="lineno"><a href="#line_2957" id="line_2957"> 2957.</a></span><span class="count                ">    765</span><span>                } = fixtureList.concat(controlList)[ii];</span></pre>
+<pre><span class="lineno"><a href="#line_2958" id="line_2958"> 2958.</a></span><span class="count                ">    765</span><span>                let check;</span></pre>
+<pre><span class="lineno"><a href="#line_2959" id="line_2959"> 2959.</a></span><span class="count                ">    750</span><span>                if (ii &lt; fixtureList.length) {</span></pre>
+<pre><span class="lineno"><a href="#line_2960" id="line_2960"> 2960.</a></span><span class="count                ">    750</span><span>                    raiseDict[raise?.[1]] = true;</span></pre>
+<pre><span class="lineno"><a href="#line_2961" id="line_2961"> 2961.</a></span><span class="count                ">    750</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2962" id="line_2962"> 2962.</a></span><span class="count                ">    750</span><span>// A fixture filed up the stack pairs the function holding its block with the</span></pre>
+<pre><span class="lineno"><a href="#line_2963" id="line_2963"> 2963.</a></span><span class="count                ">    750</span><span>// one that raised it; count the fixtures of each pair.</span></pre>
+<pre><span class="lineno"><a href="#line_2964" id="line_2964"> 2964.</a></span><span class="count                ">    750</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2965" id="line_2965"> 2965.</a></span><span class="count                ">    750</span><span>                    if (name !== fn) {</span></pre>
+<pre><span class="lineno"><a href="#line_2966" id="line_2966"> 2966.</a></span><span class="count                ">    750</span><span>                        hostDict[name + " &lt;- " + fn] = (</span></pre>
+<pre><span class="lineno"><a href="#line_2967" id="line_2967"> 2967.</a></span><span class="count                ">    750</span><span>                            hostDict[name + " &lt;- " + fn] || 0</span></pre>
+<pre><span class="lineno"><a href="#line_2968" id="line_2968"> 2968.</a></span><span class="count                ">    750</span><span>                        ) + 1;</span></pre>
+<pre><span class="lineno"><a href="#line_2969" id="line_2969"> 2969.</a></span><span class="count                ">    750</span><span>                    }</span></pre>
+<pre><span class="lineno"><a href="#line_2970" id="line_2970"> 2970.</a></span><span class="count                ">    750</span><span>                }</span></pre>
+<pre><span class="lineno"><a href="#line_2971" id="line_2971"> 2971.</a></span><span class="count                ">    765</span><span>                check = {</span></pre>
+<pre><span class="lineno"><a href="#line_2972" id="line_2972"> 2972.</a></span><span class="count                ">    765</span><span>                    codeless: !codeless,</span></pre>
+<pre><span class="lineno"><a href="#line_2973" id="line_2973"> 2973.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2974" id="line_2974"> 2974.</a></span><span class="count                ">    765</span><span>// Field 2 of a (live) fixture names the function holding the block.</span></pre>
+<pre><span class="lineno"><a href="#line_2975" id="line_2975"> 2975.</a></span><span class="count                ">    765</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2976" id="line_2976"> 2976.</a></span><span class="count                ">    765</span><span>                    inFn: fn === (</span></pre>
+<pre><span class="lineno"><a href="#line_2977" id="line_2977"> 2977.</a></span><span class="count                ">    765</span><span>                        code === "(live)"</span></pre>
+<pre><span class="lineno"><a href="#line_2978" id="line_2978"> 2978.</a></span><span class="count                ">    180</span><span>                        ? name</span></pre>
+<pre><span class="lineno"><a href="#line_2979" id="line_2979"> 2979.</a></span><span class="count                ">    585</span><span>                        : raiser</span></pre>
+<pre><span class="lineno"><a href="#line_2980" id="line_2980"> 2980.</a></span><span class="count                ">    765</span><span>                    ),</span></pre>
+<pre><span class="lineno"><a href="#line_2981" id="line_2981"> 2981.</a></span><span class="count                ">    765</span><span>                    known,</span></pre>
+<pre><span class="lineno"><a href="#line_2982" id="line_2982"> 2982.</a></span><span class="count                ">    765</span><span>                    live: count &gt; 0,</span></pre>
+<pre><span class="lineno"><a href="#line_2983" id="line_2983"> 2983.</a></span><span class="count                ">    765</span><span>                    shown,</span></pre>
+<pre><span class="lineno"><a href="#line_2984" id="line_2984"> 2984.</a></span><span class="count                ">    765</span><span>                    silent,</span></pre>
+<pre><span class="lineno"><a href="#line_2985" id="line_2985"> 2985.</a></span><span class="count                ">    765</span><span>                    via</span></pre>
+<pre><span class="lineno"><a href="#line_2986" id="line_2986"> 2986.</a></span><span class="count                ">    765</span><span>                };</span></pre>
+<pre><span class="lineno"><a href="#line_2987" id="line_2987"> 2987.</a></span><span class="count                ">    765</span><span>                return {</span></pre>
+<pre><span class="lineno"><a href="#line_2988" id="line_2988"> 2988.</a></span><span class="count                ">    765</span><span>                    at,</span></pre>
+<pre><span class="lineno"><a href="#line_2989" id="line_2989"> 2989.</a></span><span class="count                ">    765</span><span>                    cause,</span></pre>
+<pre><span class="lineno"><a href="#line_2990" id="line_2990"> 2990.</a></span><span class="count                ">    765</span><span>                    expect,</span></pre>
+<pre><span class="lineno"><a href="#line_2991" id="line_2991"> 2991.</a></span><span class="count                ">   5355</span><span>                    fail: Object.keys(check).filter(function (key) {</span></pre>
+<pre><span class="lineno"><a href="#line_2992" id="line_2992"> 2992.</a></span><span class="count                ">   5355</span><span>                        return !check[key];</span></pre>
+<pre><span class="lineno"><a href="#line_2993" id="line_2993"> 2993.</a></span><span class="count                ">   5355</span><span>                    })</span></pre>
+<pre><span class="lineno"><a href="#line_2994" id="line_2994"> 2994.</a></span><span class="count                ">    765</span><span>                };</span></pre>
+<pre><span class="lineno"><a href="#line_2995" id="line_2995"> 2995.</a></span><span class="count                ">    765</span><span>            });</span></pre>
 <pre><span class="lineno"><a href="#line_2996" id="line_2996"> 2996.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2997" id="line_2997"> 2997.</a></span><span class="count                ">      1</span><span>// List every fixture whose failed checks differ from those expected: none for</span></pre>
 <pre><span class="lineno"><a href="#line_2998" id="line_2998"> 2998.</a></span><span class="count                ">      1</span><span>// a fixture, exactly the named ones for a negative control.</span></pre>
 <pre><span class="lineno"><a href="#line_2999" id="line_2999"> 2999.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_3000" id="line_3000"> 3000.</a></span><span class="count                ">    735</span><span>            assertJsonEqual(recordList.filter(function ({expect, fail}) {</span></pre>
-<pre><span class="lineno"><a href="#line_3001" id="line_3001"> 3001.</a></span><span class="count                ">    735</span><span>                return String(fail) !== String(expect);</span></pre>
-<pre><span class="lineno"><a href="#line_3002" id="line_3002"> 3002.</a></span><span class="count                ">    735</span><span>            }), []);</span></pre>
+<pre><span class="lineno"><a href="#line_3000" id="line_3000"> 3000.</a></span><span class="count                ">    765</span><span>            assertJsonEqual(recordList.filter(function ({expect, fail}) {</span></pre>
+<pre><span class="lineno"><a href="#line_3001" id="line_3001"> 3001.</a></span><span class="count                ">    765</span><span>                return String(fail) !== String(expect);</span></pre>
+<pre><span class="lineno"><a href="#line_3002" id="line_3002"> 3002.</a></span><span class="count                ">    765</span><span>            }), []);</span></pre>
 <pre><span class="lineno"><a href="#line_3003" id="line_3003"> 3003.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_3004" id="line_3004"> 3004.</a></span><span class="count                ">      1</span><span>// Validate the roster of fixtures filed up the stack, as "host &lt;- raiser" with</span></pre>
 <pre><span class="lineno"><a href="#line_3005" id="line_3005"> 3005.</a></span><span class="count                ">      1</span><span>// its fixture count, so one moved down to its raise site, or filed far up the</span></pre>
@@ -3195,16 +3195,16 @@ body {
 <pre><span class="lineno"><a href="#line_3030" id="line_3030"> 3030.</a></span><span class="count                ">      1</span><span>                /^ {4}function (?:stop|warn)(?:_at)?\([\S\s]*?\n {4}\}\n/gm</span></pre>
 <pre><span class="lineno"><a href="#line_3031" id="line_3031"> 3031.</a></span><span class="count                ">      4</span><span>            ), function (match0) {</span></pre>
 <pre><span class="lineno"><a href="#line_3032" id="line_3032"> 3032.</a></span><span class="count                ">      4</span><span>                return match0.replace(/[^\n]/g, "");</span></pre>
-<pre><span class="lineno"><a href="#line_3033" id="line_3033"> 3033.</a></span><span class="count                ">  13900</span><span>            }).split("\n").map(function (text, ii) {</span></pre>
-<pre><span class="lineno"><a href="#line_3034" id="line_3034"> 3034.</a></span><span class="count                ">  13900</span><span>                return [ii + 1, text.trim()];</span></pre>
-<pre><span class="lineno"><a href="#line_3035" id="line_3035"> 3035.</a></span><span class="count                ">  13900</span><span>            }).filter(function ([line, text]) {</span></pre>
-<pre><span class="lineno"><a href="#line_3036" id="line_3036"> 3036.</a></span><span class="count                ">  13900</span><span>                return (</span></pre>
-<pre><span class="lineno"><a href="#line_3037" id="line_3037"> 3037.</a></span><span class="count                ">  11198</span><span>                    !text.startsWith("//") &amp;&amp;</span></pre>
-<pre><span class="lineno"><a href="#line_3038" id="line_3038"> 3038.</a></span><span class="count                ">  11198</span><span>                    (/(?:^|[^\w.])(?:stop|warn)(?:_at)?\(/m).test(text) &amp;&amp;</span></pre>
-<pre><span class="lineno"><a href="#line_3039" id="line_3039"> 3039.</a></span><span class="count                ">    291</span><span>                    !text.includes("\"test_unknown_warning_code\"") &amp;&amp;</span></pre>
-<pre><span class="lineno"><a href="#line_3040" id="line_3040"> 3040.</a></span><span class="count                ">    290</span><span>                    !raiseDict[line]</span></pre>
-<pre><span class="lineno"><a href="#line_3041" id="line_3041"> 3041.</a></span><span class="count                ">  13900</span><span>                );</span></pre>
-<pre><span class="lineno"><a href="#line_3042" id="line_3042"> 3042.</a></span><span class="count                ">  13900</span><span>            }), []);</span></pre>
+<pre><span class="lineno"><a href="#line_3033" id="line_3033"> 3033.</a></span><span class="count                ">  14010</span><span>            }).split("\n").map(function (text, ii) {</span></pre>
+<pre><span class="lineno"><a href="#line_3034" id="line_3034"> 3034.</a></span><span class="count                ">  14010</span><span>                return [ii + 1, text.trim()];</span></pre>
+<pre><span class="lineno"><a href="#line_3035" id="line_3035"> 3035.</a></span><span class="count                ">  14010</span><span>            }).filter(function ([line, text]) {</span></pre>
+<pre><span class="lineno"><a href="#line_3036" id="line_3036"> 3036.</a></span><span class="count                ">  14010</span><span>                return (</span></pre>
+<pre><span class="lineno"><a href="#line_3037" id="line_3037"> 3037.</a></span><span class="count                ">  11253</span><span>                    !text.startsWith("//") &amp;&amp;</span></pre>
+<pre><span class="lineno"><a href="#line_3038" id="line_3038"> 3038.</a></span><span class="count                ">  11253</span><span>                    (/(?:^|[^\w.])(?:stop|warn)(?:_at)?\(/m).test(text) &amp;&amp;</span></pre>
+<pre><span class="lineno"><a href="#line_3039" id="line_3039"> 3039.</a></span><span class="count                ">    292</span><span>                    !text.includes("\"test_unknown_warning_code\"") &amp;&amp;</span></pre>
+<pre><span class="lineno"><a href="#line_3040" id="line_3040"> 3040.</a></span><span class="count                ">    291</span><span>                    !raiseDict[line]</span></pre>
+<pre><span class="lineno"><a href="#line_3041" id="line_3041"> 3041.</a></span><span class="count                ">  14010</span><span>                );</span></pre>
+<pre><span class="lineno"><a href="#line_3042" id="line_3042"> 3042.</a></span><span class="count                ">  14010</span><span>            }), []);</span></pre>
 <pre><span class="lineno"><a href="#line_3043" id="line_3043"> 3043.</a></span><span class="count                ">      1</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_3044" id="line_3044"> 3044.</a></span><span class="count                ">      1</span><span>    });</span></pre>
 <pre><span class="lineno"><a href="#line_3045" id="line_3045"> 3045.</a></span><span class="count                ">      1</span><span>});</span></pre>

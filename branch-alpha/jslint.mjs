@@ -399,6 +399,7 @@
     thru,
     toFixed,
     toLocaleString,
+    toLowerCase,
     toString,
     token,
     token_global,
@@ -1413,6 +1414,9 @@ function jslint(
 
 // PR-516 - A function using its own name from <scope_name> lists it nowhere,
 // though a nested function using it lists it as outer.
+
+// test_cause:
+// ["aa=function bb(){return bb;}", "scope_report_push", "(live)", "", 0]
 
             return;
         }
@@ -3403,15 +3407,44 @@ function jslint_phase2_lex(state) {
 
         check_numeric_separator(prefix, column - prefix.length);
         char_after();
-        switch (prefix === "0" && char) {
+        switch (prefix === "0" && char.toLowerCase()) {
         case "b":
         case "o":
         case "x":
-            read_digits(char, mode_digits_numeric_separator);
+
+// An uppercase radix prefix '0B', '0O' or '0X' is valid, so warn and read the
+// digits as for its lowercase form.
+
+            if (char !== char.toLowerCase()) {
+
+// test_cause:
+// ["aa=0B1", "lex_number", "expected_a_b", "B", 5]
+// ["aa=0O7", "lex_number", "expected_a_b", "O", 5]
+// ["aa=0X1", "lex_number", "expected_a_b", "X", 5]
+
+                warn_at(
+                    "expected_a_b",
+                    line,
+                    column - 1,
+                    char.toLowerCase(),
+                    char
+                );
+            }
+
+// test_cause:
+// ["aa=0b1", "lex_number", "(live)", "", 0]
+// ["aa=0o7", "lex_number", "(live)", "", 0]
+// ["aa=0x1", "lex_number", "(live)", "", 0]
+
+            read_digits(char.toLowerCase(), mode_digits_numeric_separator);
 
 // PR-351 - Ignore BigInt suffix 'n'.
 
             if (char === "n") {
+
+// test_cause:
+// ["aa=0x1fn", "lex_number", "(live)", "", 0]
+
                 char_after("n");
             }
             break;
@@ -3420,8 +3453,17 @@ function jslint_phase2_lex(state) {
                 read_digits("d", mode_digits_numeric_separator);
             }
             if (char === "E" || char === "e") {
+
+// test_cause:
+// ["aa=1e+5", "lex_number", "(live)", "", 0]
+// ["aa=1e5", "lex_number", "(live)", "", 0]
+
                 char_after(char);
                 if (char !== "+" && char !== "-") {
+
+// test_cause:
+// ["aa=1e5", "lex_number", "(live)", "", 0]
+
                     char_before();
                 }
                 read_digits("d", mode_digits_numeric_separator);
@@ -3859,6 +3901,10 @@ function jslint_phase2_lex(state) {
 // PR-499 - Add ES2022-feature RegExp Match Indices.
 
             case "d":
+
+// test_cause:
+// ["aa=/./d", "lex_regexp", "(live)", "", 0]
+
                 break;
             case "g":
                 break;
@@ -3870,6 +3916,10 @@ function jslint_phase2_lex(state) {
 // PR-499 - Add ES2018-feature s (dotall) flag for regular expressions.
 
             case "s":
+
+// test_cause:
+// ["aa=/./s", "lex_regexp", "(live)", "", 0]
+
                 break;
             case "u":
                 if (
@@ -3981,6 +4031,10 @@ function jslint_phase2_lex(state) {
 
             return stop("unexpected_a", the_token);
         case "return":
+
+// test_cause:
+// ["function aa(){return /./;}", "lex_slash_or_regexp", "(live)", "", 0]
+
             return lex_regexp();
         }
         switch (!token_prv_expr.identifier && token_prv_expr.id.slice(-1)) {
@@ -4244,11 +4298,19 @@ function jslint_phase2_lex(state) {
 // PR-404 - Alias "evil" to sub-directive "eval" for backwards-compat.
 
         case "evil":
+
+// test_cause:
+// ["/*jslint evil*/", "option_set_item", "(live)", "", 0]
+
             return option_set_item("eval", value);
 
 // PR-404 - Alias "nomen" to sub-directive "name" for backwards-compat.
 
         case "name":
+
+// test_cause:
+// ["/*jslint name*/", "option_set_item", "(live)", "", 0]
+
             return option_set_item("nomen", value);
         default:
             return false;
@@ -4289,6 +4351,10 @@ function jslint_phase2_lex(state) {
                                     dict_name.startsWith("browser")
                                     ? "browser"
                                     : dict_name.startsWith("couch")
+
+// test_cause:
+// ["/*jslint couch*/", "option_set_item", "(live)", "", 0]
+
                                     ? "CouchDb"
                                     : dict_name.startsWith("devel")
                                     ? "development"
@@ -4309,8 +4375,16 @@ function jslint_phase2_lex(state) {
     function read_digits(base, mode) {
         let digits = line_source.match(
             base === "b"
+
+// test_cause:
+// ["aa=0b1", "read_digits", "(live)", "", 0]
+
             ? jslint_rgx_digits_bits
             : base === "o"
+
+// test_cause:
+// ["aa=0o7", "read_digits", "(live)", "", 0]
+
             ? jslint_rgx_digits_octals
             : base === "x"
             ? jslint_rgx_digits_hexs
@@ -4682,6 +4756,10 @@ function jslint_phase2_lex(state) {
 // Scan first line for "#!" and ignore it.
 
     if (line_list[jslint_fudge].line_source.startsWith("#!")) {
+
+// test_cause:
+// ["#!/usr/bin/env node", "jslint_phase2_lex", "(live)", "", 0]
+
         line += 1;
         state.mode_shebang = true;
     }
@@ -6430,6 +6508,9 @@ function jslint_phase3_parse(state) {
 
 // PR-414 - Parse async fart.
 
+// test_cause:
+// ["aa=async(bb)=>bb", "prefix_async", "(live)", "", 0]
+
             advance("(");
             prefix_function(the_function, true, false);
         } else {
@@ -6942,6 +7023,10 @@ function jslint_phase3_parse(state) {
                             default_megastring ||
                             signature.slice(default_from).trim().length > 40
                         ) {
+
+// test_cause:
+// ["function aa(bb=`cc`){return bb;}", "prefix_function", "(live)", "", 0]
+
                             signature = (
                                 signature.slice(0, default_from) + " \u2026"
                             );
@@ -6955,6 +7040,10 @@ function jslint_phase3_parse(state) {
                         default_from = signature.length;
                     }
                     if (token.id === "`" && default_from !== undefined) {
+
+// test_cause:
+// ["function aa(bb=`cc`){return bb;}", "prefix_function", "(live)", "", 0]
+
                         default_megastring = true;
                     }
                     if (["${", "(", "[", "{"].includes(token.id)) {
@@ -7810,6 +7899,10 @@ function jslint_phase3_parse(state) {
                 warn("unexpected_a", token_nxt);
             }
             if (scope_function.async === 1) {
+
+// test_cause:
+// ["async function aa(bb){for await(aa of bb){}}", "stmt_for", "(live)", "", 0]
+
                 scope_function.async = 2;
             }
             advance("await");
@@ -8166,6 +8259,10 @@ function jslint_phase3_parse(state) {
                         if (token_nxt.id !== ",") {
                             break;
                         }
+
+// test_cause:
+// ["import {aa,bb} from \"aa\"", "stmt_import", "(live)", "", 0]
+
                         advance(",");
                     }
                 }
@@ -8192,6 +8289,10 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id !== ",") {
                 break;
             }
+
+// test_cause:
+// ["import aa,{bb} from \"aa\"", "stmt_import", "(live)", "", 0]
+
             advance(",");
         }
         advance("from");
@@ -8209,6 +8310,10 @@ function jslint_phase3_parse(state) {
 // Issue #495 - Add ES2025-syntax "import ... with {...}".
 
         if (token_nxt.id === "with") {
+
+// test_cause:
+// ["import aa from \"aa\" with {}", "stmt_import", "(live)", "", 0]
+
             advance("with");
             advance("{");
             prefix_lbrace();
@@ -9489,6 +9594,10 @@ function jslint_phase4_walk(state) {
 // 'undefined' is nullish and falsy, so it counts as assigned. '&&=' does not
 // assign it, and still warns unassigned_var_a.
 
+// test_cause:
+// ["let aa;aa??=0", "post_a_assignment", "(live)", "", 0]
+// ["let aa;aa||=0", "post_a_assignment", "(live)", "", 0]
+
                 lvalue.variable.assigned = true;
             }
             right = syntax_dict[thing.expression[1].id];
@@ -9826,6 +9935,7 @@ function jslint_phase4_walk(state) {
 
 // test_cause:
 // ["new Array()", "post_b_lparen", "expected_a_b", "new Array", 5]
+// ["new Array(0,\"bb\")", "post_b_lparen", "expected_a_b", "new Array", 5]
 
                         warn("expected_a_b", left, "[]", "new Array");
                     }
