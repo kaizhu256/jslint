@@ -231,8 +231,6 @@
     join,
     jslint,
     jslint_apidoc,
-    jslint_assert,
-    jslint_autofix_warning_list,
     jslint_charset_ascii,
     jslint_cli,
     jslint_edition,
@@ -246,7 +244,6 @@
     json,
     jstestDescribe,
     jstestIt,
-    jstestOnExit,
     jstestOrderCheck,
     jstestReport,
     keys,
@@ -12241,11 +12238,7 @@ async function jstestDescribe(description, testFunction) {
         } catch (err) {
             settle = {
                 err,
-                status: (
-                    record.pass
-                    ? "passed"
-                    : "failed"
-                )
+                status: "failed"
             };
         }
 
@@ -12301,7 +12294,7 @@ function jstestErrText(err) {
     }
 }
 
-function jstestIt(description, testFunction, mode) {
+function jstestIt(description, testFunction) {
 
 // This function will register test-case <testFunction> with given
 // <description> in the current describe, to run once its body settles.
@@ -12331,13 +12324,11 @@ function jstestIt(description, testFunction, mode) {
     }
 
 // PR-xxx - Record this test as pending from registration, so <jstestReport>
-// sees it even if its describe never runs or prints. Mode "pass" counts a
-// throwing test as passed.
+// sees it even if its describe never runs or prints.
 
     jstestItRecordList.push({
         describe: describe.description,
         description,
-        pass: mode === "pass",
         status: "pending",
         testFunction
     });
@@ -13976,8 +13967,6 @@ jslint_export = Object.freeze(
             htmlEscape,
             jslint,
             jslint_apidoc,
-            jslint_assert,
-            jslint_autofix_warning_list,
             jslint_charset_ascii,
             jslint_cli,
             jslint_edition,
@@ -13990,7 +13979,6 @@ jslint_export = Object.freeze(
             jslint_report,
             jstestDescribe,
             jstestIt,
-            jstestOnExit,
             jstestOrderCheck,
             jstestReport,
             moduleFsInit,

@@ -3575,22 +3575,6 @@ jslint.jstestDescribe("aa", function () {
         ), stderr);
     });
     jstestIt((
-        "test jstestIt-mode-pass handling-behavior"
-    ), async function () {
-
-// Mode "pass" reports a throwing test as passed and counts 0 failed.
-
-        const [exitCode, stderr] = await childRun({}, String(`
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", function () {
-        throw new Error("bb expected");
-    }, "pass");
-});
-        `));
-        assertJsonEqual(exitCode, 0);
-        assertMatch(stderr, /\u2714 1\. test it - bb\b[\s\S]*tests total {2}- 1\n {2}tests failed - 0\n/);
-    });
-    jstestIt((
         "test jstestIt-throw-non-error handling-behavior"
     ), async function () {
 
