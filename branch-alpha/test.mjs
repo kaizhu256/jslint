@@ -15,7 +15,6 @@ let {
     globExclude,
     jstestDescribe,
     jstestIt,
-    jstestOrderCheck,
     moduleFsInit,
     noop,
     v8CoverageListMerge,
@@ -3498,6 +3497,34 @@ jslint.jstestDescribe("aa", function () {
         assertOrThrow(!stderr.includes("test it failed"), stderr);
     });
     jstestIt((
+        "test jstestDescribe-order-edge handling-behavior"
+    ), async function () {
+
+// Only a describe's first bad pair fails. A duplicate fails, and so does a
+// non-string name, since '>=' would be false for it and let it pass.
+
+        const resultList = await Promise.all([
+            ["aa", "cc", "bb", "aa"],
+            ["aa", "aa"],
+            [undefined, "bb"]
+        ].map(function (descriptionList) {
+            return childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    for (const description of ${JSON.stringify(descriptionList)}) {
+        jslint.jstestIt(description ?? undefined, jslint.noop);
+    }
+});
+            `));
+        }));
+        assertJsonEqual(resultList.map(function ([exitCode, stderr]) {
+            return [exitCode, stderr.match(/\S+ must sort before .*|duplicate description .*/g)];
+        }), [
+            [1, ["\"bb\" must sort before \"cc\""]],
+            [1, ["duplicate description \"aa\""]],
+            [1, ["\"bb\" must sort before undefined"]]
+        ]);
+    });
+    jstestIt((
         "test jstestIt-filter handling-behavior"
     ), async function () {
 
@@ -3721,35 +3748,6 @@ jslint.jstestDescribe("aa", function () {
         `));
         assertJsonEqual(exitCode, 1);
         assertMatch(stderr, /1\. test it failed - aa - bb\nError: bb real error\n[\s\S]*2\. test it pending - aa - cc\n {2}tests total {2}- 2\n {2}tests failed - 2\n/);
-    });
-    jstestIt((
-        "test jstestOrderCheck handling-behavior"
-    ), function () {
-
-// A sorted list returns nothing. An unsorted pair or a duplicate returns one
-// failed result, for the first bad pair only. A non-string name fails too.
-
-        assertJsonEqual([
-            ["", "aa", "bb"],
-            ["aa", "cc", "bb", "aa"],
-            ["aa", "aa"],
-            [undefined, "bb"]
-        ].map(function (descriptionList) {
-            const failure = jstestOrderCheck(descriptionList);
-            return failure && [failure[0].message, failure[1]];
-        }), [
-            undefined,
-            [
-                "\"bb\" must sort before \"cc\"",
-                "jstestDescribe and jstestIt descriptions in ASCII order"
-            ], [
-                "duplicate description \"aa\"",
-                "jstestDescribe and jstestIt descriptions in ASCII order"
-            ], [
-                "\"bb\" must sort before undefined",
-                "jstestDescribe and jstestIt descriptions in ASCII order"
-            ]
-        ]);
     });
     jstestIt((
         "test jstestReport-numbering handling-behavior"
