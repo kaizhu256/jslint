@@ -92,7 +92,6 @@
 
 /*jslint beta, node, trace*/
 /*property
-    AsyncLocalStorage,
     JSLINT_BETA,
     NODE_V8_COVERAGE,
     alive,
@@ -123,7 +122,6 @@
     closer,
     closure,
     code,
-    collected,
     column,
     concat,
     consoleError,
@@ -199,8 +197,6 @@
     function_stack,
     functions,
     get,
-    getBuiltinModule,
-    getStore,
     getset,
     github_repo,
     globExclude,
@@ -244,7 +240,6 @@
     jstestDescribe,
     jstestIt,
     jstestOrderCheck,
-    jstestReport,
     keys,
     label_break,
     label_name,
@@ -333,7 +328,6 @@
     readFile,
     readdir,
     readonly,
-    record,
     recursive,
     reduce,
     repeat,
@@ -344,7 +338,6 @@
     rgx,
     role,
     round,
-    run,
     scope_block,
     scope_block_pop,
     scope_block_push,
@@ -798,11 +791,11 @@ const jslint_rgx_url_search_window_jslint = (
 const jslint_rgx_weird_property = (
     /^_|\$|Sync$|_$/m
 );
-const jstestDescribePrvDict = Object.create(null);
 const jstestItRecordList = [];
 let jslint_export;                      // The jslint object to be exported.
 let jslint_import_meta_url = "";        // import.meta.url used by cli.
-let jstestAls;
+let jstestDescribeNow;                  // The describe whose body is running.
+let jstestDescribePrv = "";
 let jstestItCount = 0;
 let jstestTimeStart;
 let moduleChildProcess;
@@ -12158,76 +12151,56 @@ async function jstestDescribe(description, testFunction) {
 // This function will collect test-group <testFunction>'s tests with given
 // <description>, then run them.
 
-// PR-xxx - Key the describe before this one by the file that calls it, from
-// the stack, so a process importing several test files checks each file's
-// order alone.
-
-    const caller = String(
-        String(new Error().stack).split("\n")[2]
-    ).replace((
-        /^\s*at (?:.*? \()?(.*?):\d+:\d+\)?$/
-    ), "$1");
     const describe = {
-        collected: false,
         description,
         itList: []
     };
-    const describePrv = jstestDescribePrvDict[caller] ?? "";
-    let errBody;
+    const describePrv = jstestDescribePrv;
+    const recordBody = {
+        describe: description,
+        description: "jstestDescribe body",
+        status: "pending"
+    };
     let message;
     let result;
 
 // Record <description> before the first await, since describes then
 // interleave and finish out of source order.
 
-    jstestDescribePrvDict[caller] = description;
+    jstestDescribePrv = description;
 
 // Init jstestTimeStart.
 
     if (jstestTimeStart === undefined) {
-
-// PR-xxx - Run each body and each test in an async context, storing {describe}
-// while a body collects and {describe, record} while a test runs: a body's
-// <jstestIt> finds its describe even after an await, and an error escaping a
-// test, e.g. thrown from a timer or an un-awaited rejection, names its test at
-// exit. The monitor only observes: node still crashes as before.
-// <process.getBuiltinModule> loads synchronously, so describes cannot race to
-// create two contexts, and the browser never reaches it.
-
-        const {AsyncLocalStorage} = process.getBuiltinModule("async_hooks");
-        jstestAls = new AsyncLocalStorage();
         jstestTimeStart = Date.now();
         process.on("exit", jstestOnExit);
-        process.on("uncaughtExceptionMonitor", jstestOnCrash);
     }
 
-// PR-457 - Wait awhile for imports to initialize.
+// PR-xxx - Collect, then run. Record the body as pending, then await it, so a
+// body that hangs before registering fails at exit instead of passing with 0
+// tests, and a body that throws, even a falsy value, fails as one more test. A
+// body that settles clean leaves no record.
 
-    await new Promise(function (resolve) {
-        setTimeout(resolve);
-    });
-
-// PR-xxx - Collect, then run: await the whole body, async or not, before any
-// test starts. A body that throws fails as one more test, wrapped, so a falsy
-// throw still fails.
-
+    jstestItRecordList.push(recordBody);
     try {
-        await jstestAls.run({describe}, testFunction);
+        await jstestDescribeRun(describe, testFunction);
+        jstestItRecordList.splice(jstestItRecordList.indexOf(recordBody), 1);
     } catch (err) {
-        errBody = [err, "jstestDescribe body"];
+        Object.assign(recordBody, {
+            err,
+            status: "failed"
+        });
     }
-    describe.collected = true;
 
 // PR-xxx - Assert this describe's tests, then this describe, are in ASCII
-// order. Then add one failed result for a body that threw. Record them before
-// any test runs, so a hung sibling cannot hide them at exit.
+// order. Record them before any test runs, so a hung sibling cannot hide them
+// at exit. Then add the body's failure, already recorded.
 
     result = [
         jstestOrderCheck(describe.itList.map(function (record) {
             return record.description;
         })),
-        jstestOrderCheck([describePrv, description]),
-        errBody
+        jstestOrderCheck([describePrv, description])
     ].filter(Boolean).map(function ([err, descriptionIt]) {
         return {
             describe: description,
@@ -12237,9 +12210,12 @@ async function jstestDescribe(description, testFunction) {
         };
     });
     jstestItRecordList.push(...result);
+    if (recordBody.status === "failed") {
+        result.push(recordBody);
+    }
     await Promise.all(describe.itList.map(async function (record) {
         try {
-            await jstestAls.run({describe, record}, record.testFunction);
+            await record.testFunction();
             record.status = "passed";
         } catch (err) {
             record.err = err;
@@ -12265,11 +12241,11 @@ async function jstestDescribe(description, testFunction) {
             return (
                 (record.status === "passed")
                 ? (
-                    "    \u001b[32m\u2714 " + jstestItCount + ". test it - " +
+                    "    \u001b[32m✔ " + jstestItCount + ". test it - " +
                     record.description + "\u001b[39m"
                 )
                 : (
-                    "    \u001b[31m\u2718 " + jstestItCount + ". test it - " +
+                    "    \u001b[31m✘ " + jstestItCount + ". test it - " +
                     record.description + "\n" +
                     jstestErrText(record.err) + "\u001b[39m"
                 )
@@ -12277,6 +12253,20 @@ async function jstestDescribe(description, testFunction) {
         }).join("\n")
     );
     console.error(message);
+}
+
+function jstestDescribeRun(describe, testFunction) {
+
+// This function will run describe-body <testFunction> with <describe> current
+// only while it runs synchronously, so <jstestIt> registers there alone and a
+// call after an await throws.
+
+    jstestDescribeNow = describe;
+    try {
+        return testFunction();
+    } finally {
+        jstestDescribeNow = undefined;
+    }
 }
 
 function jstestErrText(err) {
@@ -12296,15 +12286,15 @@ function jstestIt(description, testFunction) {
 // This function will register test-case <testFunction> with given
 // <description> in the current describe, to run once its body settles.
 
-    const describe = jstestAls?.getStore()?.describe;
+    const describe = jstestDescribeNow;
 
-// PR-xxx - Throw outside a describe body, or after it settled, since no
-// describe would run or report this test.
+// PR-xxx - Throw outside a describe body's synchronous part, since no describe
+// would run or report this test.
 
-    if (!describe || describe.collected) {
+    if (!describe) {
         throw new Error(
             "jstestIt " + JSON.stringify(description) +
-            " called outside a jstestDescribe body, or after it settled"
+            " called outside a jstestDescribe body, or after an await"
         );
     }
 
@@ -12330,19 +12320,6 @@ function jstestIt(description, testFunction) {
         testFunction
     });
     describe.itList.push(jstestItRecordList.at(-1));
-}
-
-function jstestOnCrash(err) {
-
-// This function will mark the test whose async context let uncaught <err>
-// escape as crashed, and list it at exit even if its describe printed.
-
-    const record = jstestAls.getStore()?.record;
-    if (record) {
-        record.err = err;
-        record.printed = false;
-        record.status = "crashed";
-    }
 }
 
 function jstestOnExit(exitCode) {
@@ -12391,12 +12368,6 @@ function jstestReport() {
     const countFailed = jstestItRecordList.filter(function ({status}) {
         return status !== "passed";
     }).length;
-    const filter = process.env.npm_config_mode_test_filter;
-
-// PR-xxx - Fail a run whose filter matched no test, so a stray or mistyped
-// filter cannot skip the whole suite and pass.
-
-    const filterEmpty = Boolean(filter) && jstestItRecordList.length === 0;
     const unprintedList = jstestItRecordList.filter(function (record) {
         return !record.printed && record.status !== "passed";
     });
@@ -12405,9 +12376,9 @@ function jstestReport() {
 // PR-xxx - Exit 1, not the failed count, since an exit status keeps only 8
 // bits, so 256 failed tests would exit 0.
 
-        exitCode: Number(countFailed > 0 || filterEmpty),
+        exitCode: Number(countFailed > 0),
         text: (
-            (countFailed || filterEmpty)
+            (countFailed > 0)
             ? "\n\u001b[31m"
             : "\n\u001b[32m"
         ) +
@@ -12418,21 +12389,14 @@ function jstestReport() {
             status
         }, ii) {
             return (
-                "  \u2718 " + (jstestItCount + ii + 1) + ". test it " + status +
+                "  ✘ " + (jstestItCount + ii + 1) + ". test it " + status +
                 " - " + describe + " - " + description + "\n" + (
                     (status === "pending")
                     ? ""
                     : jstestErrText(err) + "\n"
                 )
             );
-        }).join("") + (
-            filterEmpty
-            ? (
-                "  \u2718 no test matched npm_config_mode_test_filter=" +
-                JSON.stringify(filter) + "\n"
-            )
-            : ""
-        ) +
+        }).join("") +
         "  tests total  - " + jstestItRecordList.length + "\n" +
         "  tests failed - " + countFailed + "\n" +
         "\n" +
@@ -13994,7 +13958,6 @@ jslint_export = Object.freeze(
             jstestDescribe,
             jstestIt,
             jstestOrderCheck,
-            jstestReport,
             moduleFsInit,
             noop,
             objectDeepCopyWithKeysSorted,

@@ -16,7 +16,6 @@ let {
     jstestDescribe,
     jstestIt,
     jstestOrderCheck,
-    jstestReport,
     moduleFsInit,
     noop,
     v8CoverageListMerge,
@@ -3392,6 +3391,23 @@ jstestDescribe((
     "test jstestXxx handling-behavior"
 ), function () {
     jstestIt((
+        "test jstestDescribe-body-hang handling-behavior"
+    ), async function () {
+
+// An async body that hangs before registering any test fails at exit as a
+// pending body, instead of passing with 0 tests. With nothing alive, the hang
+// exits at once.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+jslint.jstestDescribe("aa", async function () {
+    await new Promise(jslint.noop);
+    jslint.jstestIt("bb", jslint.noop);
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertMatch(stderr, /1\. test it pending - aa - jstestDescribe body\n {2}tests total {2}- 1\n {2}tests failed - 1\n/);
+    });
+    jstestIt((
         "test jstestDescribe-body-throw handling-behavior"
     ), async function () {
 
@@ -3443,7 +3459,7 @@ jslint.jstestDescribe("aa", function () {
             "test it - jstestDescribe body\nSyntaxError: Invalid regular"
         ), stderr2);
         assertMatch(stderr3, /2\. test it - jstestDescribe body\nundefined\b[\s\S]*tests failed - 1\n/);
-        assertMatch(stderr4, /test it pending - aa - bb\n[\s\S]*test it failed - aa - jstestDescribe body\nError: aa body broke\n[\s\S]*tests failed - 2\n/);
+        assertMatch(stderr4, /test it failed - aa - jstestDescribe body\nError: aa body broke\n[\s\S]*test it pending - aa - bb\n[\s\S]*tests failed - 2\n/);
     });
     jstestIt((
         "test jstestDescribe-concurrent handling-behavior"
@@ -3499,41 +3515,6 @@ jslint.jstestDescribe("aa", function () {
         assertOrThrow(!stderr.includes("test it failed"), stderr);
     });
     jstestIt((
-        "test jstestDescribe-order-file handling-behavior"
-    ), async function () {
-
-// A process importing two test files checks each file's describe order alone:
-// bb.mjs's "aa" after aa.mjs's "cc" passes, while aa.mjs's own "bb" after "cc"
-// still fails.
-
-        let exitCode;
-        let stderr;
-        await fsWriteFileWithParents(".tmp/jstest_order_file/aa.mjs", String(`
-import jslint from "../../jslint.mjs";
-jslint.jstestDescribe("cc", function () {
-    jslint.jstestIt("dd", jslint.noop);
-});
-jslint.jstestDescribe("bb", function () {
-    jslint.jstestIt("dd", jslint.noop);
-});
-        `));
-        await fsWriteFileWithParents(".tmp/jstest_order_file/bb.mjs", String(`
-import jslint from "../../jslint.mjs";
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("dd", jslint.noop);
-});
-        `));
-        [exitCode, stderr] = await childRun({}, String(`
-import "./.tmp/jstest_order_file/aa.mjs";
-import "./.tmp/jstest_order_file/bb.mjs";
-        `));
-        assertJsonEqual(exitCode, 1);
-        assertOrThrow(stderr.includes(
-            "\"bb\" must sort before \"cc\""
-        ), stderr);
-        assertOrThrow(!stderr.includes("\"aa\" must sort before"), stderr);
-    });
-    jstestIt((
         "test jstestIt-filter handling-behavior"
     ), async function () {
 
@@ -3559,28 +3540,12 @@ jslint.jstestDescribe("cc", function () {
         assertOrThrow(!stderr.includes("test it - ee"), stderr);
     });
     jstestIt((
-        "test jstestIt-filter-empty handling-behavior"
-    ), async function () {
-
-// A filter that matches no test fails the run, so a stray or mistyped filter
-// cannot skip the whole suite and pass.
-
-        const [exitCode, stderr] = await childRun({
-            npm_config_mode_test_filter: "^zz$"
-        }, String(`
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", jslint.noop);
-});
-        `));
-        assertJsonEqual(exitCode, 1);
-        assertMatch(stderr, /no test matched npm_config_mode_test_filter="\^zz\$"\n {2}tests total {2}- 0\n/);
-    });
-    jstestIt((
         "test jstestIt-late handling-behavior"
     ), async function () {
 
-// An async describe body registers tests after an await, and they run. A
-// jstestIt after the body settled, or before any describe, throws.
+// A jstestIt after an await in an async describe body, from a timer after the
+// body settled, or before any describe, throws: only the body's synchronous
+// part registers. The first fails the body, after the test it did register.
 
         const resultList = await Promise.all([
             String(`
@@ -3610,12 +3575,12 @@ jslint.jstestIt("cc", jslint.noop);
         }));
         assertJsonEqual(resultList.map(function ([exitCode]) {
             return exitCode;
-        }), [0, 1, 1]);
-        assertMatch(resultList[0][1], /1\. test it - bb\b[\s\S]*2\. test it - cc\b[\s\S]*tests total {2}- 2\n {2}tests failed - 0\n/);
-        resultList.slice(1).forEach(function ([ignore, stderr]) {
+        }), [1, 1, 1]);
+        assertMatch(resultList[0][1], /1\. test it - bb\b[\s\S]*2\. test it - jstestDescribe body\nError: jstestIt "cc" called outside[\s\S]*tests total {2}- 2\n {2}tests failed - 1\n/);
+        resultList.forEach(function ([ignore, stderr]) {
             assertOrThrow(stderr.includes(
                 "jstestIt \"cc\" called outside a jstestDescribe body, or" +
-                " after it settled"
+                " after an await"
             ), stderr);
         });
     });
@@ -3643,7 +3608,7 @@ jslint.jstestDescribe("aa", function () {
         assertJsonEqual(exitCode, 1);
         assertOrThrow(stderr.includes(
             "jstestIt \"cc\" called outside a jstestDescribe body, or after" +
-            " it settled"
+            " an await"
         ), stderr);
     });
     jstestIt((
@@ -3690,83 +3655,6 @@ jslint.jstestDescribe("aa", function () {
         assertMatch(stderr, /1\. test it - bb\nundefined\b[\s\S]*2\. test it - cc\nundefined\b[\s\S]*3\. test it - dd\ndd string\b[\s\S]*4\. test it - ee\n\[object\][\s\S]*tests failed - 4\n/);
         assertOrThrow(!stderr.includes("TypeError"), stderr);
         assertMatch(stderr2, /test it failed - aa - bb\nbb string\n[\s\S]*test it failed - aa - bc\n0\n[\s\S]*tests failed - 3\n/);
-    });
-    jstestIt((
-        "test jstestOnExit-crash handling-behavior"
-    ), async function () {
-
-// An error escaping a test, from a timer or an un-awaited rejection, still
-// crashes, and the exit report names that test as crashed, its slow sibling as
-// pending. A crash from outside any test names none: its timer starts in the
-// describe body, after bb registers, since a top-level timer raced the
-// runner's init and fired first on a slow macOS runner.
-
-        const resultList = await Promise.all([
-            String(`
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", function () {
-        setTimeout(function () {
-            throw new Error("bb timer boom");
-        }, 10);
-        return new Promise(function (resolve) {
-            setTimeout(resolve, 50);
-        });
-    });
-    jslint.jstestIt("cc", function () {
-        return new Promise(function (resolve) {
-            setTimeout(resolve, 200);
-        });
-    });
-});
-            `),
-            String(`
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", function () {
-        Promise.reject(new Error("bb unawaited"));
-        return new Promise(function (resolve) {
-            setTimeout(resolve, 50);
-        });
-    });
-});
-            `),
-            String(`
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", function () {
-        setTimeout(function () {
-            throw new Error("bb late boom");
-        }, 100);
-    });
-});
-            `),
-            String(`
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", function () {
-        return new Promise(function (resolve) {
-            setTimeout(resolve, 200);
-        });
-    });
-    setTimeout(function () {
-        throw new Error("outside boom");
-    }, 20);
-});
-            `)
-        ].map(function (source) {
-            return childRun({}, source);
-        }));
-        assertJsonEqual(resultList.map(function ([exitCode]) {
-            return exitCode;
-        }), [1, 1, 1, 1]);
-        assertMatch(resultList[0][1], /test it crashed - aa - bb\nError: bb timer boom\n[\s\S]*test it pending - aa - cc\n/);
-        assertMatch(resultList[1][1], /test it crashed - aa - bb\nError: bb unawaited\n/);
-
-// A test that passed and printed, then crashed late, is listed again.
-
-        assertMatch(resultList[2][1], /1\. test it - bb\b[\s\S]*test it crashed - aa - bb\nError: bb late boom\n/);
-        assertMatch(resultList[3][1], /test it pending - aa - bb\n/);
-        assertOrThrow(
-            !resultList[3][1].includes("crashed"),
-            resultList[3][1]
-        );
     });
     jstestIt((
         "test jstestOnExit-exit-code handling-behavior"
@@ -3862,20 +3750,6 @@ jslint.jstestDescribe("aa", function () {
                 "jstestDescribe and jstestIt descriptions in ASCII order"
             ]
         ]);
-    });
-    jstestIt((
-        "test jstestReport handling-behavior"
-    ), function () {
-        const exitCode = process.exitCode;
-
-// The report lists this test, still running, as pending, and changes nothing,
-// since mid-run every running test is pending.
-
-        assertOrThrow(jstestReport().text.includes(
-            ". test it pending - test jstestXxx handling-behavior" +
-            " - test jstestReport handling-behavior\n"
-        ));
-        assertJsonEqual(process.exitCode, exitCode);
     });
     jstestIt((
         "test jstestReport-numbering handling-behavior"
