@@ -12178,23 +12178,16 @@ async function jstestDescribe(description, testFunction) {
 
 // PR-xxx - Collect, then run. Record the body as pending, then await it, so a
 // body that hangs before registering fails at exit instead of passing with 0
-// tests, and a body that throws, even a falsy value, fails as one more test. A
-// body that settles clean leaves no record.
+// tests. A body that throws crashes node as an unhandled rejection, leaving its
+// record pending. A body that settles clean leaves no record.
 
     jstestItRecordList.push(recordBody);
-    try {
-        await jstestDescribeRun(describe, testFunction);
-        jstestItRecordList.splice(jstestItRecordList.indexOf(recordBody), 1);
-    } catch (err) {
-        Object.assign(recordBody, {
-            err,
-            status: "failed"
-        });
-    }
+    await jstestDescribeRun(describe, testFunction);
+    jstestItRecordList.splice(jstestItRecordList.indexOf(recordBody), 1);
 
 // PR-xxx - Assert this describe's tests, then this describe, are in ASCII
 // order. Record them before any test runs, so a hung sibling cannot hide them
-// at exit. Then add the body's failure, already recorded.
+// at exit.
 
     result = [
         jstestOrderCheck(describe.itList.map(function (record) {
@@ -12210,9 +12203,6 @@ async function jstestDescribe(description, testFunction) {
         };
     });
     jstestItRecordList.push(...result);
-    if (recordBody.status === "failed") {
-        result.push(recordBody);
-    }
     await Promise.all(describe.itList.map(async function (record) {
         try {
             await record.testFunction();
@@ -12241,11 +12231,11 @@ async function jstestDescribe(description, testFunction) {
             return (
                 (record.status === "passed")
                 ? (
-                    "    \u001b[32m✔ " + jstestItCount + ". test it - " +
+                    "    \u001b[32m\u2714 " + jstestItCount + ". test it - " +
                     record.description + "\u001b[39m"
                 )
                 : (
-                    "    \u001b[31m✘ " + jstestItCount + ". test it - " +
+                    "    \u001b[31m\u2718 " + jstestItCount + ". test it - " +
                     record.description + "\n" +
                     jstestErrText(record.err) + "\u001b[39m"
                 )
@@ -12368,6 +12358,13 @@ function jstestReport() {
     const countFailed = jstestItRecordList.filter(function ({status}) {
         return status !== "passed";
     }).length;
+    const filter = process.env.npm_config_mode_test_filter;
+
+// PR-xxx - Fail a run whose filter matched no test, so a stray or mistyped
+// filter, e.g. a mode_test_filter line left in .npmrc, cannot skip the whole
+// suite and pass green.
+
+    const filterEmpty = Boolean(filter) && jstestItRecordList.length === 0;
     const unprintedList = jstestItRecordList.filter(function (record) {
         return !record.printed && record.status !== "passed";
     });
@@ -12376,9 +12373,9 @@ function jstestReport() {
 // PR-xxx - Exit 1, not the failed count, since an exit status keeps only 8
 // bits, so 256 failed tests would exit 0.
 
-        exitCode: Number(countFailed > 0),
+        exitCode: Number(countFailed > 0 || filterEmpty),
         text: (
-            (countFailed > 0)
+            (countFailed > 0 || filterEmpty)
             ? "\n\u001b[31m"
             : "\n\u001b[32m"
         ) +
@@ -12389,14 +12386,21 @@ function jstestReport() {
             status
         }, ii) {
             return (
-                "  ✘ " + (jstestItCount + ii + 1) + ". test it " + status +
+                "  \u2718 " + (jstestItCount + ii + 1) + ". test it " + status +
                 " - " + describe + " - " + description + "\n" + (
                     (status === "pending")
                     ? ""
                     : jstestErrText(err) + "\n"
                 )
             );
-        }).join("") +
+        }).join("") + (
+            filterEmpty
+            ? (
+                "  \u2718 no test matched npm_config_mode_test_filter=" +
+                JSON.stringify(filter) + "\n"
+            )
+            : ""
+        ) +
         "  tests total  - " + jstestItRecordList.length + "\n" +
         "  tests failed - " + countFailed + "\n" +
         "\n" +

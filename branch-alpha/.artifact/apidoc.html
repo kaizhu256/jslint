@@ -1582,23 +1582,16 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 
 // PR-xxx - Collect, then run. Record the body as pending, then await it, so a
 // body that hangs before registering fails at exit instead of passing with 0
-// tests, and a body that throws, even a falsy value, fails as one more test. A
-// body that settles clean leaves no record.
+// tests. A body that throws crashes node as an unhandled rejection, leaving its
+// record pending. A body that settles clean leaves no record.
 
     jstestItRecordList.push(recordBody);
-    try {
-        await jstestDescribeRun(describe, testFunction);
-        jstestItRecordList.splice(jstestItRecordList.indexOf(recordBody), 1);
-    } catch (err) {
-        Object.assign(recordBody, {
-            err,
-            status: "failed"
-        });
-    }
+    await jstestDescribeRun(describe, testFunction);
+    jstestItRecordList.splice(jstestItRecordList.indexOf(recordBody), 1);
 
 // PR-xxx - Assert this describe's tests, then this describe, are in ASCII
 // order. Record them before any test runs, so a hung sibling cannot hide them
-// at exit. Then add the body's failure, already recorded.
+// at exit.
 
     result = [
         jstestOrderCheck(describe.itList.map(function (record) {
@@ -1613,7 +1606,11 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
             status: "failed"
         };
     });
-    jstestItRecordList.p...
+    jstestItRecordList.push(...result);
+    await Promise.all(describe.itList.map(async function (record) {
+        try {
+            await record.testFunction();
+            record.status =...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

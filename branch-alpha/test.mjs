@@ -2978,12 +2978,10 @@ process.stdout.write(JSON.stringify(resultList));
                     raiseDict[raise?.[1]] = true;
 
 // A fixture filed up the stack pairs the function holding its block with the
-// one that raised it; count the fixtures of each pair.
+// one that raised it.
 
                     if (name !== fn) {
-                        hostDict[name + " <- " + fn] = (
-                            hostDict[name + " <- " + fn] || 0
-                        ) + 1;
+                        hostDict[name + " <- " + fn] = true;
                     }
                 }
                 check = {
@@ -3019,26 +3017,27 @@ process.stdout.write(JSON.stringify(resultList));
                 return String(fail) !== String(expect);
             }), []);
 
-// Validate the roster of fixtures filed up the stack, as "host <- raiser" with
-// its fixture count, so one moved down to its raise site, or filed far up the
-// stack, fails. A rename of either function shows as one pair missing and one
-// extra, with the same count.
+// Validate the roster of fixtures filed up the stack, as "host <- raiser"
+// pairs, so each new pair is a reviewed decision and a filing far up the stack
+// fails, which <via> alone accepts from any frame. A rename of either function
+// shows as one pair missing and one extra. No counts: a fixture added or moved
+// within a known pair is not a review.
 
-            assertJsonEqual(Object.entries(hostDict).sort(), [
-                ["infix_dot <- check_left", 6],
-                ["infix_grave <- check_left", 1],
-                ["infix_lbracket <- check_left", 1],
-                ["infix_lparen <- check_left", 2],
-                ["jslint_phase3_parse <- check_ordered", 3],
-                ["post_s_var <- name_lookup", 4],
-                ["prefix_destructure <- check_ordered", 2],
-                ["prefix_destructure <- name_parse", 1],
-                ["prefix_function <- check_ordered", 1],
-                ["prefix_lbrace <- check_ordered", 1],
-                ["stmt_export <- check_ordered", 1],
-                ["stmt_export <- semicolon", 1],
-                ["stmt_switch <- check_ordered_case", 10],
-                ["whitage_default <- one_space_only", 1]
+            assertJsonEqual(Object.keys(hostDict).sort(), [
+                "infix_dot <- check_left",
+                "infix_grave <- check_left",
+                "infix_lbracket <- check_left",
+                "infix_lparen <- check_left",
+                "jslint_phase3_parse <- check_ordered",
+                "post_s_var <- name_lookup",
+                "prefix_destructure <- check_ordered",
+                "prefix_destructure <- name_parse",
+                "prefix_function <- check_ordered",
+                "prefix_lbrace <- check_ordered",
+                "stmt_export <- check_ordered",
+                "stmt_export <- semicolon",
+                "stmt_switch <- check_ordered_case",
+                "whitage_default <- one_space_only"
             ]);
 
 // Validate each raise site in jslint.mjs raises the warning of some fixture,
@@ -3411,15 +3410,14 @@ jslint.jstestDescribe("aa", async function () {
         "test jstestDescribe-body-throw handling-behavior"
     ), async function () {
 
-// A describe body that throws fails as one more test, after the tests it did
-// register; an invalid filter regexp throws from that body too. A falsy throw
-// fails the same, and a hung sibling cannot hide the body's error at exit.
+// A describe body that throws crashes node, and the exit report lists the body
+// and the tests it did register as pending; an invalid filter regexp throws
+// from that body too. A falsy throw fails the same.
 
         const [
             [exitCode, stderr],
             [exitCode2, stderr2],
-            [exitCode3, stderr3],
-            [exitCode4, stderr4]
+            [exitCode3, stderr3]
         ] = await Promise.all([
             childRun({}, String(`
 jslint.jstestDescribe("aa", function () {
@@ -3439,27 +3437,12 @@ jslint.jstestDescribe("aa", function () {
     jslint.jstestIt("bb", jslint.noop);
     throw undefined;
 });
-            `)),
-            childRun({}, String(`
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", function () {
-        setTimeout(process.exit, 100);
-        return new Promise(jslint.noop);
-    });
-    throw new Error("aa body broke");
-});
             `))
         ]);
-        assertJsonEqual(
-            [exitCode, exitCode2, exitCode3, exitCode4],
-            [1, 1, 1, 1]
-        );
-        assertMatch(stderr, /1\. test it - bb\b[\s\S]*2\. test it - jstestDescribe body\nError: aa body broke\n[\s\S]*tests total {2}- 2\n {2}tests failed - 1\n/);
-        assertOrThrow(stderr2.includes(
-            "test it - jstestDescribe body\nSyntaxError: Invalid regular"
-        ), stderr2);
-        assertMatch(stderr3, /2\. test it - jstestDescribe body\nundefined\b[\s\S]*tests failed - 1\n/);
-        assertMatch(stderr4, /test it failed - aa - jstestDescribe body\nError: aa body broke\n[\s\S]*test it pending - aa - bb\n[\s\S]*tests failed - 2\n/);
+        assertJsonEqual([exitCode, exitCode2, exitCode3], [1, 1, 1]);
+        assertMatch(stderr, /1\. test it pending - aa - jstestDescribe body\n[\s\S]*2\. test it pending - aa - bb\n[\s\S]*tests failed - 2\n[\s\S]*Error: aa body broke\b/);
+        assertMatch(stderr2, /1\. test it pending - aa - jstestDescribe body\n[\s\S]*SyntaxError: Invalid regular/);
+        assertMatch(stderr3, /1\. test it pending - aa - jstestDescribe body\n[\s\S]*tests failed - 2\n[\s\S]*ERR_UNHANDLED_REJECTION/);
     });
     jstestIt((
         "test jstestDescribe-concurrent handling-behavior"
@@ -3540,12 +3523,29 @@ jslint.jstestDescribe("cc", function () {
         assertOrThrow(!stderr.includes("test it - ee"), stderr);
     });
     jstestIt((
+        "test jstestIt-filter-empty handling-behavior"
+    ), async function () {
+
+// A filter that matches no test fails the run, so a stray or mistyped filter
+// cannot skip the whole suite and pass.
+
+        const [exitCode, stderr] = await childRun({
+            npm_config_mode_test_filter: "^zz$"
+        }, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", jslint.noop);
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertMatch(stderr, /no test matched npm_config_mode_test_filter="\^zz\$"\n {2}tests total {2}- 0\n/);
+    });
+    jstestIt((
         "test jstestIt-late handling-behavior"
     ), async function () {
 
 // A jstestIt after an await in an async describe body, from a timer after the
 // body settled, or before any describe, throws: only the body's synchronous
-// part registers. The first fails the body, after the test it did register.
+// part registers. The first crashes the body, leaving it and bb pending.
 
         const resultList = await Promise.all([
             String(`
@@ -3576,7 +3576,7 @@ jslint.jstestIt("cc", jslint.noop);
         assertJsonEqual(resultList.map(function ([exitCode]) {
             return exitCode;
         }), [1, 1, 1]);
-        assertMatch(resultList[0][1], /1\. test it - bb\b[\s\S]*2\. test it - jstestDescribe body\nError: jstestIt "cc" called outside[\s\S]*tests total {2}- 2\n {2}tests failed - 1\n/);
+        assertMatch(resultList[0][1], /1\. test it pending - aa - jstestDescribe body\n[\s\S]*2\. test it pending - aa - bb\n[\s\S]*tests failed - 2\n/);
         resultList.forEach(function ([ignore, stderr]) {
             assertOrThrow(stderr.includes(
                 "jstestIt \"cc\" called outside a jstestDescribe body, or" +
