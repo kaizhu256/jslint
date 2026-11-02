@@ -3697,7 +3697,9 @@ jslint.jstestDescribe("aa", function () {
 
 // An error escaping a test, from a timer or an un-awaited rejection, still
 // crashes, and the exit report names that test as crashed, its slow sibling as
-// pending. A crash from outside any test names none.
+// pending. A crash from outside any test names none: its timer starts in the
+// describe body, after bb registers, since a top-level timer raced the
+// runner's init and fired first on a slow macOS runner.
 
         const resultList = await Promise.all([
             String(`
@@ -3737,15 +3739,15 @@ jslint.jstestDescribe("aa", function () {
 });
             `),
             String(`
-setTimeout(function () {
-    throw new Error("outside boom");
-}, 20);
 jslint.jstestDescribe("aa", function () {
     jslint.jstestIt("bb", function () {
         return new Promise(function (resolve) {
             setTimeout(resolve, 200);
         });
     });
+    setTimeout(function () {
+        throw new Error("outside boom");
+    }, 20);
 });
             `)
         ].map(function (source) {
