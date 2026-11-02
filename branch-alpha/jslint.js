@@ -134,7 +134,6 @@
     context_report,
     convert,
     count,
-    countFailed,
     coverageDir,
     create,
     cwd,
@@ -799,11 +798,11 @@ const jslint_rgx_url_search_window_jslint = (
 const jslint_rgx_weird_property = (
     /^_|\$|Sync$|_$/m
 );
+const jstestDescribePrvDict = Object.create(null);
 const jstestItRecordList = [];
 let jslint_export;                      // The jslint object to be exported.
 let jslint_import_meta_url = "";        // import.meta.url used by cli.
 let jstestAls;
-let jstestDescribePrv = "";
 let jstestItCount = 0;
 let jstestTimeStart;
 let moduleChildProcess;
@@ -12159,12 +12158,21 @@ async function jstestDescribe(description, testFunction) {
 // This function will collect test-group <testFunction>'s tests with given
 // <description>, then run them.
 
+// PR-xxx - Key the describe before this one by the file that calls it, from
+// the stack, so a process importing several test files checks each file's
+// order alone.
+
+    const caller = String(
+        String(new Error().stack).split("\n")[2]
+    ).replace((
+        /^\s*at (?:.*? \()?(.*?):\d+:\d+\)?$/
+    ), "$1");
     const describe = {
         collected: false,
         description,
         itList: []
     };
-    const describePrv = jstestDescribePrv;
+    const describePrv = jstestDescribePrvDict[caller] ?? "";
     let errBody;
     let message;
     let result;
@@ -12172,7 +12180,7 @@ async function jstestDescribe(description, testFunction) {
 // Record <description> before the first await, since describes then
 // interleave and finish out of source order.
 
-    jstestDescribePrv = description;
+    jstestDescribePrvDict[caller] = description;
 
 // Init jstestTimeStart.
 
@@ -12230,23 +12238,12 @@ async function jstestDescribe(description, testFunction) {
     });
     jstestItRecordList.push(...result);
     await Promise.all(describe.itList.map(async function (record) {
-        let settle = {
-            status: "passed"
-        };
         try {
             await jstestAls.run({describe, record}, record.testFunction);
+            record.status = "passed";
         } catch (err) {
-            settle = {
-                err,
-                status: "failed"
-            };
-        }
-
-// PR-xxx - A test settles once, so a crash <jstestOnCrash> recorded while it
-// ran stands, even when a user's own uncaughtException handler lets it finish.
-
-        if (record.status === "pending") {
-            Object.assign(record, settle);
+            record.err = err;
+            record.status = "failed";
         }
     }));
     result.unshift(...describe.itList);
@@ -12353,9 +12350,9 @@ function jstestOnExit(exitCode) {
 // This function will on process-exit, print test-report
 // and exit with non-zero exit-code if any test failed.
 
-    const {countFailed, text} = jstestReport();
-    console.error(text);
-    process.exitCode = exitCode || countFailed;
+    const report = jstestReport();
+    console.error(report.text);
+    process.exitCode = exitCode || report.exitCode;
 }
 
 function jstestOrderCheck(descriptionList) {
@@ -12384,7 +12381,7 @@ function jstestOrderCheck(descriptionList) {
 
 function jstestReport() {
 
-// This function will return the test-report <text> and its <countFailed>,
+// This function will return the test-report <text> and its <exitCode>,
 // without side effects.
 
 // PR-xxx - List and count as failed each test its describe never printed: one
@@ -12394,13 +12391,23 @@ function jstestReport() {
     const countFailed = jstestItRecordList.filter(function ({status}) {
         return status !== "passed";
     }).length;
+    const filter = process.env.npm_config_mode_test_filter;
+
+// PR-xxx - Fail a run whose filter matched no test, so a stray or mistyped
+// filter cannot skip the whole suite and pass.
+
+    const filterEmpty = Boolean(filter) && jstestItRecordList.length === 0;
     const unprintedList = jstestItRecordList.filter(function (record) {
         return !record.printed && record.status !== "passed";
     });
     return {
-        countFailed,
+
+// PR-xxx - Exit 1, not the failed count, since an exit status keeps only 8
+// bits, so 256 failed tests would exit 0.
+
+        exitCode: Number(countFailed > 0 || filterEmpty),
         text: (
-            countFailed
+            (countFailed || filterEmpty)
             ? "\n\u001b[31m"
             : "\n\u001b[32m"
         ) +
@@ -12418,7 +12425,14 @@ function jstestReport() {
                     : jstestErrText(err) + "\n"
                 )
             );
-        }).join("") +
+        }).join("") + (
+            filterEmpty
+            ? (
+                "  \u2718 no test matched npm_config_mode_test_filter=" +
+                JSON.stringify(filter) + "\n"
+            )
+            : ""
+        ) +
         "  tests total  - " + jstestItRecordList.length + "\n" +
         "  tests failed - " + countFailed + "\n" +
         "\n" +

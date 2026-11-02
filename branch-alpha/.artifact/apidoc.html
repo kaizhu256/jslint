@@ -1562,12 +1562,21 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 // This function will collect test-group &lt;testFunction&gt;'s tests with given
 // &lt;description&gt;, then run them.
 
-</span>    const describe = {
+</span>// PR-xxx - Key the describe before this one by the file that calls it, from
+// the stack, so a process importing several test files checks each file's
+// order alone.
+
+    const caller = String(
+        String(new Error().stack).split("\n")[2]
+    ).replace((
+        /^\s*at (?:.*? \()?(.*?):\d+:\d+\)?$/
+    ), "$1");
+    const describe = {
         collected: false,
         description,
         itList: []
     };
-    const describePrv = jstestDescribePrv;
+    const describePrv = jstestDescribePrvDict[caller] ?? "";
     let errBody;
     let message;
     let result;
@@ -1575,7 +1584,7 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 // Record &lt;description&gt; before the first await, since describes then
 // interleave and finish out of source order.
 
-    jstestDescribePrv = description;
+    jstestDescribePrvDict[caller] = description;
 
 // Init jstestTimeStart.
 
@@ -1603,18 +1612,7 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
     });
 
 // PR-xxx - Collect, then run: await the whole body, async or not, before any
-// test starts. A body that throws fails as one more test, wrapped, so a falsy
-// throw still fails.
-
-    try {
-        await jstestAls.run({describe}, testFunction);
-    } catch (err) {
-        errBody = [err, "jstestDescribe body"];
-    }
-    describe.collected = true;
-
-// PR-xxx - Assert this describe's tests, then this describe, are in ASCII
-// order. Then add one failed result for a bo...
+// test starts. A body that throws fails a...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1627,7 +1625,7 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 
 <span class="apidocCodeKeywordSpan">jstestDescribe</span>((
     "test v8CoverageReportCreate handling-behavior"
-), function testBehaviorV8CoverageReportCreate() {
+), function () {
     jstestIt((
         "test coverage-hole-closing-midline handling-behavior"
     ), async function () {
@@ -1757,7 +1755,7 @@ assertJsonEqual([
 </li>
 <li>Description and source-code:<pre class="apidocCodePre">function jstestReport() {
 <span class="apidocCodeCommentSpan">
-// This function will return the test-report &lt;text&gt; and its &lt;countFailed&gt;,
+// This function will return the test-report &lt;text&gt; and its &lt;exitCode&gt;,
 // without side effects.
 
 </span>// PR-xxx - List and count as failed each test its describe never printed: one
@@ -1767,13 +1765,23 @@ assertJsonEqual([
     const countFailed = jstestItRecordList.filter(function ({status}) {
         return status !== "passed";
     }).length;
+    const filter = process.env.npm_config_mode_test_filter;
+
+// PR-xxx - Fail a run whose filter matched no test, so a stray or mistyped
+// filter cannot skip the whole suite and pass.
+
+    const filterEmpty = Boolean(filter) &amp;&amp; jstestItRecordList.length === 0;
     const unprintedList = jstestItRecordList.filter(function (record) {
         return !record.printed &amp;&amp; record.status !== "passed";
     });
     return {
-        countFailed,
+
+// PR-xxx - Exit 1, not the failed count, since an exit status keeps only 8
+// bits, so 256 failed tests would exit 0.
+
+        exitCode: Number(countFailed &gt; 0 || filterEmpty),
         text: (
-            countFailed
+            (countFailed || filterEmpty)
             ? "\n\u001b[31m"
             : "\n\u001b[32m"
         ) +
@@ -1791,16 +1799,18 @@ assertJsonEqual([
                     : jstestErrText(err) + "\n"
                 )
             );
-        }).join("") +
+        }).join("") + (
+            filterEmpty
+            ? (
+                "  \u2718 no test matched npm_config_mode_test_filter=" +
+                JSON.stringify(filter) + "\n"
+            )
+            : ""
+        ) +
         "  tests total  - " + jstestItRecordList.length + "\n" +
-        "  tests failed - " + countFailed + "\n" +
-        "\n" +
-        "  time finished - " +
-        Number(Date.now() - jstestTimeStart).toLocaleString() +
-        " ms\n" +
-        "\u001b[39m"
-    };
-}</pre></li>
+        "  tests failed - " +...
+}
+</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
     "test jstestReport handling-behavior"
 ), function () {

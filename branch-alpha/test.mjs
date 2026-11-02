@@ -123,7 +123,7 @@ function processExit1(exitCode) {
 
 jstestDescribe((
     "test assertXxx handling-behavior"
-), function testBehaviorAssertXxx() {
+), function () {
     jstestIt((
         "test assertXxx-error handling-behavior"
     ), async function () {
@@ -155,7 +155,7 @@ jstestDescribe((
 
 jstestDescribe((
     "test fsXxx handling-behavior"
-), function testBehaviorFsXxx() {
+), function () {
     jstestIt((
         "test fsWriteFileWithParents handling-behavior"
     ), async function () {
@@ -179,7 +179,7 @@ jstestDescribe((
 
 jstestDescribe((
     "test globXxx handling-behavior"
-), function testBehaviorGlobXxx() {
+), function () {
     jstestIt((
         "test globAssertNotWeird-error handling-behavior"
     ), async function () {
@@ -500,7 +500,7 @@ jstestDescribe((
 
 jstestDescribe((
     "test jslint's autofix handling-behavior"
-), function testBehaviorJslintAutofix() {
+), function () {
     jstestIt((
         "test autofix-api handling-behavior"
     ), function () {
@@ -1090,7 +1090,7 @@ aa(dd(0), 0);
 
 jstestDescribe((
     "test jslint's cli handling-behavior"
-), function testBehaviorJslintCli() {
+), function () {
     jstestIt((
         "test cli-apidoc handling-behavior"
     ), function () {
@@ -1408,7 +1408,7 @@ jstestDescribe((
 
 jstestDescribe((
     "test jslint's no-warnings handling-behavior"
-), function testBehaviorJslintNoWarnings() {
+), function () {
     jstestIt((
         "test jslint's no-warnings handling-behavior"
     ), function () {
@@ -2058,7 +2058,7 @@ aa();
 
 jstestDescribe((
     "test jslint's option handling-behavior"
-), function testBehaviorJslintOption() {
+), function () {
 
 // Samples group by option, so each option is one test with a unique name.
 
@@ -2195,7 +2195,7 @@ function aa() {
 
 jstestDescribe((
     "test jslint's report handling-behavior"
-), function testBehaviorJslintReport() {
+), function () {
     jstestIt((
         "test report-autofix handling-behavior"
     ), function () {
@@ -2503,7 +2503,7 @@ function vv(ww = (xx = 1) => "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") {
 
 jstestDescribe((
     "test jslint's warnings handling-behavior"
-), function testBehaviorJslintWarnings() {
+), function () {
     jstestIt((
         "test binding-power handling-behavior"
     ), function () {
@@ -2618,8 +2618,12 @@ ff();
 // up the stack, and that each raise site in jslint.mjs has a fixture.
 
         const controlList = [];
+        const fixtureLineList = [];
         const fixtureList = [];
         const raiserList = ["stop", "stop_at", "warn", "warn_at"];
+        const rgxFixtureLine = (
+            /^\/\/ (?!\/\/).*, \d+\](?: \/\/jslint-ignore-line)?$/gm
+        );
         const rgxFrame = (
             /^ {4}at (?:(?:Object\.)?([\w.]+).*? \()?.*?jslint\.mjs:(\d+):/gm
         );
@@ -2633,10 +2637,7 @@ ff();
                 sourceJslintMjs.slice(0, anchor).match(/\n/g).length + 1
             );
             const [source, fn, code, aa, column] = cause;
-            const {warnings} = jslint.jslint(source, {
-                beta: true,
-                trace: true
-            });
+            const warnings = jslintTrace(source);
 
 // List each warning with its frames in jslint.mjs, by the stack that option
 // trace records, as [name, line] innermost first, and the frames above the
@@ -2725,11 +2726,22 @@ ff();
                 via: code === "(live)" || warningsVia.length > 0
             });
         }
+        function jslintTrace(source) {
 
-// Keep every frame, since a fixture filed up the stack can sit past V8's
-// default of 10.
+// This function will lint <source> with option trace, keeping every frame,
+// since a fixture filed up the stack can sit past V8's default of 10. Restore
+// the limit even if jslint throws, so no other test inherits it.
 
-        Error.stackTraceLimit = Infinity;
+            Error.stackTraceLimit = Infinity;
+            try {
+                return jslint.jslint(source, {
+                    beta: true,
+                    trace: true
+                }).warnings;
+            } finally {
+                Error.stackTraceLimit = stackTraceLimit;
+            }
+        }
 
         sourceJslintMjs.replace((
             /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?) *?\S/g
@@ -2741,6 +2753,7 @@ ff();
             assertOrThrow(header === "\n\n// test_cause:\n", match0);
             // Validate footer.
             assertOrThrow(footer === "\n\n", match0);
+            fixtureLineList.push(...match0.match(rgxFixtureLine));
             // Validate causeList.
             causeList = causeList.replace((
                 /^\/\/ /gm
@@ -2784,12 +2797,19 @@ ff();
         });
 
 // Validate each fixture's last line was parsed in a block, so a misspelled
-// header fails, instead of hiding its block. Commented-out code keeps its
+// header fails, naming the lines it hid, instead of hiding its block. The
+// count catches a line that two blocks share. Commented-out code keeps its
 // blocks as '// // test_cause:', unchecked.
 
-        assertJsonEqual(sourceJslintMjs.match(
-            /^\/\/ (?!\/\/).*, \d+\](?: \/\/jslint-ignore-line)?$/gm
-        ).length, fixtureList.length);
+        assertJsonEqual(sourceJslintMjs.match(rgxFixtureLine).filter(
+            function (line) {
+                return !fixtureLineList.includes(line);
+            }
+        ), []);
+        assertJsonEqual(
+            sourceJslintMjs.match(rgxFixtureLine).length,
+            fixtureLineList.length
+        );
 
 // Negative controls: each bad fixture, filed in the block of a good one, must
 // fail exactly the named check, so a weakened checker turns this test red.
@@ -2884,7 +2904,6 @@ ff();
             fixturePush(controlList, bad, found.anchor);
             controlList.at(-1).expect = expect;
         }
-        Error.stackTraceLimit = stackTraceLimit;
 
 // Measure each fixture's coverage in a child, since taking precise coverage
 // resets the counters that NODE_V8_COVERAGE dumps at exit.
@@ -3046,7 +3065,7 @@ process.stdout.write(JSON.stringify(resultList));
 
 jstestDescribe((
     "test jslint_wrapper_vscode handling-behavior"
-), function testBehaviorJslintWrapperVscode() {
+), function () {
     jstestIt((
         "test jslint_wrapper_vscode commands handling-behavior"
     ), async function () {
@@ -3371,7 +3390,7 @@ ${sourceWrapper}
 
 jstestDescribe((
     "test jstestXxx handling-behavior"
-), function testBehaviorJstestXxx() {
+), function () {
     jstestIt((
         "test jstestDescribe-body-throw handling-behavior"
     ), async function () {
@@ -3417,14 +3436,14 @@ jslint.jstestDescribe("aa", function () {
         ]);
         assertJsonEqual(
             [exitCode, exitCode2, exitCode3, exitCode4],
-            [1, 1, 1, 2]
+            [1, 1, 1, 1]
         );
         assertMatch(stderr, /1\. test it - bb\b[\s\S]*2\. test it - jstestDescribe body\nError: aa body broke\n[\s\S]*tests total {2}- 2\n {2}tests failed - 1\n/);
         assertOrThrow(stderr2.includes(
             "test it - jstestDescribe body\nSyntaxError: Invalid regular"
         ), stderr2);
         assertMatch(stderr3, /2\. test it - jstestDescribe body\nundefined\b[\s\S]*tests failed - 1\n/);
-        assertMatch(stderr4, /test it pending - aa - bb\n[\s\S]*test it failed - aa - jstestDescribe body\nError: aa body broke\n/);
+        assertMatch(stderr4, /test it pending - aa - bb\n[\s\S]*test it failed - aa - jstestDescribe body\nError: aa body broke\n[\s\S]*tests failed - 2\n/);
     });
     jstestIt((
         "test jstestDescribe-concurrent handling-behavior"
@@ -3466,7 +3485,8 @@ jslint.jstestDescribe("aa", function () {
     jslint.jstestIt("dd", jslint.noop);
 });
         `));
-        assertJsonEqual(exitCode, 2);
+        assertJsonEqual(exitCode, 1);
+        assertMatch(stderr, /tests failed - 2\n/);
         assertOrThrow(stderr.includes(
             "\"aa\" must sort before \"bb\""
         ), stderr);
@@ -3477,6 +3497,41 @@ jslint.jstestDescribe("aa", function () {
 // A failure its describe printed is not listed again at exit.
 
         assertOrThrow(!stderr.includes("test it failed"), stderr);
+    });
+    jstestIt((
+        "test jstestDescribe-order-file handling-behavior"
+    ), async function () {
+
+// A process importing two test files checks each file's describe order alone:
+// bb.mjs's "aa" after aa.mjs's "cc" passes, while aa.mjs's own "bb" after "cc"
+// still fails.
+
+        let exitCode;
+        let stderr;
+        await fsWriteFileWithParents(".tmp/jstest_order_file/aa.mjs", String(`
+import jslint from "../../jslint.mjs";
+jslint.jstestDescribe("cc", function () {
+    jslint.jstestIt("dd", jslint.noop);
+});
+jslint.jstestDescribe("bb", function () {
+    jslint.jstestIt("dd", jslint.noop);
+});
+        `));
+        await fsWriteFileWithParents(".tmp/jstest_order_file/bb.mjs", String(`
+import jslint from "../../jslint.mjs";
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("dd", jslint.noop);
+});
+        `));
+        [exitCode, stderr] = await childRun({}, String(`
+import "./.tmp/jstest_order_file/aa.mjs";
+import "./.tmp/jstest_order_file/bb.mjs";
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertOrThrow(stderr.includes(
+            "\"bb\" must sort before \"cc\""
+        ), stderr);
+        assertOrThrow(!stderr.includes("\"aa\" must sort before"), stderr);
     });
     jstestIt((
         "test jstestIt-filter handling-behavior"
@@ -3502,6 +3557,23 @@ jslint.jstestDescribe("cc", function () {
         assertMatch(stderr, /test describe - cc\n.*1\. test it - dd\b[\s\S]*tests total {2}- 1\n/);
         assertOrThrow(!stderr.includes("test describe - aa"), stderr);
         assertOrThrow(!stderr.includes("test it - ee"), stderr);
+    });
+    jstestIt((
+        "test jstestIt-filter-empty handling-behavior"
+    ), async function () {
+
+// A filter that matches no test fails the run, so a stray or mistyped filter
+// cannot skip the whole suite and pass.
+
+        const [exitCode, stderr] = await childRun({
+            npm_config_mode_test_filter: "^zz$"
+        }, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", jslint.noop);
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertMatch(stderr, /no test matched npm_config_mode_test_filter="\^zz\$"\n {2}tests total {2}- 0\n/);
     });
     jstestIt((
         "test jstestIt-late handling-behavior"
@@ -3614,10 +3686,10 @@ jslint.jstestDescribe("aa", function () {
 });
             `))
         ]);
-        assertJsonEqual([exitCode, exitCode2], [4, 3]);
+        assertJsonEqual([exitCode, exitCode2], [1, 1]);
         assertMatch(stderr, /1\. test it - bb\nundefined\b[\s\S]*2\. test it - cc\nundefined\b[\s\S]*3\. test it - dd\ndd string\b[\s\S]*4\. test it - ee\n\[object\][\s\S]*tests failed - 4\n/);
         assertOrThrow(!stderr.includes("TypeError"), stderr);
-        assertMatch(stderr2, /test it failed - aa - bb\nbb string\n[\s\S]*test it failed - aa - bc\n0\n/);
+        assertMatch(stderr2, /test it failed - aa - bb\nbb string\n[\s\S]*test it failed - aa - bc\n0\n[\s\S]*tests failed - 3\n/);
     });
     jstestIt((
         "test jstestOnExit-crash handling-behavior"
@@ -3695,27 +3767,25 @@ jslint.jstestDescribe("aa", function () {
         );
     });
     jstestIt((
-        "test jstestOnExit-crash-handled handling-behavior"
+        "test jstestOnExit-exit-code handling-behavior"
     ), async function () {
 
-// A user's own uncaughtException handler lets a test that crashed mid-run
-// finish, and it still fails, since a test settles once.
+// 256 failed tests exit 1, not their count, which an 8-bit exit status would
+// wrap to a passing 0.
 
         const [exitCode, stderr] = await childRun({}, String(`
-process.on("uncaughtException", jslint.noop);
 jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", function () {
-        setTimeout(function () {
-            throw new Error("bb handled boom");
-        }, 10);
-        return new Promise(function (resolve) {
-            setTimeout(resolve, 50);
+    let ii = 0;
+    while (ii < 256) {
+        jslint.jstestIt(String(1000 + ii), function () {
+            throw new Error();
         });
-    });
+        ii += 1;
+    }
 });
         `));
         assertJsonEqual(exitCode, 1);
-        assertMatch(stderr, /1\. test it - bb\nError: bb handled boom\n[\s\S]*tests failed - 1\n/);
+        assertMatch(stderr, /tests total {2}- 256\n {2}tests failed - 256\n/);
     });
     jstestIt((
         "test jstestOnExit-pending handling-behavior"
@@ -3759,7 +3829,7 @@ jslint.jstestDescribe("aa", function () {
     });
 });
         `));
-        assertJsonEqual(exitCode, 2);
+        assertJsonEqual(exitCode, 1);
         assertMatch(stderr, /1\. test it failed - aa - bb\nError: bb real error\n[\s\S]*2\. test it pending - aa - cc\n {2}tests total {2}- 2\n {2}tests failed - 2\n/);
     });
     jstestIt((
@@ -3832,7 +3902,7 @@ jslint.jstestDescribe("cc", function () {
 
 jstestDescribe((
     "test v8CoverageListMerge handling-behavior"
-), function testBehaviorV8CoverageListMerge() {
+), function () {
     let functionsInput = JSON.stringify([
         {
             functionName: "test",
@@ -4045,7 +4115,7 @@ jstestDescribe((
 
 jstestDescribe((
     "test v8CoverageReportCreate handling-behavior"
-), function testBehaviorV8CoverageReportCreate() {
+), function () {
     jstestIt((
         "test coverage-hole-closing-midline handling-behavior"
     ), async function () {
