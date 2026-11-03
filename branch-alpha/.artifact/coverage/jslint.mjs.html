@@ -2160,15 +2160,15 @@ body {
 <pre><span class="lineno"><a href="#line_1995" id="line_1995"> 1995.</a></span><span class="count                ">   1020</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_1996" id="line_1996"> 1996.</a></span><span class="count                ">   1020</span><span>// Sort warning_list by mode_stop first, line, column respectively.</span></pre>
 <pre><span class="lineno"><a href="#line_1997" id="line_1997"> 1997.</a></span><span class="count                ">   1020</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_1998" id="line_1998"> 1998.</a></span><span class="count                ">   1824</span><span>    warning_list.sort(function (aa, bb) {</span></pre>
-<pre><span class="lineno"><a href="#line_1999" id="line_1999"> 1999.</a></span><span class="count                ">   1824</span><span>        return (</span></pre>
-<pre><span class="lineno"><a href="#line_2000" id="line_2000"> 2000.</a></span><span class="count                ">   1705</span><span>            Boolean(bb.mode_stop) - Boolean(aa.mode_stop) ||</span></pre>
-<pre><span class="lineno"><a href="#line_2001" id="line_2001"> 2001.</a></span><span class="count                ">   1705</span><span>            aa.line - bb.line ||</span></pre>
-<pre><span class="lineno"><a href="#line_2002" id="line_2002"> 2002.</a></span><span class="count                ">   1672</span><span>            aa.column - bb.column</span></pre>
-<pre><span class="lineno"><a href="#line_2003" id="line_2003"> 2003.</a></span><span class="count                ">   1824</span><span>        );</span></pre>
-<pre><span class="lineno"><a href="#line_2004" id="line_2004"> 2004.</a></span><span class="count                ">   1824</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2005" id="line_2005"> 2005.</a></span><span class="count                ">   1824</span><span>// Update each warning with formatted_message ready-for-use by jslint_cli.</span></pre>
-<pre><span class="lineno"><a href="#line_2006" id="line_2006"> 2006.</a></span><span class="count                ">   1824</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_1998" id="line_1998"> 1998.</a></span><span class="count                ">   1696</span><span>    warning_list.sort(function (aa, bb) {</span></pre>
+<pre><span class="lineno"><a href="#line_1999" id="line_1999"> 1999.</a></span><span class="count                ">   1696</span><span>        return (</span></pre>
+<pre><span class="lineno"><a href="#line_2000" id="line_2000"> 2000.</a></span><span class="count                ">   1592</span><span>            Boolean(bb.mode_stop) - Boolean(aa.mode_stop) ||</span></pre>
+<pre><span class="lineno"><a href="#line_2001" id="line_2001"> 2001.</a></span><span class="count                ">   1592</span><span>            aa.line - bb.line ||</span></pre>
+<pre><span class="lineno"><a href="#line_2002" id="line_2002"> 2002.</a></span><span class="count                ">   1560</span><span>            aa.column - bb.column</span></pre>
+<pre><span class="lineno"><a href="#line_2003" id="line_2003"> 2003.</a></span><span class="count                ">   1696</span><span>        );</span></pre>
+<pre><span class="lineno"><a href="#line_2004" id="line_2004"> 2004.</a></span><span class="count                ">   1696</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2005" id="line_2005"> 2005.</a></span><span class="count                ">   1696</span><span>// Update each warning with formatted_message ready-for-use by jslint_cli.</span></pre>
+<pre><span class="lineno"><a href="#line_2006" id="line_2006"> 2006.</a></span><span class="count                ">   1696</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2007" id="line_2007"> 2007.</a></span><span class="count                ">   1992</span><span>    }).map(function ({</span></pre>
 <pre><span class="lineno"><a href="#line_2008" id="line_2008"> 2008.</a></span><span class="count                ">   1992</span><span>        column,</span></pre>
 <pre><span class="lineno"><a href="#line_2009" id="line_2009"> 2009.</a></span><span class="count                ">   1992</span><span>        line,</span></pre>
@@ -7925,7 +7925,7 @@ body {
 <pre><span class="lineno"><a href="#line_7760" id="line_7760"> 7760.</a></span><span class="count                ">     17</span><span>                the_id = the_name.id;</span></pre>
 <pre><span class="lineno"><a href="#line_7761" id="line_7761"> 7761.</a></span><span class="count                ">     17</span><span>                the_name.used = true;</span></pre>
 <pre><span class="lineno"><a href="#line_7762" id="line_7762"> 7762.</a></span><span class="count                ">     17</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_7763" id="line_7763"> 7763.</a></span><span class="count                ">     17</span><span>// PR-xxx - deadcode-confirmed - This duplicate is never shown. An earlier</span></pre>
+<pre><span class="lineno"><a href="#line_7763" id="line_7763"> 7763.</a></span><span class="count                ">     17</span><span>// PR-517 - deadcode-confirmed - This duplicate is never shown. An earlier</span></pre>
 <pre><span class="lineno"><a href="#line_7764" id="line_7764"> 7764.</a></span><span class="count                ">     17</span><span>// export of &lt;the_id&gt; needs it declared at top level, so declaring it again</span></pre>
 <pre><span class="lineno"><a href="#line_7765" id="line_7765"> 7765.</a></span><span class="count                ">     17</span><span>// above warns redefinition_a_b on the same token first, and &lt;warn&gt; drops a</span></pre>
 <pre><span class="lineno"><a href="#line_7766" id="line_7766"> 7766.</a></span><span class="count                ">     17</span><span>// second warning on one token.</span></pre>
@@ -9942,7 +9942,7 @@ body {
 <pre><span class="lineno"><a href="#line_9777" id="line_9777"> 9777.</a></span><span class="count                ">   7548</span><span>                thing.expression[0].arity === "unary" &amp;&amp;</span></pre>
 <pre><span class="lineno"><a href="#line_9778" id="line_9778"> 9778.</a></span><span class="count                ">   7548</span><span>                !thing.expression[0].wrapped &amp;&amp;</span></pre>
 <pre><span class="lineno"><a href="#line_9779" id="line_9779"> 9779.</a></span><span class="count                ">   7548</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9780" id="line_9780"> 9780.</a></span><span class="count                ">   7548</span><span>// PR-xxx - deadcode-confirmed - A 'void' here never showed its warning, since</span></pre>
+<pre><span class="lineno"><a href="#line_9780" id="line_9780"> 9780.</a></span><span class="count                ">   7548</span><span>// PR-517 - deadcode-confirmed - A 'void' here never showed its warning, since</span></pre>
 <pre><span class="lineno"><a href="#line_9781" id="line_9781"> 9781.</a></span><span class="count                ">   7548</span><span>// &lt;prefix_void&gt; has already warned on the same token, and &lt;warn&gt; drops a</span></pre>
 <pre><span class="lineno"><a href="#line_9782" id="line_9782"> 9782.</a></span><span class="count                ">   7548</span><span>// second warning on one token.</span></pre>
 <pre><span class="lineno"><a href="#line_9783" id="line_9783"> 9783.</a></span><span class="count                ">   7548</span><span>//</span></pre>
@@ -10053,7 +10053,7 @@ body {
 <pre><span class="lineno"><a href="#line_9888" id="line_9888"> 9888.</a></span><span class="count                ">  11468</span><span>        } else if (left.identifier) {</span></pre>
 <pre><span class="lineno"><a href="#line_9889" id="line_9889"> 9889.</a></span><span class="count                ">  11468</span><span>            if (the_new !== undefined) {</span></pre>
 <pre><span class="lineno"><a href="#line_9890" id="line_9890"> 9890.</a></span><span class="count                ">  11468</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_9891" id="line_9891"> 9891.</a></span><span class="count                ">  11468</span><span>// PR-xxx - deadcode-confirmed - A branch for 'new Function' never showed its</span></pre>
+<pre><span class="lineno"><a href="#line_9891" id="line_9891"> 9891.</a></span><span class="count                ">  11468</span><span>// PR-517 - deadcode-confirmed - A branch for 'new Function' never showed its</span></pre>
 <pre><span class="lineno"><a href="#line_9892" id="line_9892"> 9892.</a></span><span class="count                ">  11468</span><span>// warning. Without option eval, &lt;constant_Function&gt; has already warned on the</span></pre>
 <pre><span class="lineno"><a href="#line_9893" id="line_9893"> 9893.</a></span><span class="count                ">  11468</span><span>// same 'Function' token, and &lt;warn&gt; drops a second warning on one token.</span></pre>
 <pre><span class="lineno"><a href="#line_9894" id="line_9894"> 9894.</a></span><span class="count                ">  11468</span><span>//</span></pre>
@@ -11566,7 +11566,7 @@ body {
 <pre><span class="lineno"><a href="#line_11401" id="line_11401">11401.</a></span><span class="count                ">     35</span><span>// invalidate a later fix's column, and BOTTOM-UP across lines, so every line</span></pre>
 <pre><span class="lineno"><a href="#line_11402" id="line_11402">11402.</a></span><span class="count                ">     35</span><span>// a splice shifts has already been visited.</span></pre>
 <pre><span class="lineno"><a href="#line_11403" id="line_11403">11403.</a></span><span class="count                ">     35</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_11404" id="line_11404">11404.</a></span><span class="count                ">     35</span><span>    warning_list.slice().sort(function (aa, bb) {</span></pre>
+<pre><span class="lineno"><a href="#line_11404" id="line_11404">11404.</a></span><span class="count                ">     36</span><span>    warning_list.slice().sort(function (aa, bb) {</span></pre>
 <pre><span class="lineno"><a href="#line_11405" id="line_11405">11405.</a></span><span class="count                ">     35</span><span>        return bb.line - aa.line || bb.column - aa.column;</span></pre>
 <pre><span class="lineno"><a href="#line_11406" id="line_11406">11406.</a></span><span class="count                ">     63</span><span>    }).forEach(function ({</span></pre>
 <pre><span class="lineno"><a href="#line_11407" id="line_11407">11407.</a></span><span class="count                ">     63</span><span>        a,</span></pre>
@@ -12340,7 +12340,7 @@ body {
 <pre><span class="lineno"><a href="#line_12175" id="line_12175">12175.</a></span><span class="count                ">     22</span><span>        process.on("exit", jstestOnExit);</span></pre>
 <pre><span class="lineno"><a href="#line_12176" id="line_12176">12176.</a></span><span class="count                ">     22</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_12177" id="line_12177">12177.</a></span><span class="count                ">     37</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12178" id="line_12178">12178.</a></span><span class="count                ">     37</span><span>// PR-xxx - Collect, then run. Record the body as pending, then await it, so a</span></pre>
+<pre><span class="lineno"><a href="#line_12178" id="line_12178">12178.</a></span><span class="count                ">     37</span><span>// PR-517 - Collect, then run. Record the body as pending, then await it, so a</span></pre>
 <pre><span class="lineno"><a href="#line_12179" id="line_12179">12179.</a></span><span class="count                ">     37</span><span>// body that hangs before registering fails at exit instead of passing with 0</span></pre>
 <pre><span class="lineno"><a href="#line_12180" id="line_12180">12180.</a></span><span class="count                ">     37</span><span>// tests. A body that throws crashes node as an unhandled rejection, leaving its</span></pre>
 <pre><span class="lineno"><a href="#line_12181" id="line_12181">12181.</a></span><span class="count                ">     37</span><span>// record pending. A body that settles clean leaves no record.</span></pre>
@@ -12349,7 +12349,7 @@ body {
 <pre><span class="lineno"><a href="#line_12184" id="line_12184">12184.</a></span><span class="count                ">     32</span><span>    await jstestDescribeRun(describe, testFunction);</span></pre>
 <pre><span class="lineno"><a href="#line_12185" id="line_12185">12185.</a></span><span class="count                ">     32</span><span>    jstestItRecordList.splice(jstestItRecordList.indexOf(recordBody), 1);</span></pre>
 <pre><span class="lineno"><a href="#line_12186" id="line_12186">12186.</a></span><span class="count                ">     32</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12187" id="line_12187">12187.</a></span><span class="count                ">     32</span><span>// PR-xxx - Assert this describe's tests, then this describe, are in ASCII</span></pre>
+<pre><span class="lineno"><a href="#line_12187" id="line_12187">12187.</a></span><span class="count                ">     32</span><span>// PR-517 - Assert this describe's tests, then this describe, are in ASCII</span></pre>
 <pre><span class="lineno"><a href="#line_12188" id="line_12188">12188.</a></span><span class="count                ">     32</span><span>// order. Record them before any test runs, so a hung sibling cannot hide them</span></pre>
 <pre><span class="lineno"><a href="#line_12189" id="line_12189">12189.</a></span><span class="count                ">     32</span><span>// at exit.</span></pre>
 <pre><span class="lineno"><a href="#line_12190" id="line_12190">12190.</a></span><span class="count                ">     32</span><span></span></pre>
@@ -12378,7 +12378,7 @@ body {
 <pre><span class="lineno"><a href="#line_12213" id="line_12213">12213.</a></span><span class="count                ">    363</span><span>    }));</span></pre>
 <pre><span class="lineno"><a href="#line_12214" id="line_12214">12214.</a></span><span class="count                ">     32</span><span>    result.unshift(...describe.itList);</span></pre>
 <pre><span class="lineno"><a href="#line_12215" id="line_12215">12215.</a></span><span class="count                ">     32</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12216" id="line_12216">12216.</a></span><span class="count                ">     32</span><span>// PR-xxx - Print nothing for a describe whose tests the filter all skipped.</span></pre>
+<pre><span class="lineno"><a href="#line_12216" id="line_12216">12216.</a></span><span class="count                ">     32</span><span>// PR-517 - Print nothing for a describe whose tests the filter all skipped.</span></pre>
 <pre><span class="lineno"><a href="#line_12217" id="line_12217">12217.</a></span><span class="count                ">     32</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_12218" id="line_12218">12218.</a></span><span class="count                ">     32</span><span>    if (result.length === 0) {</span></pre>
 <pre><span class="lineno"><a href="#line_12219" id="line_12219">12219.</a></span><span class="count                ">     32</span><span>        return;</span></pre>
@@ -12442,7 +12442,7 @@ body {
 <pre><span class="lineno"><a href="#line_12277" id="line_12277">12277.</a></span><span class="count                ">    374</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_12278" id="line_12278">12278.</a></span><span class="count                ">    374</span><span>    const describe = jstestDescribeNow;</span></pre>
 <pre><span class="lineno"><a href="#line_12279" id="line_12279">12279.</a></span><span class="count                ">    374</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12280" id="line_12280">12280.</a></span><span class="count                ">    374</span><span>// PR-xxx - Throw outside a describe body's synchronous part, since no describe</span></pre>
+<pre><span class="lineno"><a href="#line_12280" id="line_12280">12280.</a></span><span class="count                ">    374</span><span>// PR-517 - Throw outside a describe body's synchronous part, since no describe</span></pre>
 <pre><span class="lineno"><a href="#line_12281" id="line_12281">12281.</a></span><span class="count                ">    374</span><span>// would run or report this test.</span></pre>
 <pre><span class="lineno"><a href="#line_12282" id="line_12282">12282.</a></span><span class="count                ">    374</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_12283" id="line_12283">12283.</a></span><span class="count                ">    372</span><span>    if (!describe) {</span></pre>
@@ -12452,7 +12452,7 @@ body {
 <pre><span class="lineno"><a href="#line_12287" id="line_12287">12287.</a></span><span class="count                ">    372</span><span>        );</span></pre>
 <pre><span class="lineno"><a href="#line_12288" id="line_12288">12288.</a></span><span class="count                ">    372</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_12289" id="line_12289">12289.</a></span><span class="count                ">    372</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12290" id="line_12290">12290.</a></span><span class="count                ">    372</span><span>// PR-xxx - Run only a test whose "&lt;describe&gt; - &lt;it&gt;" matches opt-in regexp</span></pre>
+<pre><span class="lineno"><a href="#line_12290" id="line_12290">12290.</a></span><span class="count                ">    372</span><span>// PR-517 - Run only a test whose "&lt;describe&gt; - &lt;it&gt;" matches opt-in regexp</span></pre>
 <pre><span class="lineno"><a href="#line_12291" id="line_12291">12291.</a></span><span class="count                ">    372</span><span>// npm_config_mode_test_filter, e.g.</span></pre>
 <pre><span class="lineno"><a href="#line_12292" id="line_12292">12292.</a></span><span class="count                ">    372</span><span>// npm_config_mode_test_filter="jstestXxx.*pending" npm test</span></pre>
 <pre><span class="lineno"><a href="#line_12293" id="line_12293">12293.</a></span><span class="count                ">    372</span><span>// Prefer the env form, since npm 11 warns the flag form --mode-test-filter</span></pre>
@@ -12464,7 +12464,7 @@ body {
 <pre><span class="lineno"><a href="#line_12299" id="line_12299">12299.</a></span><span class="count                ">    372</span><span>        return;</span></pre>
 <pre><span class="lineno"><a href="#line_12300" id="line_12300">12300.</a></span><span class="count                ">    372</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_12301" id="line_12301">12301.</a></span><span class="count                ">    372</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12302" id="line_12302">12302.</a></span><span class="count                ">    372</span><span>// PR-xxx - Record this test as pending from registration, so &lt;jstestReport&gt;</span></pre>
+<pre><span class="lineno"><a href="#line_12302" id="line_12302">12302.</a></span><span class="count                ">    372</span><span>// PR-517 - Record this test as pending from registration, so &lt;jstestReport&gt;</span></pre>
 <pre><span class="lineno"><a href="#line_12303" id="line_12303">12303.</a></span><span class="count                ">    372</span><span>// sees it even if its describe never runs or prints.</span></pre>
 <pre><span class="lineno"><a href="#line_12304" id="line_12304">12304.</a></span><span class="count                ">    372</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_12305" id="line_12305">12305.</a></span><span class="count                ">    372</span><span>    jstestItRecordList.push({</span></pre>
@@ -12515,7 +12515,7 @@ body {
 <pre><span class="lineno"><a href="#line_12350" id="line_12350">12350.</a></span><span class="count                ">     22</span><span>// This function will return the test-report &lt;text&gt; and its &lt;exitCode&gt;,</span></pre>
 <pre><span class="lineno"><a href="#line_12351" id="line_12351">12351.</a></span><span class="count                ">     22</span><span>// without side effects.</span></pre>
 <pre><span class="lineno"><a href="#line_12352" id="line_12352">12352.</a></span><span class="count                ">     22</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12353" id="line_12353">12353.</a></span><span class="count                ">     22</span><span>// PR-xxx - List and count as failed each test its describe never printed: one</span></pre>
+<pre><span class="lineno"><a href="#line_12353" id="line_12353">12353.</a></span><span class="count                ">     22</span><span>// PR-517 - List and count as failed each test its describe never printed: one</span></pre>
 <pre><span class="lineno"><a href="#line_12354" id="line_12354">12354.</a></span><span class="count                ">     22</span><span>// still pending, e.g. hung until a watchdog ended the process, or one that</span></pre>
 <pre><span class="lineno"><a href="#line_12355" id="line_12355">12355.</a></span><span class="count                ">     22</span><span>// failed while a sibling hung, whose error was otherwise never shown.</span></pre>
 <pre><span class="lineno"><a href="#line_12356" id="line_12356">12356.</a></span><span class="count                ">     22</span><span></span></pre>
@@ -12524,7 +12524,7 @@ body {
 <pre><span class="lineno"><a href="#line_12359" id="line_12359">12359.</a></span><span class="count                ">    376</span><span>    }).length;</span></pre>
 <pre><span class="lineno"><a href="#line_12360" id="line_12360">12360.</a></span><span class="count                ">     22</span><span>    const filter = process.env.npm_config_mode_test_filter;</span></pre>
 <pre><span class="lineno"><a href="#line_12361" id="line_12361">12361.</a></span><span class="count                ">     22</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12362" id="line_12362">12362.</a></span><span class="count                ">     22</span><span>// PR-xxx - Fail a run whose filter matched no test, so a stray or mistyped</span></pre>
+<pre><span class="lineno"><a href="#line_12362" id="line_12362">12362.</a></span><span class="count                ">     22</span><span>// PR-517 - Fail a run whose filter matched no test, so a stray or mistyped</span></pre>
 <pre><span class="lineno"><a href="#line_12363" id="line_12363">12363.</a></span><span class="count                ">     22</span><span>// filter, e.g. a mode_test_filter line left in .npmrc, cannot skip the whole</span></pre>
 <pre><span class="lineno"><a href="#line_12364" id="line_12364">12364.</a></span><span class="count                ">     22</span><span>// suite and pass green.</span></pre>
 <pre><span class="lineno"><a href="#line_12365" id="line_12365">12365.</a></span><span class="count                ">     22</span><span></span></pre>
@@ -12534,7 +12534,7 @@ body {
 <pre><span class="lineno"><a href="#line_12369" id="line_12369">12369.</a></span><span class="count                ">    376</span><span>    });</span></pre>
 <pre><span class="lineno"><a href="#line_12370" id="line_12370">12370.</a></span><span class="count                ">     22</span><span>    return {</span></pre>
 <pre><span class="lineno"><a href="#line_12371" id="line_12371">12371.</a></span><span class="count                ">     22</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12372" id="line_12372">12372.</a></span><span class="count                ">     22</span><span>// PR-xxx - Exit 1, not the failed count, since an exit status keeps only 8</span></pre>
+<pre><span class="lineno"><a href="#line_12372" id="line_12372">12372.</a></span><span class="count                ">     22</span><span>// PR-517 - Exit 1, not the failed count, since an exit status keeps only 8</span></pre>
 <pre><span class="lineno"><a href="#line_12373" id="line_12373">12373.</a></span><span class="count                ">     22</span><span>// bits, so 256 failed tests would exit 0.</span></pre>
 <pre><span class="lineno"><a href="#line_12374" id="line_12374">12374.</a></span><span class="count                ">     22</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_12375" id="line_12375">12375.</a></span><span class="count                ">      4</span><span>        exitCode: Number(countFailed &gt; 0 || filterEmpty),</span></pre>
@@ -12671,16 +12671,16 @@ body {
 <pre><span class="lineno"><a href="#line_12506" id="line_12506">12506.</a></span><span class="count                ">     98</span><span>    let resultMerged = [];      // List of merged scripts from processCovs.</span></pre>
 <pre><span class="lineno"><a href="#line_12507" id="line_12507">12507.</a></span><span class="count                ">     98</span><span>    let urlToScriptDict = new Map();    // Map scriptCov.url to scriptCovs.</span></pre>
 <pre><span class="lineno"><a href="#line_12508" id="line_12508">12508.</a></span><span class="count                ">     98</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12509" id="line_12509">12509.</a></span><span class="count                ">   1106</span><span>    function compareRangeList(aa, bb) {</span></pre>
-<pre><span class="lineno"><a href="#line_12510" id="line_12510">12510.</a></span><span class="count                ">   1106</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12511" id="line_12511">12511.</a></span><span class="count                ">   1106</span><span>// Compares two range coverages.</span></pre>
-<pre><span class="lineno"><a href="#line_12512" id="line_12512">12512.</a></span><span class="count                ">   1106</span><span>// The ranges are first ordered by ascending `startOffset` and then by</span></pre>
-<pre><span class="lineno"><a href="#line_12513" id="line_12513">12513.</a></span><span class="count                ">   1106</span><span>// descending `endOffset`.</span></pre>
-<pre><span class="lineno"><a href="#line_12514" id="line_12514">12514.</a></span><span class="count                ">   1106</span><span>// This corresponds to a pre-order tree traversal.</span></pre>
-<pre><span class="lineno"><a href="#line_12515" id="line_12515">12515.</a></span><span class="count                ">   1106</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12516" id="line_12516">12516.</a></span><span class="count                ">   1076</span><span>        if (aa.startOffset !== bb.startOffset) {</span></pre>
-<pre><span class="lineno"><a href="#line_12517" id="line_12517">12517.</a></span><span class="count                ">   1076</span><span>            return aa.startOffset - bb.startOffset;</span></pre>
-<pre><span class="lineno"><a href="#line_12518" id="line_12518">12518.</a></span><span class="count                ">   1076</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_12509" id="line_12509">12509.</a></span><span class="count                ">   1198</span><span>    function compareRangeList(aa, bb) {</span></pre>
+<pre><span class="lineno"><a href="#line_12510" id="line_12510">12510.</a></span><span class="count                ">   1198</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_12511" id="line_12511">12511.</a></span><span class="count                ">   1198</span><span>// Compares two range coverages.</span></pre>
+<pre><span class="lineno"><a href="#line_12512" id="line_12512">12512.</a></span><span class="count                ">   1198</span><span>// The ranges are first ordered by ascending `startOffset` and then by</span></pre>
+<pre><span class="lineno"><a href="#line_12513" id="line_12513">12513.</a></span><span class="count                ">   1198</span><span>// descending `endOffset`.</span></pre>
+<pre><span class="lineno"><a href="#line_12514" id="line_12514">12514.</a></span><span class="count                ">   1198</span><span>// This corresponds to a pre-order tree traversal.</span></pre>
+<pre><span class="lineno"><a href="#line_12515" id="line_12515">12515.</a></span><span class="count                ">   1198</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_12516" id="line_12516">12516.</a></span><span class="count                ">   1168</span><span>        if (aa.startOffset !== bb.startOffset) {</span></pre>
+<pre><span class="lineno"><a href="#line_12517" id="line_12517">12517.</a></span><span class="count                ">   1168</span><span>            return aa.startOffset - bb.startOffset;</span></pre>
+<pre><span class="lineno"><a href="#line_12518" id="line_12518">12518.</a></span><span class="count                ">   1168</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_12519" id="line_12519">12519.</a></span><span class="count                ">     30</span><span>        return bb.endOffset - aa.endOffset;</span></pre>
 <pre><span class="lineno"><a href="#line_12520" id="line_12520">12520.</a></span><span class="count                ">     30</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_12521" id="line_12521">12521.</a></span><span class="count                ">     98</span><span></span></pre>
@@ -12932,9 +12932,9 @@ body {
 <pre><span class="lineno"><a href="#line_12767" id="line_12767">12767.</a></span><span class="count                ">    335</span><span>            return [</span></pre>
 <pre><span class="lineno"><a href="#line_12768" id="line_12768">12768.</a></span><span class="count                ">    335</span><span>                startOffset, trees</span></pre>
 <pre><span class="lineno"><a href="#line_12769" id="line_12769">12769.</a></span><span class="count                ">    335</span><span>            ];</span></pre>
-<pre><span class="lineno"><a href="#line_12770" id="line_12770">12770.</a></span><span class="count                ">    217</span><span>        }).sort(function (aa, bb) {</span></pre>
-<pre><span class="lineno"><a href="#line_12771" id="line_12771">12771.</a></span><span class="count                ">    217</span><span>            return aa[0] - bb[0];</span></pre>
-<pre><span class="lineno"><a href="#line_12772" id="line_12772">12772.</a></span><span class="count                ">    217</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_12770" id="line_12770">12770.</a></span><span class="count                ">    222</span><span>        }).sort(function (aa, bb) {</span></pre>
+<pre><span class="lineno"><a href="#line_12771" id="line_12771">12771.</a></span><span class="count                ">    222</span><span>            return aa[0] - bb[0];</span></pre>
+<pre><span class="lineno"><a href="#line_12772" id="line_12772">12772.</a></span><span class="count                ">    222</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_12773" id="line_12773">12773.</a></span><span class="count                ">    639</span><span>        while (true) {</span></pre>
 <pre><span class="lineno"><a href="#line_12774" id="line_12774">12774.</a></span><span class="count                ">    639</span><span>            if (nextXxx()) {</span></pre>
 <pre><span class="lineno"><a href="#line_12775" id="line_12775">12775.</a></span><span class="count                ">    639</span><span>                break;</span></pre>
@@ -12968,9 +12968,9 @@ body {
 <pre><span class="lineno"><a href="#line_12803" id="line_12803">12803.</a></span><span class="count                ">    130</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_12804" id="line_12804">12804.</a></span><span class="count                ">    130</span><span>// Sort functions by root range (pre-order sort).</span></pre>
 <pre><span class="lineno"><a href="#line_12805" id="line_12805">12805.</a></span><span class="count                ">    130</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_12806" id="line_12806">12806.</a></span><span class="count                ">    565</span><span>        scriptCov.functions.sort(function (aa, bb) {</span></pre>
-<pre><span class="lineno"><a href="#line_12807" id="line_12807">12807.</a></span><span class="count                ">    565</span><span>            return compareRangeList(aa.ranges[0], bb.ranges[0]);</span></pre>
-<pre><span class="lineno"><a href="#line_12808" id="line_12808">12808.</a></span><span class="count                ">    565</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_12806" id="line_12806">12806.</a></span><span class="count                ">    583</span><span>        scriptCov.functions.sort(function (aa, bb) {</span></pre>
+<pre><span class="lineno"><a href="#line_12807" id="line_12807">12807.</a></span><span class="count                ">    583</span><span>            return compareRangeList(aa.ranges[0], bb.ranges[0]);</span></pre>
+<pre><span class="lineno"><a href="#line_12808" id="line_12808">12808.</a></span><span class="count                ">    583</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_12809" id="line_12809">12809.</a></span><span class="count                ">    130</span><span>        return scriptCov;</span></pre>
 <pre><span class="lineno"><a href="#line_12810" id="line_12810">12810.</a></span><span class="count                ">    130</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_12811" id="line_12811">12811.</a></span><span class="count                ">     98</span><span></span></pre>
@@ -13898,14 +13898,14 @@ body {
 <pre><span class="lineno"><a href="#line_13733" id="line_13733">13733.</a></span><span class="count                ">      8</span><span>        let pathnameDict = Object.create(null);</span></pre>
 <pre><span class="lineno"><a href="#line_13734" id="line_13734">13734.</a></span><span class="count                ">      8</span><span>        data = await moduleFs.promises.readFile(coverageDir + file, "utf8");</span></pre>
 <pre><span class="lineno"><a href="#line_13735" id="line_13735">13735.</a></span><span class="count                ">      8</span><span>        data = JSON.parse(data);</span></pre>
-<pre><span class="lineno"><a href="#line_13736" id="line_13736">13736.</a></span><span class="count                ">    491</span><span>        data.result.forEach(function (scriptCov) {</span></pre>
-<pre><span class="lineno"><a href="#line_13737" id="line_13737">13737.</a></span><span class="count                ">    491</span><span>            let pathname = scriptCov.url;</span></pre>
-<pre><span class="lineno"><a href="#line_13738" id="line_13738">13738.</a></span><span class="count                ">    491</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_13739" id="line_13739">13739.</a></span><span class="count                ">    491</span><span>// Filter out internal coverages.</span></pre>
-<pre><span class="lineno"><a href="#line_13740" id="line_13740">13740.</a></span><span class="count                ">    491</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_13741" id="line_13741">13741.</a></span><span class="count                ">    412</span><span>            if (!pathname.startsWith("file:///")) {</span></pre>
-<pre><span class="lineno"><a href="#line_13742" id="line_13742">13742.</a></span><span class="count                ">    412</span><span>                return;</span></pre>
-<pre><span class="lineno"><a href="#line_13743" id="line_13743">13743.</a></span><span class="count                ">    412</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_13736" id="line_13736">13736.</a></span><span class="count                ">    478</span><span>        data.result.forEach(function (scriptCov) {</span></pre>
+<pre><span class="lineno"><a href="#line_13737" id="line_13737">13737.</a></span><span class="count                ">    478</span><span>            let pathname = scriptCov.url;</span></pre>
+<pre><span class="lineno"><a href="#line_13738" id="line_13738">13738.</a></span><span class="count                ">    478</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_13739" id="line_13739">13739.</a></span><span class="count                ">    478</span><span>// Filter out internal coverages.</span></pre>
+<pre><span class="lineno"><a href="#line_13740" id="line_13740">13740.</a></span><span class="count                ">    478</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_13741" id="line_13741">13741.</a></span><span class="count                ">    399</span><span>            if (!pathname.startsWith("file:///")) {</span></pre>
+<pre><span class="lineno"><a href="#line_13742" id="line_13742">13742.</a></span><span class="count                ">    399</span><span>                return;</span></pre>
+<pre><span class="lineno"><a href="#line_13743" id="line_13743">13743.</a></span><span class="count                ">    399</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_13744" id="line_13744">13744.</a></span><span class="count                ">     79</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_13745" id="line_13745">13745.</a></span><span class="count                ">     79</span><span>// Normalize pathname.</span></pre>
 <pre><span class="lineno"><a href="#line_13746" id="line_13746">13746.</a></span><span class="count                ">     79</span><span></span></pre>

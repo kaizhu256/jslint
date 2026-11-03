@@ -1573,7 +1573,7 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
         process.on("exit", jstestOnExit);
     }
 
-// PR-xxx - Collect, then run. Record the body as pending, then await it, so a
+// PR-517 - Collect, then run. Record the body as pending, then await it, so a
 // body that hangs before registering fails at exit instead of passing with 0
 // tests. A body that throws crashes node as an unhandled rejection, leaving its
 // record pending. A body that settles clean leaves no record.
@@ -1582,7 +1582,7 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
     await jstestDescribeRun(describe, testFunction);
     jstestItRecordList.splice(jstestItRecordList.indexOf(recordBody), 1);
 
-// PR-xxx - Assert this describe's tests, then this describe, are in ASCII
+// PR-517 - Assert this describe's tests, then this describe, are in ASCII
 // order. Record them before any test runs, so a hung sibling cannot hide them
 // at exit.
 
@@ -1638,7 +1638,7 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 
 </span>    const describe = jstestDescribeNow;
 
-// PR-xxx - Throw outside a describe body's synchronous part, since no describe
+// PR-517 - Throw outside a describe body's synchronous part, since no describe
 // would run or report this test.
 
     if (!describe) {
@@ -1648,7 +1648,7 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
         );
     }
 
-// PR-xxx - Run only a test whose "&lt;describe&gt; - &lt;it&gt;" matches opt-in regexp
+// PR-517 - Run only a test whose "&lt;describe&gt; - &lt;it&gt;" matches opt-in regexp
 // npm_config_mode_test_filter, e.g.
 // npm_config_mode_test_filter="jstestXxx.*pending" npm test
 // Prefer the env form, since npm 11 warns the flag form --mode-test-filter
@@ -1660,7 +1660,7 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
         return;
     }
 
-// PR-xxx - Record this test as pending from registration, so &lt;jstestReport&gt;
+// PR-517 - Record this test as pending from registration, so &lt;jstestReport&gt;
 // sees it even if its describe never runs or prints.
 
     jstestItRecordList.push({

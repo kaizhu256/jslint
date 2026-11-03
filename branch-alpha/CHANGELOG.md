@@ -23,6 +23,7 @@
 - jslint - Revamp cause-based testing on option trace and V8 block coverage, replacing the runtime hook and option test_cause.
 - jslint - Report: Functions - Copy each signature from its source text, keeping default values.
 - jslint - Report: Functions - List block-scoped names, catch-variables and outer names, and mark closure only across functions.
+- ci - Bump to node_version 24 to 26.
 
 # v2026.9.29
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
