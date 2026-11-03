@@ -179,13 +179,13 @@
     textLength="768"
     x="10"
     y="648"
->- jstest - Collect each describe's tests before running them, and report every failed, hung or c\</tspan>
+>- jstest - Collect each describe's tests from its body's synchronous part, so a jstestIt after a\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="670"
->  rashed test at exit.                                                                           </tspan>
+>  n await throws, then report every failed or unfinished test at exit, and exit 1 on any.        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

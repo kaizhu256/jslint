@@ -17,7 +17,7 @@
 - jslint - Add html and css linting back into jslint.
 
 # v2026.10.30
-- jstest - Collect each describe's tests before running them, and report every failed, hung or crashed test at exit.
+- jstest - Collect each describe's tests from its body's synchronous part, so a jstestIt after an await throws, then report every failed or unfinished test at exit, and exit 1 on any.
 - jstest - Fail any describe or jstestIt name not in ASCII order.
 - jstest - Add opt-in test filter 'npm_config_mode_test_filter=<regexp>' on '<describe> - <it>'.
 - jslint - Revamp cause-based testing on option trace and V8 block coverage, replacing the runtime hook and option test_cause.
