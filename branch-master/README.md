@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2026.9.29)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
+| Branch | [master<br>(v2026.10.30)](https://github.com/kaizhu256/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/kaizhu256/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/kaizhu256/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/kaizhu256/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/kaizhu256/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/kaizhu256/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/kaizhu256/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://kaizhu256.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://kaizhu256.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://kaizhu256.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://kaizhu256.github.io/jslint/branch-master/.artifact/coverage/index.html) |
@@ -1119,7 +1119,7 @@ if (false) {
         - base respository: `kaizhu256/jslint`
         - base: `beta`
     - click `Create pull request`
-        - verify ci-success @ https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
+        - verify ci-success @ https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 
 1. wait awhile before continuing ...
     - click `Squash and merge`
@@ -1168,7 +1168,7 @@ if (false) {
         - base respository: `kaizhu256/jslint`
         - base: `beta`
     - click `Create pull request`
-        - verify ci-success @ https://github.com/kaizhu256/jslint/actions/workflows/on_pull_request.yml
+        - verify ci-success @ https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 
 1. wait awhile before continuing ...
     - click `Squash and merge`
