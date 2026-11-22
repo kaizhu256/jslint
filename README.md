@@ -1093,12 +1093,13 @@ if (false) {
 
         # commit pending changes onto alpha, push branch-p20yy.mm.dd,
         # print title, description, body
-        sh jslint_ci.sh shGithubPrCreate pr # v20yy.mm.dd __pr_beta_pre
+        # (use origin in place of upstream to test the flow on the fork)
+        sh jslint_ci.sh shGithubPrCreate upstream pr # v20yy.mm.dd __pr_beta_pre
 
         # open pull-request against beta, needing $MY_GITHUB_TOKEN
         # npm_config_mode_pr_issue=xxx adds "Fixes #xxx." to description
         npm_config_mode_pr_issue=xxx npm_config_mode_pr_create=1 \
-            sh jslint_ci.sh shGithubPrCreate pr
+            sh jslint_ci.sh shGithubPrCreate upstream pr
         ```
     - add `<screenshot>` to pull-request description, if any
 
@@ -1108,7 +1109,7 @@ if (false) {
         ```shell
         # wait for ci after each push, reset alpha to beta,
         # push alpha and beta, then delete head-branch
-        sh jslint_ci.sh shGithubPrCleanup
+        sh jslint_ci.sh shGithubPrCleanup upstream
         ```
 
 
@@ -1127,10 +1128,12 @@ if (false) {
 
         # commit pending changes onto alpha, push branch-v20yy.mm.dd,
         # print title, description, body
-        sh jslint_ci.sh shGithubPrCreate release # v20yy.mm.dd __pr_master_pre
+        # (use origin in place of upstream to test the flow on the fork)
+        sh jslint_ci.sh shGithubPrCreate upstream release # v20yy.mm.dd __pr_master_pre
 
         # open pull-request against beta, needing $MY_GITHUB_TOKEN
-        npm_config_mode_pr_create=1 sh jslint_ci.sh shGithubPrCreate release
+        npm_config_mode_pr_create=1 \
+            sh jslint_ci.sh shGithubPrCreate upstream release
         ```
 
 1. wait awhile before continuing ...
@@ -1138,8 +1141,10 @@ if (false) {
     - run
         ```shell
         # wait for ci after each push, reset alpha to beta,
-        # push alpha and beta, push beta to master, then delete head-branch
-        sh jslint_ci.sh shGithubPrCleanup
+        # push alpha and beta, push beta to master, then delete head-branch,
+        # then save a draft-release v20yy.mm.dd of master,
+        # with CHANGELOG.md entries and generated release notes
+        sh jslint_ci.sh shGithubPrCleanup upstream
         ```
 
 
@@ -1152,15 +1157,8 @@ if (false) {
     - input `Repository*` with: `jslint`
     - input `Workflow filename*` with: `publish.yml`
     - click `Set up connection` or `Update Package Settings`
-1. after `shGithubPrCleanup` pushes master
-    - run
-        ```shell
-        # wait for master ci, then save a draft-release v20yy.mm.dd of master,
-        # with CHANGELOG.md entries and generated release notes,
-        # needing $MY_GITHUB_TOKEN
-        sh jslint_ci.sh shGithubReleaseCreate
-        ```
-1. goto the printed draft-release url
+1. goto the draft-release url printed by `shGithubPrCleanup`
+    - if none, re-run `sh jslint_ci.sh shGithubReleaseCreate upstream`
     - click `Edit`, `Preview` and review
     - verify `Set as the latest release` is checked
     - click `Publish release`
