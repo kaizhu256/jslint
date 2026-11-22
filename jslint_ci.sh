@@ -2040,7 +2040,7 @@ import {promisify} from "util";
     // A pypi-package, as in sqlmath, publishes the version in pyproject.toml,
     // less any "-" suffix.
     version_pypi = (
-        /^version = "([^"]*)"$/m
+        /^version = "([^"]*)"\r?$/m
     ).exec(await git_show("pyproject.toml").catch(function () {
         return "";
     }))?.[1];
@@ -2088,7 +2088,6 @@ import {promisify} from "util";
         body: entry_list,
         draft: true,
         generate_release_notes: true,
-        make_latest: "true",
         name: `${tag} - ${entry_first.slice(2)}`,
         tag_name: tag,
         target_commitish: arg_sha
