@@ -1755,6 +1755,15 @@ function jslint(
             mm = `Use double quotes, not single quotes.`;
             break;
 
+// PR-519 - Name the one way to invoke a function immediately.
+
+        case "use_function_immediate":
+            mm = (
+                `Use '(function () {...}())', not an arrow function, for an` +
+                ` immediate invocation.`
+            );
+            break;
+
 // PR-386 - Fix issue #382 - Make fart-related warnings more readable.
 
         case "use_function_not_fart":
@@ -5028,18 +5037,21 @@ function jslint_phase3_parse(state) {
 
     function check_left(left, right) {
 
-// Warn if the left is not one of these:
-//      ?.
-//      ?:
-//      (e + f)
+// Warn if the left of <right> is not one of these:
+//      (e ? f : g)
+//      (e + f).b, (e + f)[b]
+//      (e || f)(), (e || f)``
+//      e?.b
 //      e()
 //      e.b
 //      e[b]
 //      identifier
 
-// PR-xxx - Allow member-access, call, or tagged-template on a parenthesized
-// binary-expression, as in '(aa + bb).padEnd(cc)'. The parens make it explicit.
-// A parenthesized literal still warns, a second way to write '"aa".bb'.
+// PR-519 - Allow member-access on a parenthesized binary-expression, as in
+// '(aa + bb).padEnd(cc)', since the parens make it explicit, and a call or
+// tagged-template only on one that can yield a function, '||', '&&' or '??'.
+// A ternary is always parenthesized here. A parenthesized literal or
+// arrow-function still warns, a second way to write '"aa".bb'.
 
 // test_cause:
 // ["(aa+aa).aa", "check_left", "(live)", "", 0]
@@ -5047,28 +5059,31 @@ function jslint_phase3_parse(state) {
         const id = left.id;
         if (
             !left.identifier &&
-            (
-                left.arity !== "ternary" ||
-                (
-                    !check_left(left.expression[1]) &&
-                    !check_left(left.expression[2])
-                )
-            ) &&
+            left.arity !== "ternary" &&
             (
                 left.arity !== "binary" ||
                 (
-                    !left.wrapped &&
                     id !== "." &&
                     id !== "?." &&
                     id !== "(" &&
-                    id !== "["
+                    id !== "[" &&
+                    (
+                        !left.wrapped ||
+                        id === "=>" ||
+                        (
+                            right.id !== "." &&
+                            right.id !== "?." &&
+                            right.id !== "[" &&
+                            id !== "&&" &&
+                            id !== "??" &&
+                            id !== "||"
+                        )
+                    )
                 )
             )
         ) {
-            warn("unexpected_a", right || token_nxt);
-            return false;
+            warn("unexpected_a", right);
         }
-        return true;
     }
 
     function check_mutation(the_thing) {
@@ -5529,7 +5544,7 @@ function jslint_phase3_parse(state) {
 
     function constant_super() {
 
-// PR-xxx - Allow 'super.aa' and 'super[aa]' in object-method under option
+// PR-519 - Allow 'super.aa' and 'super[aa]' in object-method under option
 // 'this'. This function will warn 'super' unless option 'this', in an
 // object-method or its arrow-function, and before '.' or '['.
 
@@ -5636,6 +5651,7 @@ function jslint_phase3_parse(state) {
         ) {
 
 // test_cause:
+// ["((aa)=>0).aa", "check_left", "unexpected_a", ".", 10]
 // ["(/./)?.0", "check_left", "unexpected_a", "?.", 6]
 // ["(\"\").aa", "check_left", "unexpected_a", ".", 5]
 // ["\"\".aa", "check_left", "unexpected_a", ".", 3]
@@ -5737,10 +5753,22 @@ function jslint_phase3_parse(state) {
             }
         }
 
+// PR-519 - Allow subscript of an array- or object-literal, '[aa, bb][cc]' and
+// '{aa: bb}[cc]'. Inline is the one way for a single-use lookup [owner]. A
+// constant key '[aa]["aa"]' still warns, as its dot notation would.
+
+// test_cause:
+// ["aa=[aa][0]", "infix_lbracket", "(live)", "", 0]
+// ["aa={aa:0}[aa]", "infix_lbracket", "(live)", "", 0]
+
+        if (name !== undefined || (left.id !== "{" && left.id !== "[")) {
+
 // test_cause:
 // ["0[0]", "check_left", "unexpected_a", "[", 2]
+// ["aa=[aa][\"aa\"]", "check_left", "unexpected_a", "[", 8]
 
-        check_left(left, the_token);
+            check_left(left, the_token);
+        }
         the_token.expression = [left, the_subscript];
         advance("]");
         return the_token;
@@ -5752,10 +5780,21 @@ function jslint_phase3_parse(state) {
         if (left.id !== "function" && left.id !== "=>") {
 
 // test_cause:
-// ["(0?0:0)()", "check_left", "unexpected_a", "(", 8]
+// ["(aa+aa)()", "check_left", "unexpected_a", "(", 8]
 // ["0()", "check_left", "unexpected_a", "(", 2]
 
             check_left(left, the_paren);
+        }
+        if (left.id === "=>") {
+
+// PR-519 - An arrow-function invoked immediately needs its parens, so warning
+// unexpected_parens on them cannot be obeyed. Name the one way instead.
+
+// test_cause:
+// ["((aa)=>0)()", "infix_lparen", "use_function_immediate", "=>", 6]
+
+            warn("use_function_immediate", left);
+            left.wrapped_operand = true;
         }
         the_paren.expression = [left];
         if (token_nxt.id !== ")") {
@@ -6191,7 +6230,7 @@ function jslint_phase3_parse(state) {
         }
         if (rbp >= 20 && left.id === "=>") {
 
-// PR-xxx - Bugfix - An arrow function as an operand, as in
+// PR-519 - Bugfix - An arrow function as an operand, as in
 // 'aa || ((bb) => cc)', needs its parens, so post_s_function does not warn
 // unexpected_parens on them. Without them, 'aa || (bb) => cc' is a
 // SyntaxError, like 'aa || bb => cc' below.
@@ -6242,7 +6281,7 @@ function jslint_phase3_parse(state) {
             }
             if (token_nxt.id === "=>" && rbp >= 20 && left.identifier) {
 
-// PR-xxx - Bugfix - An arrow function is an AssignmentExpression, so as the
+// PR-519 - Bugfix - An arrow function is an AssignmentExpression, so as the
 // operand of an operator tighter than '=', as in 'aa || bb => cc', it is a
 // SyntaxError. Warn on its parameter, which suppresses wrap_fart_parameter,
 // since '(bb) => cc' there is still invalid.
@@ -6893,7 +6932,7 @@ function jslint_phase3_parse(state) {
         };
         if (mode_fart) {
 
-// PR-xxx - An arrow-function sees the 'super' of its parent, so inherits
+// PR-519 - An arrow-function sees the 'super' of its parent, so inherits
 // <method> for <constant_super>.
 
             the_function.arity = "binary";
@@ -7301,7 +7340,11 @@ function jslint_phase3_parse(state) {
             advance();
             if (
                 (name.id === "get" || name.id === "set") &&
-                (token_nxt.identifier || token_nxt.id === "[")
+                (
+                    token_nxt.identifier ||
+                    token_nxt.id === "(string)" ||
+                    token_nxt.id === "["
+                )
             ) {
                 if (!option_dict.getset) {
 
@@ -7311,14 +7354,13 @@ function jslint_phase3_parse(state) {
                     warn("unexpected_a", name);
                 }
                 extra = name.id;
-                full = extra + " " + token_nxt.id;
                 name.getset = true;
                 name = token_nxt;
                 advance();
             }
             if (name.id === "[") {
 
-// PR-xxx - Add ES2015-feature computed property-name '{[aa]: bb}'. Its key is
+// PR-519 - Add ES2015-feature computed property-name '{[aa]: bb}'. Its key is
 // pushed before its value, for the walker. Neither gets <name_alias>, so
 // <check_ordered> skips them, like a spread. A key on one line names a method
 // in the report.
@@ -7346,7 +7388,7 @@ function jslint_phase3_parse(state) {
                     value.id === "true"
                 ) {
 
-// PR-xxx - Warn constant-key computed property-name. One way to write a
+// PR-519 - Warn constant-key computed property-name. One way to write a
 // constant key: '{"aa": bb}', not '{["aa"]: bb}'.
 
                     key = (
@@ -7380,13 +7422,32 @@ function jslint_phase3_parse(state) {
                 return parse_expression(0);
             }
             if (typeof extra === "string") {
+
+// PR-519 - Allow string-key accessor '{get "aa"() {}}', named 'get aa' like
+// '{get aa() {}}', so either form catches a duplicate of the other.
+
+// test_cause:
+// ["aa={get \"a-a\"(){}}", "property_parse", "(live)", "", 0]
+
                 id = survey(name);
+                full = extra + " " + id;
                 if (seen_getset[full] === true || seen[id] === true) {
 
 // test_cause:
+// ["aa={aa:0,get \"aa\"(){}}", "property_parse", "duplicate_a", "aa", 14]
 // ["aa={get aa(){},get aa(){}}", "property_parse", "duplicate_a", "aa", 20]
 
                     warn("duplicate_a", name);
+                }
+                if (name.id === "(string)" && jslint_rgx_identifier.test(id)) {
+
+// PR-519 - One way to name an accessor: 'get aa', not 'get "aa"' [owner]. A
+// duplicate warns first, the worse of two on one token.
+
+// test_cause:
+// ["aa={get \"aa\"(){}}", "property_parse", "expected_a_b", "\"aa\"", 9]
+
+                    warn("expected_a_b", name, id, "\"" + id + "\"");
                 }
                 seen[id] = false;
                 seen_getset[full] = true;
@@ -7401,7 +7462,11 @@ function jslint_phase3_parse(state) {
                 }
                 seen[id] = true;
             }
-            if (!name.identifier && token_nxt.id !== "(") {
+            if (
+                !name.identifier &&
+                token_nxt.id !== "(" &&
+                typeof extra !== "string"
+            ) {
 
 // test_cause:
 // ["aa={\"aa\":0}", "property_parse", "(live)", "", 0]
@@ -7429,7 +7494,7 @@ function jslint_phase3_parse(state) {
 
 // PR-516 - Bugfix - Name an accessor 'get aa' in the report, not 'get'.
 
-// PR-xxx - Allow string-key method '{"aa"() {}}'.
+// PR-519 - Allow string-key method '{"aa"() {}}'.
 
                 value = property_method(name, (
                     typeof extra === "string"
