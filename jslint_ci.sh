@@ -1944,6 +1944,149 @@ ${prText.body}
 ' "$BRANCH_MERGE" "$@" # '
 )}
 
+shGithubReleaseCreate() {(set -e
+# This function will save a draft github-release of upstream/master, for the
+# version atop its CHANGELOG.md, after its github-ci passes.
+# Publish the draft by hand, which triggers .github/workflows/publish.yml.
+# It writes nothing before its checks pass, and never a second draft.
+#
+# example usage:
+# shGithubReleaseCreate
+    git fetch upstream master
+    if [ "$(git rev-parse master)" != "$(git rev-parse upstream/master)" ]
+    then
+        printf "shGithubReleaseCreate - master differs from upstream/master\n" \
+            >&2
+        exit 1
+    fi
+    shGithubCiWait upstream master
+    shGithubTokenExport
+    node --input-type=module --eval '
+import moduleChildProcess from "child_process";
+import {promisify} from "util";
+(async function () {
+    const [arg_sha, arg_url] = process.argv.slice(1);
+    const exec_file = promisify(moduleChildProcess.execFile);
+    const repo = (
+        /github\.com[\/:]([^\/]+\/[^\/]+?)(?:\.git)?\/?$/
+    ).exec(arg_url)?.[1];
+    let changelog;
+    let entry_list;
+    let release;
+    let result;
+    let tag;
+    let version;
+    let version_package;
+    function fail(message) {
+        console.error(`shGithubReleaseCreate - ${repo} - ${message}`);
+    }
+    async function git_show(file) {
+        return (await exec_file("git", ["show", `${arg_sha}:${file}`], {
+            maxBuffer: 256 * 1024 * 1024
+        })).stdout;
+    }
+    async function github_request(method, path, body) {
+        const res = await fetch(`https://api.github.com/repos/${repo}${path}`, {
+            body: body && JSON.stringify(body),
+            headers: {
+                accept: "application/vnd.github+json",
+                authorization: `Bearer ${process.env.MY_GITHUB_TOKEN}`,
+                "x-github-api-version": "2022-11-28"
+            },
+            method
+        });
+        const text = await res.text();
+        return {
+            json: (res.ok && text) && JSON.parse(text),
+            status: res.status,
+            text
+        };
+    }
+    // Fail closed, so only a saved draft exits 0.
+    process.exitCode = 1;
+    if (!repo) {
+        fail(`cannot parse github repo from url "${arg_url}"`);
+        return;
+    }
+    if (!process.env.MY_GITHUB_TOKEN) {
+        fail("needs MY_GITHUB_TOKEN");
+        return;
+    }
+    // Take the first "# v" heading, skipping "# Todo", with its entries up to
+    // the next heading.
+    changelog = (await git_show("CHANGELOG.md")).replace((/\r/g), "");
+    [, version, entry_list] = (
+        /^# v(\S+)\n([\s\S]*?)(?:^# |(?![\s\S]))/m
+    ).exec(changelog) || [];
+    entry_list = (entry_list || "").split("\n").filter(function (line) {
+        return line.startsWith("- ");
+    });
+    version_package = JSON.parse(await git_show("package.json")).version;
+    if (!version || entry_list.length === 0) {
+        fail("no \"# v<version>\" with entries in CHANGELOG.md");
+        return;
+    }
+    if (version !== version_package) {
+        fail(
+            `CHANGELOG.md version ${version}` +
+            ` differs from package.json version ${version_package}`
+        );
+        return;
+    }
+    tag = `v${version}`;
+    // A draft has no tag yet, and only a listing of releases shows drafts.
+    result = await github_request("GET", "/releases?per_page=100");
+    if (result.status !== 200) {
+        fail(`list releases - ${result.status} ${result.text}`);
+        return;
+    }
+    release = result.json.find(function (elem) {
+        return elem.tag_name === tag;
+    });
+    if (release) {
+        fail(
+            `${tag} already exists as a ` + (
+                release.draft
+                ? "draft"
+                : "release"
+            ) + ` - ${release.html_url}`
+        );
+        return;
+    }
+    result = await github_request("GET", `/git/matching-refs/tags/${tag}`);
+    if (result.status !== 200) {
+        fail(`list tags - ${result.status} ${result.text}`);
+        return;
+    }
+    if (result.json.some(function (elem) {
+        return elem.ref === `refs/tags/${tag}`;
+    })) {
+        fail(`tag ${tag} already exists, with no release`);
+        return;
+    }
+    // Never retry, since a lost reply could mean a saved draft, which a
+    // re-run then finds above.
+    result = await github_request("POST", "/releases", {
+        body: entry_list.join("\n"),
+        draft: true,
+        generate_release_notes: true,
+        make_latest: "true",
+        name: `${tag} - ${entry_list[0].slice(2)}`,
+        tag_name: tag,
+        target_commitish: arg_sha
+    });
+    if (result.status !== 201) {
+        fail(`create draft - ${result.status} ${result.text}`);
+        return;
+    }
+    console.error(
+        `shGithubReleaseCreate - saved draft ${tag} - ${result.json.html_url}`
+    );
+    process.exitCode = 0;
+}());
+' "$(git rev-parse upstream/master)" "$(git config remote.upstream.url)" # '
+)}
+
 shGithubTokenExport() {
 # This function will export $MY_GITHUB_TOKEN from file.
     if [ ! "$MY_GITHUB_TOKEN" ]

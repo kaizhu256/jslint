@@ -1146,35 +1146,23 @@ if (false) {
 <br><br>
 
 ### branch-master publish
-1. goto https://www.npmjs.com/package/@jslint-org/jslint/access <!--no-validate-->
+1. once per package, goto https://www.npmjs.com/package/@jslint-org/jslint/access <!--no-validate-->
     - click `Github Actions`
     - input `Organization or user*` with: `jslint-org`
     - input `Repository*` with: `jslint`
     - input `Workflow filename*` with: `publish.yml`
     - click `Set up connection` or `Update Package Settings`
-1.
+1. after `shGithubPrCleanup` pushes master
     - run
         ```shell
-        git push upstream beta:master
+        # wait for master ci, then save a draft-release v20yy.mm.dd of master,
+        # with CHANGELOG.md entries and generated release notes,
+        # needing $MY_GITHUB_TOKEN
+        sh jslint_ci.sh shGithubReleaseCreate
         ```
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
-1. goto https://github.com/jslint-org/jslint/releases/new
-    - input `Tag: Select tag` with: `v20yy.mm.dd`
-        - click `Create new tag` and click `Create`
-        - verify correct-year `v20yy.mm.dd`
-        - select `Target: master`
-    - input `Release title` with: `v20yy.mm.dd - <CHANGELOG.md entry #1>`
-        - select `Previous tag: Auto`
-        - click `Generate release notes`
-    - input `Write` with:
-        ```
-        <CHANGELOG.md entry #1>
-        <CHANGELOG.md entry extra>
-
-        **Full Changelog**: ...
-        ```
-    - click `Preview` and review
-    - click `Latest`
+1. goto the printed draft-release url
+    - click `Edit`, `Preview` and review
+    - verify `Set as the latest release` is checked
     - click `Publish release`
         - verify ci-success @ https://github.com/jslint-org/jslint/actions
         - verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
