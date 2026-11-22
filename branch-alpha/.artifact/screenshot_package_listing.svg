@@ -11,13 +11,13 @@
     textLength="768"
     x="10"
     y="32"
-> 0.  755  2026-11-22T09:15:57Z  1702 KB  sha256    .                                             </tspan>
+> 0.  755  2026-11-22T23:54:25Z  1710 KB  sha256    .                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="54"
-> 1.  644  2026-10-23T07:41:33Z    23 KB  f677a95d  .ci.sh                                        </tspan>
+> 1.  644  2026-11-22T23:54:25Z    23 KB  8841195a  .ci.sh                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -53,7 +53,7 @@
     textLength="768"
     x="10"
     y="186"
-> 7.  644  2026-11-03T06:49:36Z     2 KB  d70d4ac4  .github/workflows/publish.yml                 </tspan>
+> 7.  644  2026-11-22T17:31:33Z     2 KB  90d6ea37  .github/workflows/publish.yml                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -71,7 +71,7 @@
     textLength="768"
     x="10"
     y="252"
->10.  644  2026-11-22T09:15:57Z    29 KB  213efb70  CHANGELOG.md                                  </tspan>
+>10.  644  2026-11-22T23:54:25Z    29 KB  70c0755d  CHANGELOG.md                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -83,7 +83,7 @@
     textLength="768"
     x="10"
     y="296"
->12.  644  2026-11-22T09:15:57Z    42 KB  f84e6327  README.md                                     </tspan>
+>12.  644  2026-11-22T23:54:25Z    42 KB  9e0487c5  README.md                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -155,13 +155,13 @@
     textLength="768"
     x="10"
     y="560"
->24.  644  2026-11-22T09:15:57Z   414 KB  32ecaec6  jslint.mjs                                    </tspan>
+>24.  644  2026-11-22T23:54:25Z   414 KB  55e2030a  jslint.mjs                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="582"
->25.  644  2026-11-22T09:15:57Z   128 KB  8ad7bb7a  jslint_ci.sh                                  </tspan>
+>25.  644  2026-11-22T17:31:33Z   136 KB  788bf54c  jslint_ci.sh                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -197,7 +197,7 @@
     textLength="768"
     x="10"
     y="714"
->31.  644  2026-10-23T07:41:33Z     1 KB  c12e4acc  package.json                                  </tspan>
+>31.  644  2026-11-22T23:54:25Z     1 KB  d8657553  package.json                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
