@@ -1971,12 +1971,14 @@ import {promisify} from "util";
         /github\.com[\/:]([^\/]+\/[^\/]+?)(?:\.git)?\/?$/
     ).exec(arg_url)?.[1];
     let changelog;
+    let entry_first;
     let entry_list;
     let release;
     let result;
     let tag;
     let version;
     let version_package;
+    let version_pypi;
     function fail(message) {
         console.error(`shGithubReleaseCreate - ${repo} - ${message}`);
     }
@@ -2018,11 +2020,13 @@ import {promisify} from "util";
     [, version, entry_list] = (
         /^# v(\S+)\n([\s\S]*?)(?:^# |(?![\s\S]))/m
     ).exec(changelog) || [];
-    entry_list = (entry_list || "").split("\n").filter(function (line) {
+    // Keep indented sub-items, and title the release with the first item.
+    entry_list = (entry_list || "").trim();
+    entry_first = entry_list.split("\n").find(function (line) {
         return line.startsWith("- ");
     });
     version_package = JSON.parse(await git_show("package.json")).version;
-    if (!version || entry_list.length === 0) {
+    if (!version || !entry_first) {
         fail("no \"# v<version>\" with entries in CHANGELOG.md");
         return;
     }
@@ -2030,6 +2034,20 @@ import {promisify} from "util";
         fail(
             `CHANGELOG.md version ${version}` +
             ` differs from package.json version ${version_package}`
+        );
+        return;
+    }
+    // A pypi-package, as in sqlmath, publishes the version in pyproject.toml,
+    // less any "-" suffix.
+    version_pypi = (
+        /^version = "([^"]*)"$/m
+    ).exec(await git_show("pyproject.toml").catch(function () {
+        return "";
+    }))?.[1];
+    if (version_pypi && version_pypi !== version.split("-")[0]) {
+        fail(
+            `CHANGELOG.md version ${version}` +
+            ` differs from pyproject.toml version ${version_pypi}`
         );
         return;
     }
@@ -2067,11 +2085,11 @@ import {promisify} from "util";
     // Never retry, since a lost reply could mean a saved draft, which a
     // re-run then finds above.
     result = await github_request("POST", "/releases", {
-        body: entry_list.join("\n"),
+        body: entry_list,
         draft: true,
         generate_release_notes: true,
         make_latest: "true",
-        name: `${tag} - ${entry_list[0].slice(2)}`,
+        name: `${tag} - ${entry_first.slice(2)}`,
         tag_name: tag,
         target_commitish: arg_sha
     });
