@@ -5031,10 +5031,18 @@ function jslint_phase3_parse(state) {
 // Warn if the left is not one of these:
 //      ?.
 //      ?:
+//      (e + f)
 //      e()
 //      e.b
 //      e[b]
 //      identifier
+
+// PR-xxx - Allow member-access, call, or tagged-template on a parenthesized
+// binary-expression, as in '(aa + bb).padEnd(cc)'. The parens make it explicit.
+// A parenthesized literal still warns, a second way to write '"aa".bb'.
+
+// test_cause:
+// ["(aa+aa).aa", "check_left", "(live)", "", 0]
 
         const id = left.id;
         if (
@@ -5048,7 +5056,13 @@ function jslint_phase3_parse(state) {
             ) &&
             (
                 left.arity !== "binary" ||
-                (id !== "." && id !== "?." && id !== "(" && id !== "[")
+                (
+                    !left.wrapped &&
+                    id !== "." &&
+                    id !== "?." &&
+                    id !== "(" &&
+                    id !== "["
+                )
             )
         ) {
             warn("unexpected_a", right || token_nxt);
@@ -5615,7 +5629,6 @@ function jslint_phase3_parse(state) {
                     name.id !== "toSorted"
                 )
             ) &&
-            (left.id !== "+" || name.id !== "slice") &&
             (
                 left.id !== "(regexp)" ||
                 (name.id !== "exec" && name.id !== "test")
@@ -5624,6 +5637,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["(/./)?.0", "check_left", "unexpected_a", "?.", 6]
+// ["(\"\").aa", "check_left", "unexpected_a", ".", 5]
 // ["\"\".aa", "check_left", "unexpected_a", ".", 3]
 // ["\"aa\"?.0", "check_left", "unexpected_a", "?.", 5]
 // ["aa=[]?.aa", "check_left", "unexpected_a", "?.", 6]
