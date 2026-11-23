@@ -1094,12 +1094,11 @@ if (false) {
         # commit pending changes onto alpha, push branch-p20yy.mm.dd,
         # print title, description
         # (use origin in place of upstream to test the flow on the fork)
-        sh jslint_ci.sh shGithubPrCreate upstream pr # v20yy.mm.dd __pr_beta_pre
+        sh jslint_ci.sh shGithubPrFlow branch upstream pr # v20yy.mm.dd __pr_beta_pre
 
         # open pull-request against beta, needing $MY_GITHUB_TOKEN
-        # npm_config_mode_pr_issue=xxx adds "Fixes #xxx." to description
-        npm_config_mode_pr_issue=xxx npm_config_mode_pr_create=1 \
-            sh jslint_ci.sh shGithubPrCreate upstream pr
+        # optional issue list xxx,yyy adds "Fixes #xxx. Fixes #yyy." to description
+        sh jslint_ci.sh shGithubPrFlow create upstream pr # xxx,yyy
         ```
     - add `<screenshot>` to pull-request description, if any
 
@@ -1107,12 +1106,11 @@ if (false) {
     - run
         ```shell
         # wait for pull-request ci-success, then squash-and-merge it
-        npm_config_mode_pr_merge=squash \
-            sh jslint_ci.sh shGithubPrCreate upstream pr
+        sh jslint_ci.sh shGithubPrFlow merge_squash upstream
 
         # wait for ci after each push, reset alpha to beta,
         # push alpha and beta, then delete head-branch
-        sh jslint_ci.sh shGithubPrCleanup upstream
+        sh jslint_ci.sh shGithubPrFlow cleanup upstream
         ```
 
 
@@ -1129,28 +1127,15 @@ if (false) {
         # re-run until version propagates
         npm run test2
 
+        # unattended, and safe to re-run, resuming where it stopped:
         # commit pending changes onto alpha, push branch-v20yy.mm.dd,
-        # print title, description
-        # (use origin in place of upstream to test the flow on the fork)
-        sh jslint_ci.sh shGithubPrCreate upstream release # v20yy.mm.dd __pr_master_pre
-
-        # open pull-request against beta, needing $MY_GITHUB_TOKEN
-        npm_config_mode_pr_create=1 \
-            sh jslint_ci.sh shGithubPrCreate upstream release
-        ```
-
-1. wait awhile before continuing ...
-    - run
-        ```shell
-        # wait for pull-request ci-success, then squash-and-merge it
-        npm_config_mode_pr_merge=squash \
-            sh jslint_ci.sh shGithubPrCreate upstream release
-
-        # wait for ci after each push, reset alpha to beta,
-        # push alpha and beta, push beta to master, then delete head-branch,
-        # then save a draft-release v20yy.mm.dd of master,
+        # open pull-request against beta, wait for its ci-success,
+        # squash-and-merge it, wait for ci after each push,
+        # reset alpha to beta, push alpha, beta and master,
+        # delete head-branch, then save a draft-release v20yy.mm.dd of master,
         # with CHANGELOG.md entries and generated release notes
-        sh jslint_ci.sh shGithubPrCleanup upstream
+        # (use origin in place of upstream to test the flow on the fork)
+        sh jslint_ci.sh shGithubPrFlow all upstream release # v20yy.mm.dd
         ```
 
 
@@ -1163,11 +1148,12 @@ if (false) {
     - input `Repository*` with: `jslint`
     - input `Workflow filename*` with: `publish.yml`
     - click `Set up connection` or `Update Package Settings`
-1. goto the draft-release url printed by `shGithubPrCleanup`
-    - if none, re-run `sh jslint_ci.sh shGithubReleaseCreate upstream`
+1. goto the draft-release url printed by `shGithubPrFlow all`
+    - if none, re-run `sh jslint_ci.sh shGithubPrFlow release upstream`
     - click `Edit`, `Preview` and review
     - verify `Set as the latest release` is checked
-    - click `Publish release`
+    - run `sh jslint_ci.sh shGithubPrFlow publish upstream`,
+      or click `Publish release`
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
         - verify email-notification `Successfully published @kaizhu256/jslint@20yy.mm.dd`
 
