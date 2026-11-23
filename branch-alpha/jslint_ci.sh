@@ -1261,6 +1261,7 @@ import moduleFs from "fs";
 // saved draft or release ends it, a merged pull-request goes to cleanup, and an
 // open one at HEAD goes to merge_squash.
 
+        let found;
         let pr;
         let top;
         moduleAssert.ok(
@@ -1280,7 +1281,18 @@ import moduleFs from "fs";
         );
         modePr = "release";
         branchPull = `branch-v${top.version}`;
-        if (await releaseFind(await repoOf(remote), `v${top.version}`)) {
+        found = await releaseFind(await repoOf(remote), `v${top.version}`);
+        if (found) {
+            // A draft or release of the tag on another commit is not done, as
+            // when the version was not bumped.
+            await gitRun(["fetch", remote, "master"]);
+            moduleAssert.ok(
+                found.target_commitish === await gitOutput([
+                    "rev-parse", `${remote}/master`
+                ]),
+                `shGithubPrFlow all - v${top.version} targets` +
+                ` ${found.target_commitish}, not ${remote}/master`
+            );
             log(`v${top.version} already released, nothing to do`);
             process.exitCode = 0;
             return;
@@ -1302,6 +1314,7 @@ import moduleFs from "fs";
                 pr.head.sha === await gitOutput(["rev-parse", "HEAD"]),
                 `shGithubPrFlow all - open ${pr.html_url} is not at HEAD`
             );
+            await assertNoPending(pr);
             log(`v${top.version} already open - ${pr.html_url}`);
         }
         await merge("squash");
@@ -1320,6 +1333,7 @@ import moduleFs from "fs";
         head = await gitOutput(["rev-parse", "HEAD"]);
         pr = (await prFind("open"))[0];
         if (pr) {
+            await assertNoPending(pr);
             log(`already open - ${pr.html_url}`);
             await merge("merge");
             await cleanup();
@@ -1333,7 +1347,11 @@ import moduleFs from "fs";
             head === await gitOutput(["rev-parse", `${remote}/beta`]) &&
             !(await gitOutput(["status", "--porcelain"]))
         )) {
-            log(`already merged - ${pr?.html_url || head}`);
+            log(
+                pr
+                ? `already merged - ${pr.html_url}`
+                : `HEAD at ${remote}/beta with no pending change`
+            );
             await cleanup();
             return;
         }
@@ -1341,6 +1359,17 @@ import moduleFs from "fs";
         await create();
         await merge("merge");
         await cleanup();
+    }
+    async function assertNoPending(pr) {
+
+// This function will fail on a pending change, which merging the open <pr>
+// would leave out.
+
+        moduleAssert.ok(
+            !(await gitOutput(["status", "--porcelain"])),
+            `shGithubPrFlow all - pending change, not in open ${pr.html_url}` +
+            " - run branch first"
+        );
     }
     async function branch() {
 
@@ -1465,7 +1494,7 @@ import moduleFs from "fs";
                     "show",
                     `refs/remotes/${remote}/beta:CHANGELOG.md`
                 ])
-            ).split("\n");
+            ).replace((/\r/g), "").split("\n");
             changelogNew = changelogNew.filter(function (item) {
                 return !changelogOld.includes(item.split("\n")[0]);
             });
@@ -1480,16 +1509,20 @@ import moduleFs from "fs";
             // A kept open pull-request takes the push on its own head-branch.
             branchPull = (
                 prBranch
-                ? prBranch.replace((/[^\w.\-]/g), "_")
+                ? prBranch.replace((/[^\w.\-\/]/g), "_")
                 : `branch-p${version}`
             );
         }
         // A re-run on its own pull-commit, with no squash given, rebuilds it on
         // the same base rather than stack a duplicate. Its pull-commit is HEAD
         // at __pr_<merge>, or a pull-commit message on __pr_<merge>_pre if a
-        // re-run stopped before that push.
+        // re-run stopped before that push, but never a commit merged to beta.
         if (
-            !argList[3] && (
+            !argList[3] &&
+            await refSha(`refs/heads/__pr_${branchMerge()}_pre`) &&
+            await gitTryCode([
+                "merge-base", "--is-ancestor", "HEAD", `${remote}/beta`
+            ]) !== 0 && (
                 await gitOutput(["rev-parse", "HEAD"]) === await refSha(
                     `refs/heads/__pr_${branchMerge()}`
                 ) || (
@@ -1517,6 +1550,8 @@ import moduleFs from "fs";
     git reset "${branchSquash}"
     git push . HEAD:__pr_"${branchMerge()}"_pre -f
     shGitSquashPop alpha \u0027${commitMessage}\u0027
+    [ "$(git rev-parse HEAD)" != \
+        "$(git rev-parse __pr_"${branchMerge()}"_pre)" ]
     git push . HEAD:__pr_"${branchMerge()}" -f
     git --no-pager diff origin/"${branchPull}" || true
     git push origin alpha:"${branchPull}" -f
@@ -1701,7 +1736,7 @@ import moduleFs from "fs";
                 );
             }
             moduleAssert.ok(
-                !(result.retryMs > msCiTotal - msElapsed()),
+                !(result.retryMs && result.retryMs > msCiTotal - msElapsed()),
                 `shGithubPrFlow ci_wait - rate-limited past the deadline` +
                 ` - ${result.text}`
             );
@@ -1991,6 +2026,7 @@ import moduleFs from "fs";
         let pr;
         let res;
         let runCountDone = 0;
+        let runDone;
         let runList;
         let runListBad;
         let sha;
@@ -2047,13 +2083,18 @@ import moduleFs from "fs";
             );
             // A late workflow adds its runs after the first ones finish, so
             // trust "all done" only if a poll later still says so.
-            if (runList.length > 0 && runList.length === runCountDone) {
+            runDone = runList.every(function (run) {
+                return run.status === "completed";
+            });
+            if (
+                runDone &&
+                runList.length > 0 &&
+                runList.length === runCountDone
+            ) {
                 break;
             }
             runCountDone = (
-                runList.every(function (run) {
-                    return run.status === "completed";
-                })
+                runDone
                 ? runList.length
                 : 0
             );
@@ -2393,8 +2434,8 @@ ${prText.description}
 
         return String(version)
             .trim()
-            .replace((/^(\d{4})-0?(\d+)-0?(\d+)$/), "$1.$2.$3")
             .replace((/^v/), "")
+            .replace((/^(\d{4})-0?(\d+)-0?(\d+)$/), "$1.$2.$3")
             // security - Sanitize version
             .replace((/[^\w.\-]/g), "_");
     }
@@ -2467,6 +2508,11 @@ ${prText.description}
     moduleAssert.ok(
         ["origin", "upstream"].includes(remote),
         `shGithubPrFlow ${subcmd} - usage: ${subcmd} <origin|upstream> ...`
+    );
+    // Without a token, drafts are invisible and writes fail late.
+    moduleAssert.ok(
+        process.env.MY_GITHUB_TOKEN,
+        `shGithubPrFlow ${subcmd} - needs MY_GITHUB_TOKEN`
     );
     await {
         all,
