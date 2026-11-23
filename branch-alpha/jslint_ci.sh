@@ -1871,7 +1871,6 @@ import moduleFs from "fs";
             `shGithubPrCreate - title over 256 chars - ${title}`
         );
         return {
-            body: message.trim(),
             description: (
                 modePr === "release"
                 ? rest
@@ -1897,10 +1896,6 @@ ${prText.title}
 shGithubPrCreate - description:
 
 ${prText.description}
-
-shGithubPrCreate - body:
-
-${prText.body}
         `).trim() + "\n");
     }
     // Fail closed, so only a finished push or open exits 0.
