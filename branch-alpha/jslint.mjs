@@ -5047,11 +5047,10 @@ function jslint_phase3_parse(state) {
 //      e[b]
 //      identifier
 
-// PR-519 - Allow member-access on a parenthesized binary-expression, as in
-// '(aa + bb).padEnd(cc)', since the parens make it explicit, and a call or
-// tagged-template only on one that can yield a function, '||', '&&' or '??'.
-// A ternary is always parenthesized here. A parenthesized literal or
-// arrow-function still warns, a second way to write '"aa".bb'.
+// PR-519 - Allow member-access on a parenthesized binary-expression or ternary,
+// explicit by its parens, as in '(aa + bb).padEnd(cc)', and a call or
+// tagged-template only on '||', '&&' or '??', which can yield a function. A
+// parenthesized literal or arrow-function warns, a second way to '"aa".bb'.
 
 // test_cause:
 // ["(aa+aa).aa", "check_left", "(live)", "", 0]

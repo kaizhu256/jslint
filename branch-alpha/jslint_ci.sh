@@ -1206,7 +1206,7 @@ shGithubPrFlow() {(set -e
 #     publish the draft github-release, which triggers publish.yml
 # all <remote> <pr|release> [version] [squash-base]
 #     branch, create, merge (pr) or merge_squash (release), and cleanup,
-#     resuming by state; never publish
+#     resuming by state, and never publish
 # ci_wait <remote>/<branch> [dispatch]
 #     wait for the newest github-ci runs on the commit at <remote>/<branch>
 #
@@ -1258,9 +1258,9 @@ import moduleFs from "fs";
     let remote = "";
     async function all() {
 
-// This function will run the release flow unattended, resuming by state: a
+// This function will run the release flow unattended, resuming by state. A
 // saved draft or release ends it, a merged pull-request goes to cleanup, and an
-// open one at HEAD goes to merge_squash. Mode pr runs allPr.
+// open one at HEAD goes to merge_squash.
 
         let pr;
         let top;
@@ -1310,10 +1310,9 @@ import moduleFs from "fs";
     }
     async function allPr() {
 
-// This function will run the pull-request flow unattended, merging with the
-// default merge-commit, and resuming by state: an open pull-request at HEAD
-// goes to merge; one merged at HEAD, or HEAD at <remote>/beta with no pending
-// change, goes to cleanup, whose re-run is safe.
+// This function will run the pull-request flow unattended, resuming by state.
+// An open pull-request at HEAD goes to merge, and one merged at HEAD, or HEAD
+// at <remote>/beta with no pending change, goes to cleanup.
 
         let head;
         let pr;
@@ -1438,7 +1437,6 @@ import moduleFs from "fs";
         )) {
             log(`keep open ${prXxx} on ${prBranch}`);
         } else {
-            // Update PR-xxx placeholder in codebase.
             res = await githubRequest(
                 "GET",
                 `/repos/${repoUpstream}/issues?per_page=1&state=all`
@@ -1473,8 +1471,6 @@ import moduleFs from "fs";
             changelogNew = changelogNew.filter(function (item) {
                 return !changelogOld.includes(item.split("\n")[0]);
             });
-            // Fail, rather than reuse a released item, when CHANGELOG.md names
-            // nothing new for this pull-request.
             moduleAssert.ok(
                 changelogNew.length > 0,
                 `shGithubPrFlow branch - CHANGELOG.md top section has no item` +
@@ -1491,10 +1487,9 @@ import moduleFs from "fs";
             );
         }
         // A re-run on its own pull-commit, with no squash given, rebuilds it on
-        // the same base, rather than stack a duplicate and overwrite that
-        // backup. Its own pull-commit is HEAD at __pr_<merge>, or, if a
-        // re-run stopped before that push, a pull-commit message on top of
-        // __pr_<merge>_pre.
+        // the same base rather than stack a duplicate. Its pull-commit is HEAD
+        // at __pr_<merge>, or a pull-commit message on __pr_<merge>_pre if a
+        // re-run stopped before that push.
         if (
             !argList[3] && (
                 await gitOutput(["rev-parse", "HEAD"]) === await refSha(
@@ -1513,7 +1508,7 @@ import moduleFs from "fs";
             log(`re-run, squash ${branchSquash}`);
         }
         prText = prTextCreate(commitMessage, "");
-        // security - sanitize commitMessage
+        // security - Sanitize commitMessage
         commitMessage = commitMessage.trim().replace((/\u0027/g), "$&\"$&\"$&");
         moduleAssert.ok(
             await shRun(`
@@ -1751,7 +1746,6 @@ import moduleFs from "fs";
             );
         }
         sha = await gitOutput(["rev-parse", `${remote}/beta`]);
-        // Find the merged pull-request, for its head-branch.
         res = await githubRequest(
             "GET",
             `/repos/${repoRemote}/pulls` +
@@ -1905,10 +1899,6 @@ import moduleFs from "fs";
         process.exitCode = 0;
     }
     function fileRead(sha, file) {
-
-// This function will read <file> from commit <sha>, or the working tree if
-// none.
-
         return (
             sha
             ? gitOutput(["show", `${sha}:${file}`])
@@ -1979,9 +1969,6 @@ import moduleFs from "fs";
         };
     }
     function log(message, name = subcmd) {
-
-// This function will print <message> to stderr, after a timestamp.
-
         console.error(
             new Date().toISOString().replace((/\.\d+Z$/), "Z") +
             ` - shGithubPrFlow ${name} - ${message}`
@@ -1990,11 +1977,9 @@ import moduleFs from "fs";
     async function merge(modeMerge) {
 
 // This function will wait for the github-ci of the open pull-request of HEAD,
-// then merge it. Merge and rebase take the message github offers by default.
-// A squash keeps the pull-commit message, "- PR-516 - ... (#516)" or
-// "# v2026.9.29 (#515)", then the rest of its lines, since a pr-mode
-// pull-request carries every alpha commit since beta, and the default would
-// list them all under a title without its PR-xxx.
+// then merge it with the message github offers. A squash instead keeps the
+// pull-commit message plus " (#N)", since a pr-mode pull-request carries every
+// alpha commit since beta, and the default lists them all, dropping PR-xxx.
 
         const msInterval = 60 * 1000;
         const name = (
@@ -2107,9 +2092,6 @@ import moduleFs from "fs";
         process.exitCode = 0;
     }
     async function modeParse() {
-
-// This function will check alpha is checked out and argList[1] is pr|release.
-
         modePr = argList[1];
         moduleAssert.ok(
             ["pr", "release"].includes(modePr),
@@ -2143,7 +2125,7 @@ import moduleFs from "fs";
         if (branchList.length === 1) {
             branchPull = branchList[0].replace("origin/", "");
         } else {
-            // Mode merge names no branch of its own, so it needs one pushed.
+            // No branch named yet means none pushed, so none open.
             if (!branchPull) {
                 return [];
             }
@@ -2163,10 +2145,6 @@ import moduleFs from "fs";
         return prListByName(state);
     }
     async function prListByName(state) {
-
-// This function will list the pull-requests in <state> of origin branch
-// <branchPull> against <remote>.
-
         const ownerOrigin = (await repoOf("origin")).split("/")[0];
         const res = await githubRequest(
             "GET",
@@ -2378,9 +2356,6 @@ ${prText.description}
         });
     }
     async function repoOf(name) {
-
-// This function will parse owner/repo from the url of git remote <name>.
-
         const repo = (
             /github\.com[\/:]([^\/]+\/[^\/]+?)(?:\.git)?\/?$/
         ).exec(await gitTry(["config", `remote.${name}.url`]))?.[1];
@@ -2422,7 +2397,7 @@ ${prText.description}
             .trim()
             .replace((/^(\d{4})-0?(\d+)-0?(\d+)$/), "$1.$2.$3")
             .replace((/^v/), "")
-            // security - sanitize version
+            // security - Sanitize version
             .replace((/[^\w.\-]/g), "_");
     }
     async function versionTop(sha, isCheck) {

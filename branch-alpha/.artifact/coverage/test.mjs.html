@@ -3214,16 +3214,16 @@ body {
 <pre><span class="lineno"><a href="#line_3049" id="line_3049"> 3049.</a></span><span class="count                ">      1</span><span>                /^ {4}function (?:stop|warn)(?:_at)?\([\S\s]*?\n {4}\}\n/gm</span></pre>
 <pre><span class="lineno"><a href="#line_3050" id="line_3050"> 3050.</a></span><span class="count                ">      4</span><span>            ), function (match0) {</span></pre>
 <pre><span class="lineno"><a href="#line_3051" id="line_3051"> 3051.</a></span><span class="count                ">      4</span><span>                return match0.replace(/[^\n]/g, "");</span></pre>
-<pre><span class="lineno"><a href="#line_3052" id="line_3052"> 3052.</a></span><span class="count                ">  14208</span><span>            }).split("\n").map(function (text, ii) {</span></pre>
-<pre><span class="lineno"><a href="#line_3053" id="line_3053"> 3053.</a></span><span class="count                ">  14208</span><span>                return [ii + 1, text.trim()];</span></pre>
-<pre><span class="lineno"><a href="#line_3054" id="line_3054"> 3054.</a></span><span class="count                ">  14208</span><span>            }).filter(function ([line, text]) {</span></pre>
-<pre><span class="lineno"><a href="#line_3055" id="line_3055"> 3055.</a></span><span class="count                ">  14208</span><span>                return (</span></pre>
+<pre><span class="lineno"><a href="#line_3052" id="line_3052"> 3052.</a></span><span class="count                ">  14207</span><span>            }).split("\n").map(function (text, ii) {</span></pre>
+<pre><span class="lineno"><a href="#line_3053" id="line_3053"> 3053.</a></span><span class="count                ">  14207</span><span>                return [ii + 1, text.trim()];</span></pre>
+<pre><span class="lineno"><a href="#line_3054" id="line_3054"> 3054.</a></span><span class="count                ">  14207</span><span>            }).filter(function ([line, text]) {</span></pre>
+<pre><span class="lineno"><a href="#line_3055" id="line_3055"> 3055.</a></span><span class="count                ">  14207</span><span>                return (</span></pre>
 <pre><span class="lineno"><a href="#line_3056" id="line_3056"> 3056.</a></span><span class="count                ">  11370</span><span>                    !text.startsWith("//") &amp;&amp;</span></pre>
 <pre><span class="lineno"><a href="#line_3057" id="line_3057"> 3057.</a></span><span class="count                ">  11370</span><span>                    (/(?:^|[^\w.])(?:stop|warn)(?:_at)?\(/m).test(text) &amp;&amp;</span></pre>
 <pre><span class="lineno"><a href="#line_3058" id="line_3058"> 3058.</a></span><span class="count                ">    298</span><span>                    !text.includes("\"test_unknown_warning_code\"") &amp;&amp;</span></pre>
 <pre><span class="lineno"><a href="#line_3059" id="line_3059"> 3059.</a></span><span class="count                ">    297</span><span>                    !raiseDict[line]</span></pre>
-<pre><span class="lineno"><a href="#line_3060" id="line_3060"> 3060.</a></span><span class="count                ">  14208</span><span>                );</span></pre>
-<pre><span class="lineno"><a href="#line_3061" id="line_3061"> 3061.</a></span><span class="count                ">  14208</span><span>            }), []);</span></pre>
+<pre><span class="lineno"><a href="#line_3060" id="line_3060"> 3060.</a></span><span class="count                ">  14207</span><span>                );</span></pre>
+<pre><span class="lineno"><a href="#line_3061" id="line_3061"> 3061.</a></span><span class="count                ">  14207</span><span>            }), []);</span></pre>
 <pre><span class="lineno"><a href="#line_3062" id="line_3062"> 3062.</a></span><span class="count                ">      1</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_3063" id="line_3063"> 3063.</a></span><span class="count                ">      1</span><span>    });</span></pre>
 <pre><span class="lineno"><a href="#line_3064" id="line_3064"> 3064.</a></span><span class="count                ">      1</span><span>});</span></pre>
