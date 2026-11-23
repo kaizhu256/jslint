@@ -1359,6 +1359,7 @@ import moduleFs from "fs";
         let changelogNew;
         let changelogOld;
         let commitMessage;
+        let head;
         let pr;
         let prBranch = "";
         let prXxx = (
@@ -1370,9 +1371,11 @@ import moduleFs from "fs";
         await modeParse();
         await gitRun(["fetch", remote, "beta"]);
         // A pull-request merged at HEAD is done, so a re-run goes to cleanup
-        // rather than push a second one.
+        // rather than push a second one. An earlier one merged from a branch
+        // of the same name, on the same day, is not.
+        head = await gitOutput(["rev-parse", "HEAD"]);
         pr = (await prFind("closed")).find(function (elem) {
-            return elem.merged_at;
+            return elem.merged_at && elem.head.sha === head;
         });
         moduleAssert.ok(
             !pr,
@@ -1852,7 +1855,12 @@ import moduleFs from "fs";
                 new Date().toISOString().slice(0, 10)
             )
         );
-        prText = prTextCreate(commitMessage, argList[2] || "");
+        // Only create itself takes an issue list, since all puts the version
+        // there.
+        prText = prTextCreate(
+            commitMessage,
+            (subcmd === "create" && argList[2]) || ""
+        );
         prTextPrint();
         pr = (await prFind("open"))[0];
         if (pr) {
