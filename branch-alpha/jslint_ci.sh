@@ -1590,71 +1590,142 @@ import moduleFs from "fs";
             : "beta"
         );
     }
-    async function ciWait(remoteName, branchName, mode) {
+    async function ciPoll({describe, isOldOk, label, name, path, runListGet}) {
 
-// This function will wait for the newest github-ci runs on the commit at
-// <remoteName>/<branchName>, and fail if any fails or none finishes in 30
-// minutes. Mode dispatch first triggers workflow ci.yml on <branchName>, then
-// waits only for runs created after that.
+// This function will poll github <path> until its runs all pass and settle,
+// failing on a failed run, on no run in 5 minutes, or at 30 minutes. A changed
+// run list restarts the settle-time, so a late workflow is caught.
 
         // A push of a commit that ran before still starts new runs within
         // seconds, so trust only old runs after this wait.
         const msLate = 15 * 1000;
         const msNorun = 5 * 60 * 1000;
         const msSettle = 60 * 1000;
-        const repo = await repoOf(remoteName);
-        const sha = await gitOutput([
-            "rev-parse", `refs/remotes/${remoteName}/${branchName}`
-        ]);
         const timeStart = Date.now();
+        let key;
+        let keyPrv = "";
         let line = "";
-        let msDispatch = 0;
         let msNow = 0;
         let msSeen = 0;
         let result;
         let runList;
-        let workflowKey;
-        let workflowKeyPrv = "";
+        let runListBad;
         function logTick(message) {
             log(
-                `${repo} ${branchName} - ` +
+                `${label} - ` +
                 `${Math.floor(msElapsed() / 60000)}m / ${msCiTotal / 60000}m` +
                 ` - ${message}`,
-                "ci_wait"
+                name
             );
         }
         function msElapsed() {
             return Date.now() - timeStart;
         }
-        function runIsOk(run) {
-            return ["neutral", "skipped", "success"].includes(run.conclusion);
+        function runIsDone(run) {
+            return run.status === "completed";
         }
         function runIsOld(run) {
             // A run done a settle-time ago, by the clock of github, had its own
             // settle-time for a late workflow, as on a re-run.
             return msNow - Date.parse(run.updated_at) >= msSettle;
         }
-        function runListNewest(runListAll) {
-
-// This function will keep the newest push or dispatch run of each workflow,
-// as a later entry of the same workflow overwrites an earlier one.
-
-            return Object.values(Object.fromEntries(
-                runListAll
-                    .filter(function (run) {
-                        return (
-                            ["push", "workflow_dispatch"].includes(run.event) &&
-                            Date.parse(run.created_at) >= msDispatch
-                        );
-                    })
-                    .sort(function (aa, bb) {
-                        return aa.run_number - bb.run_number;
-                    })
-                    .map(function (run) {
-                        return [run.workflow_id, run];
-                    })
+        while (true) {
+            result = await githubRequest("GET", path).catch(function (err) {
+                return {status: 0, text: err.message};
+            });
+            // A 403 with no rate-limit headers is a forbidden token, not a
+            // limit.
+            moduleAssert.ok(
+                !(
+                    [401, 404, 422].includes(result.status) ||
+                    (result.status === 403 && !result.retryMs)
+                ),
+                `shGithubPrFlow ${name} - ${label}` +
+                ` - ${result.status} ${result.text}`
+            );
+            if (result.status === 200) {
+                msNow = Date.parse(result.date);
+                runList = runListGet(result.json);
+                line = (
+                    runList.length > 0
+                    ? describe(runList)
+                    : "no run yet"
+                );
+                // Print every poll, so a long wait shows it is alive.
+                logTick(line);
+                moduleAssert.ok(
+                    runList.length > 0 || msElapsed() < msNorun,
+                    `shGithubPrFlow ${name} - ${label}` +
+                    " - no run found in 5 minutes"
+                );
+                runListBad = runList.filter(function (run) {
+                    return runIsDone(run) && ![
+                        "neutral", "skipped", "success"
+                    ].includes(run.conclusion);
+                });
+                moduleAssert.ok(
+                    runListBad.length === 0,
+                    `shGithubPrFlow ${name} - ${label} - failed - ` +
+                    runListBad.map(function (run) {
+                        return `${run.name} ${run.conclusion} ${run.html_url}`;
+                    }).join(", ")
+                );
+                key = runList.map(function (run) {
+                    return run.workflow_id || run.id;
+                }).sort().join();
+                if (key !== keyPrv) {
+                    msSeen = msElapsed();
+                    keyPrv = key;
+                }
+                if (
+                    runList.length > 0 &&
+                    runList.every(runIsDone) && (
+                        msElapsed() - msSeen >= msSettle ||
+                        (
+                            isOldOk &&
+                            msElapsed() >= msLate &&
+                            runList.every(runIsOld)
+                        )
+                    )
+                ) {
+                    log(`${label} - ok`, name);
+                    return;
+                }
+            } else {
+                logTick(
+                    `retry after ${result.status}` +
+                    ` ${String(result.text).slice(0, 200)}`
+                );
+            }
+            moduleAssert.ok(
+                !(result.retryMs && result.retryMs > msCiTotal - msElapsed()),
+                `shGithubPrFlow ${name} - rate-limited past the deadline` +
+                ` - ${result.text}`
+            );
+            moduleAssert.ok(
+                msElapsed() < msCiTotal,
+                `shGithubPrFlow ${name} - ${label}` +
+                ` - no result in 30 minutes - ${line}`
+            );
+            // Sleep no later than the deadline, so one last poll runs there.
+            await sleep(Math.min(
+                Math.max(msCiInterval, result.retryMs || 0),
+                msCiTotal - msElapsed()
             ));
         }
+    }
+    async function ciWait(remoteName, branchName, mode) {
+
+// This function will wait for the newest github-ci runs on the commit at
+// <remoteName>/<branchName>. Mode dispatch first triggers workflow ci.yml on
+// <branchName>, then waits only for runs created after that.
+
+        const repo = await repoOf(remoteName);
+        const sha = await gitOutput([
+            "rev-parse", `refs/remotes/${remoteName}/${branchName}`
+        ]);
+        let msDispatch = 0;
+        let result;
         moduleAssert.ok(
             !mode || mode === "dispatch",
             `shGithubPrFlow ci_wait - unknown mode "${mode}"`
@@ -1673,102 +1744,42 @@ import moduleFs from "fs";
             // Use the clock of github, which stamps the run, minus 5s of skew.
             msDispatch = Date.parse(result.date) - 5000;
         }
-        while (true) {
-            result = await githubRequest(
-                "GET",
+        await ciPoll({
+            describe: function (runList) {
+                return runList.map(function (run) {
+                    return `${run.name} ${run.status} ${run.conclusion}`;
+                }).join(", ");
+            },
+            isOldOk: true,
+            label: `${repo} ${branchName}`,
+            name: "ci_wait",
+            path: (
                 `/repos/${repo}/actions/runs` +
                 `?branch=${encodeURIComponent(branchName)}` +
                 `&head_sha=${sha}&per_page=100`
-            ).catch(
-                function (err) {
-                    return {status: 0, text: err.message};
-                }
-            );
-            // A 403 with no rate-limit headers is a forbidden token, not a
-            // limit.
-            moduleAssert.ok(
-                !(
-                    [401, 404, 422].includes(result.status) ||
-                    (result.status === 403 && !result.retryMs)
-                ),
-                `shGithubPrFlow ci_wait - ${repo} ${branchName} ${sha}` +
-                ` - ${result.status} ${result.text}`
-            );
-            if (result.status === 200) {
+            ),
+            runListGet: function (json) {
                 moduleAssert.ok(
-                    result.json.total_count <= 100,
+                    json.total_count <= 100,
                     `shGithubPrFlow ci_wait - too many runs` +
-                    ` - ${result.json.total_count}`
+                    ` - ${json.total_count}`
                 );
-                msNow = Date.parse(result.date);
-                runList = runListNewest(result.json.workflow_runs);
-                moduleAssert.ok(
-                    runList.length > 0 || msElapsed() < msNorun,
-                    `shGithubPrFlow ci_wait - ${repo} ${branchName} ${sha}` +
-                    " - no run found in 5 minutes"
-                );
-                if (runList.length === 0) {
-                    logTick("no run yet");
-                }
-                if (runList.length > 0) {
-                    line = runList.map(function (run) {
-                        return `${run.name} ${run.status} ${run.conclusion}`;
-                    }).join(", ");
-                    workflowKey = runList.map(function (run) {
-                        return run.workflow_id;
-                    }).sort().join();
-                    // Print every poll, so a long wait shows it is alive.
-                    logTick(line);
-                    // Restart the settle-time whenever the set of workflows
-                    // changes, so a late workflow is not missed.
-                    if (workflowKey !== workflowKeyPrv) {
-                        msSeen = msElapsed();
-                        workflowKeyPrv = workflowKey;
-                    }
-                    moduleAssert.ok(
-                        !runList.some(function (run) {
-                            return run.status === "completed" && !runIsOk(run);
-                        }),
-                        `shGithubPrFlow ci_wait - ${repo} ${branchName}` +
-                        ` ${sha}` +
-                        ` - failed - ${line}\n` + runList.map(function (run) {
-                            return run.html_url;
-                        }).join("\n")
-                    );
-                    if (
-                        runList.every(function (run) {
-                            return run.status === "completed";
-                        }) && (
-                            msElapsed() - msSeen >= msSettle ||
-                            (msElapsed() >= msLate && runList.every(runIsOld))
-                        )
-                    ) {
-                        log(`${repo} ${branchName} - ok`, "ci_wait");
-                        return;
-                    }
-                }
-            } else {
-                logTick(
-                    `retry after ${result.status}` +
-                    ` ${String(result.text).slice(0, 200)}`
-                );
+                // Keep the newest push or dispatch run of each workflow, as a
+                // later entry of the same workflow overwrites an earlier one.
+                return Object.values(Object.fromEntries(
+                    json.workflow_runs.filter(function (run) {
+                        return (
+                            ["push", "workflow_dispatch"].includes(run.event) &&
+                            Date.parse(run.created_at) >= msDispatch
+                        );
+                    }).sort(function (aa, bb) {
+                        return aa.run_number - bb.run_number;
+                    }).map(function (run) {
+                        return [run.workflow_id, run];
+                    })
+                ));
             }
-            moduleAssert.ok(
-                !(result.retryMs && result.retryMs > msCiTotal - msElapsed()),
-                `shGithubPrFlow ci_wait - rate-limited past the deadline` +
-                ` - ${result.text}`
-            );
-            moduleAssert.ok(
-                msElapsed() < msCiTotal,
-                `shGithubPrFlow ci_wait - ${repo} ${branchName} ${sha}` +
-                ` - no result in 30 minutes - ${line}`
-            );
-            // Sleep no later than the deadline, so one last poll runs there.
-            await sleep(Math.min(
-                Math.max(msCiInterval, result.retryMs || 0),
-                msCiTotal - msElapsed()
-            ));
-        }
+        });
     }
     async function cleanup() {
 
@@ -2032,21 +2043,15 @@ import moduleFs from "fs";
 // pull-commit message plus " (#N)", since a pr-mode pull-request carries every
 // alpha commit since beta, and the default lists them all, dropping PR-xxx.
 
-        const msInterval = 60 * 1000;
         const name = (
             modeMerge === "merge"
             ? "merge"
             : `merge_${modeMerge}`
         );
         const repoRemote = await repoOf(remote);
-        const timeStart = Date.now();
         let commitMessage;
         let pr;
         let res;
-        let runCountDone = 0;
-        let runDone;
-        let runList;
-        let runListBad;
         let sha;
         pr = (await prFind("open"))[0];
         // Merged by hand at HEAD is done, so a chained cleanup still runs.
@@ -2065,67 +2070,22 @@ import moduleFs from "fs";
             return;
         }
         sha = pr.head.sha;
-        while (true) {
-            // The check-runs of the pull-request repo include its own
-            // pull_request runs, which a push-only wait skips.
-            res = await githubRequest(
-                "GET",
-                `/repos/${repoRemote}/commits/${sha}/check-runs?per_page=100`
-            );
-            moduleAssert.ok(
-                res.status === 200,
-                `shGithubPrFlow ${name} - ${res.status} ${res.text}`
-            );
-            runList = res.json.check_runs;
-            runListBad = runList.filter(function (run) {
-                return (
-                    run.status === "completed" &&
-                    !["neutral", "skipped", "success"].includes(run.conclusion)
-                );
-            });
-            moduleAssert.ok(
-                runListBad.length === 0,
-                `shGithubPrFlow ${name} - ci failed, not merged - ` +
-                runListBad.map(function (run) {
-                    return `${run.name} ${run.conclusion}`;
-                }).join(", ")
-            );
-            log(
-                `${repoRemote}#${pr.number}` +
-                ` - ${Math.floor((Date.now() - timeStart) / 60000)}m` +
-                ` / ${msCiTotal / 60000}m - ` +
-                runList.filter(function (run) {
+        // The check-runs of the pull-request repo include its own pull_request
+        // runs, which a push-only wait skips.
+        await ciPoll({
+            describe: function (runList) {
+                return runList.filter(function (run) {
                     return run.status === "completed";
-                }).length + ` of ${runList.length} done`,
-                name
-            );
-            // A late workflow adds its runs after the first ones finish, so
-            // trust "all done" only if a poll later still says so.
-            runDone = runList.every(function (run) {
-                return run.status === "completed";
-            });
-            if (
-                runDone &&
-                runList.length > 0 &&
-                runList.length === runCountDone
-            ) {
-                break;
+                }).length + ` of ${runList.length} done`;
+            },
+            isOldOk: false,
+            label: `${repoRemote}#${pr.number}`,
+            name,
+            path: `/repos/${repoRemote}/commits/${sha}/check-runs?per_page=100`,
+            runListGet: function (json) {
+                return json.check_runs;
             }
-            runCountDone = (
-                runDone
-                ? runList.length
-                : 0
-            );
-            moduleAssert.ok(
-                runList.length > 0 || Date.now() - timeStart < 5 * 60 * 1000,
-                `shGithubPrFlow ${name} - no ci run in 300s, not merged`
-            );
-            moduleAssert.ok(
-                Date.now() - timeStart < msCiTotal,
-                `shGithubPrFlow ${name} - ci unfinished in 1800s, not merged`
-            );
-            await sleep(msInterval);
-        }
+        });
         if (modeMerge === "squash") {
             commitMessage = await gitOutput(["log", "-1", "--format=%B", sha]);
         }
