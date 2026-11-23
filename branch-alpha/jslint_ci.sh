@@ -1106,6 +1106,9 @@ shGithubCiWait() {(set -e
         ? 30
         : 120
     );
+    // A push of a commit that ran before still starts new runs within seconds,
+    // so trust only old runs after this wait.
+    const ms_late = 15 * 1000;
     const ms_norun = 5 * 60 * 1000;
     const ms_settle = 60 * 1000;
     const ms_total = 30 * 60 * 1000;
@@ -1120,6 +1123,7 @@ shGithubCiWait() {(set -e
     let line;
     let line_prv = "";
     let ms_dispatch = 0;
+    let ms_now = 0;
     let ms_seen = 0;
     let result;
     let run_list;
@@ -1170,23 +1174,31 @@ shGithubCiWait() {(set -e
     function run_is_ok(run) {
         return ["neutral", "skipped", "success"].includes(run.conclusion);
     }
+    function run_is_old(run) {
+        // A run done a settle-time ago, by the clock of github, had its own
+        // settle-time for a late workflow, as on a re-run.
+        return ms_now - Date.parse(run.updated_at) >= ms_settle;
+    }
     function run_list_newest(run_list_all) {
 
 // This function will keep the newest push or dispatch run of each workflow,
 // as a later entry of the same workflow overwrites an earlier one.
 
-        return Array.from(new Map(
-            run_list_all.filter(function (run) {
-                return (
-                    ["push", "workflow_dispatch"].includes(run.event) &&
-                    Date.parse(run.created_at) >= ms_dispatch
-                );
-            }).sort(function (aa, bb) {
-                return aa.run_number - bb.run_number;
-            }).map(function (run) {
-                return [run.workflow_id, run];
-            })
-        ).values());
+        return Object.values(Object.fromEntries(
+            run_list_all
+                .filter(function (run) {
+                    return (
+                        ["push", "workflow_dispatch"].includes(run.event) &&
+                        Date.parse(run.created_at) >= ms_dispatch
+                    );
+                })
+                .sort(function (aa, bb) {
+                    return aa.run_number - bb.run_number;
+                })
+                .map(function (run) {
+                    return [run.workflow_id, run];
+                })
+        ));
     }
     function sleep(ms) {
         return new Promise(function (resolve) {
@@ -1238,18 +1250,24 @@ shGithubCiWait() {(set -e
                 fail(`too many runs - ${result.json.total_count}`);
                 return;
             }
+            ms_now = Date.parse(result.date);
             run_list = run_list_newest(result.json.workflow_runs);
             if (run_list.length === 0 && ms_elapsed() >= ms_norun) {
                 fail("no run found in 5 minutes");
                 return;
             }
             if (run_list.length > 0) {
-                line = run_list.map(function (run) {
-                    return `${run.name} ${run.status} ${run.conclusion}`;
-                }).join(", ");
-                workflow_key = run_list.map(function (run) {
-                    return run.workflow_id;
-                }).sort().join();
+                line = run_list
+                    .map(function (run) {
+                        return `${run.name} ${run.status} ${run.conclusion}`;
+                    })
+                    .join(", ");
+                workflow_key = run_list
+                    .map(function (run) {
+                        return run.workflow_id;
+                    })
+                    .sort()
+                    .join();
                 if (line !== line_prv) {
                     console.error(
                         `shGithubCiWait - ${repo} ${arg_branch} - ${line}`
@@ -1266,16 +1284,23 @@ shGithubCiWait() {(set -e
                     return run.status === "completed" && !run_is_ok(run);
                 })) {
                     fail(`failed - ${line}`);
-                    console.error(run_list.map(function (run) {
-                        return run.html_url;
-                    }).join("\n"));
+                    console.error(
+                        run_list
+                            .map(function (run) {
+                                return run.html_url;
+                            })
+                            .join("\n")
+                    );
                     return;
                 }
                 if (
                     run_list.every(function (run) {
                         return run.status === "completed";
                     }) &&
-                    ms_elapsed() - ms_seen >= ms_settle
+                    (
+                        ms_elapsed() - ms_seen >= ms_settle ||
+                        (ms_elapsed() >= ms_late && run_list.every(run_is_old))
+                    )
                 ) {
                     console.error(
                         `shGithubCiWait - ${repo} ${arg_branch} - ok`
@@ -1408,8 +1433,9 @@ shGithubPrCleanup() {(set -e
 # This function will cleanup pull-request after merge into beta of remote
 # <origin|upstream>, waiting for github-ci after each push, and deleting the
 # head-branch only after all ci passes. After a release, it saves the draft
-# github-release. It writes nothing before its checks pass, so re-run it after
-# a fix.
+# github-release.
+#
+# It writes nothing before its checks pass, so re-run it after a fix.
 #
 # example usage:
 # sh jslint_ci.sh shGithubPrCleanup upstream
@@ -1485,6 +1511,11 @@ EOF
         exit 1
     fi
     printf "shGithubPrCleanup - merged %s\n" "$PR_HEAD_REF"
+    case "$PR_HEAD_IS_ORIGIN $PR_HEAD_REF" in
+    "false branch-v"*)
+        printf "shGithubPrCleanup - head-branch not in origin, no release\n"
+        ;;
+    esac
     shGithubCiWait "$REMOTE" beta
     # Keep the backup of the pre-merge alpha on a re-run.
     if [ "$(git rev-parse alpha)" != "$SHA" ]
@@ -1501,8 +1532,10 @@ EOF
         git push upstream alpha -f
         shGithubCiWait upstream alpha
     fi
-    case "$PR_HEAD_REF" in
-    branch-v*)
+    # Release only a branch-v* head from origin, so a contributor branch of
+    # that name cannot push master.
+    case "$PR_HEAD_IS_ORIGIN $PR_HEAD_REF" in
+    "true branch-v"*)
         # Local master mirrors <remote>/master, and so does origin/master for
         # upstream, so only <remote>/master guards against a non-fast-forward,
         # and a test on origin cannot block the real release after it.
@@ -1539,8 +1572,8 @@ EOF
             ":refs/heads/$PR_HEAD_REF"
     fi
     git push . alpha:__pr_upstream -f
-    case "$PR_HEAD_REF" in
-    branch-v*)
+    case "$PR_HEAD_IS_ORIGIN $PR_HEAD_REF" in
+    "true branch-v"*)
         shGithubReleaseCreate "$REMOTE"
         ;;
     esac
@@ -1549,9 +1582,11 @@ EOF
 shGithubPrCreate() {(set -e
 # This function will commit pending changes onto alpha as a pull-commit built
 # from CHANGELOG.md, and push it to origin as branch-p<date> for mode 'pr', or
-# branch-v<version> for mode 'release'. With npm_config_mode_pr_create=1, it
-# instead opens the pull-request of that pushed branch against beta of remote
-# <origin|upstream>, where origin tests the flow on the fork.
+# branch-v<version> for mode 'release'.
+#
+# With npm_config_mode_pr_create=1, it instead opens the pull-request of that
+# pushed branch against beta of remote <origin|upstream>, where origin tests
+# the flow on the fork.
 #
 # example usage:
 # sh jslint_ci.sh shGithubPrCreate upstream pr
@@ -1601,7 +1636,7 @@ shGithubPrCreate() {(set -e
     export PR_REMOTE
     export PR_REPOSITORY="$(git config "remote.$PR_REMOTE.url" |
         sed -En -e 's|.*github\.com[/:]||p' |
-        sed -e 's|/$||' -e 's|\.git$||')"
+        sed -E -e 's|/$||' -e 's|\.git$||')"
     if [ ! "$PR_REPOSITORY" ]
     then
         printf "shGithubPrCreate - cannot parse url of remote %s\n" \
@@ -1743,13 +1778,17 @@ import moduleFs from "fs";
 
 // This function will open the pull-request of the branch pushed for HEAD.
 
-        const branchList = (await gitOutput([
-            "for-each-ref",
-            "--points-at",
-            "HEAD",
-            "--format=%(refname:short)",
-            "refs/remotes/origin/branch-*"
-        ])).split("\n").filter(Boolean);
+        const branchList = (
+            await gitOutput([
+                "for-each-ref",
+                "--points-at",
+                "HEAD",
+                "--format=%(refname:short)",
+                "refs/remotes/origin/branch-*"
+            ])
+        )
+            .split("\n")
+            .filter(Boolean);
         const owner = (
             /github\.com[\/:]([^\/]+)\//
         ).exec(await gitOutput(["config", "remote.origin.url"]))?.[1];
@@ -1772,10 +1811,12 @@ import moduleFs from "fs";
             // No tracking-ref holds HEAD. Fail if one of that name exists,
             // since HEAD then moved after the push.
             moduleAssert.ok(
-                !(await gitOutput([
-                    "for-each-ref",
-                    `refs/remotes/origin/${branchPull}`
-                ])),
+                !(
+                    await gitOutput([
+                        "for-each-ref",
+                        `refs/remotes/origin/${branchPull}`
+                    ])
+                ),
                 `shGithubPrCreate - HEAD moved since push to ${branchPull}`
             );
             console.error(
@@ -1783,7 +1824,7 @@ import moduleFs from "fs";
                 ` trying ${branchPull}`
             );
         }
-        // A re-run after success finds its pull-request already open.
+        // Fail if its pull-request is already open, since it is created once.
         res = await githubRequest(
             "GET",
             `/repos/${process.env.PR_REPOSITORY}/pulls` +
@@ -1875,9 +1916,12 @@ import moduleFs from "fs";
                 modePr === "release"
                 ? rest
                 : [
-                    issue && issue.split(",").map(function (number) {
-                        return `Fixes #${number}.`;
-                    }).join(" "),
+                    issue && issue
+                        .split(",")
+                        .map(function (number) {
+                            return `Fixes #${number}.`;
+                        })
+                        .join(" "),
                     `This PR will:\n${title}`,
                     rest && `This PR will additionally:\n${rest}`
                 ].filter(Boolean).join("\n\n")
@@ -1900,7 +1944,10 @@ ${prText.description}
     }
     // Fail closed, so only a finished push or open exits 0.
     process.exitCode = 1;
-    version = version.replace((/-0?/g), ".").replace((/^v/), "");
+    // Turn only a date 2026-01-05 into 2026.1.5, keeping a suffix -rc1.
+    version = version
+        .replace((/^(\d{4})-0?(\d+)-0?(\d+)$/), "$1.$2.$3")
+        .replace((/^v/), "");
     // security - sanitize version
     version = version.trim().replace((/[^\w.\-]/g), "_");
     data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
@@ -1968,6 +2015,21 @@ ${prText.description}
         await prOpen();
         return;
     }
+    // A re-run on its own pull-commit, with no squash given, rebuilds it on the
+    // same base, rather than stack a duplicate and overwrite that backup.
+    if (
+        !process.argv[4] &&
+        await gitOutput(["rev-parse", "HEAD"]) === (
+            await gitOutput([
+                "for-each-ref",
+                "--format=%(objectname)",
+                `refs/heads/__pr_${branchMerge}`
+            ])
+        )
+    ) {
+        branchSquash = `__pr_${branchMerge}_pre`;
+        console.error(`shGithubPrCreate - re-run, squash ${branchSquash}`);
+    }
     prText = prTextCreate(commitMessage);
     // security - sanitize commitMessage
     commitMessage = commitMessage.trim().replace((/\u0027/g), "$&\"$&\"$&");
@@ -2009,6 +2071,7 @@ shGithubReleaseCreate() {(set -e
 # This function will save a draft github-release of master of remote
 # <origin|upstream>, for the version atop its CHANGELOG.md, after its github-ci
 # passes. Publish the draft by hand, which triggers publish.yml.
+#
 # It writes nothing before its checks pass, and never a second draft, and a
 # re-run finds a draft or release of the same commit as done.
 #
@@ -2037,26 +2100,54 @@ import moduleChildProcess from "child_process";
 import {promisify} from "util";
 (async function () {
     const [arg_sha, arg_url] = process.argv.slice(1);
-    const exec_file = promisify(moduleChildProcess.execFile);
+    const latest = changelog_parse(await git_show("CHANGELOG.md"));
     const repo = (
         /github\.com[\/:]([^\/]+\/[^\/]+?)(?:\.git)?\/?$/
     ).exec(arg_url)?.[1];
-    let changelog;
-    let entry_first;
-    let entry_list;
+    const tag = `v${latest.version}`;
+    const version_package = JSON.parse(await git_show("package.json")).version;
+    // A pypi-package, as in sqlmath, publishes the version in pyproject.toml,
+    // less any "-" suffix.
+    const version_pypi = (
+        /^version = "([^"]*)"\r?$/m
+    ).exec(
+        await git_show("pyproject.toml").catch(function () {
+            return "";
+        })
+    )?.[1];
     let release;
     let result;
-    let tag;
-    let version;
-    let version_package;
-    let version_pypi;
+    function changelog_parse(text) {
+
+// This function will take the first "# v" heading, skipping "# Todo", with its
+// entries up to the next heading, keeping indented sub-items.
+
+        const [
+            ,
+            version,
+            body = ""
+        ] = (
+            /^# v(\S+)\n([\s\S]*?)(?:^# |(?![\s\S]))/m
+        ).exec(text.replace((/\r/g), "")) || [];
+        return {
+            body: body.trim(),
+            // Title the release with the first item.
+            item_first: body.trim().split("\n").find(function (line) {
+                return line.startsWith("- ");
+            }),
+            version
+        };
+    }
     function fail(message) {
         console.error(`shGithubReleaseCreate - ${repo} - ${message}`);
     }
     async function git_show(file) {
-        return (await exec_file("git", ["show", `${arg_sha}:${file}`], {
-            maxBuffer: 256 * 1024 * 1024
-        })).stdout;
+        const {stdout} = await promisify(moduleChildProcess.execFile)(
+            "git",
+            ["show", `${arg_sha}:${file}`],
+            {maxBuffer: 256 * 1024 * 1024}
+        );
+        return stdout;
     }
     async function github_request(method, path, body) {
         const res = await fetch(`https://api.github.com/repos/${repo}${path}`, {
@@ -2085,44 +2176,24 @@ import {promisify} from "util";
         fail("needs MY_GITHUB_TOKEN");
         return;
     }
-    // Take the first "# v" heading, skipping "# Todo", with its entries up to
-    // the next heading.
-    changelog = (await git_show("CHANGELOG.md")).replace((/\r/g), "");
-    [, version, entry_list] = (
-        /^# v(\S+)\n([\s\S]*?)(?:^# |(?![\s\S]))/m
-    ).exec(changelog) || [];
-    // Keep indented sub-items, and title the release with the first item.
-    entry_list = (entry_list || "").trim();
-    entry_first = entry_list.split("\n").find(function (line) {
-        return line.startsWith("- ");
-    });
-    version_package = JSON.parse(await git_show("package.json")).version;
-    if (!version || !entry_first) {
+    if (!latest.version || !latest.item_first) {
         fail("no \"# v<version>\" with entries in CHANGELOG.md");
         return;
     }
-    if (version !== version_package) {
+    if (latest.version !== version_package) {
         fail(
-            `CHANGELOG.md version ${version}` +
+            `CHANGELOG.md version ${latest.version}` +
             ` differs from package.json version ${version_package}`
         );
         return;
     }
-    // A pypi-package, as in sqlmath, publishes the version in pyproject.toml,
-    // less any "-" suffix.
-    version_pypi = (
-        /^version = "([^"]*)"\r?$/m
-    ).exec(await git_show("pyproject.toml").catch(function () {
-        return "";
-    }))?.[1];
-    if (version_pypi && version_pypi !== version.split("-")[0]) {
+    if (version_pypi && version_pypi !== latest.version.split("-")[0]) {
         fail(
-            `CHANGELOG.md version ${version}` +
+            `CHANGELOG.md version ${latest.version}` +
             ` differs from pyproject.toml version ${version_pypi}`
         );
         return;
     }
-    tag = `v${version}`;
     // A draft has no tag yet, and only a listing of releases shows drafts.
     result = await github_request("GET", "/releases?per_page=100");
     if (result.status !== 200) {
@@ -2165,10 +2236,10 @@ import {promisify} from "util";
     // Never retry, since a lost reply could mean a saved draft, which a
     // re-run then finds above.
     result = await github_request("POST", "/releases", {
-        body: entry_list,
+        body: latest.body,
         draft: true,
         generate_release_notes: true,
-        name: `${tag} - ${entry_first.slice(2)}`,
+        name: `${tag} - ${latest.item_first.slice(2)}`,
         tag_name: tag,
         target_commitish: arg_sha
     });
@@ -2188,7 +2259,10 @@ shGithubTokenExport() {
 # This function will export $MY_GITHUB_TOKEN from file.
     if [ ! "$MY_GITHUB_TOKEN" ]
     then
-        export MY_GITHUB_TOKEN="$(cat ~/.mysecret2/.my_github_token)"
+        # Drop any CR or LF, which an editor on windows may leave in the file.
+        export MY_GITHUB_TOKEN="$(
+            tr -d '\r\n' < ~/.mysecret2/.my_github_token
+        )"
     fi
 }
 
