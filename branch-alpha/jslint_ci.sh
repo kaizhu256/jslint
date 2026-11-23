@@ -1293,6 +1293,11 @@ import moduleFs from "fs";
                 `shGithubPrFlow all - v${top.version} targets` +
                 ` ${found.target_commitish}, not ${remote}/master`
             );
+            moduleAssert.ok(
+                !(await gitOutput(["status", "--porcelain"])),
+                `shGithubPrFlow all - pending change, but v${top.version} is` +
+                " already released; bump the version"
+            );
             log(`v${top.version} already released, nothing to do`);
             process.exitCode = 0;
             return;
@@ -1333,6 +1338,10 @@ import moduleFs from "fs";
         head = await gitOutput(["rev-parse", "HEAD"]);
         pr = (await prFind("open"))[0];
         if (pr) {
+            moduleAssert.ok(
+                !pr.head.ref.startsWith("branch-v"),
+                `shGithubPrFlow all - open ${pr.html_url} is a release`
+            );
             await assertNoPending(pr);
             log(`already open - ${pr.html_url}`);
             await merge("merge");
@@ -1392,6 +1401,7 @@ import moduleFs from "fs";
         let prXxx = (
             /^- (PR-\d+) /
         ).exec(await gitOutput(["log", "-1", "--format=%s"]))?.[1];
+        let preSha;
         let res;
         let top;
         let version;
@@ -1463,8 +1473,23 @@ import moduleFs from "fs";
                 return prBranch;
             })
         )) {
+            // Only a branch-* head is found again at merge and create.
+            moduleAssert.ok(
+                prBranch.startsWith("branch-"),
+                `shGithubPrFlow branch - open ${prXxx} is on ${prBranch},` +
+                " not a branch-* head"
+            );
             log(`keep open ${prXxx} on ${prBranch}`);
         } else {
+            // An unmerged HEAD whose number is taken carries tags that would
+            // go stale under a new number.
+            moduleAssert.ok(
+                !prXxx || await gitTryCode([
+                    "merge-base", "--is-ancestor", "HEAD", `${remote}/beta`
+                ]) === 0,
+                `shGithubPrFlow branch - ${prXxx} is taken upstream; write` +
+                " its tags back as pr-xxx, then re-run"
+            );
             res = await githubRequest(
                 "GET",
                 `/repos/${repoUpstream}/issues?per_page=1&state=all`
@@ -1513,27 +1538,20 @@ import moduleFs from "fs";
                 : `branch-p${version}`
             );
         }
-        // A re-run on its own pull-commit, with no squash given, rebuilds it on
-        // the same base rather than stack a duplicate. Its pull-commit is HEAD
-        // at __pr_<merge>, or a pull-commit message on __pr_<merge>_pre if a
-        // re-run stopped before that push, but never a commit merged to beta.
+        // A re-run, with no squash given, rebuilds everything since the last
+        // squash base, rather than stack a duplicate, an origin test merge or
+        // a hand fix on it. That base lies between <remote>/beta and HEAD.
+        preSha = await refSha(`refs/heads/__pr_${branchMerge()}_pre`);
         if (
             !argList[3] &&
-            await refSha(`refs/heads/__pr_${branchMerge()}_pre`) &&
+            preSha &&
+            preSha !== await gitOutput(["rev-parse", "HEAD"]) &&
             await gitTryCode([
-                "merge-base", "--is-ancestor", "HEAD", `${remote}/beta`
-            ]) !== 0 && (
-                await gitOutput(["rev-parse", "HEAD"]) === await refSha(
-                    `refs/heads/__pr_${branchMerge()}`
-                ) || (
-                    await gitTry(["rev-parse", "HEAD^"]) === await refSha(
-                        `refs/heads/__pr_${branchMerge()}_pre`
-                    ) &&
-                    (/^(?:- PR-\d+ - |# v\d)/).test(
-                        await gitOutput(["log", "-1", "--format=%s"])
-                    )
-                )
-            )
+                "merge-base", "--is-ancestor", `${remote}/beta`, preSha
+            ]) === 0 &&
+            await gitTryCode([
+                "merge-base", "--is-ancestor", preSha, "HEAD"
+            ]) === 0
         ) {
             branchSquash = `__pr_${branchMerge()}_pre`;
             log(`re-run, squash ${branchSquash}`);
