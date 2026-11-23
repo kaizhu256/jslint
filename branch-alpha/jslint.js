@@ -5543,9 +5543,8 @@ function jslint_phase3_parse(state) {
 
     function constant_super() {
 
-// PR-519 - Allow 'super.aa' and 'super[aa]' in object-method under option
-// 'this'. This function will warn 'super' unless option 'this', in an
-// object-method or its arrow-function, and before '.' or '['.
+// PR-519 - Allow 'super.aa' and 'super[aa]' in an object-method or its
+// arrow-function, under option 'this'.
 
         if (
             !option_dict.this ||

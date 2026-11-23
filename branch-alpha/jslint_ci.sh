@@ -1078,8 +1078,7 @@ shGithubCheckoutRemote() {(set -e
 )}
 
 shGithubCiWait() {(set -e
-# This function will wait for the newest github-ci runs on the commit at
-# <remote>/<branch>, as shGithubPrFlow ci_wait.
+# This function will run shGithubPrFlow ci_wait.
 #
 # example usage:
 # shGithubCiWait upstream/beta
@@ -1458,9 +1457,8 @@ import moduleFs from "fs";
         if (modePr === "release") {
             commitMessage = `# ${version}\n${top.body}`;
         } else {
-            // Name only the items this pull-request adds, those missing from
-            // the CHANGELOG of <remote>/beta, so the message repeats no
-            // released item.
+            // Name only items missing from <remote>/beta CHANGELOG.md, so the
+            // message repeats no released item.
             changelogNew = top.body.split(/\n(?=- )/);
             changelogOld = (
                 await gitTry([
