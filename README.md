@@ -1092,7 +1092,7 @@ if (false) {
         npm run test2
 
         # commit pending changes onto alpha, push branch-p20yy.mm.dd,
-        # print title, description, body
+        # print title, description
         # (use origin in place of upstream to test the flow on the fork)
         sh jslint_ci.sh shGithubPrCreate upstream pr # v20yy.mm.dd __pr_beta_pre
 
@@ -1127,7 +1127,7 @@ if (false) {
         npm run test2
 
         # commit pending changes onto alpha, push branch-v20yy.mm.dd,
-        # print title, description, body
+        # print title, description
         # (use origin in place of upstream to test the flow on the fork)
         sh jslint_ci.sh shGithubPrCreate upstream release # v20yy.mm.dd __pr_master_pre
 
