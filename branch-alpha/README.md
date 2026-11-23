@@ -1105,12 +1105,17 @@ if (false) {
 1. wait awhile before continuing ...
     - run
         ```shell
-        # wait for pull-request ci-success, then squash-and-merge it
-        sh jslint_ci.sh shGithubPrFlow merge_squash upstream
+        # wait for pull-request ci-success, then merge it
+        sh jslint_ci.sh shGithubPrFlow merge upstream
 
         # wait for ci after each push, reset alpha to beta,
         # push alpha and beta, then delete head-branch
         sh jslint_ci.sh shGithubPrFlow cleanup upstream
+        ```
+    - or run every step above unattended, safe to re-run, resuming where it
+      stopped
+        ```shell
+        sh jslint_ci.sh shGithubPrFlow all upstream pr # v20yy.mm.dd __pr_beta_pre
         ```
 
 

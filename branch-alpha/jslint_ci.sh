@@ -1204,9 +1204,9 @@ shGithubPrFlow() {(set -e
 #     save the draft github-release of master again
 # publish <remote>
 #     publish the draft github-release, which triggers publish.yml
-# all <remote> release [version]
-#     branch, create, merge_squash and cleanup, resuming by state; never
-#     publish
+# all <remote> <pr|release> [version] [squash-base]
+#     branch, create, merge (pr) or merge_squash (release), and cleanup,
+#     resuming by state; never publish
 # ci_wait <remote>/<branch> [dispatch]
 #     wait for the newest github-ci runs on the commit at <remote>/<branch>
 #
@@ -1215,6 +1215,7 @@ shGithubPrFlow() {(set -e
 # sh jslint_ci.sh shGithubPrFlow create upstream pr 519
 # sh jslint_ci.sh shGithubPrFlow merge_squash upstream
 # sh jslint_ci.sh shGithubPrFlow cleanup upstream
+# sh jslint_ci.sh shGithubPrFlow all upstream pr v2026.11.1 __pr_beta_pre
 # sh jslint_ci.sh shGithubPrFlow all upstream release v2026.11.1
 # sh jslint_ci.sh shGithubPrFlow publish upstream
     case "$1" in
@@ -1259,15 +1260,20 @@ import moduleFs from "fs";
 
 // This function will run the release flow unattended, resuming by state: a
 // saved draft or release ends it, a merged pull-request goes to cleanup, and an
-// open one at HEAD goes to merge_squash.
+// open one at HEAD goes to merge_squash. Mode pr runs allPr.
 
-        const top = await versionTop("", true);
         let pr;
+        let top;
         moduleAssert.ok(
-            argList[1] === "release",
-            "shGithubPrFlow all - usage: all <origin|upstream> release" +
-            " [version]"
+            ["pr", "release"].includes(argList[1]),
+            "shGithubPrFlow all - usage: all <origin|upstream> <pr|release>" +
+            " [version] [squash-base]"
         );
+        if (argList[1] === "pr") {
+            await allPr();
+            return;
+        }
+        top = await versionTop("", true);
         moduleAssert.ok(
             !argList[2] || versionNormalize(argList[2]) === top.version,
             `shGithubPrFlow all - CHANGELOG.md tops with v${top.version}` +
@@ -1300,6 +1306,42 @@ import moduleFs from "fs";
             log(`v${top.version} already open - ${pr.html_url}`);
         }
         await merge("squash");
+        await cleanup();
+    }
+    async function allPr() {
+
+// This function will run the pull-request flow unattended, merging with the
+// default merge-commit, and resuming by state: an open pull-request at HEAD
+// goes to merge; one merged at HEAD, or HEAD at <remote>/beta with no pending
+// change, goes to cleanup, whose re-run is safe.
+
+        let head;
+        let pr;
+        modePr = "pr";
+        await gitRun(["fetch", remote, "beta"]);
+        head = await gitOutput(["rev-parse", "HEAD"]);
+        pr = (await prFind("open"))[0];
+        if (pr) {
+            log(`already open - ${pr.html_url}`);
+            await merge("merge");
+            await cleanup();
+            return;
+        }
+        pr = (await prFind("closed")).find(function (elem) {
+            return elem.merged_at && elem.head.sha === head;
+        });
+        // A cleanup stopped after its reset leaves HEAD at <remote>/beta.
+        if (pr || (
+            head === await gitOutput(["rev-parse", `${remote}/beta`]) &&
+            !(await gitOutput(["status", "--porcelain"]))
+        )) {
+            log(`already merged - ${pr?.html_url || head}`);
+            await cleanup();
+            return;
+        }
+        await branch();
+        await create();
+        await merge("merge");
         await cleanup();
     }
     async function branch() {
@@ -1447,15 +1489,21 @@ import moduleFs from "fs";
         }
         // A re-run on its own pull-commit, with no squash given, rebuilds it on
         // the same base, rather than stack a duplicate and overwrite that
-        // backup.
+        // backup. Its own pull-commit is HEAD at __pr_<merge>, or, if a
+        // re-run stopped before that push, a pull-commit message on top of
+        // __pr_<merge>_pre.
         if (
-            !argList[3] &&
-            await gitOutput(["rev-parse", "HEAD"]) === (
-                await gitOutput([
-                    "for-each-ref",
-                    "--format=%(objectname)",
+            !argList[3] && (
+                await gitOutput(["rev-parse", "HEAD"]) === await refSha(
                     `refs/heads/__pr_${branchMerge()}`
-                ])
+                ) || (
+                    await gitTry(["rev-parse", "HEAD^"]) === await refSha(
+                        `refs/heads/__pr_${branchMerge()}_pre`
+                    ) &&
+                    (/^(?:- PR-\d+ - |# v\d)/).test(
+                        await gitOutput(["log", "-1", "--format=%s"])
+                    )
+                )
             )
         ) {
             branchSquash = `__pr_${branchMerge()}_pre`;
@@ -1473,10 +1521,10 @@ import moduleFs from "fs";
     git reset "${branchSquash}"
     git push . HEAD:__pr_"${branchMerge()}"_pre -f
     shGitSquashPop alpha \u0027${commitMessage}\u0027
+    git push . HEAD:__pr_"${branchMerge()}" -f
     git --no-pager diff origin/"${branchPull}" || true
     git push origin alpha:"${branchPull}" -f
     git push origin alpha -f
-    git push . HEAD:__pr_"${branchMerge()}" -f
     printf "\n\n\n\n"
     git --no-pager log -n 4
 )
@@ -2227,6 +2275,12 @@ ${prText.description}
         );
         log(`published ${res.json.html_url} - publish.yml at ${urlRun}`);
         process.exitCode = 0;
+    }
+    function refSha(ref) {
+
+// This function will return the sha of git <ref>, or "" if none.
+
+        return gitOutput(["for-each-ref", "--format=%(objectname)", ref]);
     }
     async function release() {
 
