@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2026.10.30)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2026.11.1)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/index.html) |
@@ -1031,7 +1031,7 @@ if (false) {
 |  22. | ✅ | ES2016 | [`Array.prototype.includes`](https://github.com/tc39/proposal-Array.prototype.includes) |
 |  21. | ✅ | ES2015 | [`arrows`](https://github.com/lukehoban/es6features#arrows) |
 |  20. | ❌ | ES2015 | [`classes`](https://github.com/lukehoban/es6features#classes) |
-|  19. | ❌ | ES2015 | [`enhanced object literals`](https://github.com/lukehoban/es6features#enhanced-object-literals) |
+|  19. | ⚠️ | ES2015 | [`enhanced object literals`](https://github.com/lukehoban/es6features#enhanced-object-literals) |
 |  18. | ✅ | ES2015 | [`template strings`](https://github.com/lukehoban/es6features#template-strings) |
 |  17. | ✅ | ES2015 | [`destructuring`](https://github.com/lukehoban/es6features#destructuring) |
 |  16. | ✅ | ES2015 | [`default + rest + spread`](https://github.com/lukehoban/es6features#default--rest--spread) |
@@ -1091,48 +1091,26 @@ if (false) {
         # re-run until version propagates
         npm run test2
 
-        # re-run until version propagates
-        sh jslint_ci.sh shGithubPrCreate alpha beta # v20yy.mm.dd __pr_beta_pre
+        # commit pending changes onto alpha, push branch-p20yy.mm.dd,
+        # print title, description
+        # (use origin in place of upstream to test the flow on the fork)
+        sh jslint_ci.sh shGithubPrCreate upstream pr # v20yy.mm.dd __pr_beta_pre
 
-        git push upstream alpha -f
+        # open pull-request against beta, needing $MY_GITHUB_TOKEN
+        # npm_config_mode_pr_issue=xxx adds "Fixes #xxx." to description
+        npm_config_mode_pr_issue=xxx npm_config_mode_pr_create=1 \
+            sh jslint_ci.sh shGithubPrCreate upstream pr
         ```
-        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
-
-1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p20yy.mm.dd
-    - click `Create pull request`
-    - input `Add a title *` with: `<CHANGELOG.md entry #1>`
-    - input `Add a description` with:
-        ```
-        Fixes #xxx.
-
-        This PR will:
-        <CHANGELOG.md entry #1>
-
-        This PR will additionally:
-        <CHANGELOG.md entry extra>
-
-        <screenshot>
-        ```
-    - click `Preview` and review
-    - verify:
-        - base respository: `jslint-org/jslint`
-        - base: `beta`
-    - click `Create pull request`
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+    - add `<screenshot>` to pull-request description, if any
 
 1. wait awhile before continuing ...
-    - click `Squash and merge`
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+    - after pull-request ci-success, click `Squash and merge`
     - run
         ```shell
-        sh jslint_ci.sh shGithubPrCleanup
-
-        git push upstream alpha -f
+        # wait for ci after each push, reset alpha to beta,
+        # push alpha and beta, then delete head-branch
+        sh jslint_ci.sh shGithubPrCleanup upstream
         ```
-        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
-    - click `Delete branch`
 
 
 <br><br>
@@ -1141,89 +1119,48 @@ if (false) {
 1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
     - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
 1. update `CHANGELOG.md`
+    - set top heading to `# v20yy.mm.dd`
     - verify `<CHANGELOG.md entries>` ordered by impact
     - run
         ```shell
         # re-run until version propagates
         npm run test2
 
-        # re-run until version propagates
-        sh jslint_ci.sh shGithubPrCreate alpha master # v20yy.mm.dd __pr_master_pre
+        # commit pending changes onto alpha, push branch-v20yy.mm.dd,
+        # print title, description
+        # (use origin in place of upstream to test the flow on the fork)
+        sh jslint_ci.sh shGithubPrCreate upstream release # v20yy.mm.dd __pr_master_pre
 
-        git push upstream alpha -f
+        # open pull-request against beta, needing $MY_GITHUB_TOKEN
+        npm_config_mode_pr_create=1 \
+            sh jslint_ci.sh shGithubPrCreate upstream release
         ```
-        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
-
-1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v20yy.mm.dd
-    - click `Create pull request`
-    - input `Add a title *` with: `# v20yy.mm.dd`
-    - input `Add a description` with:
-        ```
-        <CHANGELOG.md entry #1>
-        <CHANGELOG.md entry extra>
-        ```
-    - click `Preview` and review
-    - verify:
-        - base respository: `jslint-org/jslint`
-        - base: `beta`
-    - click `Create pull request`
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 
 1. wait awhile before continuing ...
-    - click `Squash and merge`
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+    - after pull-request ci-success, click `Squash and merge`
     - run
         ```shell
-        sh jslint_ci.sh shGithubPrCleanup
-
-        git push upstream alpha -f
+        # wait for ci after each push, reset alpha to beta,
+        # push alpha and beta, push beta to master, then delete head-branch,
+        # then save a draft-release v20yy.mm.dd of master,
+        # with CHANGELOG.md entries and generated release notes
+        sh jslint_ci.sh shGithubPrCleanup upstream
         ```
-        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
-    - click `Delete branch`
-    - run
-        ```shell
-        git push origin beta:master
-
-        git push upstream beta:master
-        ```
-        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
 
 
 <br><br>
 
 ### branch-master publish
-1. goto https://www.npmjs.com/package/@jslint-org/jslint/access <!--no-validate-->
+1. once per package, goto https://www.npmjs.com/package/@jslint-org/jslint/access <!--no-validate-->
     - click `Github Actions`
     - input `Organization or user*` with: `jslint-org`
     - input `Repository*` with: `jslint`
     - input `Workflow filename*` with: `publish.yml`
     - click `Set up connection` or `Update Package Settings`
-1.
-    - run
-        ```shell
-        git push upstream beta:master
-        ```
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
-1. goto https://github.com/jslint-org/jslint/releases/new
-    - input `Tag: Select tag` with: `v20yy.mm.dd`
-        - click `Create new tag` and click `Create`
-        - verify correct-year `v20yy.mm.dd`
-        - select `Target: master`
-    - input `Release title` with: `v20yy.mm.dd - <CHANGELOG.md entry #1>`
-        - select `Previous tag: Auto`
-        - click `Generate release notes`
-    - input `Write` with:
-        ```
-        <CHANGELOG.md entry #1>
-        <CHANGELOG.md entry extra>
-
-        **Full Changelog**: ...
-        ```
-    - click `Preview` and review
-    - click `Latest`
+1. goto the draft-release url printed by `shGithubPrCleanup`
+    - if none, re-run `sh jslint_ci.sh shGithubReleaseCreate upstream`
+    - click `Edit`, `Preview` and review
+    - verify `Set as the latest release` is checked
     - click `Publish release`
         - verify ci-success @ https://github.com/jslint-org/jslint/actions
         - verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
