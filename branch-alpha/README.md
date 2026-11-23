@@ -1104,9 +1104,12 @@ if (false) {
     - add `<screenshot>` to pull-request description, if any
 
 1. wait awhile before continuing ...
-    - after pull-request ci-success, click `Squash and merge`
     - run
         ```shell
+        # wait for pull-request ci-success, then squash-and-merge it
+        npm_config_mode_pr_merge=squash \
+            sh jslint_ci.sh shGithubPrCreate upstream pr
+
         # wait for ci after each push, reset alpha to beta,
         # push alpha and beta, then delete head-branch
         sh jslint_ci.sh shGithubPrCleanup upstream
@@ -1137,9 +1140,12 @@ if (false) {
         ```
 
 1. wait awhile before continuing ...
-    - after pull-request ci-success, click `Squash and merge`
     - run
         ```shell
+        # wait for pull-request ci-success, then squash-and-merge it
+        npm_config_mode_pr_merge=squash \
+            sh jslint_ci.sh shGithubPrCreate upstream release
+
         # wait for ci after each push, reset alpha to beta,
         # push alpha and beta, push beta to master, then delete head-branch,
         # then save a draft-release v20yy.mm.dd of master,

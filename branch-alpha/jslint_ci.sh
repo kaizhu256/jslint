@@ -1588,10 +1588,14 @@ shGithubPrCreate() {(set -e
 # pushed branch against beta of remote <origin|upstream>, where origin tests
 # the flow on the fork.
 #
+# With npm_config_mode_pr_merge=<merge|squash|rebase>, it instead skips every
+# other step, waits for the github-ci of that open pull-request, and merges it.
+#
 # example usage:
 # sh jslint_ci.sh shGithubPrCreate upstream pr
 # npm_config_mode_pr_issue=519 npm_config_mode_pr_create=1 \
 #     sh jslint_ci.sh shGithubPrCreate upstream pr
+# npm_config_mode_pr_merge=squash sh jslint_ci.sh shGithubPrCreate upstream pr
     case "$1" in
     origin|upstream)
         ;;
@@ -1643,7 +1647,8 @@ shGithubPrCreate() {(set -e
             "$PR_REMOTE" >&2
         exit 1
     fi
-    if [ "${npm_config_mode_pr_create:-}" = 1 ]
+    if [ "${npm_config_mode_pr_create:-}" = 1 ] ||
+        [ "${npm_config_mode_pr_merge:-}" ]
     then
         shGithubTokenExport
     else
@@ -1740,6 +1745,7 @@ import moduleFs from "fs";
     let changelogVersion;
     let commitMessage;
     let data;
+    let modeMerge = process.env.npm_config_mode_pr_merge || "";
     let prText;
     function gitOutput(argList) {
         return new Promise(function (resolve, reject) {
@@ -1774,9 +1780,9 @@ import moduleFs from "fs";
             text
         };
     }
-    async function prOpen() {
+    async function prFind() {
 
-// This function will open the pull-request of the branch pushed for HEAD.
+// This function will find the open pull-request of the branch pushed for HEAD.
 
         const branchList = (
             await gitOutput([
@@ -1792,9 +1798,6 @@ import moduleFs from "fs";
         const owner = (
             /github\.com[\/:]([^\/]+)\//
         ).exec(await gitOutput(["config", "remote.origin.url"]))?.[1];
-        const prNumber = Number(
-            (/^- PR-(\d+) /).exec(commitMessage)?.[1]
-        );
         let res;
         moduleAssert.ok(
             process.env.MY_GITHUB_TOKEN,
@@ -1824,7 +1827,6 @@ import moduleFs from "fs";
                 ` trying ${branchPull}`
             );
         }
-        // Fail if its pull-request is already open, since it is created once.
         res = await githubRequest(
             "GET",
             `/repos/${process.env.PR_REPOSITORY}/pulls` +
@@ -1834,10 +1836,134 @@ import moduleFs from "fs";
             res.status === 200,
             `shGithubPrCreate - ${res.status} ${res.text}`
         );
-        if (res.json.length > 0) {
+        return res.json[0];
+    }
+    async function prMerge() {
+
+// This function will wait for the github-ci of the open pull-request of HEAD,
+// then merge it with the commit-message github itself offers for <modeMerge>.
+
+        const msInterval = 30 * 1000;
+        const msNorun = 5 * 60 * 1000;
+        const msTotal = 30 * 60 * 1000;
+        const timeStart = Date.now();
+        let pr;
+        let res;
+        let runCountDone = 0;
+        let runList;
+        let runListBad;
+        moduleAssert.ok(
+            ["merge", "rebase", "squash"].includes(modeMerge),
+            `shGithubPrCreate - bad npm_config_mode_pr_merge "${modeMerge}"`
+        );
+        pr = await prFind();
+        moduleAssert.ok(pr, `shGithubPrCreate - no open pull-request of HEAD`);
+        while (true) {
+            // The check-runs of the pull-request repo include its own
+            // pull_request runs, which a push-only wait skips.
+            res = await githubRequest(
+                "GET",
+                `/repos/${process.env.PR_REPOSITORY}/commits/${pr.head.sha}` +
+                "/check-runs?per_page=100"
+            );
+            moduleAssert.ok(
+                res.status === 200,
+                `shGithubPrCreate - ${res.status} ${res.text}`
+            );
+            runList = res.json.check_runs;
+            runListBad = runList.filter(function (run) {
+                return (
+                    run.status === "completed" &&
+                    !["neutral", "skipped", "success"].includes(run.conclusion)
+                );
+            });
+            moduleAssert.ok(
+                runListBad.length === 0,
+                `shGithubPrCreate - ci failed, not merged - ` +
+                runListBad.map(function (run) {
+                    return `${run.name} ${run.conclusion}`;
+                }).join(", ")
+            );
             console.error(
-                "shGithubPrCreate - pull-request already open" +
-                ` - ${res.json[0].html_url}`
+                `shGithubPrCreate - ci of ${pr.html_url} - ` +
+                runList.filter(function (run) {
+                    return run.status === "completed";
+                }).length + ` of ${runList.length} done`
+            );
+            // A late workflow adds its runs after the first ones finish, so
+            // trust "all done" only if a poll later still says so.
+            if (
+                runList.length > 0 &&
+                runList.length === runCountDone
+            ) {
+                break;
+            }
+            runCountDone = (
+                runList.every(function (run) {
+                    return run.status === "completed";
+                })
+                ? runList.length
+                : 0
+            );
+            moduleAssert.ok(
+                runList.length > 0 || Date.now() - timeStart < msNorun,
+                `shGithubPrCreate - no ci run in ${msNorun / 1000}s, not merged`
+            );
+            moduleAssert.ok(
+                Date.now() - timeStart < msTotal,
+                `shGithubPrCreate - ci unfinished in ${msTotal / 1000}s` +
+                ", not merged"
+            );
+            await new Promise(function (resolve) {
+                setTimeout(resolve, msInterval);
+            });
+        }
+        res = await githubRequest(
+            "PUT",
+            `/repos/${process.env.PR_REPOSITORY}/pulls/${pr.number}/merge`,
+            Object.assign({
+                merge_method: modeMerge,
+                // Merge only the commit ci passed on.
+                sha: pr.head.sha
+            }, {
+                merge: {
+                    commit_message: pr.title,
+                    commit_title: (
+                        `Merge pull request #${pr.number}` +
+                        ` from ${pr.head.label.replace(":", "/")}`
+                    )
+                },
+                rebase: {},
+                squash: {
+                    commit_message: pr.body || "",
+                    commit_title: `${pr.title} (#${pr.number})`
+                }
+            }[modeMerge])
+        );
+        moduleAssert.ok(
+            res.status === 200,
+            `shGithubPrCreate - ${res.status} ${res.text}`
+        );
+        console.error(
+            `shGithubPrCreate - ${modeMerge} ${pr.html_url} as ${res.json.sha}`
+        );
+        process.exitCode = 0;
+    }
+    async function prOpen() {
+
+// This function will open the pull-request of the branch pushed for HEAD.
+
+        const owner = (
+            /github\.com[\/:]([^\/]+)\//
+        ).exec(await gitOutput(["config", "remote.origin.url"]))?.[1];
+        const prNumber = Number(
+            (/^- PR-(\d+) /).exec(commitMessage)?.[1]
+        );
+        let res = await prFind();
+        // Fail if its pull-request is already open, since it is created once.
+        if (res) {
+            console.error(
+                `shGithubPrCreate - pull-request already open - ${res.html_url}`
             );
             return;
         }
@@ -1942,8 +2068,13 @@ shGithubPrCreate - description:
 ${prText.description}
         `).trim() + "\n");
     }
-    // Fail closed, so only a finished push or open exits 0.
+    // Fail closed, so only a finished push, open or merge exits 0.
     process.exitCode = 1;
+    // Mode pr_merge skips every other step.
+    if (modeMerge) {
+        await prMerge();
+        return;
+    }
     // Turn only a date 2026-01-05 into 2026.1.5, keeping a suffix -rc1.
     version = version
         .replace((/^(\d{4})-0?(\d+)-0?(\d+)$/), "$1.$2.$3")
