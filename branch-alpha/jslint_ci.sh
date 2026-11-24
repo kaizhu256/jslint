@@ -1528,20 +1528,15 @@ import moduleFs from "fs";
             // A kept open pull-request takes the push on its own head-branch.
             branchPull = prBranch || `branch-p${version}`;
             pr = (await prGet(branchPull)).open;
-            // An open pr-mode pull-request whose head HEAD holds, as on a
-            // re-run on origin, numbered apart from upstream, is kept too.
-            if (
-                !prBranch &&
-                (/^branch-(?!v)[\w.\-]+$/).test(pr?.head.ref) &&
-                await gitTryCode([
-                    "merge-base", "--is-ancestor", pr.head.sha, "HEAD"
-                ]) === 0
-            ) {
+            // An open pr-mode pull-request, as on a re-run on origin, numbered
+            // apart from upstream, is kept too, if the tip check below finds
+            // its head in HEAD.
+            if (!prBranch && (/^branch-(?!v)[\w.\-]+$/).test(pr?.head.ref)) {
                 prBranch = pr.head.ref;
                 branchPull = prBranch;
             }
-            // Never force-push over another open pull-request, such as one
-            // left by a reset, which create inside all would then adopt.
+            // Never force-push over another open pull-request at HEAD, which
+            // create inside all would then adopt.
             moduleAssert.ok(
                 !pr || pr.head.ref === prBranch,
                 `shGithubPrFlow branch - ${pr?.html_url} is open on` +
@@ -1575,7 +1570,8 @@ import moduleFs from "fs";
             "shGithubPrFlow branch - nothing to commit - pass a squash-base"
         );
         // The push goes to origin for either remote, so never over a commit
-        // HEAD lacks, such as of a pull-request the check above cannot see.
+        // HEAD lacks, such as of a pull-request on the other remote, and the
+        // lease on the push keeps it so through the slow test.
         tip = (
             await gitOutput(["ls-remote", "origin", `refs/heads/${branchPull}`])
         ).split("\t")[0];
@@ -1621,8 +1617,8 @@ import moduleFs from "fs";
         "$(git rev-parse __pr_"${branchMerge()}"_pre)" ]
     git push . HEAD:__pr_"${branchMerge()}" -f
     git --no-pager diff origin/"${branchPull}" 2>/dev/null || true
-    git push origin alpha:"${branchPull}" -f
-    git push origin alpha -f
+    git push --atomic origin +alpha:alpha alpha:"${branchPull}" \
+        --force-with-lease=refs/heads/"${branchPull}":"${tip}"
     printf "\n\n\n\n"
     git --no-pager log -n 4
 )
