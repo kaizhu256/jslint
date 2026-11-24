@@ -1532,13 +1532,12 @@ import moduleFs from "fs";
             // apart from upstream, is kept too, if the tip check below finds
             // its head in HEAD.
             if (!prBranch && (/^branch-(?!v)[\w.\-]+$/).test(pr?.head.ref)) {
-                prBranch = pr.head.ref;
-                branchPull = prBranch;
+                branchPull = pr.head.ref;
             }
             // Never force-push over another open pull-request at HEAD, which
             // create inside all would then adopt.
             moduleAssert.ok(
-                !pr || pr.head.ref === prBranch,
+                !pr || pr.head.ref === branchPull,
                 `shGithubPrFlow branch - ${pr?.html_url} is open on` +
                 ` ${pr?.head.ref} - merge or close it first`
             );
@@ -1580,7 +1579,7 @@ import moduleFs from "fs";
                 "merge-base", "--is-ancestor", tip, "HEAD"
             ]) === 0,
             `shGithubPrFlow branch - origin ${branchPull} holds ${tip},` +
-            " not in HEAD - merge or close its pull-request, or delete it"
+            " not in HEAD - delete it after its pull-request merges or closes"
         );
         prText = prTextCreate(commitMessage, "");
         // Test before the tags are written, so a stop in the slow test leaves
@@ -1616,7 +1615,7 @@ import moduleFs from "fs";
     [ "$(git rev-parse HEAD)" != \
         "$(git rev-parse __pr_"${branchMerge()}"_pre)" ]
     git push . HEAD:__pr_"${branchMerge()}" -f
-    git --no-pager diff origin/"${branchPull}" 2>/dev/null || true
+    git --no-pager diff "${tip || "HEAD"}"
     git push --atomic origin +alpha:alpha alpha:"${branchPull}" \
         --force-with-lease=refs/heads/"${branchPull}":"${tip}"
     printf "\n\n\n\n"
