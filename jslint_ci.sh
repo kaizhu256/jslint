@@ -1361,7 +1361,7 @@ import moduleFs from "fs";
             ])
         ).split("\n").filter(Boolean);
         const ownerOrigin = (await repoOf("origin")).split("/")[0];
-        const repoUpstream = await upstreamRepo();
+        const repoRemote = await repoOf(remote);
         let branchPull = "";
         let branchSquash = "HEAD";
         let changelogNew;
@@ -1442,7 +1442,7 @@ import moduleFs from "fs";
         if (prXxx) {
             res = await githubRequest(
                 "GET",
-                `/repos/${repoUpstream}/issues/${prXxx.slice(3)}`
+                `/repos/${repoRemote}/issues/${prXxx.slice(3)}`
             );
             moduleAssert.ok(
                 [200, 404].includes(res.status),
@@ -1453,7 +1453,7 @@ import moduleFs from "fs";
         if (!prXxx) {
             res = await githubRequest(
                 "GET",
-                `/repos/${repoUpstream}/issues?per_page=1&state=all`
+                `/repos/${repoRemote}/issues?per_page=1&state=all`
             );
             moduleAssert.ok(
                 res.json?.[0]?.number,
@@ -1466,7 +1466,7 @@ import moduleFs from "fs";
         } else {
             res = await githubRequest(
                 "GET",
-                `/repos/${repoUpstream}/pulls/${prXxx.slice(3)}`
+                `/repos/${repoRemote}/pulls/${prXxx.slice(3)}`
             );
             moduleAssert.ok(
                 [200, 404].includes(res.status),
@@ -1488,7 +1488,7 @@ import moduleFs from "fs";
             // it, and its tags would go stale under a new number.
             moduleAssert.ok(
                 prBranch,
-                `shGithubPrFlow branch - ${prXxx} is taken upstream - git` +
+                `shGithubPrFlow branch - ${prXxx} is taken on ${remote} - git` +
                 ` reset ${remote}/beta, write its tags back as pr-xxx, then` +
                 " re-run, or if github opened it as #M, write them as PR-M"
             );
@@ -2035,13 +2035,12 @@ import moduleFs from "fs";
             log(`pull-request already open - ${pr.html_url}`);
             return;
         }
-        // A test on origin gets a number of the fork, so skip the check.
-        if (modePr === "pr" && remote === "upstream") {
-            // Github numbers issues and pull-requests in one sequence, so
-            // the newest must sit just below the number the tags carry.
+        // Github numbers issues and pull-requests in one sequence, so the
+        // newest must sit just below the number the tags carry.
+        if (modePr === "pr") {
             res = await githubRequest(
                 "GET",
-                `/repos/${await upstreamRepo()}/issues?per_page=1&state=all`
+                `/repos/${repoRemote}/issues?per_page=1&state=all`
             );
             moduleAssert.ok(
                 res.json?.[0]?.number === prNumber - 1,
@@ -2061,11 +2060,7 @@ import moduleFs from "fs";
             `shGithubPrFlow create - ${res.status} ${res.text}`
         );
         moduleAssert.ok(
-            (
-                modePr === "release" ||
-                remote === "origin" ||
-                res.json.number === prNumber
-            ),
+            modePr === "release" || res.json.number === prNumber,
             `shGithubPrFlow create - github numbered ${res.json.html_url}` +
             `, not PR-${prNumber}, so fix the tags and title`
         );
@@ -2198,7 +2193,6 @@ import moduleFs from "fs";
         commitMessage = await gitOutput(["log", "-1", "--format=%B", sha]);
         moduleAssert.ok(
             (
-                remote === "origin" ||
                 pr.head.ref.startsWith("branch-v") ||
                 commitMessage.startsWith(`- PR-${pr.number} `)
             ),
@@ -2516,17 +2510,6 @@ ${prText.description}
             `shGithubPrFlow ${subcmd} - tag ${tag} already exists,` +
             " and a release would bind to it"
         );
-    }
-    async function upstreamRepo() {
-        const repo = (
-            /"git\+https:\/\/github\.com\/([^"]+)\.git"/
-        ).exec(await moduleFs.promises.readFile("package.json", "utf8"))?.[1];
-        moduleAssert.ok(
-            repo,
-            `shGithubPrFlow ${subcmd} - missing upstream repository in` +
-            " package.json"
-        );
-        return repo;
     }
     function versionNormalize(version) {
 

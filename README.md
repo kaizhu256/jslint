@@ -1093,10 +1093,12 @@ if (false) {
 
         # commit pending changes onto alpha, push branch-p20yy.mm.dd,
         # print title, description
-        # (use origin in place of upstream to test the flow on the fork)
+        # (use origin in place of upstream to test the flow on the fork,
+        # which numbers the PR-xxx tags from the fork's own issues)
         sh jslint_ci.sh shGithubPrFlow branch upstream pr # v20yy.mm.dd __pr_beta_pre
 
-        # open pull-request against beta, needing $MY_GITHUB_TOKEN
+        # open pull-request against beta, needing $MY_GITHUB_TOKEN,
+        # a fine-grained token for an org that forbids a classic token
         # optional issue list xxx,yyy adds "Fixes #xxx. Fixes #yyy." to description
         sh jslint_ci.sh shGithubPrFlow create upstream pr # xxx,yyy
         ```
