@@ -467,7 +467,7 @@ const jslint_charset_ascii = (
     "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_" +
     "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-const jslint_edition = "v2026.11.1";
+const jslint_edition = "v2026.11.3";
 const jslint_fudge = 1;                 // Fudge starting line and starting
                                         // ... column to 1.
 const jslint_global_dict_all = {
@@ -5047,11 +5047,10 @@ function jslint_phase3_parse(state) {
 //      e[b]
 //      identifier
 
-// PR-519 - Allow member-access on a parenthesized binary-expression, as in
-// '(aa + bb).padEnd(cc)', since the parens make it explicit, and a call or
-// tagged-template only on one that can yield a function, '||', '&&' or '??'.
-// A ternary is always parenthesized here. A parenthesized literal or
-// arrow-function still warns, a second way to write '"aa".bb'.
+// PR-519 - Allow member-access on a parenthesized binary-expression or ternary,
+// explicit by its parens, as in '(aa + bb).padEnd(cc)', and a call or
+// tagged-template only on '||', '&&' or '??', which can yield a function. A
+// parenthesized literal warns, a second way to write '"aa".bb'.
 
 // test_cause:
 // ["(aa+aa).aa", "check_left", "(live)", "", 0]
@@ -5544,9 +5543,8 @@ function jslint_phase3_parse(state) {
 
     function constant_super() {
 
-// PR-519 - Allow 'super.aa' and 'super[aa]' in object-method under option
-// 'this'. This function will warn 'super' unless option 'this', in an
-// object-method or its arrow-function, and before '.' or '['.
+// PR-519 - Allow 'super.aa' and 'super[aa]' in an object-method or its
+// arrow-function, under option 'this'.
 
         if (
             !option_dict.this ||
@@ -7393,7 +7391,7 @@ function jslint_phase3_parse(state) {
 
                     key = (
                         value.id === "(string)"
-                        ? "\"" + value.value + "\""
+                        ? `"${value.value}"`
                         : artifact(value)
                     );
 
@@ -7402,7 +7400,7 @@ function jslint_phase3_parse(state) {
 // ["aa={[\"aa\"\n]:0}", "property_parse", "expected_a_b", "[\"aa\"]", 5]
 // ["aa={[null]:0}", "property_parse", "expected_a_b", "[null]", 5]
 
-                    warn("expected_a_b", name, key, "[" + key + "]");
+                    warn("expected_a_b", name, key, `[${key}]`);
                 }
                 if (typeof extra === "string" || token_nxt.id === "(") {
 
@@ -7412,7 +7410,7 @@ function jslint_phase3_parse(state) {
 
                     value = property_method(name, (
                         typeof extra === "string"
-                        ? extra + " " + id
+                        ? `${extra} ${id}`
                         : id
                     ));
                     value.extra = extra;
@@ -7430,7 +7428,7 @@ function jslint_phase3_parse(state) {
 // ["aa={get \"a-a\"(){}}", "property_parse", "(live)", "", 0]
 
                 id = survey(name);
-                full = extra + " " + id;
+                full = `${extra} ${id}`;
                 if (seen_getset[full] === true || seen[id] === true) {
 
 // test_cause:
@@ -7447,7 +7445,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa={get \"aa\"(){}}", "property_parse", "expected_a_b", "\"aa\"", 9]
 
-                    warn("expected_a_b", name, id, "\"" + id + "\"");
+                    warn("expected_a_b", name, id, `"${id}"`);
                 }
                 seen[id] = false;
                 seen_getset[full] = true;
