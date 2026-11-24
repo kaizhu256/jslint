@@ -221,25 +221,25 @@
     textLength="768"
     x="10"
     y="802"
->- ci - Automate pull-request open, post-merge cleanup with github-ci waits, and draft-release, o\</tspan>
+>- ci - Automate the pull-request and release flow with github-ci waits, each step safe to re-run\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="824"
->  n remote origin to test or upstream: 'shGithubPrCreate &lt;origin|upstream&gt; pr|release', 'npm_con\</tspan>
+>  , on remote origin to test or upstream: 'shGithubPrFlow &lt;branch|create|merge|merge_rebase|merg\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="846"
->  fig_mode_pr_create=1', 'shGithubPrCleanup &lt;origin|upstream&gt;', 'shGithubReleaseCreate &lt;origin|u\</tspan>
+>  e_squash|cleanup|release|publish&gt; &lt;origin|upstream&gt;', and 'shGithubPrFlow all &lt;origin|upstream\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="868"
->  pstream&gt;'.                                                                                     </tspan>
+>  &gt; &lt;pr|release&gt;' to resume the whole flow unattended.                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
