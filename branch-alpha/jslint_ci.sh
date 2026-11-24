@@ -1240,7 +1240,6 @@ import moduleFs from "fs";
     const [
         subcmd, ...argList
     ] = process.argv.slice(2);
-    let branchPull = "";
     let modePr = "";
     let prText;
     let remote = "";
@@ -1300,7 +1299,11 @@ import moduleFs from "fs";
             return;
         }
         head = await gitOutput(["rev-parse", "HEAD"]);
-        prState = await prGet();
+        prState = await prGet(
+            isRelease
+            ? `branch-v${top.version}`
+            : ""
+        );
         pr = prState.merged;
         // A cleanup stopped after its reset leaves HEAD at <remote>/beta.
         if (pr || (
@@ -1324,12 +1327,18 @@ import moduleFs from "fs";
                     `shGithubPrFlow all - open ${pr.html_url} is not mode` +
                     ` ${modePr}`
                 );
-                await assertNoPending(pr);
+                // Merging the open pull-request would leave out a pending
+                // change.
+                moduleAssert.ok(
+                    !(await gitOutput(["status", "--porcelain"])),
+                    `shGithubPrFlow all - pending change, not in open` +
+                    ` ${pr.html_url} - run branch first`
+                );
                 log(`${tagLog}already open - ${pr.html_url}`);
             }
             await merge(
                 isRelease
-                ? "squash"
+                ? "merge_squash"
                 : "merge"
             );
         }
@@ -1339,17 +1348,6 @@ import moduleFs from "fs";
             !(await gitOutput(["status", "--porcelain"])),
             "shGithubPrFlow all - cleaned up, but a pending change is left" +
             " for the next pull-request"
-        );
-    }
-    async function assertNoPending(pr) {
-
-// This function will fail on a pending change, which merging the open <pr>
-// would leave out.
-
-        moduleAssert.ok(
-            !(await gitOutput(["status", "--porcelain"])),
-            `shGithubPrFlow all - pending change, not in open ${pr.html_url}` +
-            " - run branch first"
         );
     }
     async function branch() {
@@ -1365,6 +1363,7 @@ import moduleFs from "fs";
         ).split("\n").filter(Boolean);
         const ownerOrigin = (await repoOf("origin")).split("/")[0];
         const repoUpstream = await upstreamRepo();
+        let branchPull;
         let branchSquash = "HEAD";
         let changelogNew;
         let changelogOld;
@@ -1385,21 +1384,7 @@ import moduleFs from "fs";
         prXxx = (/^- (PR-\d+) /m).exec(await gitOutput([
             "log", "--format=%s", `${remote}/beta..HEAD`
         ]))?.[1];
-        // A pull-request merged at HEAD, or of this release, is done, so a
-        // re-run goes to cleanup rather than push a second one. An earlier one
-        // merged from a branch of the same name, on the same day, is not.
         head = await gitOutput(["rev-parse", "HEAD"]);
-        pr = (await prGet()).merged;
-        moduleAssert.ok(
-            !pr,
-            "shGithubPrFlow branch - already merged - run cleanup" + (
-                // A fix merged over a release would keep it from master.
-                pr?.head.ref.startsWith("branch-v")
-                ? `, after a failed ci on ${remote}/beta passes on re-run`
-                : `, or if ${remote}/beta fails its ci, git reset` +
-                ` ${remote}/beta and branch the fix`
-            ) + ` - ${pr?.html_url}`
-        );
         top = await versionTop("", modePr === "release");
         version = versionNormalize(
             argList[2] || new Date().toISOString().slice(0, 10)
@@ -1418,6 +1403,26 @@ import moduleFs from "fs";
                 `shGithubPrFlow branch - ${version} already released`
             );
         }
+        // A pull-request merged at HEAD, or of this release, is done, so a
+        // re-run goes to cleanup rather than push a second one. An earlier one
+        // merged from a branch of the same name, on the same day, is not.
+        pr = (
+            await prGet(
+                modePr === "release"
+                ? branchPull
+                : ""
+            )
+        ).merged;
+        moduleAssert.ok(
+            !pr,
+            "shGithubPrFlow branch - already merged - run cleanup" + (
+                // A fix merged over a release would keep it from master.
+                pr?.head.ref.startsWith("branch-v")
+                ? `, after a failed ci on ${remote}/beta passes on re-run`
+                : `, or if ${remote}/beta fails its ci, git reset` +
+                ` ${remote}/beta and branch the fix`
+            ) + ` - ${pr?.html_url}`
+        );
         // A pull-commit on an alpha that lacks <remote>/beta squashes nothing
         // and stacks an empty duplicate on a re-run. A merge, checked above,
         // also leaves alpha lacking it.
@@ -1451,46 +1456,7 @@ import moduleFs from "fs";
                 ` ${res.text}`
             );
         }
-        if (prXxx && res.status === 404) {
-            log(`keep unused ${prXxx}`);
-        } else if (prXxx && (
-            await githubRequest(
-                "GET",
-                `/repos/${repoUpstream}/pulls/${prXxx.slice(3)}`
-            ).then(function (resPr) {
-                moduleAssert.ok(
-                    [200, 404].includes(resPr.status),
-                    `shGithubPrFlow branch - read pull-request ${prXxx}` +
-                    ` - ${resPr.status} ${resPr.text}`
-                );
-                prBranch = (
-                    (
-                        resPr.json?.state === "open" &&
-                        resPr.json.head?.label?.startsWith(`${ownerOrigin}:`)
-                    )
-                    ? resPr.json.head.label.slice(ownerOrigin.length + 1)
-                    : ""
-                );
-                return prBranch;
-            })
-        )) {
-            // Only a branch-* head is found again at merge and create, and the
-            // push goes to that name unchanged.
-            moduleAssert.ok(
-                (/^branch-[\w.\-\/]+$/).test(prBranch),
-                `shGithubPrFlow branch - open ${prXxx} is on ${prBranch},` +
-                " not a branch-* head"
-            );
-            log(`keep open ${prXxx} on ${prBranch}`);
-        } else {
-            // A taken number stays in the pull-commit, so only a reset drops
-            // it, and its tags would go stale under a new number.
-            moduleAssert.ok(
-                !prXxx,
-                `shGithubPrFlow branch - ${prXxx} is taken upstream - git` +
-                ` reset ${remote}/beta, write its tags back as pr-xxx, then` +
-                " re-run"
-            );
+        if (!prXxx) {
             res = await githubRequest(
                 "GET",
                 `/repos/${repoUpstream}/issues?per_page=1&state=all`
@@ -1501,6 +1467,46 @@ import moduleFs from "fs";
                 ` - ${res.status}`
             );
             prXxx = `PR-${res.json[0].number + 1}`;
+        } else if (res.status === 404) {
+            log(`keep unused ${prXxx}`);
+        } else {
+            res = await githubRequest(
+                "GET",
+                `/repos/${repoUpstream}/pulls/${prXxx.slice(3)}`
+            );
+            moduleAssert.ok(
+                [200, 404].includes(res.status),
+                `shGithubPrFlow branch - read pull-request ${prXxx}` +
+                ` - ${res.status} ${res.text}`
+            );
+            prBranch = (
+                (
+                    res.json?.state === "open" &&
+                    // Github owners are case-insensitive.
+                    res.json.head?.label?.toLowerCase().startsWith(
+                        `${ownerOrigin.toLowerCase()}:`
+                    )
+                )
+                ? res.json.head.label.slice(ownerOrigin.length + 1)
+                : ""
+            );
+            // A taken number stays in the pull-commit, so only a reset drops
+            // it, and its tags would go stale under a new number.
+            moduleAssert.ok(
+                prBranch,
+                `shGithubPrFlow branch - ${prXxx} is taken upstream - git` +
+                ` reset ${remote}/beta, write its tags back as pr-xxx, then` +
+                " re-run, or if github opened it as #M, write them as PR-M"
+            );
+            // Only a branch-* head is found again at merge and create, and the
+            // push goes to that name unchanged. A slash in it escapes the
+            // branch-* glob create finds it by.
+            moduleAssert.ok(
+                (/^branch-[\w.\-]+$/).test(prBranch),
+                `shGithubPrFlow branch - open ${prXxx} is on ${prBranch},` +
+                " not a branch-* head"
+            );
+            log(`keep open ${prXxx} on ${prBranch}`);
         }
         if (modePr === "release") {
             commitMessage = `# ${version}\n${top.body}`;
@@ -1527,6 +1533,25 @@ import moduleFs from "fs";
             ).replace("\n", "\n\n");
             // A kept open pull-request takes the push on its own head-branch.
             branchPull = prBranch || `branch-p${version}`;
+            pr = (await prGet(branchPull)).open;
+            // An open pr-mode pull-request of an earlier push of HEAD, such as
+            // one on origin numbered apart from upstream, takes the push too.
+            if (
+                !prBranch &&
+                (/^branch-p[\w.\-]+$/).test(pr?.head.ref) &&
+                await gitTryCode([
+                    "merge-base", "--is-ancestor", pr.head.sha, "HEAD"
+                ]) === 0
+            ) {
+                branchPull = pr.head.ref;
+            }
+            // Never force-push over another open pull-request of that name,
+            // which create inside all would then adopt as already open.
+            moduleAssert.ok(
+                !pr || pr.head.ref === branchPull,
+                `shGithubPrFlow branch - ${pr?.html_url} is open on` +
+                ` ${pr?.head.ref} - merge or close it first`
+            );
         }
         // A re-run, with no squash given, rebuilds everything since the last
         // squash base, rather than stack a duplicate, an origin test merge or
@@ -1612,6 +1637,27 @@ import moduleFs from "fs";
             ? "master"
             : "beta"
         );
+    }
+    async function branchPushed() {
+
+// This function will name the head-branch the push of HEAD made, which a kept
+// pull-request or a push on an earlier day names apart from today, or "".
+
+        const branchList = (
+            await gitOutput([
+                "for-each-ref",
+                "--points-at",
+                "HEAD",
+                "--format=%(refname:lstrip=3)",
+                "refs/remotes/origin/branch-*"
+            ])
+        ).split("\n").filter(Boolean);
+        moduleAssert.ok(
+            branchList.length <= 1,
+            `shGithubPrFlow ${subcmd} - several branches hold HEAD` +
+            ` - ${branchList}`
+        );
+        return branchList[0] || "";
     }
     async function ciPoll({describe, isOldOk, label, name, path, runListGet}) {
 
@@ -1737,10 +1783,12 @@ import moduleFs from "fs";
                 ` - no result in 30 minutes - ${line}`
             );
             // Sleep no later than the deadline, so one last poll runs there.
-            await sleep(Math.min(
-                Math.max(msCiInterval, result.retryMs || 0),
-                msCiTotal - msElapsed()
-            ));
+            await new Promise(function (resolve) {
+                setTimeout(resolve, Math.max(0, Math.min(
+                    Math.max(msCiInterval, result.retryMs || 0),
+                    msCiTotal - msElapsed()
+                )));
+            });
         }
     }
     async function ciWait(remoteName, branchName, mode) {
@@ -1922,12 +1970,9 @@ import moduleFs from "fs";
             if (remote === "upstream") {
                 await gitRun(["push", "origin", "master", "-f"]);
                 await ciWait("origin", "master");
-                await gitRun(["push", "upstream", "master"]);
-                await ciWait("upstream", "master");
-            } else {
-                await gitRun(["push", "origin", "master"]);
-                await ciWait("origin", "master");
             }
+            await gitRun(["push", remote, "master"]);
+            await ciWait(remote, "master");
         }
         // Delete the head-branch only if it still holds the merged commit,
         // since a second pull-request on the same day reuses its name.
@@ -1962,37 +2007,19 @@ import moduleFs from "fs";
 // against beta of <remote>. A pull-request is created once, so a re-run on an
 // open one fails.
 
+        // Open only on the head-branch the push of HEAD made, never on one
+        // whose content HEAD has moved past since.
+        const branchPull = await branchPushed();
         const commitMessage = await gitOutput(["log", "-1", "--format=%B"]);
         const ownerOrigin = (await repoOf("origin")).split("/")[0];
         const prNumber = Number((/^- PR-(\d+) /).exec(commitMessage)?.[1]);
         const repoRemote = await repoOf(remote);
-        let branchList;
         let pr;
         let res;
-        let top;
         await modeParse();
-        top = await versionTop("", false);
-        // Name the head-branch the push of HEAD made, which a kept pull-request
-        // or a push on an earlier day names apart from today.
-        branchList = (
-            await gitOutput([
-                "for-each-ref",
-                "--points-at",
-                "HEAD",
-                "--format=%(refname:lstrip=3)",
-                "refs/remotes/origin/branch-*"
-            ])
-        ).split("\n").filter(Boolean);
         moduleAssert.ok(
-            branchList.length <= 1,
-            `shGithubPrFlow create - several branches hold HEAD - ${branchList}`
-        );
-        branchPull = branchList[0] || (
-            modePr === "release"
-            ? `branch-v${top.version}`
-            : "branch-p" + versionNormalize(
-                new Date().toISOString().slice(0, 10)
-            )
+            branchPull,
+            "shGithubPrFlow create - no branch-* holds HEAD - run branch"
         );
         // Only create itself takes an issue list, since all puts the version
         // there.
@@ -2001,7 +2028,7 @@ import moduleFs from "fs";
             (subcmd === "create" && argList[2]) || ""
         );
         prTextPrint();
-        pr = (await prGet()).open;
+        pr = (await prGet(branchPull)).open;
         if (pr) {
             // A re-run of create fails, since it opens nothing, but all goes
             // on to merge the pull-request that branch kept open.
@@ -2137,25 +2164,21 @@ import moduleFs from "fs";
             ` - shGithubPrFlow ${name} - ${message}`
         );
     }
-    async function merge(modeMerge) {
+    async function merge(name) {
 
 // This function will wait for the github-ci of the open pull-request of HEAD,
 // then merge it with the message github offers. A squash instead keeps the
 // pull-commit message plus " (#N)", since a pr-mode pull-request carries every
 // alpha commit since beta, and the default lists them all, dropping PR-xxx.
 
-        const name = (
-            modeMerge === "merge"
-            ? "merge"
-            : `merge_${modeMerge}`
-        );
+        const modeMerge = name.replace((/^merge_?/), "") || "merge";
         const repoRemote = await repoOf(remote);
         let commitMessage;
         let pr;
         let prState;
         let res;
         let sha;
-        prState = await prGet();
+        prState = await prGet(await branchPushed());
         pr = prState.open;
         // Merged by hand at HEAD is done, so a chained cleanup still runs.
         if (!pr) {
@@ -2163,7 +2186,7 @@ import moduleFs from "fs";
             moduleAssert.ok(
                 pr,
                 `shGithubPrFlow ${name} - no open or merged pull-request` +
-                " of HEAD"
+                " of HEAD, or HEAD moved since branch - run branch"
             );
             log(`already merged ${pr.html_url}`, name);
             return;
@@ -2235,19 +2258,14 @@ import moduleFs from "fs";
             `shGithubPrFlow ${subcmd} - checkout alpha first`
         );
     }
-    async function prGet() {
+    async function prGet(name) {
 
 // This function will find the open and the merged pull-request from a branch-*
-// head of origin, at HEAD, or in mode release of its branch-v<version>, from
-// github alone, since a tracking-ref may be missing or stale.
+// head of origin, at HEAD, or by head-branch <name>, open, or merged for a
+// branch-v release, since github updates a head sha only after a push.
 
         const head = await gitOutput(["rev-parse", "HEAD"]);
         const ownerOrigin = (await repoOf("origin")).split("/")[0];
-        const refRelease = (
-            modePr === "release"
-            ? `branch-v${(await versionTop("", false)).version}`
-            : ""
-        );
         const res = await githubRequest(
             "GET",
             `/repos/${await repoOf(remote)}/pulls` +
@@ -2264,7 +2282,12 @@ import moduleFs from "fs";
                 String(elem.head.label).toLowerCase().startsWith(
                     `${ownerOrigin.toLowerCase()}:branch-`
                 ) &&
-                (elem.head.sha === head || elem.head.ref === refRelease)
+                (elem.head.sha === head || (
+                    // A pr branch is named by its day, so a merged one of
+                    // that name may be an earlier pull-request.
+                    elem.head.ref === name &&
+                    (name.startsWith("branch-v") || elem.state === "open")
+                ))
             );
         });
         moduleAssert.ok(
@@ -2477,11 +2500,6 @@ ${prText.description}
             }).on("exit", resolve);
         });
     }
-    function sleep(ms) {
-        return new Promise(function (resolve) {
-            setTimeout(resolve, Math.max(0, ms));
-        });
-    }
     async function tagAssertNone(repo, tag) {
 
 // This function will fail if <repo> has git tag <tag>, which a release would
@@ -2558,29 +2576,28 @@ ${prText.description}
             (/^[\w.\-]+$/).test(version),
             `shGithubPrFlow ${subcmd} - bad CHANGELOG.md version "${version}"`
         );
-        if (!isCheck) {
-            return {body: body.trim(), itemFirst, version};
+        if (isCheck) {
+            versionPackage = JSON.parse(
+                await fileRead(sha, "package.json")
+            ).version;
+            // A pypi-package, as in sqlmath, publishes the version in
+            // pyproject.toml, less any "-" suffix.
+            versionPypi = (
+                /^version = "([^"]*)"\r?$/m
+            ).exec(await fileRead(sha, "pyproject.toml").catch(function () {
+                return "";
+            }))?.[1];
+            moduleAssert.ok(
+                version === versionPackage,
+                `shGithubPrFlow ${subcmd} - CHANGELOG.md version ${version}` +
+                ` differs from package.json version ${versionPackage}`
+            );
+            moduleAssert.ok(
+                !versionPypi || versionPypi === version.split("-")[0],
+                `shGithubPrFlow ${subcmd} - CHANGELOG.md version ${version}` +
+                ` differs from pyproject.toml version ${versionPypi}`
+            );
         }
-        versionPackage = JSON.parse(
-            await fileRead(sha, "package.json")
-        ).version;
-        // A pypi-package, as in sqlmath, publishes the version in
-        // pyproject.toml, less any "-" suffix.
-        versionPypi = (
-            /^version = "([^"]*)"\r?$/m
-        ).exec(await fileRead(sha, "pyproject.toml").catch(function () {
-            return "";
-        }))?.[1];
-        moduleAssert.ok(
-            version === versionPackage,
-            `shGithubPrFlow ${subcmd} - CHANGELOG.md version ${version}` +
-            ` differs from package.json version ${versionPackage}`
-        );
-        moduleAssert.ok(
-            !versionPypi || versionPypi === version.split("-")[0],
-            `shGithubPrFlow ${subcmd} - CHANGELOG.md version ${version}` +
-            ` differs from pyproject.toml version ${versionPypi}`
-        );
         return {body: body.trim(), itemFirst, version};
     }
     // Fail closed, so only a finished step exits 0.
@@ -2602,15 +2619,9 @@ ${prText.description}
             branch,
             cleanup,
             create,
-            merge: function () {
-                return merge("merge");
-            },
-            merge_rebase: function () {
-                return merge("rebase");
-            },
-            merge_squash: function () {
-                return merge("squash");
-            },
+            merge,
+            merge_rebase: merge,
+            merge_squash: merge,
             publish,
             release
         };
@@ -2628,7 +2639,7 @@ ${prText.description}
             process.env.MY_GITHUB_TOKEN,
             `shGithubPrFlow ${subcmd} - needs MY_GITHUB_TOKEN`
         );
-        await stepDict[subcmd]();
+        await stepDict[subcmd](subcmd);
     }
     process.exitCode = 0;
 }());
