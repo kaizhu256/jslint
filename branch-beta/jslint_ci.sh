@@ -1219,13 +1219,14 @@ shGithubPrFlow() {(set -e
 # sh jslint_ci.sh shGithubPrFlow publish upstream
     shGithubTokenExport
     # The script passes the 32k command-line limit of windows, so feed it to
-    # node on stdin, keeping the --eval form that jslint lints.
-    node() {(set -e
-        CODE="$3"
-        shift 3
+    # node on stdin, keeping the node --eval form that jslint lints, under a
+    # name the winpty alias of node in git-bash cannot break when sourced.
+    shNodeStdin() {(set -e
+        CODE="$4"
+        shift 4
         printf "%s" "$CODE" | command node --input-type=module - "$@"
     )}
-    node --input-type=module --eval '
+    shNodeStdin node --input-type=module --eval '
 import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
@@ -2339,8 +2340,8 @@ ${prText.description}
     async function publish() {
 
 // This function will publish the draft github-release of <remote>/master,
-// which triggers publish.yml, after checking its tag against CHANGELOG.md,
-// package.json and pyproject.toml.
+// after checking its tag against CHANGELOG.md, package.json and pyproject.toml,
+// then wait for the publish.yml run it triggers.
 
         const repoRemote = await repoOf(remote);
         const urlRun = (
@@ -2365,26 +2366,45 @@ ${prText.description}
             `shGithubPrFlow publish - v${top.version} targets` +
             ` ${release.target_commitish}, not ${remote}/master ${sha}`
         );
-        // A re-run after a failed publish.yml re-runs that workflow, not this.
+        // A re-run after a failed publish.yml re-runs that workflow, not this,
+        // but still waits on it.
         if (!release.draft) {
             log(
                 `v${top.version} already published - ${release.html_url}` +
                 ` - re-run a failed publish.yml at ${urlRun}`
             );
-            return;
+        } else {
+            // Publishing binds a tag made since release to the draft.
+            await tagAssertNone(repoRemote, `v${top.version}`);
+            res = await githubRequest(
+                "PATCH",
+                `/repos/${repoRemote}/releases/${release.id}`,
+                {draft: false}
+            );
+            moduleAssert.ok(
+                res.status === 200,
+                `shGithubPrFlow publish - ${res.status} ${res.text}`
+            );
+            log(`published ${res.json.html_url} - publish.yml at ${urlRun}`);
         }
-        // Publishing binds a tag made since release to the draft.
-        await tagAssertNone(repoRemote, `v${top.version}`);
-        res = await githubRequest(
-            "PATCH",
-            `/repos/${repoRemote}/releases/${release.id}`,
-            {draft: false}
-        );
-        moduleAssert.ok(
-            res.status === 200,
-            `shGithubPrFlow publish - ${res.status} ${res.text}`
-        );
-        log(`published ${res.json.html_url} - publish.yml at ${urlRun}`);
+        // Wait for the newest publish.yml run the release started.
+        await ciPoll({
+            describe: function (runList) {
+                return runList.map(function (run) {
+                    return `${run.name} ${run.status} ${run.conclusion}`;
+                }).join(", ");
+            },
+            isOldOk: true,
+            label: `${repoRemote} publish.yml v${top.version}`,
+            name: "publish",
+            path: (
+                `/repos/${repoRemote}/actions/workflows/publish.yml/runs` +
+                `?event=release&head_sha=${sha}&per_page=100`
+            ),
+            runListGet: function (json) {
+                return json.workflow_runs.slice(0, 1);
+            }
+        });
     }
     async function release() {
 
