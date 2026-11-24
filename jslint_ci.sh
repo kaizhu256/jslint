@@ -1436,33 +1436,21 @@ import moduleFs from "fs";
             );
         }
         // Keep the number of HEAD on re-run, so a pushed fix keeps the number
-        // its tags carry, if github has no issue of that number yet, or it is
+        // its tags carry, if it is the next one github gives on <remote>, or
         // the still-open pull-request from origin, whose branch then gets the
         // push on any later day.
-        if (prXxx) {
-            res = await githubRequest(
-                "GET",
-                `/repos/${repoRemote}/issues/${prXxx.slice(3)}`
-            );
-            moduleAssert.ok(
-                [200, 404].includes(res.status),
-                `shGithubPrFlow branch - read ${prXxx} - ${res.status}` +
-                ` ${res.text}`
-            );
-        }
-        if (!prXxx) {
-            res = await githubRequest(
-                "GET",
-                `/repos/${repoRemote}/issues?per_page=1&state=all`
-            );
-            moduleAssert.ok(
-                res.json?.[0]?.number,
-                `shGithubPrFlow branch - cannot read newest issue` +
-                ` - ${res.status}`
-            );
-            prXxx = `PR-${res.json[0].number + 1}`;
-        } else if (res.status === 404) {
-            log(`keep unused ${prXxx}`);
+        res = await githubRequest(
+            "GET",
+            `/repos/${repoRemote}/issues?per_page=1&state=all`
+        );
+        moduleAssert.ok(
+            res.json?.[0]?.number,
+            `shGithubPrFlow branch - cannot read newest issue` +
+            ` - ${res.status} ${res.text}`
+        );
+        prXxx ??= `PR-${res.json[0].number + 1}`;
+        if (prXxx === `PR-${res.json[0].number + 1}`) {
+            log(`number ${prXxx}`);
         } else {
             res = await githubRequest(
                 "GET",
@@ -1484,13 +1472,15 @@ import moduleFs from "fs";
                 ? res.json.head.label.slice(ownerOrigin.length + 1)
                 : ""
             );
-            // A taken number stays in the pull-commit, so only a reset drops
-            // it, and its tags would go stale under a new number.
+            // A taken number, or one from another remote, stays in the
+            // pull-commit, so only a reset drops it, and its tags would go
+            // stale under a new number.
             moduleAssert.ok(
                 prBranch,
-                `shGithubPrFlow branch - ${prXxx} is taken on ${remote} - git` +
-                ` reset ${remote}/beta, write its tags back as pr-xxx, then` +
-                " re-run, or if github opened it as #M, write them as PR-M"
+                `shGithubPrFlow branch - ${prXxx} is taken on ${remote},` +
+                ` or not its next number - git reset ${remote}/beta, write` +
+                " its tags back as pr-xxx, then re-run, or if github opened" +
+                " it as #M, write them as PR-M"
             );
             // Only a branch-* head is found again at merge and create, and the
             // push goes to that name unchanged. A slash in it escapes the
@@ -1528,12 +1518,6 @@ import moduleFs from "fs";
             // A kept open pull-request takes the push on its own head-branch.
             branchPull = prBranch || `branch-p${version}`;
             pr = (await prGet(branchPull)).open;
-            // An open pr-mode pull-request, as on a re-run on origin, numbered
-            // apart from upstream, is kept too, if the tip check below finds
-            // its head in HEAD.
-            if (!prBranch && (/^branch-(?!v)[\w.\-]+$/).test(pr?.head.ref)) {
-                branchPull = pr.head.ref;
-            }
             // Never force-push over another open pull-request at HEAD, which
             // create inside all would then adopt.
             moduleAssert.ok(
