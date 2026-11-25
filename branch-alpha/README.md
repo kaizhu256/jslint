@@ -1131,8 +1131,11 @@ if (false) {
         # re-run until version propagates
         npm run test2
 
-        # unattended, and safe to re-run, resuming where it stopped:
-        # commit pending changes onto alpha, push branch-v20yy.mm.dd,
+        # unattended, and safe to re-run, resuming where it stopped, except a
+        # re-run after branch but before create, which appends a second
+        # pull-commit:
+        # append a pull-commit onto alpha, holding any pending changes,
+        # push branch-v20yy.mm.dd,
         # open pull-request against beta, wait for its ci-success,
         # squash-and-merge it, wait for ci after each push,
         # reset alpha to beta, push alpha, beta and master,
