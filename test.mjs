@@ -2647,7 +2647,7 @@ ff();
         }).autofixed, "let aa = 2;\naa = aa ** 2;\n");
     });
     jstestIt((
-        "test computed-key-suggestion handling-behavior"
+        "test computed-key handling-behavior"
     ), function () {
 
 // PR-519 - A constant computed key suggests the key it equals, and the
@@ -2669,6 +2669,14 @@ ff();
                 {beta: true}
             ).warnings, [], source);
         }
+
+// PR-519 - The walker sees a computed key, so an undeclared name there warns.
+
+        assertJsonEqual(jslint.jslint("String({[aa]: 0});").warnings.map(
+            function ({code}) {
+                return code;
+            }
+        ), ["undeclared_a"]);
     });
     jstestIt((
         "test warning-test-cause handling-behavior"

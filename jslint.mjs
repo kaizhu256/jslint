@@ -425,7 +425,6 @@
     warnings,
     white,
     wrapped,
-    wrapped_operand,
     writeFile
 */
 
@@ -5066,7 +5065,6 @@ function jslint_phase3_parse(state) {
                     [".", "?.", "(", "["].includes(id) ||
                     (
                         left.wrapped &&
-                        id !== "=>" &&
                         (
                             [".", "?.", "["].includes(right.id) ||
                             ["&&", "??", "||"].includes(id)
@@ -5769,14 +5767,6 @@ function jslint_phase3_parse(state) {
     function infix_lparen(left) {
         const the_paren = token_now;
         let the_argument;
-        if (left.id !== "function" && left.id !== "=>") {
-
-// test_cause:
-// ["(aa+aa)()", "check_left", "unexpected_a", "(", 8]
-// ["0()", "check_left", "unexpected_a", "(", 2]
-
-            check_left(left, the_paren);
-        }
         if (left.id === "=>") {
 
 // PR-519 - An arrow-function invoked immediately needs its parens, so warning
@@ -5786,6 +5776,13 @@ function jslint_phase3_parse(state) {
 // ["((aa)=>0)()", "infix_lparen", "use_function_immediate", "=>", 6]
 
             warn("use_function_immediate", left);
+        } else if (left.id !== "function") {
+
+// test_cause:
+// ["(aa+aa)()", "check_left", "unexpected_a", "(", 8]
+// ["0()", "check_left", "unexpected_a", "(", 2]
+
+            check_left(left, the_paren);
         }
         the_paren.expression = [left];
         if (token_nxt.id !== ")") {
@@ -6222,11 +6219,12 @@ function jslint_phase3_parse(state) {
         if (rbp >= 20 && left.id === "=>") {
 
 // PR-519 - Bugfix - An arrow function as an operand, as in
-// 'aa || ((bb) => cc)', needs its parens, so post_s_function does not warn
-// unexpected_parens on them. Without them, 'aa || (bb) => cc' is a
-// SyntaxError, like 'aa || bb => cc' below. 'new ((bb) => cc)()' throws.
+// 'aa || ((bb) => cc)', needs its parens, so clearing <wrapped> keeps
+// post_s_function from warning unexpected_parens on them. Without them,
+// 'aa || (bb) => cc' is a SyntaxError, like 'aa || bb => cc' below, warned at
+// the operator, since an async arrow without await already warns at the arrow.
+// 'new ((bb) => cc)()' throws.
 
-            left.wrapped_operand = true;
             if (the_operator.id === "new") {
 
 // test_cause:
@@ -6236,10 +6234,17 @@ function jslint_phase3_parse(state) {
             } else if (!left.wrapped) {
 
 // test_cause:
-// ["aa||(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "||", 9]
+// ["aa||(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "||", 3]
+// ["aa||async(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "||", 3]
 
-                warn("wrap_subexpression_a_b", left, "=>", the_operator.id);
+                warn(
+                    "wrap_subexpression_a_b",
+                    the_operator,
+                    "=>",
+                    the_operator.id
+                );
             }
+            left.wrapped = false;
         }
 
 // Parse/loop through each symbol in expression.
@@ -6286,11 +6291,22 @@ function jslint_phase3_parse(state) {
                 warn("wrap_subexpression_a_b", left, "=>", the_operator.id);
             }
 
-// PR-519 - So does a wrapped arrow function as a left operand, as in
-// '((aa) => bb) || cc' or '((aa) => bb)()'.
+// PR-519 - So does an arrow function as a left operand, as in
+// '((aa) => bb) || cc' or '((aa) => bb)()'. Without them, as in
+// '(aa) => {...}()', it is a SyntaxError.
 
             if (left.id === "=>") {
-                left.wrapped_operand = true;
+                if (!left.wrapped) {
+
+// test_cause:
+// ["
+// /*jslint fart*/
+// aa=(aa)=>{}()
+// ", "parse_expression", "wrap_subexpression_a_b", "(", 8]
+
+                    warn("wrap_subexpression_a_b", left, "=>", token_nxt.id);
+                }
+                left.wrapped = false;
             }
             advance();
             left = the_symbol.led_infix(left);
@@ -7451,16 +7467,6 @@ function jslint_phase3_parse(state) {
 
                     warn("duplicate_a", name);
                 }
-                if (name.id === "(string)" && jslint_rgx_identifier.test(id)) {
-
-// PR-519 - One way to name an accessor: 'get aa', not 'get "aa"' [owner]. A
-// duplicate warns first, the worse of two on one token.
-
-// test_cause:
-// ["aa={get \"aa\"(){}}", "property_parse", "expected_a_b", "\"aa\"", 9]
-
-                    warn("expected_a_b", name, id, `"${id}"`);
-                }
                 seen[id] = false;
                 seen_getset[full] = true;
             } else {
@@ -7473,6 +7479,22 @@ function jslint_phase3_parse(state) {
                     warn("duplicate_a", name);
                 }
                 seen[id] = true;
+            }
+            if (
+                name.id === "(string)" &&
+                (typeof extra === "string" || token_nxt.id === "(") &&
+                jslint_rgx_identifier.test(id)
+            ) {
+
+// PR-519 - One way to name an accessor or a method: 'get aa' and 'aa()', not
+// 'get "aa"' and '"aa"()' [owner]. A duplicate warns first, the worse of two on
+// one token.
+
+// test_cause:
+// ["aa={\"aa\"(){}}", "property_parse", "expected_a_b", "\"aa\"", 5]
+// ["aa={get \"aa\"(){}}", "property_parse", "expected_a_b", "\"aa\"", 9]
+
+                warn("expected_a_b", name, id, `"${id}"`);
             }
             if (
                 !name.identifier &&
@@ -7500,7 +7522,7 @@ function jslint_phase3_parse(state) {
             } else if (token_nxt.id === "(") {
 
 // test_cause:
-// ["aa={\"aa\"(){}}", "property_parse", "(live)", "", 0]
+// ["aa={\"a-a\"(){}}", "property_parse", "(live)", "", 0]
 // ["aa={aa()}", "property_parse", "(live)", "", 0]
 // ["aa={get aa(){}}", "property_parse", "(live)", "", 0]
 
@@ -10308,7 +10330,7 @@ function jslint_phase4_walk(state) {
         delete scope_function.loop;
         delete scope_function.switch;
         delete scope_function.try;
-        if (thing.wrapped && !thing.wrapped_operand) {
+        if (thing.wrapped) {
 
 // test_cause:
 // ["aa=(function(){})", "post_s_function", "unexpected_parens", "function", 5]
