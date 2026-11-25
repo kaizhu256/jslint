@@ -1519,16 +1519,6 @@ import moduleFs from "fs";
                 ` ${pr?.head.ref} - merge or close it first`
             );
         }
-        // A squash-base at HEAD, given or by default, even on a re-run, with
-        // nothing pending, appends an empty pull-commit carrying only the
-        // message.
-        if (
-            issueFile.length === 0 &&
-            await gitOutput(["rev-parse", branchSquash]) === head &&
-            !(await gitOutput(["status", "--porcelain"]))
-        ) {
-            log("nothing pending, append an empty pull-commit on HEAD");
-        }
         // The push goes to origin for either remote, so never over a commit
         // HEAD lacks, such as of a pull-request on the other remote, and the
         // lease on the push keeps it so through the slow test.
@@ -1887,9 +1877,8 @@ import moduleFs from "fs";
         await ciWait(remote, "beta");
         // Each force-push below leases the ref fetched before it, so it never
         // overwrites a push made since.
-        await gitRun(["fetch", "origin", "alpha", "beta"]);
-        if (remote === "upstream") {
-            await gitRun(["fetch", "upstream", "alpha", "beta"]);
+        for (const name of new Set(["origin", remote])) {
+            await gitRun(["fetch", name, "alpha", "beta"]);
         }
         // Stop if beta moved during the wait, so cleanup never syncs a beta ci
         // did not pass.
