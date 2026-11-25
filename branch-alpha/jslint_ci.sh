@@ -1189,9 +1189,8 @@ shGithubPrFlow() {(set -e
 #
 # branch <remote> <pr|release> [version] [squash-base]
 #     commit pending changes onto alpha as a pull-commit built from
-#     CHANGELOG.md, squashed onto [squash-base], by default HEAD, or the last
-#     squash-base on a re-run, and push it to origin as branch-p<date> or
-#     branch-v<version>
+#     CHANGELOG.md, squashed onto [squash-base], by default HEAD, and push it
+#     to origin as branch-p<date> or branch-v<version>
 # create <remote> <pr|release> [issue,issue]
 #     open its pull-request against beta
 # merge | merge_rebase | merge_squash <remote>
@@ -1374,7 +1373,6 @@ import moduleFs from "fs";
         let pr;
         let prBranch = "";
         let prXxx;
-        let preSha;
         let res;
         let tip;
         let top;
@@ -1528,23 +1526,9 @@ import moduleFs from "fs";
                 ` ${pr?.head.ref} - merge or close it first`
             );
         }
-        // A re-run, with no squash given, rebuilds everything since the last
-        // squash base, rather than stack a duplicate, an origin test merge or
-        // a hand fix on it.
-        preSha = await gitTry([
-            "rev-parse", "--verify", `refs/heads/__pr_${branchMerge()}_pre`
-        ]);
-        if (
-            !argList[3] &&
-            preSha &&
-            preSha !== head &&
-            await isSquashBase(preSha)
-        ) {
-            branchSquash = `__pr_${branchMerge()}_pre`;
-            log(`re-run, squash ${branchSquash}`);
-        }
-        // A squash-base at HEAD, given or by default, with nothing pending,
-        // appends an empty pull-commit carrying only the message.
+        // A squash-base at HEAD, given or by default, even on a re-run, with
+        // nothing pending, appends an empty pull-commit carrying only the
+        // message.
         if (
             issueFile.length === 0 &&
             await gitOutput(["rev-parse", branchSquash]) === head &&
