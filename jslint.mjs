@@ -5057,31 +5057,24 @@ function jslint_phase3_parse(state) {
 // ["(aa+aa).aa", "check_left", "(live)", "", 0]
 
         const id = left.id;
-        if (
-            !left.identifier &&
-            left.arity !== "ternary" &&
+        if (!(
+            left.identifier ||
+            left.arity === "ternary" ||
             (
-                left.arity !== "binary" ||
+                left.arity === "binary" &&
                 (
-                    id !== "." &&
-                    id !== "?." &&
-                    id !== "(" &&
-                    id !== "[" &&
+                    [".", "?.", "(", "["].includes(id) ||
                     (
-                        !left.wrapped ||
-                        id === "=>" ||
+                        left.wrapped &&
+                        id !== "=>" &&
                         (
-                            right.id !== "." &&
-                            right.id !== "?." &&
-                            right.id !== "[" &&
-                            id !== "&&" &&
-                            id !== "??" &&
-                            id !== "||"
+                            [".", "?.", "["].includes(right.id) ||
+                            ["&&", "??", "||"].includes(id)
                         )
                     )
                 )
             )
-        ) {
+        )) {
             warn("unexpected_a", right);
         }
     }
@@ -5793,7 +5786,6 @@ function jslint_phase3_parse(state) {
 // ["((aa)=>0)()", "infix_lparen", "use_function_immediate", "=>", 6]
 
             warn("use_function_immediate", left);
-            left.wrapped_operand = true;
         }
         the_paren.expression = [left];
         if (token_nxt.id !== ")") {
@@ -6232,15 +6224,16 @@ function jslint_phase3_parse(state) {
 // PR-519 - Bugfix - An arrow function as an operand, as in
 // 'aa || ((bb) => cc)', needs its parens, so post_s_function does not warn
 // unexpected_parens on them. Without them, 'aa || (bb) => cc' is a
-// SyntaxError, like 'aa || bb => cc' below.
+// SyntaxError, like 'aa || bb => cc' below. 'new ((bb) => cc)()' throws.
 
-            if (left.wrapped) {
+            left.wrapped_operand = true;
+            if (the_operator.id === "new") {
 
 // test_cause:
-// ["aa||((aa)=>0)", "parse_expression", "(live)", "", 0]
+// ["new((aa)=>0)", "parse_expression", "unexpected_a", "new", 1]
 
-                left.wrapped_operand = true;
-            } else {
+                warn("unexpected_a", the_operator);
+            } else if (!left.wrapped) {
 
 // test_cause:
 // ["aa||(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "||", 9]
@@ -6291,6 +6284,13 @@ function jslint_phase3_parse(state) {
 // ["new aa=>0", "parse_expression", "wrap_subexpression_a_b", "new", 5]
 
                 warn("wrap_subexpression_a_b", left, "=>", the_operator.id);
+            }
+
+// PR-519 - So does a wrapped arrow function as a left operand, as in
+// '((aa) => bb) || cc' or '((aa) => bb)()'.
+
+            if (left.id === "=>") {
+                left.wrapped_operand = true;
             }
             advance();
             left = the_symbol.led_infix(left);
