@@ -1916,7 +1916,7 @@ import moduleFs from "fs";
         await ciWait(remote, "beta");
         // Keep the backup of the pre-merge alpha on a re-run.
         if (await gitOutput(["rev-parse", "alpha"]) !== sha) {
-            await gitRun(["push", ".", "alpha:__pr_upstream_pre", "-f"]);
+            await gitRun(["push", ".", `alpha:__pr_${remote}_pre`, "-f"]);
         }
         await gitRun(["reset", `${remote}/beta`]);
         await gitRun(["push", ".", "alpha:beta", "-f"]);
@@ -1962,7 +1962,7 @@ import moduleFs from "fs";
                 `:refs/heads/${pr.head.ref}`
             ]);
         }
-        await gitRun(["push", ".", "alpha:__pr_upstream", "-f"]);
+        await gitRun(["push", ".", `alpha:__pr_${remote}`, "-f"]);
         if (isRelease) {
             await release();
         }
