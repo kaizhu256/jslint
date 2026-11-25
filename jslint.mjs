@@ -332,6 +332,7 @@
     reduce,
     repeat,
     replace,
+    replaceAll,
     resolve,
     result,
     reverse,
@@ -7397,10 +7398,22 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["aa={[0]:0}", "property_parse", "expected_a_b", "[0]", 5]
+// ["aa={[0n]:0}", "property_parse", "expected_a_b", "[0n]", 5]
 // ["aa={[\"aa\"\n]:0}", "property_parse", "expected_a_b", "[\"aa\"]", 5]
 // ["aa={[null]:0}", "property_parse", "expected_a_b", "[null]", 5]
 
-                    warn("expected_a_b", name, key, `[${key}]`);
+// PR-519 - A number key suggests its string, '{"16": bb}' for '{[0x1_0]: bb}',
+// since '{16: bb}' warns too.
+
+                    warn("expected_a_b", name, (
+                        value.id === "(number)"
+                        ? JSON.stringify(String(
+                            key.endsWith("n")
+                            ? BigInt(key.slice(0, -1).replaceAll("_", ""))
+                            : Number(key.replaceAll("_", ""))
+                        ))
+                        : key
+                    ), `[${key}]`);
                 }
                 if (typeof extra === "string" || token_nxt.id === "(") {
 
