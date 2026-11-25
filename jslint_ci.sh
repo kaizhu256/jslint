@@ -1889,11 +1889,7 @@ import moduleFs from "fs";
         // overwrites a push made since.
         await gitRun(["fetch", "origin", "alpha", "beta"]);
         if (remote === "upstream") {
-            await gitRun(["fetch", "upstream", "alpha"]);
-        }
-        // Keep the backup of the pre-merge alpha on a re-run.
-        if (await gitOutput(["rev-parse", "alpha"]) !== sha) {
-            await gitRun(["push", ".", `alpha:__pr_${remote}_pre`, "-f"]);
+            await gitRun(["fetch", "upstream", "alpha", "beta"]);
         }
         // Stop if beta moved during the wait, so cleanup never syncs a beta ci
         // did not pass.
@@ -1901,6 +1897,10 @@ import moduleFs from "fs";
             await gitOutput(["rev-parse", `${remote}/beta`]) === sha,
             `shGithubPrFlow cleanup - ${remote}/beta moved during its ci`
         );
+        // Keep the backup of the pre-merge alpha on a re-run.
+        if (await gitOutput(["rev-parse", "alpha"]) !== sha) {
+            await gitRun(["push", ".", `alpha:__pr_${remote}_pre`, "-f"]);
+        }
         await gitRun(["reset", `${remote}/beta`]);
         await gitRun(["push", ".", "alpha:beta", "-f"]);
         await gitRun(["push", "origin", "alpha", "beta", "--force-with-lease"]);
