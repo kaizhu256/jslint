@@ -1895,6 +1895,12 @@ import moduleFs from "fs";
         if (await gitOutput(["rev-parse", "alpha"]) !== sha) {
             await gitRun(["push", ".", `alpha:__pr_${remote}_pre`, "-f"]);
         }
+        // Stop if beta moved during the wait, so cleanup never syncs a beta ci
+        // did not pass.
+        moduleAssert.ok(
+            await gitOutput(["rev-parse", `${remote}/beta`]) === sha,
+            `shGithubPrFlow cleanup - ${remote}/beta moved during its ci`
+        );
         await gitRun(["reset", `${remote}/beta`]);
         await gitRun(["push", ".", "alpha:beta", "-f"]);
         await gitRun(["push", "origin", "alpha", "beta", "--force-with-lease"]);
@@ -2555,7 +2561,7 @@ ${prText.description}
     if (subcmd === "ci_wait") {
         remote = remote.split("/")[0];
         moduleAssert.ok(
-            remote && argList[0].includes("/"),
+            remote && argList[0].includes("/") && argList.length === 1,
             "shGithubPrFlow ci_wait - usage: ci_wait <remote>/<branch>"
         );
         // Wait on the commit the remote holds now, not a stale tracking-ref.
