@@ -1234,6 +1234,7 @@ import moduleFs from "fs";
         subcmd, ...argList
     ] = process.argv.slice(2);
     let modePr = "";
+    let ownerOrigin = "";
     let prText;
     let remote = "";
     async function all() {
@@ -1353,7 +1354,6 @@ import moduleFs from "fs";
                 "grep", "--untracked", "-Eil", "-e", "^ *?(//|#) pr-xxx - "
             ])
         ).split("\n").filter(Boolean);
-        const ownerOrigin = (await repoOf("origin")).split("/")[0];
         const repoRemote = await repoOf(remote);
         let branchPull = "";
         let branchSquash = "HEAD";
@@ -1455,13 +1455,7 @@ import moduleFs from "fs";
                 ` - ${res.status} ${res.text}`
             );
             prBranch = (
-                (
-                    res.json?.state === "open" &&
-                    // Github owners are case-insensitive.
-                    res.json.head?.label?.toLowerCase().startsWith(
-                        `${ownerOrigin.toLowerCase()}:`
-                    )
-                )
+                (res.json?.state === "open" && isOriginHead(res.json))
                 ? res.json.head.label.slice(ownerOrigin.length + 1)
                 : ""
             );
@@ -1826,10 +1820,8 @@ import moduleFs from "fs";
             ` merged as ${sha} - ${res.status}`
         );
         // Origin is the owner of the head label, as <prGet> finds it, so
-        // a renamed fork is still origin. Github owners are case-insensitive.
-        isOrigin = String(pr.head.label).toLowerCase().startsWith(
-            `${repoOrigin.split("/")[0].toLowerCase()}:`
-        );
+        // a renamed fork is still origin.
+        isOrigin = isOriginHead(pr);
         isRefV = pr.head.ref.startsWith("branch-v");
         // Release only a branch-v* head from origin, so a contributor branch of
         // that name cannot push master.
@@ -1952,7 +1944,6 @@ import moduleFs from "fs";
         // whose content HEAD has moved past since.
         const branchPull = await branchPushed();
         const commitMessage = await gitOutput(["log", "-1", "--format=%B"]);
-        const ownerOrigin = (await repoOf("origin")).split("/")[0];
         const prNumber = Number((/^- PR-(\d+) /).exec(commitMessage)?.[1]);
         const repoRemote = await repoOf(remote);
         let pr;
@@ -2082,6 +2073,12 @@ import moduleFs from "fs";
             text
         };
     }
+    function isOriginHead(pr) {
+        // Github owners are case-insensitive.
+        return String(pr?.head?.label).toLowerCase().startsWith(
+            `${ownerOrigin.toLowerCase()}:`
+        );
+    }
     async function isSquashBase(sha) {
 
 // This function will check <sha> lies between <remote>/beta and HEAD, so a
@@ -2200,7 +2197,6 @@ import moduleFs from "fs";
 // branch-v release, since github updates a head sha only after a push.
 
         const head = await gitOutput(["rev-parse", "HEAD"]);
-        const ownerOrigin = (await repoOf("origin")).split("/")[0];
         const res = await githubRequest(
             "GET",
             `/repos/${await repoOf(remote)}/pulls` +
@@ -2211,12 +2207,10 @@ import moduleFs from "fs";
             res.status === 200,
             `shGithubPrFlow ${subcmd} - ${res.status} ${res.text}`
         );
-        // Github owners are case-insensitive.
         list = res.json.filter(function (elem) {
             return (
-                String(elem.head.label).toLowerCase().startsWith(
-                    `${ownerOrigin.toLowerCase()}:branch-`
-                ) &&
+                isOriginHead(elem) &&
+                elem.head.ref.startsWith("branch-") &&
                 (elem.head.sha === head || (
                     // A pr branch is named by its day, so a merged one of
                     // that name may be an earlier pull-request.
@@ -2547,6 +2541,7 @@ ${prText.description}
     // Fail closed, so only a finished step exits 0.
     process.exitCode = 1;
     remote = argList[0] || "";
+    ownerOrigin = (await repoOf("origin")).split("/")[0];
     if (subcmd === "ci_wait") {
         remote = remote.split("/")[0];
         moduleAssert.ok(
