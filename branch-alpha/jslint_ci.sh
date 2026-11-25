@@ -1543,10 +1543,12 @@ import moduleFs from "fs";
             log(`re-run, squash ${branchSquash}`);
         }
         // A pull-commit with nothing in it would push the commits under it
-        // unsquashed, and still exit 0.
+        // unsquashed, and still exit 0, unless a squash-base at HEAD asks for
+        // just that, an empty pull-commit carrying only the message.
         moduleAssert.ok(
             (
                 modePr === "release" ||
+                argList[3] ||
                 issueFile.length > 0 ||
                 await gitOutput(["rev-parse", branchSquash]) !== head ||
                 await gitOutput(["status", "--porcelain"])
