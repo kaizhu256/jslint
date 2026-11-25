@@ -6223,8 +6223,8 @@ function jslint_phase3_parse(state) {
 // PR-519 - Bugfix - An arrow function as an operand, as in
 // 'aa || ((bb) => cc)', needs its parens. Without them,
 // 'aa || (bb) => cc' is a SyntaxError, like 'aa || bb => cc' below, warned at
-// the operator, since an async arrow without await already warns at the arrow.
-// 'new ((bb) => cc)()' throws.
+// the arrow, or at the operator for an async arrow without await, which already
+// warns at the arrow. 'new ((bb) => cc)()' throws.
 
             if (the_operator.id === "new") {
 
@@ -6235,13 +6235,17 @@ function jslint_phase3_parse(state) {
             } else if (!left.wrapped) {
 
 // test_cause:
-// ["aa??(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "??", 3]
-// ["aa||(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "||", 3]
+// ["aa??(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "??", 9]
+// ["aa||(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "||", 9]
 // ["aa||async(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "||", 3]
 
                 warn(
                     "wrap_subexpression_a_b",
-                    the_operator,
+                    (
+                        left.async === 1
+                        ? the_operator
+                        : left
+                    ),
                     "=>",
                     the_operator.id
                 );
@@ -6294,9 +6298,10 @@ function jslint_phase3_parse(state) {
 
 // PR-519 - So does an arrow function as a left operand, as in
 // '((aa) => bb) || cc' or '((aa) => bb)()'. Without them, as in
-// '(aa) => {...}()', it is a SyntaxError.
+// '(aa) => {...}()', it is a SyntaxError. An assignment to it warns
+// bad_assignment_a instead.
 
-            if (left.id === "=>" && !left.wrapped) {
+            if (left.id === "=>" && !left.wrapped && the_symbol.lbp > 20) {
 
 // test_cause:
 // ["
@@ -7490,12 +7495,14 @@ function jslint_phase3_parse(state) {
             if (
                 name.id === "(string)" &&
                 (typeof extra === "string" || token_nxt.id === "(") &&
-                jslint_rgx_identifier.test(id)
+                jslint_rgx_identifier.test(id) &&
+                (option_dict.nomen || !jslint_rgx_weird_property.test(id))
             ) {
 
 // PR-519 - One way to name an accessor or a method: 'get aa' and 'aa()', not
 // 'get "aa"' and '"aa"()' [owner]. A duplicate warns first, the worse of two on
-// one token.
+// one token. A name that would warn weird_property_a, as '"_aa"()', keeps its
+// quotes.
 
 // test_cause:
 // ["aa={\"aa\"(){}}", "property_parse", "expected_a_b", "\"aa\"", 5]

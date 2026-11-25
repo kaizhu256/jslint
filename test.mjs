@@ -1596,7 +1596,7 @@ aa();
 
 // PR-519 - An arrow-function operand keeps the parens it needs.
 
-                "/*jslint fart*/\nString(((aa) => aa) ?? String);",
+                "/*jslint fart*/\nString(String.aa ?? ((aa) => aa));",
                 "/*jslint fart*/\nString(String.aa || ((aa) => aa));",
                 (`
 /*jslint fart*/
@@ -1922,6 +1922,7 @@ String({get [String]() {
 }});
                 `),
                 "String([String, String][0]);",
+                "String({\"_aa\"() {\n    return;\n}});",
                 "String({\"a-b\"() {\n    return;\n}});",
                 "String({[String]() {\n    return;\n}});",
                 "String({[String]: 0});",
@@ -2648,6 +2649,19 @@ ff();
         assertJsonEqual(jslint.jslint("let aa = 2;\naa = aa**2;\n", {
             autofix: true
         }).autofixed, "let aa = 2;\naa = aa ** 2;\n");
+
+// PR-519 - An assignment to an arrow function warns bad_assignment_a, not
+// wrap_subexpression_a_b, whose fix would still be a SyntaxError.
+
+        assertJsonEqual(jslint.jslint(String(`
+/*jslint fart*/
+let aa;
+aa = (bb) => {
+    return bb;
+} = aa;
+        `).trim() + "\n").warnings.map(function ({code}) {
+            return code;
+        }), ["bad_assignment_a", "unexpected_a"]);
     });
     jstestIt((
         "test computed-key handling-behavior"
