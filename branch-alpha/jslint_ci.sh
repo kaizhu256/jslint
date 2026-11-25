@@ -1591,6 +1591,8 @@ import moduleFs from "fs";
     git --no-pager diff "${tip || "HEAD"}"
     git push --atomic origin +alpha:alpha alpha:"${branchPull}" \
         --force-with-lease=refs/heads/"${branchPull}":"${tip}"
+    printf "\n\n\n\n"
+    git --no-pager log --decorate -n 4
 )
         `) !== 0) {
             await Promise.all(fileList.map(function ([file, data]) {
