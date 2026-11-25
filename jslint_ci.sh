@@ -1376,6 +1376,7 @@ import moduleFs from "fs";
         let prXxx;
         let res;
         let tip;
+        let tipAlpha;
         let top;
         let version;
         await modeParse();
@@ -1543,6 +1544,10 @@ import moduleFs from "fs";
         tip = (
             await gitOutput(["ls-remote", "origin", `refs/heads/${branchPull}`])
         ).split("\t")[0];
+        // The force-push of alpha takes a lease too.
+        tipAlpha = (
+            await gitOutput(["ls-remote", "origin", "refs/heads/alpha"])
+        ).split("\t")[0];
         moduleAssert.ok(
             !tip || await gitTryCode([
                 "merge-base", "--is-ancestor", tip, "HEAD"
@@ -1586,7 +1591,8 @@ import moduleFs from "fs";
         "$(git rev-parse __pr_"${branchMerge()}"_pre)" ]
     git push . HEAD:__pr_"${branchMerge()}" -f
     git --no-pager diff "${tip || "HEAD"}"
-    git push --atomic origin +alpha:alpha alpha:"${branchPull}" \
+    git push --atomic origin alpha:alpha alpha:"${branchPull}" \
+        --force-with-lease=refs/heads/alpha:"${tipAlpha}" \
         --force-with-lease=refs/heads/"${branchPull}":"${tip}"
     printf "\n\n\n\n"
     git --no-pager log --decorate -n 4
