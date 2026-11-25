@@ -5065,6 +5065,7 @@ function jslint_phase3_parse(state) {
                     [".", "?.", "(", "["].includes(id) ||
                     (
                         left.wrapped &&
+                        id !== "=>" &&
                         (
                             [".", "?.", "["].includes(right.id) ||
                             ["&&", "??", "||"].includes(id)
@@ -5774,6 +5775,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["((aa)=>0)()", "infix_lparen", "use_function_immediate", "=>", 6]
+// ["aa=((aa)=>0)?.()", "infix_lparen", "use_function_immediate", "=>", 9]
 
             warn("use_function_immediate", left);
         } else if (left.id !== "function") {
@@ -6219,9 +6221,7 @@ function jslint_phase3_parse(state) {
         if (rbp >= 20 && left.id === "=>") {
 
 // PR-519 - Bugfix - An arrow function as an operand, as in
-// 'aa || ((bb) => cc)', needs its parens, so clearing <wrapped> after the loop,
-// where a call or member-access on it still sees them, keeps post_s_function
-// from warning unexpected_parens on them. Without them,
+// 'aa || ((bb) => cc)', needs its parens. Without them,
 // 'aa || (bb) => cc' is a SyntaxError, like 'aa || bb => cc' below, warned at
 // the operator, since an async arrow without await already warns at the arrow.
 // 'new ((bb) => cc)()' throws.
@@ -6235,6 +6235,7 @@ function jslint_phase3_parse(state) {
             } else if (!left.wrapped) {
 
 // test_cause:
+// ["aa??(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "??", 3]
 // ["aa||(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "||", 3]
 // ["aa||async(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "||", 3]
 
@@ -6295,8 +6296,7 @@ function jslint_phase3_parse(state) {
 // '((aa) => bb) || cc' or '((aa) => bb)()'. Without them, as in
 // '(aa) => {...}()', it is a SyntaxError.
 
-            if (left.id === "=>") {
-                if (!left.wrapped) {
+            if (left.id === "=>" && !left.wrapped) {
 
 // test_cause:
 // ["
@@ -6304,15 +6304,19 @@ function jslint_phase3_parse(state) {
 // aa=(aa)=>{}()
 // ", "parse_expression", "wrap_subexpression_a_b", "(", 8]
 
-                    warn("wrap_subexpression_a_b", left, "=>", token_nxt.id);
-                }
-                left.wrapped = false;
+                warn("wrap_subexpression_a_b", left, "=>", token_nxt.id);
             }
             advance();
             left = the_symbol.led_infix(left);
         }
-        if (rbp >= 20 && left.id === "=>") {
-            left.wrapped = false;
+        if (rbp < 20 && left.id === "=>" && left.wrapped) {
+
+// pr-xxx - An arrow function that is no operand needs no parens.
+
+// test_cause:
+// ["aa=((aa)=>0)", "parse_expression", "unexpected_parens", "=>", 9]
+
+            warn("unexpected_parens", left);
         }
         return left;
     }
@@ -10333,7 +10337,7 @@ function jslint_phase4_walk(state) {
         delete scope_function.loop;
         delete scope_function.switch;
         delete scope_function.try;
-        if (thing.wrapped) {
+        if (thing.wrapped && thing.id === "function") {
 
 // test_cause:
 // ["aa=(function(){})", "post_s_function", "unexpected_parens", "function", 5]
