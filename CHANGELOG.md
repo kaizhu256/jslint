@@ -16,7 +16,7 @@
 - jslint - Add html and css linting back into jslint.
 
 # v2026.11.29
-- jslint-ecma - Add ES2015-feature computed property-name '{[aa]: bb}', '{[aa]() {}}', '{get [aa]() {}}', string-key method '{"aa"() {}}' and accessor '{get "aa"() {}}' in object-literal, and 'super.aa' in a method under option this, and warn a constant key '{["aa"]: bb}'; not yet in destructuring.
+- jslint-ecma - Add ES2015-feature computed property-name '{[aa]: bb}', '{[aa]() {}}', '{get [aa]() {}}', string-key method '{"a-b"() {}}' and accessor '{get "a-b"() {}}' in object-literal, and 'super.aa' in a method under option this, and warn a constant key '{["aa"]: bb}'; not yet in destructuring.
 - jslint - Allow member-access on a parenthesized binary-expression '(aa + bb).padEnd(cc)' or any ternary, and a call or tagged-template on a parenthesized '||', '&&' or '??', not only '(aa + bb).slice()', and a subscript of an array- or object-literal '[aa, bb][cc]'.
 - jslint - Warn arrow-function 'aa || bb => cc' as a SyntaxError with wrap_subexpression_a_b, not wrap_fart_parameter, and accept the parens it needs, 'aa || ((bb) => cc)', and warn an arrow-function invoked immediately '((aa) => bb)()', naming '(function () {...}())'.
 - ci - Automate the pull-request and release flow with github-ci waits, each step safe to re-run, on remote origin to test or upstream: 'shGithubPrFlow <branch|create|merge|merge_rebase|merge_squash|cleanup|release|publish> <origin|upstream>', and 'shGithubPrFlow all <origin|upstream> <pr|release>' to resume the whole flow unattended.
