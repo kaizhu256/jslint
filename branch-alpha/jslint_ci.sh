@@ -1556,9 +1556,8 @@ import moduleFs from "fs";
         moduleAssert.ok(
             await shRun(`
 (set -e
-    . ./jslint_ci.sh
     npm run test2
-    shDirHttplinkValidate
+    sh jslint_ci.sh shDirHttplinkValidate
 )
             `) === 0,
             "shGithubPrFlow branch - test failed"
@@ -1577,14 +1576,12 @@ import moduleFs from "fs";
         commitMessage = commitMessage.trim().replace((/\u0027/g), "$&\"$&\"$&");
         if (await shRun(`
 (set -e
-    . ./jslint_ci.sh
-    # Its git output goes to the terminal, through tee, so force color.
     export GIT_CONFIG_COUNT=1
     export GIT_CONFIG_KEY_0=color.ui
     export GIT_CONFIG_VALUE_0=always
     git reset "${branchSquash}"
     git push . HEAD:__pr_"${branchMerge()}"_pre -f
-    shGitSquashPop alpha \u0027${commitMessage}\u0027
+    sh jslint_ci.sh shGitSquashPop alpha \u0027${commitMessage}\u0027
     [ "$(git rev-parse HEAD)" != \
         "$(git rev-parse __pr_"${branchMerge()}"_pre)" ]
     git push . HEAD:__pr_"${branchMerge()}" -f
