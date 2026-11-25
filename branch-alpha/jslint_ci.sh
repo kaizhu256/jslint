@@ -2914,7 +2914,7 @@ import moduleRepl from "repl";
                 switch (match2.split(" ").slice(0, 2).join(" ")) {
                 // syntax-sugar - run git log
                 case "git log":
-                    match2 += " -n 10";
+                    match2 += " --decorate -n 10";
                     break;
                 // syntax-sugar - run ll
                 case "ll":
