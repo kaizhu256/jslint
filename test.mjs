@@ -2552,6 +2552,7 @@ jstestDescribe((
 // parameters, so none is unused, and lists the warning codes it must raise.
 
         for (const [expression, expect] of [
+            ["!((dd) => dd)()", ["use_function_immediate"]],
             ["(-aa) ** 2", []],
             ["-aa ** 2", ["wrap_subexpression_a_b"]],
             ["-aa++", ["unexpected_a"]],
@@ -2560,6 +2561,8 @@ jstestDescribe((
             ["aa ?? (bb || cc)", []],
             ["aa ?? bb && cc", ["wrap_subexpression_a_b"]],
             ["aa ?? bb ?? cc", []],
+            ["aa || ((dd) => dd)", []],
+            ["aa || ((dd) => dd)()", ["use_function_immediate"]],
             ["aa || bb ?? cc", ["wrap_subexpression_a_b"]],
             ["typeof aa ** 2", ["wrap_subexpression_a_b"]]
         ]) {

@@ -6219,8 +6219,9 @@ function jslint_phase3_parse(state) {
         if (rbp >= 20 && left.id === "=>") {
 
 // PR-519 - Bugfix - An arrow function as an operand, as in
-// 'aa || ((bb) => cc)', needs its parens, so clearing <wrapped> keeps
-// post_s_function from warning unexpected_parens on them. Without them,
+// 'aa || ((bb) => cc)', needs its parens, so clearing <wrapped> after the loop,
+// where a call or member-access on it still sees them, keeps post_s_function
+// from warning unexpected_parens on them. Without them,
 // 'aa || (bb) => cc' is a SyntaxError, like 'aa || bb => cc' below, warned at
 // the operator, since an async arrow without await already warns at the arrow.
 // 'new ((bb) => cc)()' throws.
@@ -6244,7 +6245,6 @@ function jslint_phase3_parse(state) {
                     the_operator.id
                 );
             }
-            left.wrapped = false;
         }
 
 // Parse/loop through each symbol in expression.
@@ -6310,6 +6310,9 @@ function jslint_phase3_parse(state) {
             }
             advance();
             left = the_symbol.led_infix(left);
+        }
+        if (rbp >= 20 && left.id === "=>") {
+            left.wrapped = false;
         }
         return left;
     }
