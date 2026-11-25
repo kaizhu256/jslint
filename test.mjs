@@ -1593,6 +1593,11 @@ aa();
                 `)
             ],
             fart: [
+
+// PR-519 - An arrow-function operand keeps the parens it needs.
+
+                "/*jslint fart*/\nString(((aa) => aa) ?? String);",
+                "/*jslint fart*/\nString(String.aa || ((aa) => aa));",
                 (`
 /*jslint fart*/
 let aa = async (bb, [cc, dd], {ee, ff}, ...gg) => {
@@ -1887,7 +1892,40 @@ function aa({constructor}) {
 aa();
                 `)
             ],
+
+// PR-519 - Allow member-access on a parenthesized binary-expression, and a call
+// or tagged-template on '||', '&&' or '??'.
+
+            paren_left: [
+                "(String.aa && String)();",
+                "(String.aa || String)();",
+                "String((String + String).length);",
+                "String((String + String)[0]);",
+                "String((String.aa ?? String)`aa`);",
+                "String((String.aa || String)?.bb);"
+            ],
             property: [
+
+// PR-519 - Allow computed property-name, string-key method and accessor, and a
+// subscript of an array- or object-literal.
+
+                (`
+/*jslint getset*/
+String({get "a-b"() {
+    return;
+}});
+                `),
+                (`
+/*jslint getset*/
+String({get [String]() {
+    return;
+}});
+                `),
+                "String([String, String][0]);",
+                "String({\"a-b\"() {\n    return;\n}});",
+                "String({[String]() {\n    return;\n}});",
+                "String({[String]: 0});",
+                "String({aa: 0}[String]);",
                 "String[`!`]();"
             ],
             regexp: [
@@ -2607,6 +2645,30 @@ ff();
         assertJsonEqual(jslint.jslint("let aa = 2;\naa = aa**2;\n", {
             autofix: true
         }).autofixed, "let aa = 2;\naa = aa ** 2;\n");
+    });
+    jstestIt((
+        "test computed-key-suggestion handling-behavior"
+    ), function () {
+
+// PR-519 - A constant computed key suggests the key it equals, and the
+// suggested fix lints clean.
+
+        for (const [source, expect] of [
+            ["String({[\"aa\"]: 0});", "\"aa\""],
+            ["String({[0]: 0});", "\"0\""],
+            ["String({[0x1_0]: 0});", "\"16\""],
+            ["String({[1n]: 0});", "\"1\""],
+            ["String({[null]: 0});", "null"]
+        ]) {
+            const [warning] = jslint.jslint(source, {
+                beta: true
+            }).warnings;
+            assertJsonEqual(warning.a, expect, source);
+            assertJsonEqual(jslint.jslint(
+                source.replace(warning.b, warning.a),
+                {beta: true}
+            ).warnings, [], source);
+        }
     });
     jstestIt((
         "test warning-test-cause handling-behavior"

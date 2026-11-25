@@ -7399,6 +7399,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa={[0]:0}", "property_parse", "expected_a_b", "[0]", 5]
 // ["aa={[0n]:0}", "property_parse", "expected_a_b", "[0n]", 5]
+// ["aa={[0x1_0]:0}", "property_parse", "expected_a_b", "[0x1_0]", 5]
 // ["aa={[\"aa\"\n]:0}", "property_parse", "expected_a_b", "[\"aa\"]", 5]
 // ["aa={[null]:0}", "property_parse", "expected_a_b", "[null]", 5]
 
