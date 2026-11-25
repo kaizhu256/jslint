@@ -1189,7 +1189,8 @@ shGithubPrFlow() {(set -e
 #
 # branch <remote> <pr|release> [version] [squash-base]
 #     commit pending changes onto alpha as a pull-commit built from
-#     CHANGELOG.md, and push it to origin as branch-p<date> or
+#     CHANGELOG.md, squashed onto [squash-base], by default HEAD, or the last
+#     squash-base on a re-run, and push it to origin as branch-p<date> or
 #     branch-v<version>
 # create <remote> <pr|release> [issue,issue]
 #     open its pull-request against beta
@@ -1542,19 +1543,15 @@ import moduleFs from "fs";
             branchSquash = `__pr_${branchMerge()}_pre`;
             log(`re-run, squash ${branchSquash}`);
         }
-        // A pull-commit with nothing in it would push the commits under it
-        // unsquashed, and still exit 0, unless a squash-base at HEAD asks for
-        // just that, an empty pull-commit carrying only the message.
-        moduleAssert.ok(
-            (
-                modePr === "release" ||
-                argList[3] ||
-                issueFile.length > 0 ||
-                await gitOutput(["rev-parse", branchSquash]) !== head ||
-                await gitOutput(["status", "--porcelain"])
-            ),
-            "shGithubPrFlow branch - nothing to commit - pass a squash-base"
-        );
+        // A squash-base at HEAD, given or by default, with nothing pending,
+        // appends an empty pull-commit carrying only the message.
+        if (
+            issueFile.length === 0 &&
+            await gitOutput(["rev-parse", branchSquash]) === head &&
+            !(await gitOutput(["status", "--porcelain"]))
+        ) {
+            log("nothing pending, append an empty pull-commit on HEAD");
+        }
         // The push goes to origin for either remote, so never over a commit
         // HEAD lacks, such as of a pull-request on the other remote, and the
         // lease on the push keeps it so through the slow test.
