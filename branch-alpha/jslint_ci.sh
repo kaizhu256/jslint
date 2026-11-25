@@ -1578,6 +1578,10 @@ import moduleFs from "fs";
         if (await shRun(`
 (set -e
     . ./jslint_ci.sh
+    # Its git output goes to the terminal, through tee, so force color.
+    export GIT_CONFIG_COUNT=1
+    export GIT_CONFIG_KEY_0=color.ui
+    export GIT_CONFIG_VALUE_0=always
     git reset "${branchSquash}"
     git push . HEAD:__pr_"${branchMerge()}"_pre -f
     shGitSquashPop alpha \u0027${commitMessage}\u0027
@@ -2071,7 +2075,10 @@ import moduleFs from "fs";
     }
     function gitTryCode(list) {
         return new Promise(function (resolve) {
-            moduleChildProcess.spawn("git", list, {
+            // Its output goes to the terminal, through tee, so force color.
+            moduleChildProcess.spawn("git", [
+                "-c", "color.ui=always", ...list
+            ], {
                 stdio: ["ignore", 1, 2]
             }).on("exit", resolve);
         });
