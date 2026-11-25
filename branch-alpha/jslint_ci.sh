@@ -2075,10 +2075,7 @@ import moduleFs from "fs";
     }
     function gitTryCode(list) {
         return new Promise(function (resolve) {
-            // Its output goes to the terminal, through tee, so force color.
-            moduleChildProcess.spawn("git", [
-                "-c", "color.ui=always", ...list
-            ], {
+            moduleChildProcess.spawn("git", list, {
                 stdio: ["ignore", 1, 2]
             }).on("exit", resolve);
         });
