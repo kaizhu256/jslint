@@ -1031,7 +1031,7 @@ shGitSquashPop() {(set -e
     # commit HEAD immediately after previous $COMMIT
     git commit --allow-empty -am "$MESSAGE" || true
     printf "\n\n\n\n"
-    git --no-pager log -n 4
+    git --no-pager log --decorate -n 4
 )}
 
 shGithubCheckoutRemote() {(set -e
