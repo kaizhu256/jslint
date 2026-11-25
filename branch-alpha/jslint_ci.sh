@@ -1185,7 +1185,8 @@ shGithubFileUpload() {(set -e
 shGithubPrFlow() {(set -e
 # This function will run one step of the pull-request and release flow on
 # remote <origin|upstream>, where origin tests the flow on the fork. Every step
-# is safe to re-run except create, since a pull-request is created once.
+# is safe to re-run except create, since a pull-request is created once, and
+# branch, which appends another pull-commit.
 #
 # branch <remote> <pr|release> [version] [squash-base]
 #     commit pending changes onto alpha as a pull-commit built from

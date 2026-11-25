@@ -1091,8 +1091,8 @@ if (false) {
         # re-run until version propagates
         npm run test2
 
-        # commit pending changes onto alpha, push branch-p20yy.mm.dd,
-        # print title, description
+        # append a pull-commit onto alpha, holding any pending changes,
+        # push branch-p20yy.mm.dd, print title, description
         sh jslint_ci.sh shGithubPrFlow branch upstream pr # v20yy.mm.dd __pr_beta_pre
 
         # open pull-request against beta
@@ -1111,7 +1111,8 @@ if (false) {
         sh jslint_ci.sh shGithubPrFlow cleanup upstream
         ```
     - or run every step above unattended, safe to re-run, resuming where it
-      stopped
+      stopped, except a re-run after branch but before create, which appends
+      a second pull-commit
         ```shell
         sh jslint_ci.sh shGithubPrFlow all upstream pr # v20yy.mm.dd __pr_beta_pre
         ```
