@@ -1798,11 +1798,7 @@ import moduleFs from "fs";
             msDispatch = Date.parse(result.date) - 5000;
         }
         await ciPoll({
-            describe: function (runList) {
-                return runList.map(function (run) {
-                    return `${run.name} ${run.status} ${run.conclusion}`;
-                }).join(", ");
-            },
+            describe: runListDescribe,
             isOldOk: true,
             label: `${repo} ${branchName}`,
             name: "ci_wait",
@@ -1920,17 +1916,23 @@ import moduleFs from "fs";
             }
         }
         await ciWait(remote, "beta");
+        // Each force-push below leases the ref fetched here, so it never
+        // overwrites a push made since.
+        await gitRun(["fetch", "origin", "alpha", "beta", "master"]);
+        if (remote === "upstream") {
+            await gitRun(["fetch", "upstream", "alpha"]);
+        }
         // Keep the backup of the pre-merge alpha on a re-run.
         if (await gitOutput(["rev-parse", "alpha"]) !== sha) {
             await gitRun(["push", ".", `alpha:__pr_${remote}_pre`, "-f"]);
         }
         await gitRun(["reset", `${remote}/beta`]);
         await gitRun(["push", ".", "alpha:beta", "-f"]);
-        await gitRun(["push", "origin", "alpha", "beta", "-f"]);
+        await gitRun(["push", "origin", "alpha", "beta", "--force-with-lease"]);
         await ciWait("origin", "alpha");
         await ciWait("origin", "beta");
         if (remote === "upstream") {
-            await gitRun(["push", "upstream", "alpha", "-f"]);
+            await gitRun(["push", "upstream", "alpha", "--force-with-lease"]);
             await ciWait("upstream", "alpha");
         }
         if (isRelease) {
@@ -1940,7 +1942,9 @@ import moduleFs from "fs";
             // release after it.
             await gitRun(["push", ".", "beta:master", "-f"]);
             if (remote === "upstream") {
-                await gitRun(["push", "origin", "master", "-f"]);
+                await gitRun([
+                    "push", "origin", "master", "--force-with-lease"
+                ]);
                 await ciWait("origin", "master");
             }
             await gitRun(["push", remote, "master"]);
@@ -2380,11 +2384,7 @@ ${prText.description}
         }
         // Wait for the newest publish.yml run the release started.
         await ciPoll({
-            describe: function (runList) {
-                return runList.map(function (run) {
-                    return `${run.name} ${run.status} ${run.conclusion}`;
-                }).join(", ");
-            },
+            describe: runListDescribe,
             isOldOk: true,
             label: `${repoRemote} publish.yml v${top.version}`,
             name: "publish",
@@ -2477,6 +2477,11 @@ ${prText.description}
             `shGithubPrFlow ${subcmd} - cannot parse url of remote ${name}`
         );
         return repo;
+    }
+    function runListDescribe(runList) {
+        return runList.map(function (run) {
+            return `${run.name} ${run.status} ${run.conclusion}`;
+        }).join(", ");
     }
     function shRun(script) {
         return new Promise(function (resolve) {
