@@ -1885,9 +1885,9 @@ import moduleFs from "fs";
             }
         }
         await ciWait(remote, "beta");
-        // Each force-push below leases the ref fetched here, so it never
+        // Each force-push below leases the ref fetched before it, so it never
         // overwrites a push made since.
-        await gitRun(["fetch", "origin", "alpha", "beta", "master"]);
+        await gitRun(["fetch", "origin", "alpha", "beta"]);
         if (remote === "upstream") {
             await gitRun(["fetch", "upstream", "alpha"]);
         }
@@ -1911,6 +1911,7 @@ import moduleFs from "fs";
             // release after it.
             await gitRun(["push", ".", "beta:master", "-f"]);
             if (remote === "upstream") {
+                await gitRun(["fetch", "origin", "master"]);
                 await gitRun([
                     "push", "origin", "master", "--force-with-lease"
                 ]);
