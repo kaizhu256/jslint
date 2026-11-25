@@ -1077,15 +1077,6 @@ shGithubCheckoutRemote() {(set -e
     done
 )}
 
-shGithubCiWait() {(set -e
-# This function will run shGithubPrFlow ci_wait.
-#
-# example usage:
-# shGithubCiWait upstream/beta
-# shGithubCiWait upstream/beta dispatch
-    shGithubPrFlow ci_wait "$@"
-)}
-
 shGithubFileDownload() {(set -e
 # This function will download file $1 from github repo/branch.
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
@@ -1207,7 +1198,7 @@ shGithubPrFlow() {(set -e
 # all <remote> <pr|release> [version] [squash-base]
 #     branch, create, merge (pr) or merge_squash (release), and cleanup,
 #     resuming by state, and never publish
-# ci_wait <remote>/<branch> [dispatch]
+# ci_wait <remote>/<branch>
 #     wait for the newest github-ci runs on the commit at <remote>/<branch>
 #
 # example usage:
@@ -1767,36 +1758,15 @@ import moduleFs from "fs";
             });
         }
     }
-    async function ciWait(remoteName, branchName, mode) {
+    async function ciWait(remoteName, branchName) {
 
 // This function will wait for the newest github-ci runs on the commit at
-// <remoteName>/<branchName>. Mode dispatch first triggers workflow ci.yml on
-// <branchName>, then waits only for runs created after that.
+// <remoteName>/<branchName>.
 
         const repo = await repoOf(remoteName);
         const sha = await gitOutput([
             "rev-parse", `refs/remotes/${remoteName}/${branchName}`
         ]);
-        let msDispatch = 0;
-        let result;
-        moduleAssert.ok(
-            !mode || mode === "dispatch",
-            `shGithubPrFlow ci_wait - unknown mode "${mode}"`
-        );
-        if (mode === "dispatch") {
-            result = await githubRequest(
-                "POST",
-                `/repos/${repo}/actions/workflows/ci.yml/dispatches`,
-                {ref: branchName}
-            );
-            moduleAssert.ok(
-                result.status === 204,
-                `shGithubPrFlow ci_wait - dispatch - ${result.status}` +
-                ` ${result.text}`
-            );
-            // Use the clock of github, which stamps the run, minus 5s of skew.
-            msDispatch = Date.parse(result.date) - 5000;
-        }
         await ciPoll({
             describe: runListDescribe,
             isOldOk: true,
@@ -1812,9 +1782,8 @@ import moduleFs from "fs";
                 // later entry of the same workflow overwrites an earlier one.
                 return Object.values(Object.fromEntries(
                     json.workflow_runs.filter(function (run) {
-                        return (
-                            ["push", "workflow_dispatch"].includes(run.event) &&
-                            Date.parse(run.created_at) >= msDispatch
+                        return ["push", "workflow_dispatch"].includes(
+                            run.event
                         );
                     }).sort(function (aa, bb) {
                         return aa.run_number - bb.run_number;
@@ -2586,12 +2555,11 @@ ${prText.description}
         remote = remote.split("/")[0];
         moduleAssert.ok(
             remote && argList[0].includes("/"),
-            "shGithubPrFlow ci_wait - usage: ci_wait <remote>/<branch>" +
-            " [dispatch]"
+            "shGithubPrFlow ci_wait - usage: ci_wait <remote>/<branch>"
         );
         // Wait on the commit the remote holds now, not a stale tracking-ref.
         await gitRun(["fetch", remote, argList[0].slice(remote.length + 1)]);
-        await ciWait(remote, argList[0].slice(remote.length + 1), argList[1]);
+        await ciWait(remote, argList[0].slice(remote.length + 1));
     } else {
         const stepDict = {
             all,
