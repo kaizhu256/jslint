@@ -1596,7 +1596,7 @@ aa();
 
 // PR-519 - An arrow-function operand keeps the parens it needs.
 
-                "/*jslint fart*/\nString(((aa) => aa) ?? String);",
+                "/*jslint fart*/\nString(String.aa ?? ((aa) => aa));",
                 "/*jslint fart*/\nString(String.aa || ((aa) => aa));",
                 (`
 /*jslint fart*/
@@ -1922,7 +1922,9 @@ String({get [String]() {
 }});
                 `),
                 "String([String, String][0]);",
+                "String({\"_aa\"() {\n    return;\n}});",
                 "String({\"a-b\"() {\n    return;\n}});",
+                "String({\"function\"() {\n    return;\n}});",
                 "String({[String]() {\n    return;\n}});",
                 "String({[String]: 0});",
                 "String({aa: 0}[String]);",
@@ -2648,6 +2650,29 @@ ff();
         assertJsonEqual(jslint.jslint("let aa = 2;\naa = aa**2;\n", {
             autofix: true
         }).autofixed, "let aa = 2;\naa = aa ** 2;\n");
+
+// PR-519 - An assignment or '++' to an arrow function warns bad_assignment_a,
+// not wrap_subexpression_a_b, whose fix would still be a SyntaxError. Extra
+// parens around an arrow warn once, at the extra pair.
+
+        for (const [source, expect] of [
+            ["aa = (((bb) => bb))++;", [
+                "unexpected_a", "bad_assignment_a", "unexpected_a"
+            ]],
+            ["aa = (bb) => {\n    return bb;\n} = aa;", [
+                "bad_assignment_a", "unexpected_a"
+            ]],
+            ["aa = (bb) => {\n    return bb;\n}++;", [
+                "bad_assignment_a", "unexpected_a"
+            ]],
+            ["aa = aa || (((bb) => bb));", ["unexpected_a"]]
+        ]) {
+            assertJsonEqual(jslint.jslint(
+                `/*jslint fart*/\nlet aa;\n${source}\n`
+            ).warnings.map(function ({code}) {
+                return code;
+            }), expect, source);
+        }
     });
     jstestIt((
         "test computed-key handling-behavior"
