@@ -6322,7 +6322,7 @@ function jslint_phase3_parse(state) {
         }
         if (rbp < 20 && left.id === "=>" && left.wrapped && !mode_paren) {
 
-// pr-xxx - An arrow function that is no operand needs no parens. Inside more
+// PR-519 - An arrow function that is no operand needs no parens. Inside more
 // parens, as in '(((aa) => bb))', <prefix_lparen> warns the extra pair instead.
 
 // test_cause:
