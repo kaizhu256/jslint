@@ -1077,15 +1077,6 @@ shGithubCheckoutRemote() {(set -e
     done
 )}
 
-shGithubCiWait() {(set -e
-# This function will run shGithubPrFlow ci_wait.
-#
-# example usage:
-# shGithubCiWait upstream/beta
-# shGithubCiWait upstream/beta dispatch
-    shGithubPrFlow ci_wait "$@"
-)}
-
 shGithubFileDownload() {(set -e
 # This function will download file $1 from github repo/branch.
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
@@ -1207,7 +1198,7 @@ shGithubPrFlow() {(set -e
 # all <remote> <pr|release> [version] [squash-base]
 #     branch, create, merge (pr) or merge_squash (release), and cleanup,
 #     resuming by state, and never publish
-# ci_wait <remote>/<branch> [dispatch]
+# ci_wait <remote>/<branch>
 #     wait for the newest github-ci runs on the commit at <remote>/<branch>
 #
 # example usage:
@@ -1376,6 +1367,7 @@ import moduleFs from "fs";
         let prXxx;
         let res;
         let tip;
+        let tipAlpha;
         let top;
         let version;
         await modeParse();
@@ -1543,6 +1535,10 @@ import moduleFs from "fs";
         tip = (
             await gitOutput(["ls-remote", "origin", `refs/heads/${branchPull}`])
         ).split("\t")[0];
+        // The force-push of alpha takes a lease too.
+        tipAlpha = (
+            await gitOutput(["ls-remote", "origin", "refs/heads/alpha"])
+        ).split("\t")[0];
         moduleAssert.ok(
             !tip || await gitTryCode([
                 "merge-base", "--is-ancestor", tip, "HEAD"
@@ -1586,7 +1582,8 @@ import moduleFs from "fs";
         "$(git rev-parse __pr_"${branchMerge()}"_pre)" ]
     git push . HEAD:__pr_"${branchMerge()}" -f
     git --no-pager diff "${tip || "HEAD"}"
-    git push --atomic origin +alpha:alpha alpha:"${branchPull}" \
+    git push --atomic origin alpha:alpha alpha:"${branchPull}" \
+        --force-with-lease=refs/heads/alpha:"${tipAlpha}" \
         --force-with-lease=refs/heads/"${branchPull}":"${tip}"
     printf "\n\n\n\n"
     git --no-pager log --decorate -n 4
@@ -1761,42 +1758,17 @@ import moduleFs from "fs";
             });
         }
     }
-    async function ciWait(remoteName, branchName, mode) {
+    async function ciWait(remoteName, branchName) {
 
 // This function will wait for the newest github-ci runs on the commit at
-// <remoteName>/<branchName>. Mode dispatch first triggers workflow ci.yml on
-// <branchName>, then waits only for runs created after that.
+// <remoteName>/<branchName>.
 
         const repo = await repoOf(remoteName);
         const sha = await gitOutput([
             "rev-parse", `refs/remotes/${remoteName}/${branchName}`
         ]);
-        let msDispatch = 0;
-        let result;
-        moduleAssert.ok(
-            !mode || mode === "dispatch",
-            `shGithubPrFlow ci_wait - unknown mode "${mode}"`
-        );
-        if (mode === "dispatch") {
-            result = await githubRequest(
-                "POST",
-                `/repos/${repo}/actions/workflows/ci.yml/dispatches`,
-                {ref: branchName}
-            );
-            moduleAssert.ok(
-                result.status === 204,
-                `shGithubPrFlow ci_wait - dispatch - ${result.status}` +
-                ` ${result.text}`
-            );
-            // Use the clock of github, which stamps the run, minus 5s of skew.
-            msDispatch = Date.parse(result.date) - 5000;
-        }
         await ciPoll({
-            describe: function (runList) {
-                return runList.map(function (run) {
-                    return `${run.name} ${run.status} ${run.conclusion}`;
-                }).join(", ");
-            },
+            describe: runListDescribe,
             isOldOk: true,
             label: `${repo} ${branchName}`,
             name: "ci_wait",
@@ -1810,9 +1782,8 @@ import moduleFs from "fs";
                 // later entry of the same workflow overwrites an earlier one.
                 return Object.values(Object.fromEntries(
                     json.workflow_runs.filter(function (run) {
-                        return (
-                            ["push", "workflow_dispatch"].includes(run.event) &&
-                            Date.parse(run.created_at) >= msDispatch
+                        return ["push", "workflow_dispatch"].includes(
+                            run.event
                         );
                     }).sort(function (aa, bb) {
                         return aa.run_number - bb.run_number;
@@ -1914,17 +1885,23 @@ import moduleFs from "fs";
             }
         }
         await ciWait(remote, "beta");
+        // Each force-push below leases the ref fetched here, so it never
+        // overwrites a push made since.
+        await gitRun(["fetch", "origin", "alpha", "beta", "master"]);
+        if (remote === "upstream") {
+            await gitRun(["fetch", "upstream", "alpha"]);
+        }
         // Keep the backup of the pre-merge alpha on a re-run.
         if (await gitOutput(["rev-parse", "alpha"]) !== sha) {
-            await gitRun(["push", ".", "alpha:__pr_upstream_pre", "-f"]);
+            await gitRun(["push", ".", `alpha:__pr_${remote}_pre`, "-f"]);
         }
         await gitRun(["reset", `${remote}/beta`]);
         await gitRun(["push", ".", "alpha:beta", "-f"]);
-        await gitRun(["push", "origin", "alpha", "beta", "-f"]);
+        await gitRun(["push", "origin", "alpha", "beta", "--force-with-lease"]);
         await ciWait("origin", "alpha");
         await ciWait("origin", "beta");
         if (remote === "upstream") {
-            await gitRun(["push", "upstream", "alpha", "-f"]);
+            await gitRun(["push", "upstream", "alpha", "--force-with-lease"]);
             await ciWait("upstream", "alpha");
         }
         if (isRelease) {
@@ -1934,7 +1911,9 @@ import moduleFs from "fs";
             // release after it.
             await gitRun(["push", ".", "beta:master", "-f"]);
             if (remote === "upstream") {
-                await gitRun(["push", "origin", "master", "-f"]);
+                await gitRun([
+                    "push", "origin", "master", "--force-with-lease"
+                ]);
                 await ciWait("origin", "master");
             }
             await gitRun(["push", remote, "master"]);
@@ -1962,7 +1941,7 @@ import moduleFs from "fs";
                 `:refs/heads/${pr.head.ref}`
             ]);
         }
-        await gitRun(["push", ".", "alpha:__pr_upstream", "-f"]);
+        await gitRun(["push", ".", `alpha:__pr_${remote}`, "-f"]);
         if (isRelease) {
             await release();
         }
@@ -2374,11 +2353,7 @@ ${prText.description}
         }
         // Wait for the newest publish.yml run the release started.
         await ciPoll({
-            describe: function (runList) {
-                return runList.map(function (run) {
-                    return `${run.name} ${run.status} ${run.conclusion}`;
-                }).join(", ");
-            },
+            describe: runListDescribe,
             isOldOk: true,
             label: `${repoRemote} publish.yml v${top.version}`,
             name: "publish",
@@ -2471,6 +2446,11 @@ ${prText.description}
             `shGithubPrFlow ${subcmd} - cannot parse url of remote ${name}`
         );
         return repo;
+    }
+    function runListDescribe(runList) {
+        return runList.map(function (run) {
+            return `${run.name} ${run.status} ${run.conclusion}`;
+        }).join(", ");
     }
     function shRun(script) {
         return new Promise(function (resolve) {
@@ -2575,12 +2555,11 @@ ${prText.description}
         remote = remote.split("/")[0];
         moduleAssert.ok(
             remote && argList[0].includes("/"),
-            "shGithubPrFlow ci_wait - usage: ci_wait <remote>/<branch>" +
-            " [dispatch]"
+            "shGithubPrFlow ci_wait - usage: ci_wait <remote>/<branch>"
         );
         // Wait on the commit the remote holds now, not a stale tracking-ref.
         await gitRun(["fetch", remote, argList[0].slice(remote.length + 1)]);
-        await ciWait(remote, argList[0].slice(remote.length + 1), argList[1]);
+        await ciWait(remote, argList[0].slice(remote.length + 1));
     } else {
         const stepDict = {
             all,
